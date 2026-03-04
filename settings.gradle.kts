@@ -28,7 +28,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-include(":sharedUI")
 include(":androidApp")
 include(":desktopApp")
+include(":shared:compose")
 

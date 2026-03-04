@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
@@ -60,7 +58,7 @@ kotlin {
         .configureEach {
             binaries {
                 framework {
-                    baseName = "SharedUI"
+                    baseName = "compose"
                     isStatic = true
                 }
             }
