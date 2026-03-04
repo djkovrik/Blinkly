@@ -7,14 +7,14 @@ plugins {
 }
 
 android {
-    namespace = "com.sedsoftware.blinkly.androidApp"
+    namespace = "com.sedsoftware.blinkly"
     compileSdk = 36
 
     defaultConfig {
         minSdk = 23
         targetSdk = 36
 
-        applicationId = "com.sedsoftware.blinkly.androidApp"
+        applicationId = "com.sedsoftware.blinkly"
         versionCode = 1
         versionName = "1.0.0"
     }
@@ -30,6 +30,6 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":compose"))
+    implementation(project(":sharedUI"))
     implementation(libs.androidx.activityCompose)
 }

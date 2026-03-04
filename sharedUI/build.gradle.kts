@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
@@ -11,8 +13,9 @@ plugins {
 }
 
 kotlin {
-    @Suppress("DEPRECATION")
     androidTarget() //We need the deprecated target to have working previews
+
+    jvm()
 
     iosX64()
     iosArm64()
@@ -44,6 +47,11 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
         }
 
+        jvmMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
+        }
+
     }
 
     targets
@@ -52,7 +60,7 @@ kotlin {
         .configureEach {
             binaries {
                 framework {
-                    baseName = "compose"
+                    baseName = "SharedUI"
                     isStatic = true
                 }
             }
@@ -81,6 +89,7 @@ room {
 dependencies {
     with(libs.room.compiler) {
         add("kspAndroid", this)
+        add("kspJvm", this)
         add("kspIosX64", this)
         add("kspIosArm64", this)
         add("kspIosSimulatorArm64", this)
