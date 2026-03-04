@@ -8,6 +8,7 @@ import platform.UIKit.UIStatusBarStyleLightContent
 import platform.UIKit.UIViewController
 import platform.UIKit.setStatusBarStyle
 
+@Suppress("FunctionNaming")
 fun MainViewController(): UIViewController = ComposeUIViewController { 
     App(onThemeChanged = { ThemeChanged(it) })
 }

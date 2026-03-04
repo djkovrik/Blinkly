@@ -27,10 +27,9 @@ kotlin {
             api(libs.compose.resources)
             api(libs.compose.ui.tooling.preview)
             api(libs.compose.material3)
-            implementation(libs.kermit)
+            implementation(libs.lib.kermit)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.multiplatformSettings)
             implementation(libs.kotlinx.datetime)
             implementation(libs.room.runtime)
         }
@@ -38,7 +37,7 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.compose.ui.test)
-            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.test.kotlin.coroutines)
         }
 
         androidMain.dependencies {
@@ -68,6 +67,7 @@ kotlin {
 dependencies {
     debugImplementation(libs.compose.ui.tooling)
 }
+
 android {
     namespace = "com.sedsoftware.blinkly"
     compileSdk = 36
