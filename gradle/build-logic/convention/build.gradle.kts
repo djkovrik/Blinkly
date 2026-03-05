@@ -20,5 +20,9 @@ gradlePlugin {
             id = "blinkly.config.multiplatform"
             implementationClass = "com.sedsoftware.blinkly.convention.ConfigureMultiplatformPlugin"
         }
+        register("printLineCoverage") {
+            id = "blinkly.config.printcoverage"
+            implementationClass = "com.sedsoftware.blinkly.convention.PrintLineCoveragePlugin"
+        }
     }
 }

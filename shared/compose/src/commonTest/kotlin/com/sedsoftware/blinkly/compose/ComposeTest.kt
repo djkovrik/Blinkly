@@ -1,4 +1,4 @@
-package com.sedsoftware.blinkly
+package com.sedsoftware.blinkly.compose
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -26,11 +26,11 @@ class ComposeTest {
             Column {
                 Text(
                     text = txt,
-                    modifier = Modifier.testTag("t_text")
+                    modifier = Modifier.Companion.testTag("t_text")
                 )
                 Button(
                     onClick = { txt += "." },
-                    modifier = Modifier.testTag("t_button")
+                    modifier = Modifier.Companion.testTag("t_button")
                 ) {
                     Text("click me")
                 }

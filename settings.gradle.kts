@@ -32,6 +32,7 @@ include(
     ":androidApp",
     ":desktopApp",
     ":shared:compose",
+    ":shared:domain",
 )
 
 includeBuild("gradle/build-logic")

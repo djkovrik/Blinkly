@@ -1,5 +1,3 @@
-import javax.xml.parsers.DocumentBuilderFactory
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform).apply(false)
     alias(libs.plugins.compose.compiler).apply(false)
@@ -14,6 +12,7 @@ plugins {
     alias(libs.plugins.mokkery).apply(false)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kover)
+    alias(libs.plugins.coverage)
 }
 
 detekt {
@@ -52,7 +51,7 @@ kover {
             }
             includes {
                 classes(
-                    "com.sedsoftware.blinkly.*.domain.*",
+                    "com.sedsoftware.blinkly.domain.*",
                     "com.sedsoftware.blinkly.*.extension.*",
                     "com.sedsoftware.blinkly.*.integration.*Default",
                     "com.sedsoftware.blinkly.*.store.*",
@@ -72,39 +71,4 @@ dependencies {
 
     detektPlugins(libs.lib.detekt.compose)
     detektPlugins(libs.lib.detekt.decompose)
-}
-
-// Src: https://bitspittle.dev/blog/2022/kover-badge
-tasks.register("printLineCoverage") {
-    group = "verification"
-    dependsOn("koverXmlReport")
-    doLast {
-        val report = file("${rootProject.projectDir}/build/reports/kover/report.xml")
-
-        val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(report)
-        val rootNode = doc.firstChild
-        var childNode = rootNode.firstChild
-
-        var coveragePercent = 0.0
-
-        while (childNode != null) {
-            if (childNode.nodeName == "counter") {
-                val typeAttr = childNode.attributes.getNamedItem("type")
-                if (typeAttr.textContent == "LINE") {
-                    val missedAttr = childNode.attributes.getNamedItem("missed")
-                    val coveredAttr = childNode.attributes.getNamedItem("covered")
-
-                    val missed = missedAttr.textContent.toLong()
-                    val covered = coveredAttr.textContent.toLong()
-
-                    coveragePercent = (covered * 100.0) / (missed + covered)
-
-                    break
-                }
-            }
-            childNode = childNode.nextSibling
-        }
-
-        println("%.1f".format(coveragePercent))
-    }
 }

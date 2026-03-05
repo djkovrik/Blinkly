@@ -1,4 +1,4 @@
-package com.sedsoftware.blinkly.theme
+package com.sedsoftware.blinkly.compose.theme
 
 import androidx.compose.ui.graphics.Color
 

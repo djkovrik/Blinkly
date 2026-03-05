@@ -1,4 +1,4 @@
-package com.sedsoftware.blinkly
+package com.sedsoftware.blinkly.compose
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -44,8 +44,8 @@ import blinkly.shared.compose.generated.resources.open_github
 import blinkly.shared.compose.generated.resources.run
 import blinkly.shared.compose.generated.resources.stop
 import blinkly.shared.compose.generated.resources.theme
-import com.sedsoftware.blinkly.theme.AppTheme
-import com.sedsoftware.blinkly.theme.LocalThemeIsDark
+import com.sedsoftware.blinkly.compose.theme.AppTheme
+import com.sedsoftware.blinkly.compose.theme.LocalThemeIsDark
 import kotlinx.coroutines.isActive
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource

@@ -69,7 +69,7 @@ dependencies {
 }
 
 android {
-    namespace = "com.sedsoftware.blinkly"
+    namespace = "com.sedsoftware.blinkly.compose"
     compileSdk = 36
     defaultConfig {
         minSdk = 23
