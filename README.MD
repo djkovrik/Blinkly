@@ -13,10 +13,14 @@ Kotlin Multiplatform app for eye health support
 * Progress tracking & calendar 📈
 * Grow your garden 🌱
 * Daily eye tips 💡
+* 50 achievements to unlock 🏆
 
 ### Used libraries
 * [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform)
 * [Decompose](https://github.com/arkivanov/Decompose/)
 * [MVIKotlin](https://github.com/arkivanov/MVIKotlin/)
-* [Multiplatform Settings](https://github.com/russhwolf/multiplatform-settings)
 * [Room](https://developer.android.com/kotlin/multiplatform/room)
+* [Multiplatform Settings](https://github.com/russhwolf/multiplatform-settings)
+* [MOKO Permissions](https://github.com/icerockdev/moko-permissions)
+* [Alarmee](https://github.com/tweener/alarmee)
+* [Kermit](https://github.com/touchlab/Kermit)

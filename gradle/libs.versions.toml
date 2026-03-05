@@ -31,6 +31,8 @@ essenty = "2.5.0"
 #Libs
 multiplatform-settings = "1.3.0"
 kermit = "2.0.8"
+alarmee = "2.6.0"
+moko-permissions = "0.20.1"
 detekt = "1.23.8"
 detekt-compose = "0.5.6"
 detekt-decompose = "0.2.0"
@@ -76,6 +78,9 @@ ark-decompose-extensions = { module = "com.arkivanov.decompose:extensions-compos
 ark-essenty = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
 
 lib-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+lib-alarmee = { group = "io.github.tweener", name = "alarmee", version.ref = "alarmee" }
+lib-moko-permissions-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "moko-permissions" }
+lib-moko-permissions-notifications = { group = "dev.icerock.moko", name = "permissions-notifications", version.ref = "moko-permissions" }
 lib-multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 lib-detekt-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "detekt-compose" }
 lib-detekt-decompose = { module = "io.github.ajiekcx.detekt:decompose-detekt-rules", version.ref = "detekt-decompose" }
