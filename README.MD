@@ -13,7 +13,7 @@ Kotlin Multiplatform app for eye health support
 * Progress tracking & calendar 📈
 * Grow your garden 🌱
 * Daily eye tips 💡
-* 50 achievements to unlock 🏆
+* 40 achievements to unlock 🏆
 
 ### Used libraries
 * [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform)
