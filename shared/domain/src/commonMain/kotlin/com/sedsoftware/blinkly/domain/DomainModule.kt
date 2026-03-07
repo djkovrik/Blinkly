@@ -5,10 +5,10 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
-import com.sedsoftware.blinkly.domain.internal.AchievementWatcherImpl
+import com.sedsoftware.blinkly.domain.internal.ExerciseProgressWatcherImpl
 
 interface DomainModule {
-    val achievementWatcher: AchievementWatcher
+    val exerciseProgressWatcher: ExerciseProgressWatcher
 }
 
 interface DomainModuleDependencies {
@@ -21,8 +21,8 @@ interface DomainModuleDependencies {
 
 fun DomainModule(dependencies: DomainModuleDependencies): DomainModule {
     return object : DomainModule {
-        override val achievementWatcher: AchievementWatcher by lazy {
-            AchievementWatcherImpl(
+        override val exerciseProgressWatcher: ExerciseProgressWatcher by lazy {
+            ExerciseProgressWatcherImpl(
                 database = dependencies.database,
                 notifier = dependencies.notifier,
                 settings = dependencies.settings,

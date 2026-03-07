@@ -11,9 +11,6 @@ import kotlinx.datetime.toLocalDateTime
 
 fun AchievementType.getLevel(): AchievementLevel =
     when (this) {
-        AchievementType.UNKNOWN
-            -> AchievementLevel.UNKNOWN
-
         AchievementType.FIRST_SPARK,
         AchievementType.BLINK_STARTER,
         AchievementType.CLOSE_UP,

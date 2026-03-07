@@ -17,7 +17,6 @@ class ModelExtTest {
     fun `getLevel should return correct level`() = runTest {
         // given
         val levelsMap = mapOf(
-            AchievementType.UNKNOWN to AchievementLevel.UNKNOWN,
             AchievementType.FIRST_SPARK to AchievementLevel.BEGINNER,
             AchievementType.BLINK_STARTER to AchievementLevel.BEGINNER,
             AchievementType.CLOSE_UP to AchievementLevel.BEGINNER,

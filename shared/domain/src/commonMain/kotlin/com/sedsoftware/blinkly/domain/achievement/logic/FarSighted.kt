@@ -7,7 +7,7 @@ import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.ExerciseType
 
 /**
- * Achievement #10
+ * Achievement #17
  * Far-Sighted - Complete the 20-20-20 rule 100 times
  */
 internal class FarSighted : UnlockableAchievement {

@@ -7,7 +7,7 @@ import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.ExerciseType
 
 /**
- * Achievement #17
+ * Achievement #10
  * Express Master - Use the 20-20-20 rule 50 times
  */
 internal class ExpressMaster : UnlockableAchievement {

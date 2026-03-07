@@ -1,7 +1,6 @@
 package com.sedsoftware.blinkly.domain.model
 
 enum class AchievementType(val index: Int) {
-    UNKNOWN(0),
     FIRST_SPARK(1),
     BLINK_STARTER(2),
     CLOSE_UP(3),
@@ -11,14 +10,14 @@ enum class AchievementType(val index: Int) {
     THREE_DAY_STREAK(7),
     DIAMOND_EYES(8),
     BLINK_MASTER(9),
-    FAR_SIGHTED(10),
+    EXPRESS_MASTER(10),
     THE_ARTIST(11),
     CLOCKMAKER(12),
     REVERSE_MYOPE(13),
     RELAX_ENTHUSIAST(14),
     REGULAR_WARM_UP(15),
     EVENING_RITUAL(16),
-    EXPRESS_MASTER(17),
+    FAR_SIGHTED(17),
     THIRTY_EXERCISES(18),
     HUNDRED_EXERCISES(19),
     IRON_GAZE(20),

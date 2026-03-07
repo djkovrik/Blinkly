@@ -1,7 +1,6 @@
 package com.sedsoftware.blinkly.domain.model
 
 enum class TreeType(val index: Int) {
-    UNKNOWN(0),
     FRAXINUS_EXCELSIOR(1),
     GINKGO_BILOBA(2),
     SALIX_BABYLONICA(3),
