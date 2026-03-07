@@ -1,9 +1,13 @@
 package com.sedsoftware.blinkly.domain
 
+import com.sedsoftware.blinkly.domain.extension.getLevel
+import com.sedsoftware.blinkly.domain.model.Achievement
+import com.sedsoftware.blinkly.domain.model.AchievementLevel
+import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.Exercise
+import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.Workout
-import com.sedsoftware.blinkly.domain.type.ExerciseBlock
-import com.sedsoftware.blinkly.domain.type.ExerciseType
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
@@ -110,4 +114,87 @@ internal object FakeData {
 
         return result.reversed()
     }
+
+    fun getCalendarWithFullBlocksA(now: Instant, requiredCount: Int): List<Workout> {
+        val calendar = mutableListOf<Workout>()
+        repeat(requiredCount) { index ->
+            calendar.add(
+                Workout(
+                    exercises = listOf(
+                        Exercise(
+                            block = ExerciseBlock.A,
+                            type = ExerciseType.BLINK_BREAK,
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
+                        ),
+                        Exercise(
+                            block = ExerciseBlock.A,
+                            type = ExerciseType.NEAR_FAR_FOCUS,
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
+                        ),
+                        Exercise(
+                            block = ExerciseBlock.A,
+                            type = ExerciseType.DIAGONAL_GAZES,
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
+                        ),
+                        Exercise(
+                            block = ExerciseBlock.B,
+                            type = ExerciseType.FIGURE_EIGHT,
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
+                        )
+                    )
+                )
+            )
+        }
+
+        return calendar
+    }
+
+    fun getCalendarWithFullBlocksB(now: Instant, requiredCount: Int): List<Workout> {
+        val calendar = mutableListOf<Workout>()
+        repeat(requiredCount) { index ->
+            calendar.add(
+                Workout(
+                    exercises = listOf(
+                        Exercise(
+                            block = ExerciseBlock.B,
+                            type = ExerciseType.FIGURE_EIGHT,
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
+                        ),
+                        Exercise(
+                            block = ExerciseBlock.B,
+                            type = ExerciseType.CLOCK_ROLLS,
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
+                        ),
+                        Exercise(
+                            block = ExerciseBlock.B,
+                            type = ExerciseType.PALMING,
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
+                        ),
+                        Exercise(
+                            block = ExerciseBlock.A,
+                            type = ExerciseType.BLINK_BREAK,
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
+                        )
+                    )
+                )
+            )
+        }
+
+        return calendar
+    }
+
+    fun getFullAchievementsList(now: Instant): List<Achievement> =
+        AchievementType.entries
+            .filterNot { it == AchievementType.UNKNOWN }
+            .mapIndexed { index, type ->
+                Achievement(
+                    type = type,
+                    level = type.getLevel(),
+                    unlockedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
+                )
+            }
+
+    fun getRegularAchievementsList(now: Instant): List<Achievement> =
+        getFullAchievementsList(now)
+            .filterNot { it.level == AchievementLevel.HIDDEN }
 }

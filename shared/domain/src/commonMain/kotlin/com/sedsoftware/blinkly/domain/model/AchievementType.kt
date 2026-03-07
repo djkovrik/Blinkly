@@ -13,7 +13,7 @@ enum class AchievementType(val index: Int) {
     BLINK_MASTER(9),
     FAR_SIGHTED(10),
     THE_ARTIST(11),
-    CLOCK_MASTER(12),
+    CLOCKMAKER(12),
     REVERSE_MYOPE(13),
     RELAX_ENTHUSIAST(14),
     REGULAR_WARM_UP(15),
