@@ -4,7 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.sedsoftware.blinkly.domain.FakeData
-import com.sedsoftware.blinkly.domain.achievement.BaseAchievementTest
+import com.sedsoftware.blinkly.domain.base.BaseAchievementTest
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.test.runTest

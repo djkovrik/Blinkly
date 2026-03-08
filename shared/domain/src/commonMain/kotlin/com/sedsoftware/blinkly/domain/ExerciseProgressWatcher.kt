@@ -10,4 +10,5 @@ interface ExerciseProgressWatcher {
 
     fun start()
     fun stop()
+    fun cleanup()
 }

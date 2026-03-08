@@ -1,5 +1,6 @@
-package com.sedsoftware.blinkly.domain.achievement
+package com.sedsoftware.blinkly.domain.base
 
+import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlin.time.Clock

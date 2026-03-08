@@ -53,9 +53,12 @@ import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 internal class ExerciseProgressWatcherImpl(
@@ -67,7 +70,7 @@ internal class ExerciseProgressWatcherImpl(
 ) : ExerciseProgressWatcher {
 
     private val instances: List<UnlockableAchievement> = registerAchievements()
-    private val scope: CoroutineScope = CoroutineScope(dispatchers.io)
+    private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
 
     private val lightThemeWorkoutDone: () -> Boolean
         get() = { settings.lightThemeWorkoutDone }
@@ -75,8 +78,7 @@ internal class ExerciseProgressWatcherImpl(
     private val darkThemeWorkoutDone: () -> Boolean
         get() = { settings.darkThemeWorkoutDone }
 
-    private var observeAchievementsJob: Job? = null
-    private var observeCalendarJob: Job? = null
+    private var observeProgressJob: Job? = null
 
     private val _achievements: MutableStateFlow<List<Achievement>> = MutableStateFlow(emptyList())
     private val _calendar: MutableStateFlow<List<Workout>> = MutableStateFlow(emptyList())
@@ -88,32 +90,28 @@ internal class ExerciseProgressWatcherImpl(
         get() = _calendar
 
     override fun start() {
-        observeAchievementsJob?.cancel()
-        observeAchievementsJob = scope.launch {
-            database.currentAchievements().collect { achievements: List<Achievement> ->
+        observeProgressJob?.cancel()
+        observeProgressJob = scope.launch {
+            combine(database.currentAchievements(), database.currentCalendar()) { achievements, calendar ->
                 _achievements.emit(achievements)
-                checkIfUnlocked()
-            }
-        }
-
-        observeCalendarJob?.cancel()
-        observeCalendarJob = scope.launch {
-            database.currentCalendar().collect { calendar: List<Workout> ->
                 _calendar.emit(calendar)
-                checkIfUnlocked()
-            }
+                checkIfUnlocked(achievements, calendar)
+            }.collect()
         }
     }
 
     override fun stop() {
-        observeCalendarJob?.cancel()
-        observeAchievementsJob?.cancel()
+        observeProgressJob?.cancel()
+    }
+
+    override fun cleanup() {
+        stop()
         scope.cancel()
     }
 
-    private suspend fun checkIfUnlocked() {
+    private suspend fun checkIfUnlocked(achievements: List<Achievement>, calendar: List<Workout>) {
         instances.forEach { instance: UnlockableAchievement ->
-            if (instance.unlocked(_achievements.value, _calendar.value) && !isAchievementUnlocked(instance.type)) {
+            if (instance.unlocked(achievements, calendar) && !isAchievementUnlocked(instance.type)) {
                 saveUnlockedAchievement(instance.type)
                 notifyAboutUnlockedAchievement(instance.type)
             }
@@ -133,10 +131,8 @@ internal class ExerciseProgressWatcherImpl(
         notifier.achievementUnlocked(achievementType)
     }
 
-    private fun isAchievementUnlocked(achievementType: AchievementType): Boolean {
-        val types = _achievements.value.map { it.type }
-        return types.contains(achievementType)
-    }
+    private fun isAchievementUnlocked(achievementType: AchievementType): Boolean =
+        _achievements.value.any { it.type == achievementType }
 
     private fun registerAchievements(): List<UnlockableAchievement> =
         listOf(

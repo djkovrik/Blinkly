@@ -3,7 +3,7 @@ package com.sedsoftware.blinkly.domain.achievement.logic
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import com.sedsoftware.blinkly.domain.achievement.BaseAchievementTest
+import com.sedsoftware.blinkly.domain.base.BaseAchievementTest
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
