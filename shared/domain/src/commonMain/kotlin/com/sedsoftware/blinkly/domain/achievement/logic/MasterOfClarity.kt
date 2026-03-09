@@ -4,9 +4,8 @@ import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
 import com.sedsoftware.blinkly.domain.extension.getLevel
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
-import com.sedsoftware.blinkly.domain.model.Workout
 import com.sedsoftware.blinkly.domain.model.AchievementType
-import com.sedsoftware.blinkly.domain.model.ExerciseType
+import com.sedsoftware.blinkly.domain.model.Workout
 
 /**
  * Achievement #34

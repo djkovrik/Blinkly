@@ -2,9 +2,8 @@ package com.sedsoftware.blinkly.domain.achievement.logic
 
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
 import com.sedsoftware.blinkly.domain.model.Achievement
-import com.sedsoftware.blinkly.domain.model.Workout
 import com.sedsoftware.blinkly.domain.model.AchievementType
-import com.sedsoftware.blinkly.domain.model.ExerciseType
+import com.sedsoftware.blinkly.domain.model.Workout
 
 /**
  * Achievement #23

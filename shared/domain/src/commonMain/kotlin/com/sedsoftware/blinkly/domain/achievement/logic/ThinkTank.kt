@@ -16,7 +16,7 @@ internal class ThinkTank : UnlockableAchievement {
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
         val allExercises = calendar.flatMap { it.exercises }
 
-        if (allExercises.size < 10) return false
+        if (allExercises.size < ACHIEVEMENT_THRESHOLD) return false
 
         var consecutiveNonRepeating = 1
 

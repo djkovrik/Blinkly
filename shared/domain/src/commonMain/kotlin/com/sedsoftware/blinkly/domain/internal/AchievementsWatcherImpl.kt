@@ -1,6 +1,6 @@
 package com.sedsoftware.blinkly.domain.internal
 
-import com.sedsoftware.blinkly.domain.ExerciseProgressWatcher
+import com.sedsoftware.blinkly.domain.AchievementsWatcher
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
 import com.sedsoftware.blinkly.domain.achievement.logic.BlinkExpert
 import com.sedsoftware.blinkly.domain.achievement.logic.BlinkLegend
@@ -52,25 +52,29 @@ import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 
-internal class ExerciseProgressWatcherImpl(
+internal class AchievementsWatcherImpl(
     private val database: BlinklyDatabase,
     private val notifier: BlinklyNotifier,
     private val settings: BlinklySettings,
     private val timeUtils: BlinklyTimeUtils,
     dispatchers: BlinklyDispatchers,
-) : ExerciseProgressWatcher {
+) : AchievementsWatcher {
 
     private val instances: List<UnlockableAchievement> = registerAchievements()
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
+    private val _currentAchievements = MutableStateFlow<List<Achievement>>(emptyList())
 
     private val lightThemeWorkoutDone: () -> Boolean
         get() = { settings.lightThemeWorkoutDone }
@@ -78,39 +82,33 @@ internal class ExerciseProgressWatcherImpl(
     private val darkThemeWorkoutDone: () -> Boolean
         get() = { settings.darkThemeWorkoutDone }
 
-    private var observeProgressJob: Job? = null
-
-    private val _achievements: MutableStateFlow<List<Achievement>> = MutableStateFlow(emptyList())
-    private val _calendar: MutableStateFlow<List<Workout>> = MutableStateFlow(emptyList())
+    private val achievementsFlow: Flow<List<Achievement>> = flow {
+        val achievementsSource: Flow<List<Achievement>> = database.currentAchievements()
+        val calendarSource: Flow<List<Workout>> = database.currentCalendar()
+        emitAll(
+            combine(achievementsSource, calendarSource) { achievements, calendar ->
+                checkIfUnlocked(achievements, calendar)
+                achievements
+            }
+        )
+    }
+        .flowOn(dispatchers.io)
+        .catch { /* handle error if needed */ }
+        .onEach { _currentAchievements.value = it }
+        .shareIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = SUBSCRIPTION_CANCEL_PERIOD),
+            replay = 1,
+        )
 
     override val achievements: Flow<List<Achievement>>
-        get() = _achievements
+        get() = achievementsFlow
 
-    override val calendar: Flow<List<Workout>>
-        get() = _calendar
-
-    override fun start() {
-        observeProgressJob?.cancel()
-        observeProgressJob = scope.launch {
-            combine(database.currentAchievements(), database.currentCalendar()) { achievements, calendar ->
-                _achievements.emit(achievements)
-                _calendar.emit(calendar)
-                checkIfUnlocked(achievements, calendar)
-            }.collect()
-        }
-    }
-
-    override fun stop() {
-        observeProgressJob?.cancel()
-    }
-
-    override fun cleanup() {
-        stop()
-        scope.cancel()
-    }
-
-    private suspend fun checkIfUnlocked(achievements: List<Achievement>, calendar: List<Workout>) {
-        instances.forEach { instance: UnlockableAchievement ->
+    private suspend fun checkIfUnlocked(
+        achievements: List<Achievement>,
+        calendar: List<Workout>,
+    ) {
+        instances.forEach { instance ->
             if (instance.unlocked(achievements, calendar) && !isAchievementUnlocked(instance.type)) {
                 saveUnlockedAchievement(instance.type)
                 notifyAboutUnlockedAchievement(instance.type)
@@ -131,8 +129,9 @@ internal class ExerciseProgressWatcherImpl(
         notifier.achievementUnlocked(achievementType)
     }
 
-    private fun isAchievementUnlocked(achievementType: AchievementType): Boolean =
-        _achievements.value.any { it.type == achievementType }
+    private fun isAchievementUnlocked(achievementType: AchievementType): Boolean {
+        return _currentAchievements.value.any { it.type == achievementType }
+    }
 
     private fun registerAchievements(): List<UnlockableAchievement> =
         listOf(
@@ -177,4 +176,8 @@ internal class ExerciseProgressWatcherImpl(
             TimelessGaze(),
             ThinkTank(),
         )
+
+    private companion object {
+        const val SUBSCRIPTION_CANCEL_PERIOD = 5000L
+    }
 }
