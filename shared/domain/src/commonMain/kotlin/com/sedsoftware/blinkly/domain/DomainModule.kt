@@ -6,9 +6,11 @@ import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.internal.AchievementsWatcherImpl
+import com.sedsoftware.blinkly.domain.internal.CalendarWatcherImpl
 
 interface DomainModule {
     val achievementsWatcher: AchievementsWatcher
+    val calendarWatcher: CalendarWatcher
 }
 
 interface DomainModuleDependencies {
@@ -27,6 +29,13 @@ fun DomainModule(dependencies: DomainModuleDependencies): DomainModule {
                 notifier = dependencies.notifier,
                 settings = dependencies.settings,
                 timeUtils = dependencies.timeUtils,
+                dispatchers = dependencies.dispatchers,
+            )
+        }
+
+        override val calendarWatcher: CalendarWatcher by lazy {
+            CalendarWatcherImpl(
+                database = dependencies.database,
                 dispatchers = dependencies.dispatchers,
             )
         }
