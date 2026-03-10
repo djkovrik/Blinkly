@@ -26,14 +26,14 @@ internal class CalendarWatcherImpl(
         .flowOn(dispatchers.io)
         .shareIn(
             scope = scope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = SUBSCRIPTION_CANCEL_PERIOD),
-            replay = 1
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = SUBSCRIPTION_STOP_TIMEOUT),
+            replay = 1,
         )
 
     override val calendar: Flow<List<Workout>>
         get() = calendarFlow
 
     private companion object {
-        const val SUBSCRIPTION_CANCEL_PERIOD = 5000L
+        const val SUBSCRIPTION_STOP_TIMEOUT = 5000L
     }
 }

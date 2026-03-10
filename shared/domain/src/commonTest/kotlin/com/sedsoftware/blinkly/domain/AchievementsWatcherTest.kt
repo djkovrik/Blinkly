@@ -37,12 +37,14 @@ class AchievementsWatcherTest : BaseDomainTest() {
     @Test
     fun `any exercise at the first day should unlock FirstSpark`() = runTest(testScheduler) {
         // given
-        val workout = FakeData.getSingleExerciseWorkout(now)
+        val today = now
+        val workout = FakeData.getSingleExerciseWorkout(today)
         val calendar: List<Workout> = listOf(workout)
+        every { timeUtils.now() } returns today
         val unlockedAchievement = Achievement(
             AchievementType.FIRST_SPARK,
             AchievementLevel.BEGINNER,
-            now
+            today,
         )
 
         // when
@@ -62,12 +64,14 @@ class AchievementsWatcherTest : BaseDomainTest() {
     @Test
     fun `any exercise when both light and dark workouts completed should unlock Yin Yang`() = runTest(testScheduler) {
         // given
-        val workout = FakeData.getSingleExerciseWorkout(now)
+        val today = now
+        val workout = FakeData.getSingleExerciseWorkout(today)
         val calendar: List<Workout> = listOf(workout)
+        every { timeUtils.now() } returns today
         val unlockedAchievement = Achievement(
             type = AchievementType.YIN_YANG,
             level = AchievementLevel.HIDDEN,
-            unlockedAt = now,
+            unlockedAt = today,
         )
 
         every { settings.lightThemeWorkoutDone } returns true

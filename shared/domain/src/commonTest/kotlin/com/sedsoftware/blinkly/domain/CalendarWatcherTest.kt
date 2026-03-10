@@ -1,5 +1,7 @@
 package com.sedsoftware.blinkly.domain
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.fakes.FakeData
@@ -14,7 +16,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class CalendarWatcherTest : BaseDomainTest() {
 
@@ -43,7 +44,7 @@ class CalendarWatcherTest : BaseDomainTest() {
 
         // then
         val actualCalendar = watcher.calendar.first()
-        assertEquals(expectedCalendar, actualCalendar)
+        assertThat(expectedCalendar).isEqualTo(actualCalendar)
 
         collectJob.cancel()
     }
@@ -58,7 +59,7 @@ class CalendarWatcherTest : BaseDomainTest() {
 
         // then
         val actualCalendar = watcher.calendar.first()
-        assertEquals(emptyList<Workout>(), actualCalendar)
+        assertThat(actualCalendar).isEqualTo(emptyList())
 
         collectJob.cancel()
     }

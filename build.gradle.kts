@@ -48,7 +48,6 @@ kover {
                 classes(
                     "com.sedsoftware.blinkly.*.integration.*Preview",
                     "com.sedsoftware.blinkly.*.*Module",
-                    "com.sedsoftware.*.model.*",
                 )
             }
             includes {

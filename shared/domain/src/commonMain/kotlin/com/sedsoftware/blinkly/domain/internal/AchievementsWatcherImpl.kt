@@ -97,7 +97,7 @@ internal class AchievementsWatcherImpl(
         .onEach { _currentAchievements.value = it }
         .shareIn(
             scope = scope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = SUBSCRIPTION_CANCEL_PERIOD),
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = SUBSCRIPTION_STOP_TIMEOUT),
             replay = 1,
         )
 
@@ -178,6 +178,6 @@ internal class AchievementsWatcherImpl(
         )
 
     private companion object {
-        const val SUBSCRIPTION_CANCEL_PERIOD = 5000L
+        const val SUBSCRIPTION_STOP_TIMEOUT = 5000L
     }
 }

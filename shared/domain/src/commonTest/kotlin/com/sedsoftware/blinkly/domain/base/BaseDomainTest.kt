@@ -12,6 +12,11 @@ import dev.mokkery.mock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 abstract class BaseDomainTest {
@@ -24,7 +29,14 @@ abstract class BaseDomainTest {
             override val io: CoroutineDispatcher = StandardTestDispatcher(testScheduler)
         }
 
-    protected val now: Instant = Instant.DISTANT_PAST
+    protected val now: Instant
+        get() = Clock.System.now()
+
+    protected val yesterday: Instant
+        get() = now.minus(1, DateTimeUnit.DAY, TimeZone.UTC)
+
+    protected val tomorrow: Instant
+        get() = now.plus(1, DateTimeUnit.DAY, TimeZone.UTC)
 
     protected val notifier: BlinklyNotifier = mock {
         every { achievementUnlocked(any()) } returns Unit
@@ -33,8 +45,9 @@ abstract class BaseDomainTest {
     protected val settings: BlinklySettings = mock {
         every { blinkBreakCount } returns 60
         every { nearFarFocusCount } returns 10
-        every { nearFarFocusDuration } returns 10
+        every { nearFarFocusDuration } returns 5f
         every { diagonalGazesCount } returns 5
+        every { diagonalGazesDuration } returns 3f
         every { figureEightCount } returns 10
         every { clockRollsEachSide } returns 5
         every { palmingDuration } returns 120

@@ -1,5 +1,8 @@
-package com.sedsoftware.blinkly.domain
+package com.sedsoftware.blinkly.domain.di
 
+import com.sedsoftware.blinkly.domain.AchievementsWatcher
+import com.sedsoftware.blinkly.domain.CalendarWatcher
+import com.sedsoftware.blinkly.domain.TreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
@@ -7,10 +10,12 @@ import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.internal.AchievementsWatcherImpl
 import com.sedsoftware.blinkly.domain.internal.CalendarWatcherImpl
+import com.sedsoftware.blinkly.domain.internal.TreeProgressWatcherImpl
 
 interface DomainModule {
     val achievementsWatcher: AchievementsWatcher
     val calendarWatcher: CalendarWatcher
+    val treeProgressWatcher: TreeProgressWatcher
 }
 
 interface DomainModuleDependencies {
@@ -36,6 +41,14 @@ fun DomainModule(dependencies: DomainModuleDependencies): DomainModule {
         override val calendarWatcher: CalendarWatcher by lazy {
             CalendarWatcherImpl(
                 database = dependencies.database,
+                dispatchers = dependencies.dispatchers,
+            )
+        }
+
+        override val treeProgressWatcher: TreeProgressWatcher by lazy {
+            TreeProgressWatcherImpl(
+                database = dependencies.database,
+                timeUtils = dependencies.timeUtils,
                 dispatchers = dependencies.dispatchers,
             )
         }

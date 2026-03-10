@@ -16,7 +16,7 @@ internal class ThinkTankTest : BaseAchievementTest() {
     @Test
     fun `when calendar and achievements match logic then unlocked`() = runTest {
         // given
-        val calendar = FakeData.getThinkTankWorkoutCorrect()
+        val calendar = FakeData.getThinkTankWorkoutCorrect(now)
         // when
         val unlocked = achievement.unlocked(emptyAchievements, calendar)
         // then
@@ -26,7 +26,7 @@ internal class ThinkTankTest : BaseAchievementTest() {
     @Test
     fun `when calendar and achievements do not match logic then not unlocked`() = runTest {
         // given
-        val calendar = FakeData.getThinkTankWorkoutIncorrect()
+        val calendar = FakeData.getThinkTankWorkoutIncorrect(now)
         // when
         val unlocked = achievement.unlocked(emptyAchievements, calendar)
         // then

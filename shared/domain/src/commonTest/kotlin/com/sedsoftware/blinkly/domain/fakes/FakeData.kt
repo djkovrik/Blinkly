@@ -26,6 +26,10 @@ internal object FakeData {
         )
     }
 
+    fun getSingleExerciseCalendar(now: Instant): List<Workout> {
+        return listOf(getSingleExerciseWorkout(now))
+    }
+
     fun getWorkoutDayFull(now: Instant): Workout {
         return Workout(
             exercises = listOf(
@@ -55,7 +59,7 @@ internal object FakeData {
         var index = 0
         while (index < amountOfDays) {
             val day = getWorkoutDayFull(currentDate)
-            currentDate = currentDate.minus(1, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+            currentDate = currentDate.minus(1, DateTimeUnit.DAY, TimeZone.UTC)
             index++
             result.add(day)
         }
@@ -69,7 +73,7 @@ internal object FakeData {
         var index = 0
         while (index < amountOfDays) {
             val day = getWorkoutDayPartial(currentDate)
-            currentDate = currentDate.minus(1, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+            currentDate = currentDate.minus(1, DateTimeUnit.DAY, TimeZone.UTC)
             index++
             result.add(day)
         }
@@ -88,7 +92,7 @@ internal object FakeData {
             } else {
                 getWorkoutDayPartial(currentDate)
             }
-            currentDate = currentDate.minus(1, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+            currentDate = currentDate.minus(1, DateTimeUnit.DAY, TimeZone.UTC)
             index++
             result.add(day)
         }
@@ -109,7 +113,7 @@ internal object FakeData {
             }
             val exerciseCount = day.exercises.count { it.type == type }
             val randomMinus = Random.Default.nextInt(1, 3)
-            currentDate = currentDate.minus(randomMinus, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+            currentDate = currentDate.minus(randomMinus, DateTimeUnit.DAY, TimeZone.UTC)
             index += exerciseCount
             result.add(day)
         }
@@ -126,22 +130,22 @@ internal object FakeData {
                         Exercise(
                             block = ExerciseBlock.A,
                             type = ExerciseType.BLINK_BREAK,
-                            completedAt = now.minus(index, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
                         ),
                         Exercise(
                             block = ExerciseBlock.A,
                             type = ExerciseType.NEAR_FAR_FOCUS,
-                            completedAt = now.minus(index, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
                         ),
                         Exercise(
                             block = ExerciseBlock.A,
                             type = ExerciseType.DIAGONAL_GAZES,
-                            completedAt = now.minus(index, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
                         ),
                         Exercise(
                             block = ExerciseBlock.B,
                             type = ExerciseType.FIGURE_EIGHT,
-                            completedAt = now.minus(index, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
                         )
                     )
                 )
@@ -160,22 +164,22 @@ internal object FakeData {
                         Exercise(
                             block = ExerciseBlock.B,
                             type = ExerciseType.FIGURE_EIGHT,
-                            completedAt = now.minus(index, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
                         ),
                         Exercise(
                             block = ExerciseBlock.B,
                             type = ExerciseType.CLOCK_ROLLS,
-                            completedAt = now.minus(index, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
                         ),
                         Exercise(
                             block = ExerciseBlock.B,
                             type = ExerciseType.PALMING,
-                            completedAt = now.minus(index, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
                         ),
                         Exercise(
                             block = ExerciseBlock.A,
                             type = ExerciseType.BLINK_BREAK,
-                            completedAt = now.minus(index, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+                            completedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
                         )
                     )
                 )
@@ -191,7 +195,7 @@ internal object FakeData {
                 Achievement(
                     type = type,
                     level = type.getLevel(),
-                    unlockedAt = now.minus(index, DateTimeUnit.Companion.DAY, TimeZone.Companion.UTC)
+                    unlockedAt = now.minus(index, DateTimeUnit.DAY, TimeZone.UTC)
                 )
             }
 
@@ -207,15 +211,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 15, 5, 30).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 5, 30).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 15, 6, 15).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 6, 15).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 15, 7, 45).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 7, 45).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -226,11 +230,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 16, 6, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 16, 6, 0).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 16, 10, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 16, 10, 0).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -247,15 +251,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 15, 5, 30).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 5, 30).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 15, 6, 15).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 6, 15).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 15, 8, 1).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 8, 1).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -266,11 +270,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 16, 6, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 16, 6, 0).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 16, 10, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 16, 10, 0).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -287,15 +291,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 19, 0, 15).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 0, 15).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.C, ExerciseType.TWENTY_X3,
-                        LocalDateTime(2024, 1, 19, 1, 45).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 1, 45).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -306,11 +310,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -327,15 +331,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 19, 0, 15).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 0, 15).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.C, ExerciseType.TWENTY_X3,
-                        LocalDateTime(2024, 1, 19, 2, 2).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 2, 2).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -346,11 +350,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -367,15 +371,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 19, 0, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 0, 0).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.C, ExerciseType.TWENTY_X3,
-                        LocalDateTime(2024, 1, 19, 1, 45).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 1, 45).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -386,11 +390,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -407,15 +411,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 19, 0, 1).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 0, 1).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.C, ExerciseType.TWENTY_X3,
-                        LocalDateTime(2024, 1, 19, 2, 2).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 2, 2).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -426,11 +430,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.currentSystemDefault())
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.Companion.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.currentSystemDefault())
                     )
                 )
             )
@@ -439,15 +443,15 @@ internal object FakeData {
         return workouts
     }
 
-    fun getThinkTankWorkoutCorrect(): List<Workout> {
+    fun getThinkTankWorkoutCorrect(now: Instant): List<Workout> {
         val workouts = mutableListOf<Workout>()
         repeat(3) {
             workouts.add(
                 Workout(
                     exercises = listOf(
-                        Exercise(ExerciseBlock.A, ExerciseType.BLINK_BREAK, Instant.Companion.DISTANT_PAST),
-                        Exercise(ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS, Instant.Companion.DISTANT_PAST),
-                        Exercise(ExerciseBlock.A, ExerciseType.DIAGONAL_GAZES, Instant.Companion.DISTANT_PAST)
+                        Exercise(ExerciseBlock.A, ExerciseType.BLINK_BREAK, now),
+                        Exercise(ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS, now),
+                        Exercise(ExerciseBlock.A, ExerciseType.DIAGONAL_GAZES, now)
                     )
                 )
             )
@@ -455,7 +459,7 @@ internal object FakeData {
         workouts.add(
             Workout(
                 exercises = listOf(
-                    Exercise(ExerciseBlock.B, ExerciseType.FIGURE_EIGHT, Instant.Companion.DISTANT_PAST)
+                    Exercise(ExerciseBlock.B, ExerciseType.FIGURE_EIGHT, now)
                 )
             )
         )
@@ -463,17 +467,17 @@ internal object FakeData {
         return workouts
     }
 
-    fun getThinkTankWorkoutIncorrect(): List<Workout> {
+    fun getThinkTankWorkoutIncorrect(now: Instant): List<Workout> {
         val workouts = mutableListOf<Workout>()
 
         repeat(2) {
             workouts.add(
                 Workout(
                     exercises = listOf(
-                        Exercise(ExerciseBlock.A, ExerciseType.BLINK_BREAK, Instant.Companion.DISTANT_PAST),
-                        Exercise(ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS, Instant.Companion.DISTANT_PAST),
-                        Exercise(ExerciseBlock.A, ExerciseType.DIAGONAL_GAZES, Instant.Companion.DISTANT_PAST),
-                        Exercise(ExerciseBlock.B, ExerciseType.NEAR_FAR_FOCUS, Instant.Companion.DISTANT_PAST),
+                        Exercise(ExerciseBlock.A, ExerciseType.BLINK_BREAK, now),
+                        Exercise(ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS, now),
+                        Exercise(ExerciseBlock.A, ExerciseType.DIAGONAL_GAZES, now),
+                        Exercise(ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS, now),
                     )
                 )
             )
@@ -481,7 +485,7 @@ internal object FakeData {
         workouts.add(
             Workout(
                 exercises = listOf(
-                    Exercise(ExerciseBlock.B, ExerciseType.NEAR_FAR_FOCUS, Instant.Companion.DISTANT_PAST)
+                    Exercise(ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS, now)
                 )
             )
         )
