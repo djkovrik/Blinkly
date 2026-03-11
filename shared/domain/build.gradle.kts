@@ -6,8 +6,12 @@ plugins {
 kotlin {
     sourceSets {
         commonMain {
-            dependencies {
-            }
+            dependencies {}
         }
+    }
+
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
+        freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
     }
 }

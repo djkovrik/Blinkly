@@ -18,18 +18,30 @@ abstract class PrintLineCoverageTask : DefaultTask() {
             .newDocumentBuilder()
             .parse(reportFile.get().asFile)
 
-        val counters = doc.getElementsByTagName("counter")
+        val rootNode = doc.firstChild
+        var childNode = rootNode.firstChild
 
-        for (i in 0 until counters.length) {
-            val node = counters.item(i)
-            if (node.attributes.getNamedItem("type").nodeValue == "LINE") {
-                val missed = node.attributes.getNamedItem("missed").nodeValue.toLong()
-                val covered = node.attributes.getNamedItem("covered").nodeValue.toLong()
+        var coveragePercent = 0.0
 
-                val percent = (covered * 100.0) / (missed + covered)
-                println("%.1f".format(percent))
-                break
+        while (childNode != null) {
+            if (childNode.nodeName == "counter") {
+                val typeAttr = childNode.attributes.getNamedItem("type")
+                if (typeAttr.textContent == "LINE") {
+                    val missedAttr = childNode.attributes.getNamedItem("missed")
+                    val coveredAttr = childNode.attributes.getNamedItem("covered")
+                    val missed = missedAttr.textContent.toLong()
+                    val covered = coveredAttr.textContent.toLong()
+                    coveragePercent = (covered * HUNDRED_PERCENT) / (missed + covered)
+                    break
+                }
             }
+            childNode = childNode.nextSibling
         }
+
+        println("%.1f".format(coveragePercent))
+    }
+
+    private companion object {
+        const val HUNDRED_PERCENT = 100.0
     }
 }

@@ -47,15 +47,16 @@ kover {
             excludes {
                 classes(
                     "com.sedsoftware.blinkly.*.integration.*Preview",
+                    "com.sedsoftware.blinkly.*.*Module",
                 )
             }
             includes {
                 classes(
-                    "com.sedsoftware.blinkly.domain.*",
-                    "com.sedsoftware.blinkly.*.extension.*",
-                    "com.sedsoftware.blinkly.*.integration.*Default",
-                    "com.sedsoftware.blinkly.*.store.*",
-                    "com.sedsoftware.blinkly.*.mapper.*",
+                    "com.sedsoftware.*.domain.*",
+                    "com.sedsoftware.*.extension.*",
+                    "com.sedsoftware.*.integration.*Default",
+                    "com.sedsoftware.*.store.*",
+                    "com.sedsoftware.*.mapper.*",
                 )
             }
         }
