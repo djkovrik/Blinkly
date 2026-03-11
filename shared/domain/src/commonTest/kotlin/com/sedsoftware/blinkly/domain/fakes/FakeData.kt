@@ -17,6 +17,14 @@ import kotlin.random.Random
 import kotlin.time.Instant
 
 internal object FakeData {
+    const val BLINK_COUNT = 60
+    const val NEAR_FAR_COUNT = 10
+    const val NEAR_FAR_DURATION = 5f
+    const val DIAGONAL_COUNT = 5
+    const val DIAGONAL_DURATION = 3f
+    const val FIGURE_EIGHT_COUNT = 10
+    const val CLOCK_COUNT = 5
+    const val PALMING_DURATION = 120
 
     fun getSingleExerciseWorkout(now: Instant): Workout {
         return Workout(

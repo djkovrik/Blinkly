@@ -4,6 +4,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.fakes.FakeData
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -35,22 +36,19 @@ abstract class BaseDomainTest {
     protected val yesterday: Instant
         get() = now.minus(1, DateTimeUnit.DAY, TimeZone.UTC)
 
-    protected val tomorrow: Instant
-        get() = now.plus(1, DateTimeUnit.DAY, TimeZone.UTC)
-
     protected val notifier: BlinklyNotifier = mock {
         every { achievementUnlocked(any()) } returns Unit
     }
 
     protected val settings: BlinklySettings = mock {
-        every { blinkBreakCount } returns 60
-        every { nearFarFocusCount } returns 10
-        every { nearFarFocusDuration } returns 5f
-        every { diagonalGazesCount } returns 5
-        every { diagonalGazesDuration } returns 3f
-        every { figureEightCount } returns 10
-        every { clockRollsEachSide } returns 5
-        every { palmingDuration } returns 120
+        every { blinkBreakCount } returns FakeData.BLINK_COUNT
+        every { nearFarFocusCount } returns FakeData.NEAR_FAR_COUNT
+        every { nearFarFocusDuration } returns FakeData.NEAR_FAR_DURATION
+        every { diagonalGazesCount } returns FakeData.DIAGONAL_COUNT
+        every { diagonalGazesDuration } returns FakeData.DIAGONAL_DURATION
+        every { figureEightCount } returns FakeData.FIGURE_EIGHT_COUNT
+        every { clockRollsEachSide } returns FakeData.CLOCK_COUNT
+        every { palmingDuration } returns FakeData.PALMING_DURATION
         every { themeState } returns ThemeState.SYSTEM
         every { lightThemeWorkoutDone } returns false
         every { darkThemeWorkoutDone } returns false
