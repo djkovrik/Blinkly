@@ -33,6 +33,7 @@ internal class ExerciseManagerImpl(
 
     private val engine: ExerciseEngine = ExerciseEngine(dispatchers)
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main)
+    private val yinYangWatcher: YinYangWatcher = YinYangWatcherImpl()
     private val _events: MutableSharedFlow<ExerciseEvent> = MutableSharedFlow<ExerciseEvent>()
 
     override val events: Flow<ExerciseEvent> = _events
@@ -92,9 +93,7 @@ internal class ExerciseManagerImpl(
         progress: ExerciseProgress?,
     ) {
         progress?.let {
-            _events.emit(
-                ExerciseEvent.Progress(block, type, it)
-            )
+            _events.emit(ExerciseEvent.Progress(block, type, it))
         }
 
         when (node) {
@@ -113,6 +112,7 @@ internal class ExerciseManagerImpl(
 
             CompleteBlockNode -> {
                 _events.emit(ExerciseEvent.BlockCompleted(block))
+                yinYangWatcher.onBlockCompleted(settings)
             }
         }
     }
