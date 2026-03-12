@@ -2,7 +2,7 @@ package com.sedsoftware.blinkly.settings
 
 import com.russhwolf.settings.Settings
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
-import com.sedsoftware.blinkly.settings.internal.BlinklySettingsImpl
+import com.sedsoftware.blinkly.settings.impl.BlinklySettingsImpl
 
 interface SettingsModule {
     val settings: BlinklySettings

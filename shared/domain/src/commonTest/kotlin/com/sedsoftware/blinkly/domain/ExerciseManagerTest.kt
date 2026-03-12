@@ -7,7 +7,7 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
-import com.sedsoftware.blinkly.domain.internal.ExerciseManagerImpl
+import com.sedsoftware.blinkly.domain.impl.ExerciseManagerImpl
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ExerciseEvent
 import dev.mokkery.answering.returns

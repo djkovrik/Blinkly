@@ -9,10 +9,10 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
-import com.sedsoftware.blinkly.domain.internal.AchievementsWatcherImpl
-import com.sedsoftware.blinkly.domain.internal.CalendarWatcherImpl
-import com.sedsoftware.blinkly.domain.internal.ExerciseManagerImpl
-import com.sedsoftware.blinkly.domain.internal.TreeProgressWatcherImpl
+import com.sedsoftware.blinkly.domain.impl.AchievementsWatcherImpl
+import com.sedsoftware.blinkly.domain.impl.CalendarWatcherImpl
+import com.sedsoftware.blinkly.domain.impl.ExerciseManagerImpl
+import com.sedsoftware.blinkly.domain.impl.TreeProgressWatcherImpl
 
 interface DomainModule {
     val achievementsWatcher: AchievementsWatcher

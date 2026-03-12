@@ -29,7 +29,7 @@ class ScriptsTest : BaseDomainTest() {
         val movementCount = script.nodes.count { it is MovementNode }
 
         // then
-        assertThat(movementCount).isEqualTo(FakeData.BLINK_COUNT)
+        assertThat(movementCount).isEqualTo(FakeData.BLINK_BREAK_COUNT)
         assertThat(script.nodes.last() is CompleteExerciseNode).isTrue()
     }
 

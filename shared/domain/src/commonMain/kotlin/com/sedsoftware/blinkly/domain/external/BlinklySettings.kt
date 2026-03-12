@@ -13,7 +13,7 @@ interface BlinklySettings {
     var clockRollsEachSide: Int
     var palmingDuration: Int
     var themeState: ThemeState
-    var lightThemeWorkoutDone: Boolean
-    var darkThemeWorkoutDone: Boolean
+    var lightThemeWorkoutIndex: Int
+    var darkThemeWorkoutIndex: Int
     var lastTreeProgressCheckDate: LocalDate?
 }

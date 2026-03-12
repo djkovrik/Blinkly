@@ -1,4 +1,4 @@
-package com.sedsoftware.blinkly.domain.internal
+package com.sedsoftware.blinkly.domain.impl
 
 import com.sedsoftware.blinkly.domain.ExerciseManager
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteBlockNode
@@ -33,7 +33,6 @@ internal class ExerciseManagerImpl(
 
     private val engine: ExerciseEngine = ExerciseEngine(dispatchers)
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main)
-    private val yinYangWatcher: YinYangWatcher = YinYangWatcherImpl()
     private val _events: MutableSharedFlow<ExerciseEvent> = MutableSharedFlow<ExerciseEvent>()
 
     override val events: Flow<ExerciseEvent> = _events
@@ -112,7 +111,6 @@ internal class ExerciseManagerImpl(
 
             CompleteBlockNode -> {
                 _events.emit(ExerciseEvent.BlockCompleted(block))
-                yinYangWatcher.onBlockCompleted(settings)
             }
         }
     }

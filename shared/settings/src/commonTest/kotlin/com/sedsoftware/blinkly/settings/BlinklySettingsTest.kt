@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import com.russhwolf.settings.MapSettings
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.model.ThemeState
-import com.sedsoftware.blinkly.settings.internal.BlinklySettingsImpl
+import com.sedsoftware.blinkly.settings.impl.BlinklySettingsImpl
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 
@@ -26,8 +26,8 @@ class BlinklySettingsTest {
         val clockRollsEachSideDefault = settings.clockRollsEachSide
         val palmingDurationDefault = settings.palmingDuration
         val themeStateDefault = settings.themeState
-        val lightThemeWorkoutDoneDefault = settings.lightThemeWorkoutDone
-        val darkThemeWorkoutDoneDefault = settings.darkThemeWorkoutDone
+        val lightThemeWorkoutDoneDefault = settings.lightThemeWorkoutIndex
+        val darkThemeWorkoutDoneDefault = settings.darkThemeWorkoutIndex
         val lastTreeProgressCheckDateDefault = settings.lastTreeProgressCheckDate
 
         // then
@@ -40,8 +40,8 @@ class BlinklySettingsTest {
         assertThat(clockRollsEachSideDefault).isEqualTo(CLOCK_ROLLS_COUNT_DEFAULT)
         assertThat(palmingDurationDefault).isEqualTo(PALMING_DURATION_DEFAULT)
         assertThat(themeStateDefault).isEqualTo(ThemeState.SYSTEM)
-        assertThat(lightThemeWorkoutDoneDefault).isEqualTo(false)
-        assertThat(darkThemeWorkoutDoneDefault).isEqualTo(false)
+        assertThat(lightThemeWorkoutDoneDefault).isEqualTo(0)
+        assertThat(darkThemeWorkoutDoneDefault).isEqualTo(0)
         assertThat(lastTreeProgressCheckDateDefault).isEqualTo(null)
     }
 
@@ -52,7 +52,6 @@ class BlinklySettingsTest {
         val floatValue = 12345.0f
         val localDateValue = LocalDate.parse("2026-03-01")
         val themeValue = ThemeState.DARK
-        val booleanValue = true
         // when
         settings.blinkBreakCount = intValue
         settings.nearFarFocusCount = intValue
@@ -63,8 +62,8 @@ class BlinklySettingsTest {
         settings.clockRollsEachSide = intValue
         settings.palmingDuration = intValue
         settings.themeState = themeValue
-        settings.lightThemeWorkoutDone = booleanValue
-        settings.darkThemeWorkoutDone = booleanValue
+        settings.lightThemeWorkoutIndex = intValue
+        settings.darkThemeWorkoutIndex = intValue
         settings.lastTreeProgressCheckDate = localDateValue
         // then
         assertThat(settings.blinkBreakCount).isEqualTo(intValue)
@@ -76,8 +75,8 @@ class BlinklySettingsTest {
         assertThat(settings.clockRollsEachSide).isEqualTo(intValue)
         assertThat(settings.palmingDuration).isEqualTo(intValue)
         assertThat(settings.themeState).isEqualTo(themeValue)
-        assertThat(settings.lightThemeWorkoutDone).isEqualTo(booleanValue)
-        assertThat(settings.darkThemeWorkoutDone).isEqualTo(booleanValue)
+        assertThat(settings.lightThemeWorkoutIndex).isEqualTo(intValue)
+        assertThat(settings.darkThemeWorkoutIndex).isEqualTo(intValue)
         assertThat(settings.lastTreeProgressCheckDate).isEqualTo(localDateValue)
     }
 

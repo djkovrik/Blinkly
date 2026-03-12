@@ -1,4 +1,4 @@
-package com.sedsoftware.blinkly.settings.internal
+package com.sedsoftware.blinkly.settings.impl
 
 import com.russhwolf.settings.Settings
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
@@ -63,16 +63,16 @@ internal class BlinklySettingsImpl(
             settings.setValue(PREF_THEME_STATE, value.index)
         }
 
-    override var lightThemeWorkoutDone: Boolean
-        get() = settings.getValue(PREF_LIGHT_THEME_WORKOUT_DONE, false)
+    override var lightThemeWorkoutIndex: Int
+        get() = settings.getValue(PREF_LIGHT_THEME_WORKOUT_INDEX, 0)
         set(value) {
-            settings.setValue(PREF_LIGHT_THEME_WORKOUT_DONE, value)
+            settings.setValue(PREF_LIGHT_THEME_WORKOUT_INDEX, value)
         }
 
-    override var darkThemeWorkoutDone: Boolean
-        get() = settings.getValue(PREF_DARK_THEME_WORKOUT_DONE, false)
+    override var darkThemeWorkoutIndex: Int
+        get() = settings.getValue(PREF_DARK_THEME_WORKOUT_INDEX, 0)
         set(value) {
-            settings.setValue(PREF_DARK_THEME_WORKOUT_DONE, value)
+            settings.setValue(PREF_DARK_THEME_WORKOUT_INDEX, value)
         }
 
     override var lastTreeProgressCheckDate: LocalDate?
@@ -129,8 +129,8 @@ internal class BlinklySettingsImpl(
         const val PALMING_DURATION_DEFAULT = 120
         const val PREF_THEME_STATE = "ts"
         const val THEME_STATE_DEFAULT = 0
-        const val PREF_LIGHT_THEME_WORKOUT_DONE = "ltwd"
-        const val PREF_DARK_THEME_WORKOUT_DONE = "dtwd"
+        const val PREF_LIGHT_THEME_WORKOUT_INDEX = "ltwi"
+        const val PREF_DARK_THEME_WORKOUT_INDEX = "dtwi"
         const val PREF_LAST_TREE_PROGRESS_CHECK_DATE = "ltpcd"
     }
 }

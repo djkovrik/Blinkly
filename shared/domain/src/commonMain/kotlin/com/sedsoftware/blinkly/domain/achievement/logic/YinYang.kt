@@ -10,13 +10,15 @@ import com.sedsoftware.blinkly.domain.model.Workout
  * Yin Yang - Complete any workout after switching the app theme from dark to light, and vice versa.
  */
 internal class YinYang(
-    private val lightThemeCompleted: () -> Boolean,
-    private val darkThemeCompleted: () -> Boolean,
+    private val lightThemeCompleted: () -> Int,
+    private val darkThemeCompleted: () -> Int,
 ) : UnlockableAchievement {
 
     override val type: AchievementType = AchievementType.YIN_YANG
 
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
-        return lightThemeCompleted.invoke() && darkThemeCompleted.invoke()
+        val lightIndex = lightThemeCompleted.invoke()
+        val darkIndex = darkThemeCompleted.invoke()
+        return lightIndex != 0 && darkIndex != 0 && lightIndex != darkIndex
     }
 }

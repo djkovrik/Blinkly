@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
-import kotlinx.datetime.plus
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -41,7 +40,7 @@ abstract class BaseDomainTest {
     }
 
     protected val settings: BlinklySettings = mock {
-        every { blinkBreakCount } returns FakeData.BLINK_COUNT
+        every { blinkBreakCount } returns FakeData.BLINK_BREAK_COUNT
         every { nearFarFocusCount } returns FakeData.NEAR_FAR_COUNT
         every { nearFarFocusDuration } returns FakeData.NEAR_FAR_DURATION
         every { diagonalGazesCount } returns FakeData.DIAGONAL_COUNT
@@ -50,8 +49,8 @@ abstract class BaseDomainTest {
         every { clockRollsEachSide } returns FakeData.CLOCK_COUNT
         every { palmingDuration } returns FakeData.PALMING_DURATION
         every { themeState } returns ThemeState.SYSTEM
-        every { lightThemeWorkoutDone } returns false
-        every { darkThemeWorkoutDone } returns false
+        every { lightThemeWorkoutIndex } returns 0
+        every { darkThemeWorkoutIndex } returns 0
     }
 
     protected val timeUtils: BlinklyTimeUtils = mock {

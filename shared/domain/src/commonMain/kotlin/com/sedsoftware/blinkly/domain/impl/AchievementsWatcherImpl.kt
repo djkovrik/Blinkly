@@ -1,4 +1,4 @@
-package com.sedsoftware.blinkly.domain.internal
+package com.sedsoftware.blinkly.domain.impl
 
 import com.sedsoftware.blinkly.domain.AchievementsWatcher
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
@@ -50,6 +50,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementType
+import com.sedsoftware.blinkly.domain.model.ThemeState
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -76,17 +77,20 @@ internal class AchievementsWatcherImpl(
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
     private val _currentAchievements = MutableStateFlow<List<Achievement>>(emptyList())
 
-    private val lightThemeWorkoutDone: () -> Boolean
-        get() = { settings.lightThemeWorkoutDone }
+    private val lightThemeWorkoutIndex: () -> Int
+        get() = { settings.lightThemeWorkoutIndex }
 
-    private val darkThemeWorkoutDone: () -> Boolean
-        get() = { settings.darkThemeWorkoutDone }
+    private val darkThemeWorkoutIndex: () -> Int
+        get() = { settings.darkThemeWorkoutIndex }
 
     private val achievementsFlow: Flow<List<Achievement>> = flow {
         val achievementsSource: Flow<List<Achievement>> = database.currentAchievements()
         val calendarSource: Flow<List<Workout>> = database.currentCalendar()
         emitAll(
             combine(achievementsSource, calendarSource) { achievements, calendar ->
+                if (calendar.isNotEmpty()) {
+                    refreshYinYangState(calendar)
+                }
                 checkIfUnlocked(achievements, calendar)
                 achievements
             }
@@ -123,6 +127,16 @@ internal class AchievementsWatcherImpl(
             unlockedAt = timeUtils.now(),
         )
         database.unlockAchievement(achievement)
+    }
+
+    private fun refreshYinYangState(calendar: List<Workout>) {
+        if (settings.lightThemeWorkoutIndex == 0 && settings.themeState == ThemeState.LIGHT) {
+            settings.lightThemeWorkoutIndex = calendar.size
+        }
+
+        if (settings.darkThemeWorkoutIndex == 0 && settings.themeState == ThemeState.DARK) {
+            settings.darkThemeWorkoutIndex = calendar.size
+        }
     }
 
     private fun notifyAboutUnlockedAchievement(achievementType: AchievementType) {
@@ -172,7 +186,7 @@ internal class AchievementsWatcherImpl(
             EarlyBird(),
             NightOwl(),
             Multitasker(),
-            YinYang(lightThemeWorkoutDone, darkThemeWorkoutDone),
+            YinYang(lightThemeWorkoutIndex, darkThemeWorkoutIndex),
             TimelessGaze(),
             ThinkTank(),
         )
