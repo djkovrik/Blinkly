@@ -81,7 +81,8 @@ lib-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 lib-alarmee = { group = "io.github.tweener", name = "alarmee", version.ref = "alarmee" }
 lib-moko-permissions-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "moko-permissions" }
 lib-moko-permissions-notifications = { group = "dev.icerock.moko", name = "permissions-notifications", version.ref = "moko-permissions" }
-lib-multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
+lib-multiplatform-settings-core = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
+lib-multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
 lib-detekt-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "detekt-compose" }
 lib-detekt-decompose = { module = "io.github.ajiekcx.detekt:decompose-detekt-rules", version.ref = "detekt-decompose" }
 
