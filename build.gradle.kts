@@ -7,9 +7,8 @@ plugins {
     alias(libs.plugins.android.kmp.library).apply(false)
     alias(libs.plugins.kotlin.jvm).apply(false)
     alias(libs.plugins.kotlinx.serialization).apply(false)
-    alias(libs.plugins.room).apply(false)
-    alias(libs.plugins.ksp).apply(false)
     alias(libs.plugins.mokkery).apply(false)
+    alias(libs.plugins.sqldelight).apply(false)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kover)
     alias(libs.plugins.coverage)
@@ -47,12 +46,17 @@ kover {
             excludes {
                 classes(
                     "com.sedsoftware.blinkly.*.integration.*Preview",
-                    "com.sedsoftware.blinkly.*.*Module",
+                    "com.sedsoftware.*.database.*AppDatabase",
+                    "com.sedsoftware.*.database.*AppDatabaseQueries",
+                    "com.sedsoftware.*.*FactoryKt",
+                    "com.sedsoftware.*.di.*Module",
                 )
             }
             includes {
                 classes(
                     "com.sedsoftware.*.domain.*",
+                    "com.sedsoftware.*.database.*",
+                    "com.sedsoftware.*.settings.*",
                     "com.sedsoftware.*.extension.*",
                     "com.sedsoftware.*.integration.*Default",
                     "com.sedsoftware.*.store.*",

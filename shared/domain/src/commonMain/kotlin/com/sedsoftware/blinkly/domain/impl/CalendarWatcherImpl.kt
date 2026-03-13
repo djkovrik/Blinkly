@@ -1,4 +1,4 @@
-package com.sedsoftware.blinkly.domain.internal
+package com.sedsoftware.blinkly.domain.impl
 
 import com.sedsoftware.blinkly.domain.CalendarWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase

@@ -17,7 +17,7 @@ import kotlin.random.Random
 import kotlin.time.Instant
 
 internal object FakeData {
-    const val BLINK_COUNT = 60
+    const val BLINK_BREAK_COUNT = 60
     const val NEAR_FAR_COUNT = 10
     const val NEAR_FAR_DURATION = 5f
     const val DIAGONAL_COUNT = 5

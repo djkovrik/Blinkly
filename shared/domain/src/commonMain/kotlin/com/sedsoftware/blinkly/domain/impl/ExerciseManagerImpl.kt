@@ -1,4 +1,4 @@
-package com.sedsoftware.blinkly.domain.internal
+package com.sedsoftware.blinkly.domain.impl
 
 import com.sedsoftware.blinkly.domain.ExerciseManager
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteBlockNode
@@ -92,9 +92,7 @@ internal class ExerciseManagerImpl(
         progress: ExerciseProgress?,
     ) {
         progress?.let {
-            _events.emit(
-                ExerciseEvent.Progress(block, type, it)
-            )
+            _events.emit(ExerciseEvent.Progress(block, type, it))
         }
 
         when (node) {

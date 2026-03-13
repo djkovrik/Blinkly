@@ -13,8 +13,6 @@ agp = "8.12.3"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.9.0"
 kotlinx-datetime = "0.7.1"
-room = "2.8.4"
-ksp = "2.3.4"
 
 # AndroidX
 androidx-activityCompose = "1.12.0"
@@ -30,6 +28,7 @@ essenty = "2.5.0"
 
 #Libs
 multiplatform-settings = "1.3.0"
+sqldelight = "2.2.1"
 kermit = "2.0.8"
 alarmee = "2.6.0"
 moko-permissions = "0.20.1"
@@ -67,9 +66,6 @@ kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 
-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-
 ark-mvikotlin-core = { module = "com.arkivanov.mvikotlin:mvikotlin", version.ref = "mviKotlin" }
 ark-mvikotlin-main = { module = "com.arkivanov.mvikotlin:mvikotlin-main", version.ref = "mviKotlin" }
 ark-mvikotlin-extensions = { module = "com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines", version.ref = "mviKotlin" }
@@ -81,9 +77,16 @@ lib-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 lib-alarmee = { group = "io.github.tweener", name = "alarmee", version.ref = "alarmee" }
 lib-moko-permissions-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "moko-permissions" }
 lib-moko-permissions-notifications = { group = "dev.icerock.moko", name = "permissions-notifications", version.ref = "moko-permissions" }
-lib-multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
+lib-multiplatform-settings-core = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
+lib-multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
 lib-detekt-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "detekt-compose" }
 lib-detekt-decompose = { module = "io.github.ajiekcx.detekt:decompose-detekt-rules", version.ref = "detekt-decompose" }
+
+lib-sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+lib-sqldelight-adapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
+lib-sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+lib-sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+lib-sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 
 test-kotlin = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
@@ -100,8 +103,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-kmp-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-room = { id = "androidx.room", version.ref = "room" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }

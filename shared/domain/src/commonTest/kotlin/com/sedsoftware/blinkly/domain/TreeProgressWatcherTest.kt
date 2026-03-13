@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.fakes.FakeData
-import com.sedsoftware.blinkly.domain.internal.TreeProgressWatcherImpl
+import com.sedsoftware.blinkly.domain.impl.TreeProgressWatcherImpl
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeStage
 import com.sedsoftware.blinkly.domain.model.TreeType

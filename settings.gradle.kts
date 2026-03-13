@@ -33,6 +33,8 @@ include(
     ":desktopApp",
     ":shared:compose",
     ":shared:domain",
+    ":shared:database",
+    ":shared:settings",
 )
 
 includeBuild("gradle/build-logic")

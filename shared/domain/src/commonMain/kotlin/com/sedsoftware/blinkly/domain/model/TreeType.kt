@@ -10,5 +10,10 @@ enum class TreeType(val index: Int) {
     SEQUOIA_SEMPERVIRENS(7),
     BETULA(8),
     FICUS_BENJAMINA(9),
-    QUERCUS_ROBUR(10),
+    QUERCUS_ROBUR(10);
+
+    companion object {
+        fun fromIndex(index: Int): TreeType =
+            entries.firstOrNull { it.index == index } ?: FRAXINUS_EXCELSIOR
+    }
 }

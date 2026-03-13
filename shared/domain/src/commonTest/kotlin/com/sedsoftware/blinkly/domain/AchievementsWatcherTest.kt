@@ -1,12 +1,15 @@
 package com.sedsoftware.blinkly.domain
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.fakes.FakeData
-import com.sedsoftware.blinkly.domain.internal.AchievementsWatcherImpl
+import com.sedsoftware.blinkly.domain.impl.AchievementsWatcherImpl
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
+import com.sedsoftware.blinkly.domain.model.ThemeState
 import com.sedsoftware.blinkly.domain.model.Workout
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -62,6 +65,60 @@ class AchievementsWatcherTest : BaseDomainTest() {
     }
 
     @Test
+    fun `any exercise in light theme should write light theme index`() = runTest(testScheduler) {
+        // given
+        val today = now
+        val workout = FakeData.getSingleExerciseWorkout(today)
+        val calendar: List<Workout> = listOf(workout)
+
+        settings.lightThemeWorkoutIndex = 0
+        settings.darkThemeWorkoutIndex = 0
+        settings.themeState = ThemeState.LIGHT
+
+        // when
+        val collectJob = launch { watcher.achievements.collect {} }
+
+        achievementsFlow.emit(emptyList())
+        calendarFlow.emit(calendar)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(settings.lightThemeWorkoutIndex).isEqualTo(1)
+
+        settings.lightThemeWorkoutIndex = 0
+        settings.darkThemeWorkoutIndex = 0
+        settings.themeState = ThemeState.SYSTEM
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `any exercise in dark theme should write dark theme index`() = runTest(testScheduler) {
+        // given
+        val today = now
+        val workout = FakeData.getSingleExerciseWorkout(today)
+        val calendar: List<Workout> = listOf(workout)
+
+        settings.lightThemeWorkoutIndex = 0
+        settings.darkThemeWorkoutIndex = 0
+        settings.themeState = ThemeState.DARK
+
+        // when
+        val collectJob = launch { watcher.achievements.collect {} }
+
+        achievementsFlow.emit(emptyList())
+        calendarFlow.emit(calendar)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(settings.darkThemeWorkoutIndex).isEqualTo(1)
+
+        settings.lightThemeWorkoutIndex = 0
+        settings.darkThemeWorkoutIndex = 0
+        settings.themeState = ThemeState.SYSTEM
+        collectJob.cancel()
+    }
+
+    @Test
     fun `any exercise when both light and dark workouts completed should unlock Yin Yang`() = runTest(testScheduler) {
         // given
         val today = now
@@ -74,8 +131,8 @@ class AchievementsWatcherTest : BaseDomainTest() {
             unlockedAt = today,
         )
 
-        every { settings.lightThemeWorkoutDone } returns true
-        every { settings.darkThemeWorkoutDone } returns true
+        settings.lightThemeWorkoutIndex = 1
+        settings.darkThemeWorkoutIndex = 2
 
         // when
         val collectJob = launch { watcher.achievements.collect {} }
@@ -88,6 +145,8 @@ class AchievementsWatcherTest : BaseDomainTest() {
         verifySuspend { database.unlockAchievement(unlockedAchievement) }
         verifySuspend { notifier.achievementUnlocked(AchievementType.YIN_YANG) }
 
+        settings.lightThemeWorkoutIndex = 0
+        settings.darkThemeWorkoutIndex = 0
         collectJob.cancel()
     }
 }

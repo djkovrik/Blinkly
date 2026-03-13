@@ -1,6 +1,7 @@
-package com.sedsoftware.blinkly.domain.internal
+package com.sedsoftware.blinkly.domain.impl
 
 import com.sedsoftware.blinkly.domain.TreeProgressWatcher
+import com.sedsoftware.blinkly.domain.extension.asLocalDate
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
@@ -16,9 +17,6 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 class TreeProgressWatcherImpl(
@@ -47,9 +45,9 @@ class TreeProgressWatcherImpl(
             return Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f)
         }
 
-        val today = now.toLocalDate()
+        val today = now.asLocalDate()
         val exercisesByDate = workouts.flatMap { it.exercises }
-            .groupBy { it.completedAt.toLocalDate() }
+            .groupBy { it.completedAt.asLocalDate() }
 
         val dailyProgressByDate = exercisesByDate.mapValues { (_, exercises) ->
             val uniqueBlocks = exercises.map { it.block }.toSet().size
@@ -120,9 +118,6 @@ class TreeProgressWatcherImpl(
         }
         return type to stage
     }
-
-    private fun Instant.toLocalDate(): LocalDate =
-        this.toLocalDateTime(TimeZone.UTC).date
 
     private companion object {
         const val SUBSCRIPTION_STOP_TIMEOUT = 5000L

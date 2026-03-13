@@ -2,10 +2,8 @@ package com.sedsoftware.blinkly.domain.base
 
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
-import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
-import com.sedsoftware.blinkly.domain.fakes.FakeData
-import com.sedsoftware.blinkly.domain.model.ThemeState
+import com.sedsoftware.blinkly.domain.fakes.FakeSettings
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.matcher.any
@@ -16,7 +14,6 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
-import kotlinx.datetime.plus
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -40,19 +37,7 @@ abstract class BaseDomainTest {
         every { achievementUnlocked(any()) } returns Unit
     }
 
-    protected val settings: BlinklySettings = mock {
-        every { blinkBreakCount } returns FakeData.BLINK_COUNT
-        every { nearFarFocusCount } returns FakeData.NEAR_FAR_COUNT
-        every { nearFarFocusDuration } returns FakeData.NEAR_FAR_DURATION
-        every { diagonalGazesCount } returns FakeData.DIAGONAL_COUNT
-        every { diagonalGazesDuration } returns FakeData.DIAGONAL_DURATION
-        every { figureEightCount } returns FakeData.FIGURE_EIGHT_COUNT
-        every { clockRollsEachSide } returns FakeData.CLOCK_COUNT
-        every { palmingDuration } returns FakeData.PALMING_DURATION
-        every { themeState } returns ThemeState.SYSTEM
-        every { lightThemeWorkoutDone } returns false
-        every { darkThemeWorkoutDone } returns false
-    }
+    protected val settings: FakeSettings = FakeSettings()
 
     protected val timeUtils: BlinklyTimeUtils = mock {
         every { now() } returns now
