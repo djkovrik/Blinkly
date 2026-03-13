@@ -5,5 +5,10 @@ enum class AchievementLevel(val index: Int) {
     INTERMEDIATE(2),
     PRO(3),
     EXPERT(4),
-    HIDDEN(5),
+    HIDDEN(5);
+
+    companion object {
+        fun fromIndex(index: Int): AchievementLevel =
+            entries.firstOrNull { it.index == index } ?: BEGINNER
+    }
 }

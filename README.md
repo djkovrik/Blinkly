@@ -19,7 +19,7 @@ Kotlin Multiplatform app for eye health support
 * [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform)
 * [Decompose](https://github.com/arkivanov/Decompose/)
 * [MVIKotlin](https://github.com/arkivanov/MVIKotlin/)
-* [Room](https://developer.android.com/kotlin/multiplatform/room)
+* [SQL Delight](https://sqldelight.github.io/sqldelight/latest/)
 * [Multiplatform Settings](https://github.com/russhwolf/multiplatform-settings)
 * [MOKO Permissions](https://github.com/icerockdev/moko-permissions)
 * [Alarmee](https://github.com/tweener/alarmee)

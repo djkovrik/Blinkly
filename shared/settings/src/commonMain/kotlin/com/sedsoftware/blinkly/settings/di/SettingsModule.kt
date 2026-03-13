@@ -1,4 +1,4 @@
-package com.sedsoftware.blinkly.settings
+package com.sedsoftware.blinkly.settings.di
 
 import com.russhwolf.settings.Settings
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
