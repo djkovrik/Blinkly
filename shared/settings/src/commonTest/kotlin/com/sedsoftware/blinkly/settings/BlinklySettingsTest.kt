@@ -1,6 +1,7 @@
 package com.sedsoftware.blinkly.settings
 
 import assertk.assertThat
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import com.russhwolf.settings.MapSettings
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
@@ -29,6 +30,8 @@ class BlinklySettingsTest {
         val lightThemeWorkoutDoneDefault = settings.lightThemeWorkoutIndex
         val darkThemeWorkoutDoneDefault = settings.darkThemeWorkoutIndex
         val lastTreeProgressCheckDateDefault = settings.lastTreeProgressCheckDate
+        val displayedHighlightsDefault = settings.displayedHighlights
+        val currentHighlightDateDefault = settings.currentHighlightDate
 
         // then
         assertThat(blinkBreakCountDefault).isEqualTo(BLINK_BREAK_COUNT_DEFAULT)
@@ -43,6 +46,8 @@ class BlinklySettingsTest {
         assertThat(lightThemeWorkoutDoneDefault).isEqualTo(0)
         assertThat(darkThemeWorkoutDoneDefault).isEqualTo(0)
         assertThat(lastTreeProgressCheckDateDefault).isEqualTo(null)
+        assertThat(displayedHighlightsDefault).isEmpty()
+        assertThat(currentHighlightDateDefault).isEqualTo(null)
     }
 
     @Test
@@ -52,6 +57,7 @@ class BlinklySettingsTest {
         val floatValue = 12345.0f
         val localDateValue = LocalDate.parse("2026-03-01")
         val themeValue = ThemeState.DARK
+        val listValue = listOf(1, 2, 3)
         // when
         settings.blinkBreakCount = intValue
         settings.nearFarFocusCount = intValue
@@ -65,6 +71,8 @@ class BlinklySettingsTest {
         settings.lightThemeWorkoutIndex = intValue
         settings.darkThemeWorkoutIndex = intValue
         settings.lastTreeProgressCheckDate = localDateValue
+        settings.displayedHighlights = listValue
+        settings.currentHighlightDate = localDateValue
         // then
         assertThat(settings.blinkBreakCount).isEqualTo(intValue)
         assertThat(settings.nearFarFocusCount).isEqualTo(intValue)
@@ -78,6 +86,8 @@ class BlinklySettingsTest {
         assertThat(settings.lightThemeWorkoutIndex).isEqualTo(intValue)
         assertThat(settings.darkThemeWorkoutIndex).isEqualTo(intValue)
         assertThat(settings.lastTreeProgressCheckDate).isEqualTo(localDateValue)
+        assertThat(settings.displayedHighlights).isEqualTo(listValue)
+        assertThat(settings.currentHighlightDate).isEqualTo(localDateValue)
     }
 
     private companion object {

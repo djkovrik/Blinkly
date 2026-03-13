@@ -5,7 +5,6 @@ import assertk.assertions.isEqualTo
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.fakes.FakeData
-import com.sedsoftware.blinkly.domain.fakes.FakeSettings
 import com.sedsoftware.blinkly.domain.impl.AchievementsWatcherImpl
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
@@ -34,10 +33,8 @@ class AchievementsWatcherTest : BaseDomainTest() {
         everySuspend { unlockAchievement(any()) } returns Unit
     }
 
-    private val fakeSettings: FakeSettings = FakeSettings()
-
     private val watcher: AchievementsWatcher = AchievementsWatcherImpl(
-        database, notifier, fakeSettings, timeUtils, testDispatchers
+        database, notifier, settings, timeUtils, testDispatchers
     )
 
     @Test
@@ -74,9 +71,9 @@ class AchievementsWatcherTest : BaseDomainTest() {
         val workout = FakeData.getSingleExerciseWorkout(today)
         val calendar: List<Workout> = listOf(workout)
 
-        fakeSettings.lightThemeWorkoutIndex = 0
-        fakeSettings.darkThemeWorkoutIndex = 0
-        fakeSettings.themeState = ThemeState.LIGHT
+        settings.lightThemeWorkoutIndex = 0
+        settings.darkThemeWorkoutIndex = 0
+        settings.themeState = ThemeState.LIGHT
 
         // when
         val collectJob = launch { watcher.achievements.collect {} }
@@ -86,11 +83,11 @@ class AchievementsWatcherTest : BaseDomainTest() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(fakeSettings.lightThemeWorkoutIndex).isEqualTo(1)
+        assertThat(settings.lightThemeWorkoutIndex).isEqualTo(1)
 
-        fakeSettings.lightThemeWorkoutIndex = 0
-        fakeSettings.darkThemeWorkoutIndex = 0
-        fakeSettings.themeState = ThemeState.SYSTEM
+        settings.lightThemeWorkoutIndex = 0
+        settings.darkThemeWorkoutIndex = 0
+        settings.themeState = ThemeState.SYSTEM
         collectJob.cancel()
     }
 
@@ -101,9 +98,9 @@ class AchievementsWatcherTest : BaseDomainTest() {
         val workout = FakeData.getSingleExerciseWorkout(today)
         val calendar: List<Workout> = listOf(workout)
 
-        fakeSettings.lightThemeWorkoutIndex = 0
-        fakeSettings.darkThemeWorkoutIndex = 0
-        fakeSettings.themeState = ThemeState.DARK
+        settings.lightThemeWorkoutIndex = 0
+        settings.darkThemeWorkoutIndex = 0
+        settings.themeState = ThemeState.DARK
 
         // when
         val collectJob = launch { watcher.achievements.collect {} }
@@ -113,11 +110,11 @@ class AchievementsWatcherTest : BaseDomainTest() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(fakeSettings.darkThemeWorkoutIndex).isEqualTo(1)
+        assertThat(settings.darkThemeWorkoutIndex).isEqualTo(1)
 
-        fakeSettings.lightThemeWorkoutIndex = 0
-        fakeSettings.darkThemeWorkoutIndex = 0
-        fakeSettings.themeState = ThemeState.SYSTEM
+        settings.lightThemeWorkoutIndex = 0
+        settings.darkThemeWorkoutIndex = 0
+        settings.themeState = ThemeState.SYSTEM
         collectJob.cancel()
     }
 
@@ -134,8 +131,8 @@ class AchievementsWatcherTest : BaseDomainTest() {
             unlockedAt = today,
         )
 
-        fakeSettings.lightThemeWorkoutIndex = 1
-        fakeSettings.darkThemeWorkoutIndex = 2
+        settings.lightThemeWorkoutIndex = 1
+        settings.darkThemeWorkoutIndex = 2
 
         // when
         val collectJob = launch { watcher.achievements.collect {} }
@@ -148,8 +145,8 @@ class AchievementsWatcherTest : BaseDomainTest() {
         verifySuspend { database.unlockAchievement(unlockedAchievement) }
         verifySuspend { notifier.achievementUnlocked(AchievementType.YIN_YANG) }
 
-        fakeSettings.lightThemeWorkoutIndex = 0
-        fakeSettings.darkThemeWorkoutIndex = 0
+        settings.lightThemeWorkoutIndex = 0
+        settings.darkThemeWorkoutIndex = 0
         collectJob.cancel()
     }
 }

@@ -17,4 +17,6 @@ class FakeSettings : BlinklySettings {
     override var lightThemeWorkoutIndex: Int = 0
     override var darkThemeWorkoutIndex: Int = 0
     override var lastTreeProgressCheckDate: LocalDate? = null
+    override var displayedHighlights: List<Int> = emptyList()
+    override var currentHighlightDate: LocalDate? = null
 }

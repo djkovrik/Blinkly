@@ -16,4 +16,6 @@ interface BlinklySettings {
     var lightThemeWorkoutIndex: Int
     var darkThemeWorkoutIndex: Int
     var lastTreeProgressCheckDate: LocalDate?
+    var displayedHighlights: List<Int>
+    var currentHighlightDate: LocalDate?
 }

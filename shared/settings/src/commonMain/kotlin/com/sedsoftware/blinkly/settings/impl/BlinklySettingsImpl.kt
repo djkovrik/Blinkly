@@ -4,10 +4,18 @@ import com.russhwolf.settings.Settings
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 
 internal class BlinklySettingsImpl(
     private val settings: Settings,
 ) : BlinklySettings {
+
+    private val json: Json by lazy {
+        Json {
+            isLenient = true
+        }
+    }
 
     override var blinkBreakCount: Int
         get() = settings.getValue(PREF_BLINK_BREAK_COUNT, BLINK_BREAK_COUNT_DEFAULT)
@@ -89,6 +97,38 @@ internal class BlinklySettingsImpl(
             settings.setValue(PREF_LAST_TREE_PROGRESS_CHECK_DATE, stringValue)
         }
 
+    override var displayedHighlights: List<Int>
+        get() {
+            val stringValue = settings.getValue(PREF_DISPLAYED_HIGHLIGHTS, "")
+            val decodedList: List<Int> = try {
+                json.decodeFromString(stringValue)
+            } catch (_: SerializationException) {
+                emptyList()
+            } catch (_: IllegalArgumentException) {
+                emptyList()
+            }
+
+            return decodedList
+        }
+        set(value) {
+            val stringValue = json.encodeToString(value)
+            settings.setValue(PREF_DISPLAYED_HIGHLIGHTS, stringValue)
+        }
+
+    override var currentHighlightDate: LocalDate?
+        get() {
+            val stringValue = settings.getValue(PREF_CURRENT_HIGHLIGHT_DATE, "")
+            return if (stringValue.isNotEmpty()) {
+                LocalDate.parse(stringValue)
+            } else {
+                null
+            }
+        }
+        set(value) {
+            val stringValue = value.toString()
+            settings.setValue(PREF_CURRENT_HIGHLIGHT_DATE, stringValue)
+        }
+
     private fun Settings.setValue(key: String, value: Any) {
         when (value) {
             is String -> putString(key, value)
@@ -132,5 +172,7 @@ internal class BlinklySettingsImpl(
         const val PREF_LIGHT_THEME_WORKOUT_INDEX = "ltwi"
         const val PREF_DARK_THEME_WORKOUT_INDEX = "dtwi"
         const val PREF_LAST_TREE_PROGRESS_CHECK_DATE = "ltpcd"
+        const val PREF_DISPLAYED_HIGHLIGHTS = "dh"
+        const val PREF_CURRENT_HIGHLIGHT_DATE = "chd"
     }
 }
