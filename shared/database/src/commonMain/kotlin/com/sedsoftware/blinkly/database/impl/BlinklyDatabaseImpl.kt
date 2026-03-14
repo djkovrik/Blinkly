@@ -44,12 +44,18 @@ internal class BlinklyDatabaseImpl(
     private val queries: BlinklyAppDatabaseQueries
         get() = database.blinklyAppDatabaseQueries
 
-    override suspend fun currentCalendar(): Flow<List<Workout>> =
+    override fun currentCalendar(): Flow<List<Workout>> =
         queries.getExercises()
             .asFlow()
             .mapToList(dispatchers.io)
             .map(ExerciseMapper::toDomain)
             .map(ExerciseMapper::toWorkout)
+
+    override fun currentAchievements(): Flow<List<Achievement>> =
+        queries.getAchievements()
+            .asFlow()
+            .mapToList(dispatchers.io)
+            .map(AchievementMapper::toDomain)
 
     override suspend fun saveExercise(exercise: Exercise) {
         withContext(dispatchers.io) {
@@ -60,12 +66,6 @@ internal class BlinklyDatabaseImpl(
             )
         }
     }
-
-    override suspend fun currentAchievements(): Flow<List<Achievement>> =
-        queries.getAchievements()
-            .asFlow()
-            .mapToList(dispatchers.io)
-            .map(AchievementMapper::toDomain)
 
     override suspend fun unlockAchievement(achievement: Achievement) {
         withContext(dispatchers.io) {

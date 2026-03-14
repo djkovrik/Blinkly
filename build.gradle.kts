@@ -45,19 +45,19 @@ kover {
         filters {
             excludes {
                 classes(
-                    "com.sedsoftware.blinkly.*.integration.*Preview",
+                    "com.sedsoftware.*.integration.*Preview",
                     "com.sedsoftware.*.database.*AppDatabase",
                     "com.sedsoftware.*.database.*AppDatabaseQueries",
                     "com.sedsoftware.*.*FactoryKt",
-                    "com.sedsoftware.*.di.*Module",
+                    "com.sedsoftware.*.di.*",
                 )
             }
             includes {
                 classes(
                     "com.sedsoftware.*.domain.*",
                     "com.sedsoftware.*.database.*",
+                    "com.sedsoftware.*.notifier.*",
                     "com.sedsoftware.*.settings.*",
-                    "com.sedsoftware.*.extension.*",
                     "com.sedsoftware.*.integration.*Default",
                     "com.sedsoftware.*.store.*",
                     "com.sedsoftware.*.mapper.*",

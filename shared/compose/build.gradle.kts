@@ -11,8 +11,6 @@ plugins {
 kotlin {
     androidTarget() //We need the deprecated target to have working previews
 
-    jvm()
-
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -40,12 +38,6 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.kotlinx.coroutines.android)
         }
-
-        jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
-        }
-
     }
 
     targets
