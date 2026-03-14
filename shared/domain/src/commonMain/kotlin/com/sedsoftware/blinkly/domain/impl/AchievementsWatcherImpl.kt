@@ -139,7 +139,7 @@ internal class AchievementsWatcherImpl(
         }
     }
 
-    private fun notifyAboutUnlockedAchievement(achievementType: AchievementType) {
+    private suspend fun notifyAboutUnlockedAchievement(achievementType: AchievementType) {
         notifier.achievementUnlocked(achievementType)
     }
 

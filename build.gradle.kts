@@ -56,6 +56,7 @@ kover {
                 classes(
                     "com.sedsoftware.*.domain.*",
                     "com.sedsoftware.*.database.*",
+                    "com.sedsoftware.*.notifier.*",
                     "com.sedsoftware.*.settings.*",
                     "com.sedsoftware.*.extension.*",
                     "com.sedsoftware.*.integration.*Default",

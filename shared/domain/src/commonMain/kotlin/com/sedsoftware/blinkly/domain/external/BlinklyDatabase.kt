@@ -6,8 +6,8 @@ import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.flow.Flow
 
 interface BlinklyDatabase {
-    suspend fun currentCalendar(): Flow<List<Workout>>
+    fun currentCalendar(): Flow<List<Workout>>
+    fun currentAchievements(): Flow<List<Achievement>>
     suspend fun saveExercise(exercise: Exercise)
-    suspend fun currentAchievements(): Flow<List<Achievement>>
     suspend fun unlockAchievement(achievement: Achievement)
 }

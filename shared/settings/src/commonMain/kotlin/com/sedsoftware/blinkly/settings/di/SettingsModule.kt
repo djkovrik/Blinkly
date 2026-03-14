@@ -15,7 +15,9 @@ interface SettingsModuleDependencies {
 fun SettingsModule(dependencies: SettingsModuleDependencies): SettingsModule {
     return object : SettingsModule {
         override val settings: BlinklySettings by lazy {
-            BlinklySettingsImpl(dependencies.settings)
+            BlinklySettingsImpl(
+                settings = dependencies.settings,
+            )
         }
     }
 }
