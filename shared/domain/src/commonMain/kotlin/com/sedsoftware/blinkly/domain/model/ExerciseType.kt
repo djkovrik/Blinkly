@@ -8,9 +8,4 @@ enum class ExerciseType(val index: Int) {
     CLOCK_ROLLS(6),
     PALMING(7),
     TWENTY_X3(8);
-
-    companion object {
-        fun fromIndex(index: Int): ExerciseType =
-            entries.firstOrNull { it.index == index } ?: BLINK_BREAK
-    }
 }

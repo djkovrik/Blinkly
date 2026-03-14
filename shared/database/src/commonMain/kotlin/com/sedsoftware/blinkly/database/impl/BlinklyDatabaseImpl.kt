@@ -1,5 +1,6 @@
 package com.sedsoftware.blinkly.database.impl
 
+import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.adapter.primitive.IntColumnAdapter
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
@@ -29,14 +30,14 @@ internal class BlinklyDatabaseImpl(
         BlinklyAppDatabase(
             driver = driver,
             AchievementEntityAdapter = AchievementEntity.Adapter(
-                typeAdapter = IntColumnAdapter,
-                levelAdapter = IntColumnAdapter,
+                typeAdapter = EnumColumnAdapter(),
+                levelAdapter = EnumColumnAdapter(),
                 unlockedAtAdapter = InstantAdapter,
             ),
             ExerciseEntityAdapter = ExerciseEntity.Adapter(
                 idAdapter = IntColumnAdapter,
-                typeAdapter = IntColumnAdapter,
-                blockAdapter = IntColumnAdapter,
+                typeAdapter = EnumColumnAdapter(),
+                blockAdapter = EnumColumnAdapter(),
                 completedAtAdapter = InstantAdapter,
             ),
         )
@@ -60,8 +61,8 @@ internal class BlinklyDatabaseImpl(
     override suspend fun saveExercise(exercise: Exercise) {
         withContext(dispatchers.io) {
             queries.insertExercise(
-                type = exercise.type.index,
-                block = exercise.block.index,
+                type = exercise.type,
+                block = exercise.block,
                 completedAt = exercise.completedAt,
             )
         }
@@ -70,8 +71,8 @@ internal class BlinklyDatabaseImpl(
     override suspend fun unlockAchievement(achievement: Achievement) {
         withContext(dispatchers.io) {
             queries.insertAchievement(
-                type = achievement.type.index,
-                level = achievement.level.index,
+                type = achievement.type,
+                level = achievement.level,
                 unlockedAt = achievement.unlockedAt,
             )
         }
