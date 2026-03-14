@@ -6,6 +6,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.fakes.FakeSettings
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import kotlinx.coroutines.CoroutineDispatcher
@@ -34,7 +35,7 @@ abstract class BaseDomainTest {
         get() = now.minus(1, DateTimeUnit.DAY, TimeZone.UTC)
 
     protected val notifier: BlinklyNotifier = mock {
-        every { achievementUnlocked(any()) } returns Unit
+        everySuspend { achievementUnlocked(any()) } returns Unit
     }
 
     protected val settings: FakeSettings = FakeSettings()

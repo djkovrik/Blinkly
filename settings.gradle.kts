@@ -30,7 +30,6 @@ dependencyResolutionManagement {
 }
 include(
     ":androidApp",
-    ":desktopApp",
     ":shared:compose",
     ":shared:domain",
     ":shared:database",
