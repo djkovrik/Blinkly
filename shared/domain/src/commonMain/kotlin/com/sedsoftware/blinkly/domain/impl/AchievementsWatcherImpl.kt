@@ -87,12 +87,12 @@ internal class AchievementsWatcherImpl(
         val achievementsSource: Flow<List<Achievement>> = database.currentAchievements()
         val calendarSource: Flow<List<Workout>> = database.currentCalendar()
         emitAll(
-            combine(achievementsSource, calendarSource) { achievements, calendar ->
-                if (calendar.isNotEmpty()) {
-                    refreshYinYangState(calendar)
+            combine(achievementsSource, calendarSource) { unlockedAchievements, currentCalendar ->
+                if (currentCalendar.isNotEmpty()) {
+                    refreshYinYangState(currentCalendar)
                 }
-                checkIfUnlocked(achievements, calendar)
-                achievements
+                checkIfUnlocked(unlockedAchievements, currentCalendar)
+                buildFullAchievementsList(unlockedAchievements)
             }
         )
     }
@@ -145,6 +145,12 @@ internal class AchievementsWatcherImpl(
 
     private fun isAchievementUnlocked(achievementType: AchievementType): Boolean {
         return _currentAchievements.value.any { it.type == achievementType }
+    }
+
+    private fun buildFullAchievementsList(unlockedAchievements: List<Achievement>): List<Achievement> {
+        val unlocked: Map<AchievementType, Achievement> = unlockedAchievements.associateBy { it.type }
+        return AchievementType.entries
+            .map { type -> unlocked[type] ?: Achievement(type, type.getLevel(), null) }
     }
 
     private fun registerAchievements(): List<UnlockableAchievement> =

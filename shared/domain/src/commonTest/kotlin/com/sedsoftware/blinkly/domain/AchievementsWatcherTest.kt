@@ -1,6 +1,7 @@
 package com.sedsoftware.blinkly.domain
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
@@ -38,7 +39,7 @@ class AchievementsWatcherTest : BaseDomainTest() {
     )
 
     @Test
-    fun `any exercise at the first day should unlock FirstSpark`() = runTest(testScheduler) {
+    fun `when any exercise at the first day then should unlock FirstSpark`() = runTest(testScheduler) {
         // given
         val today = now
         val workout = FakeData.getSingleExerciseWorkout(today)
@@ -65,7 +66,7 @@ class AchievementsWatcherTest : BaseDomainTest() {
     }
 
     @Test
-    fun `any exercise in light theme should write light theme index`() = runTest(testScheduler) {
+    fun `when any exercise in light theme then should write light theme index`() = runTest(testScheduler) {
         // given
         val today = now
         val workout = FakeData.getSingleExerciseWorkout(today)
@@ -92,7 +93,7 @@ class AchievementsWatcherTest : BaseDomainTest() {
     }
 
     @Test
-    fun `any exercise in dark theme should write dark theme index`() = runTest(testScheduler) {
+    fun `when any exercise in dark theme then should write dark theme index`() = runTest(testScheduler) {
         // given
         val today = now
         val workout = FakeData.getSingleExerciseWorkout(today)
@@ -119,7 +120,7 @@ class AchievementsWatcherTest : BaseDomainTest() {
     }
 
     @Test
-    fun `any exercise when both light and dark workouts completed should unlock Yin Yang`() = runTest(testScheduler) {
+    fun `when any exercise when both light and dark workouts completed then should unlock Yin Yang`() = runTest(testScheduler) {
         // given
         val today = now
         val workout = FakeData.getSingleExerciseWorkout(today)
@@ -147,6 +148,22 @@ class AchievementsWatcherTest : BaseDomainTest() {
 
         settings.lightThemeWorkoutIndex = 0
         settings.darkThemeWorkoutIndex = 0
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `when achievement unlocked then should update resulting flow`() = runTest(testScheduler) {
+        // given
+        val achievement = Achievement(AchievementType.FIRST_SPARK, AchievementLevel.BEGINNER, now)
+        var achievements: List<Achievement> = emptyList()
+        // when
+        val collectJob = launch { watcher.achievements.collect { achievements = it } }
+        achievementsFlow.emit(listOf(achievement))
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(achievements.size).isEqualTo(AchievementType.entries.size)
+        assertThat(achievements).contains(achievement)
         collectJob.cancel()
     }
 }
