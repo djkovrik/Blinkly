@@ -15,6 +15,8 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
+    jvmToolchain(21)
+
     sourceSets {
         commonMain.dependencies {
             api(libs.compose.runtime)

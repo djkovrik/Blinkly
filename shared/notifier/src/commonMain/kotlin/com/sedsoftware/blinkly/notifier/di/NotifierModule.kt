@@ -9,11 +9,11 @@ interface NotifierModule {
     val settings: BlinklyNotifier
 }
 
-interface SettingsModuleDependencies {
+interface NotifierModuleDependencies {
     val controller: PermissionsController
 }
 
-fun NotifierModule(dependencies: SettingsModuleDependencies): NotifierModule {
+fun NotifierModule(dependencies: NotifierModuleDependencies): NotifierModule {
     return object : NotifierModule {
         override val settings: BlinklyNotifier by lazy {
             BlinklyNotifierImpl(

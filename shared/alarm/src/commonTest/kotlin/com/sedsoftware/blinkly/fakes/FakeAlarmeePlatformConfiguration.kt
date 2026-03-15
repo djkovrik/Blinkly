@@ -1,0 +1,5 @@
+package com.sedsoftware.blinkly.fakes
+
+import com.tweener.alarmee.configuration.AlarmeePlatformConfiguration
+
+class FakeAlarmeePlatformConfiguration : AlarmeePlatformConfiguration

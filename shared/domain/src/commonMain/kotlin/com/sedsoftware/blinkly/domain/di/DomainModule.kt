@@ -5,6 +5,7 @@ import com.sedsoftware.blinkly.domain.CalendarWatcher
 import com.sedsoftware.blinkly.domain.ExerciseManager
 import com.sedsoftware.blinkly.domain.HighlightsProvider
 import com.sedsoftware.blinkly.domain.TreeProgressWatcher
+import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
@@ -25,6 +26,7 @@ interface DomainModule {
 }
 
 interface DomainModuleDependencies {
+    val alarmManager: BlinklyAlarmManager
     val database: BlinklyDatabase
     val notifier: BlinklyNotifier
     val settings: BlinklySettings
