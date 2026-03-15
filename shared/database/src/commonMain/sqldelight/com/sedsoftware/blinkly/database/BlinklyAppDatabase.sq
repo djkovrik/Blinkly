@@ -2,8 +2,13 @@ import com.sedsoftware.blinkly.domain.model.AchievementLevel;
 import com.sedsoftware.blinkly.domain.model.AchievementType;
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock;
 import com.sedsoftware.blinkly.domain.model.ExerciseType;
+import com.sedsoftware.blinkly.domain.model.ReminderInterval;
+import com.sedsoftware.blinkly.domain.model.ReminderType;
 import kotlin.Int;
+import kotlin.collections.List;
 import kotlin.time.Instant;
+import kotlinx.datetime.DayOfWeek;
+import kotlinx.datetime.LocalDateTime;
 
 ---- ACHIEVEMENTS
 CREATE TABLE IF NOT EXISTS AchievementEntity(
@@ -43,3 +48,29 @@ FROM ExerciseEntity ORDER BY id;
 
 deleteExercises:
 DELETE FROM ExerciseEntity;
+
+
+---- REMINDERS
+CREATE TABLE IF NOT EXISTS ReminderEntity(
+    uuid TEXT NOT NULL PRIMARY KEY,
+    date TEXT AS LocalDateTime NOT NULL,
+    type TEXT AS ReminderType NOT NULL,
+    interval TEXT AS ReminderInterval NOT NULL,
+    weekDays TEXT AS List<DayOfWeek> NOT NULL,
+    UNIQUE(uuid)
+);
+
+insertReminder:
+INSERT OR REPLACE INTO ReminderEntity(uuid, date, type, interval, weekDays)
+VALUES (:uuid, :date, :type, :interval, :weekDays);
+
+getReminders:
+SELECT *
+FROM ReminderEntity;
+
+deleteReminder:
+DELETE FROM ReminderEntity
+WHERE uuid = :uuid;
+
+deleteReminders:
+DELETE FROM ReminderEntity;
