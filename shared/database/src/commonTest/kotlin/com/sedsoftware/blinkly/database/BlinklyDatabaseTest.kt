@@ -8,7 +8,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import com.sedsoftware.blinkly.database.impl.BlinklyDatabaseImpl
-import com.sedsoftware.blinkly.domain.extension.asLocalDateTime
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.model.Achievement
@@ -28,6 +27,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.Clock
@@ -123,7 +124,7 @@ class BlinklyDatabaseTest {
         val now = Clock.System.now()
         val reminder = Reminder(
             uuid = "test",
-            date = now.asLocalDateTime(),
+            date = now.toLocalDateTime(TimeZone.UTC),
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.DAILY,
             weekDays = listOf(DayOfWeek.MONDAY)
@@ -150,14 +151,14 @@ class BlinklyDatabaseTest {
         val uuid2 = "test2"
         val reminder1 = Reminder(
             uuid = uuid1,
-            date = now.asLocalDateTime(),
+            date = now.toLocalDateTime(TimeZone.UTC),
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.DAILY,
             weekDays = listOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
         )
         val reminder2 = Reminder(
             uuid = uuid2,
-            date = now.asLocalDateTime(),
+            date = now.toLocalDateTime(TimeZone.UTC),
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.WEEKLY,
             weekDays = listOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY)
@@ -183,14 +184,14 @@ class BlinklyDatabaseTest {
         val uuid2 = "test2"
         val reminder1 = Reminder(
             uuid = uuid1,
-            date = now.asLocalDateTime(),
+            date = now.toLocalDateTime(TimeZone.UTC),
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.DAILY,
             weekDays = listOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
         )
         val reminder2 = Reminder(
             uuid = uuid2,
-            date = now.asLocalDateTime(),
+            date = now.toLocalDateTime(TimeZone.UTC),
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.WEEKLY,
             weekDays = listOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY)
@@ -231,14 +232,14 @@ class BlinklyDatabaseTest {
         val uuid2 = "test2"
         val reminder1 = Reminder(
             uuid = uuid1,
-            date = now.asLocalDateTime(),
+            date = now.toLocalDateTime(TimeZone.UTC),
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.DAILY,
             weekDays = listOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
         )
         val reminder2 = Reminder(
             uuid = uuid2,
-            date = now.asLocalDateTime(),
+            date = now.toLocalDateTime(TimeZone.UTC),
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.WEEKLY,
             weekDays = listOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY)

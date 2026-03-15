@@ -1,7 +1,6 @@
 package com.sedsoftware.blinkly.domain.extension
 
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
@@ -14,6 +13,3 @@ val Instant.minute: Int
 
 fun Instant.asLocalDate(): LocalDate =
     this.toLocalDateTime(TimeZone.currentSystemDefault()).date
-
-fun Instant.asLocalDateTime(): LocalDateTime =
-    this.toLocalDateTime(TimeZone.currentSystemDefault())

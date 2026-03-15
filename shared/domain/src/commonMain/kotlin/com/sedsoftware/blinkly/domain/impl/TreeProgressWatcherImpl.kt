@@ -13,11 +13,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
-import kotlin.time.Instant
 
 class TreeProgressWatcherImpl(
     private val database: BlinklyDatabase,
@@ -27,20 +24,16 @@ class TreeProgressWatcherImpl(
 
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
 
-    override val tree: Flow<Tree> = flow {
-        val calendarFlow = database.currentCalendar()
-        emitAll(
-            calendarFlow.map { workouts ->
-                calculateCurrentTree(workouts, timeUtils.now())
-            }
+    override val tree: Flow<Tree> = database.currentCalendar()
+        .map(::calculateCurrentTree)
+        .shareIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_STOP_TIMEOUT),
+            replay = 1,
         )
-    }.shareIn(
-        scope = scope,
-        started = SharingStarted.WhileSubscribed(SUBSCRIPTION_STOP_TIMEOUT),
-        replay = 1,
-    )
 
-    private fun calculateCurrentTree(workouts: List<Workout>, now: Instant): Tree {
+    private fun calculateCurrentTree(workouts: List<Workout>): Tree {
+        val now = timeUtils.now()
         if (workouts.isEmpty()) {
             return Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f)
         }
