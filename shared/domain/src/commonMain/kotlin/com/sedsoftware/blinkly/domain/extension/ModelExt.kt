@@ -62,10 +62,7 @@ fun AchievementType.getLevel(): AchievementLevel =
             -> AchievementLevel.HIDDEN
     }
 
-fun List<Workout>.hasNConsecutiveDays(
-    n: Int,
-    timeZone: TimeZone = TimeZone.currentSystemDefault(),
-): Boolean {
+fun List<Workout>.hasNConsecutiveDays(n: Int, timeZone: TimeZone): Boolean {
     val uniqueDates: List<LocalDate> = this
         .mapNotNull { workout ->
             workout.exercises.firstOrNull()?.completedAt?.toLocalDateTime(timeZone)?.date

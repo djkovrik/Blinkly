@@ -31,7 +31,7 @@ internal fun Project.configureKotlinMultiplatform() {
         iosArm64()
         iosSimulatorArm64()
 
-        applyDefaultHierarchyTemplate()
+        jvmToolchain(21)
 
         targets.withType<KotlinNativeTarget>().configureEach {
             binaries.configureEach {

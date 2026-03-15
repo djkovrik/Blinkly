@@ -11,7 +11,7 @@ import kotlin.test.Test
 
 internal class ThreeDayStreakTest : BaseAchievementTest() {
 
-    override val achievement: UnlockableAchievement = ThreeDayStreak()
+    override val achievement: UnlockableAchievement = ThreeDayStreak(timeZone)
 
     private val amountOfDaysToCheck: Int = 5
 

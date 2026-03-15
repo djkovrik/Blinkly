@@ -41,9 +41,4 @@ enum class AchievementType(val index: Int) {
     YIN_YANG(38),
     TIMELESS_GAZE(39),
     THINK_TANK(40);
-
-    companion object {
-        fun fromIndex(index: Int): AchievementType =
-            entries.firstOrNull { it.index == index } ?: FIRST_SPARK
-    }
 }

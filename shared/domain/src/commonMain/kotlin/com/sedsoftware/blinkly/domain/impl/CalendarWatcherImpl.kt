@@ -8,21 +8,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.shareIn
 
 internal class CalendarWatcherImpl(
-    private val database: BlinklyDatabase,
+    database: BlinklyDatabase,
     dispatchers: BlinklyDispatchers,
 ) : CalendarWatcher {
 
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
 
-    private val calendarFlow: Flow<List<Workout>> = flow {
-        emitAll(database.currentCalendar())
-    }
+    private val calendarFlow: Flow<List<Workout>> = database.currentCalendar()
         .flowOn(dispatchers.io)
         .shareIn(
             scope = scope,

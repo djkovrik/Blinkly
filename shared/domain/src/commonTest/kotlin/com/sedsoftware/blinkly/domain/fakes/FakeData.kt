@@ -7,8 +7,12 @@ import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ExerciseType
+import com.sedsoftware.blinkly.domain.model.Reminder
+import com.sedsoftware.blinkly.domain.model.ReminderInterval
+import com.sedsoftware.blinkly.domain.model.ReminderType
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
@@ -219,15 +223,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 15, 5, 30).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 5, 30).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 15, 6, 15).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 6, 15).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 15, 7, 45).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 7, 45).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -238,11 +242,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 16, 6, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 16, 6, 0).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 16, 10, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 16, 10, 0).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -259,15 +263,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 15, 5, 30).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 5, 30).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 15, 6, 15).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 6, 15).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 15, 8, 1).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 15, 8, 1).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -278,11 +282,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 16, 6, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 16, 6, 0).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 16, 10, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 16, 10, 0).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -299,15 +303,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 19, 0, 15).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 0, 15).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.C, ExerciseType.TWENTY_X3,
-                        LocalDateTime(2024, 1, 19, 1, 45).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 1, 45).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -318,11 +322,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -339,15 +343,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 19, 0, 15).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 0, 15).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.C, ExerciseType.TWENTY_X3,
-                        LocalDateTime(2024, 1, 19, 2, 2).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 2, 2).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -358,11 +362,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -379,15 +383,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 19, 0, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 0, 0).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.C, ExerciseType.TWENTY_X3,
-                        LocalDateTime(2024, 1, 19, 1, 45).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 1, 45).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -398,11 +402,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -419,15 +423,15 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.BLINK_BREAK,
-                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 18, 23, 30).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.FIGURE_EIGHT,
-                        LocalDateTime(2024, 1, 19, 0, 1).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 0, 1).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.C, ExerciseType.TWENTY_X3,
-                        LocalDateTime(2024, 1, 19, 2, 2).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 19, 2, 2).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -438,11 +442,11 @@ internal object FakeData {
                 exercises = listOf(
                     Exercise(
                         ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS,
-                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 23, 0).toInstant(TimeZone.UTC)
                     ),
                     Exercise(
                         ExerciseBlock.B, ExerciseType.CLOCK_ROLLS,
-                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.currentSystemDefault())
+                        LocalDateTime(2024, 1, 20, 12, 0).toInstant(TimeZone.UTC)
                     )
                 )
             )
@@ -499,5 +503,15 @@ internal object FakeData {
         )
 
         return workouts
+    }
+
+    fun getReminder(date: LocalDateTime): Reminder {
+        return Reminder(
+            uuid = "test",
+            date = date,
+            type = ReminderType.TWENTY_X3,
+            interval = ReminderInterval.DAILY,
+            weekDays = DayOfWeek.entries.toList(),
+        )
     }
 }

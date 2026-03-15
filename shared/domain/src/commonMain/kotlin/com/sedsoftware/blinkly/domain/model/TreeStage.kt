@@ -8,9 +8,4 @@ enum class TreeStage(val index: Int, val threshold: Float) {
     STRONG(5, 5f),
     MATURE(6, 6f),
     MAGNIFICENT(7, 7f);
-
-    companion object {
-        fun fromIndex(index: Int): TreeStage =
-            entries.firstOrNull { it.index == index } ?: TINY
-    }
 }

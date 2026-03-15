@@ -35,6 +35,7 @@ include(
     ":shared:database",
     ":shared:settings",
     ":shared:notifier",
+    ":shared:alarm",
 )
 
 includeBuild("gradle/build-logic")

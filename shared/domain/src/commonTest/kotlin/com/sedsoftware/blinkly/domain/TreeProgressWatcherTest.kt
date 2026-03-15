@@ -11,28 +11,21 @@ import com.sedsoftware.blinkly.domain.model.TreeStage
 import com.sedsoftware.blinkly.domain.model.TreeType
 import dev.mokkery.answering.returns
 import dev.mokkery.every
-import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class TreeProgressWatcherTest : BaseDomainTest() {
 
     private val database: BlinklyDatabase = mock()
-    private lateinit var watcher: TreeProgressWatcherImpl
-
-    @BeforeTest
-    fun setup() {
-        watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
-    }
 
     @Test
     fun `when no data in database then returns FRAXINUS_EXCELSIOR TINY with 0 percent`() = runTest(testScheduler) {
         // given
-        everySuspend { database.currentCalendar() } returns flowOf(emptyList())
+        every { database.currentCalendar() } returns flowOf(emptyList())
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -45,7 +38,8 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when one day with single block then TINY 50 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getSingleExerciseCalendar(now)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -58,7 +52,8 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when one day with two or more blocks then TINY 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 1)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -71,7 +66,8 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when two full days completed then SMALL 50 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 2)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -84,7 +80,8 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when three full days completed today then SMALL 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 3)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -97,7 +94,8 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when three full days completed yesterday then YOUNG 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 3)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -110,8 +108,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when TINY stage completed today then remains current stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 1)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -124,8 +123,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when TINY stage completed yesterday then next day shows SMALL stage with 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 1)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -138,8 +138,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when SMALL stage completed today then remains current stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 31)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -152,8 +153,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when SMALL stage completed yesterday then next day shows YOUNG stage with 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 31)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -166,8 +168,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when YOUNG stage completed today then remains current stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 62)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -180,8 +183,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when YOUNG stage completed yesterday then next day shows GROWING stage with 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 62)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -194,8 +198,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when GROWING stage completed today then remains current stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 94)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -208,8 +213,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when GROWING stage completed yesterday then next day shows STRONG stage with 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 94)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -222,8 +228,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when STRONG stage completed today then remains current stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 127)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -236,8 +243,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when STRONG stage completed yesterday then next day shows MATURE stage with 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 127)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -250,8 +258,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when MATURE stage completed today then remains current stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 161)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -264,8 +273,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when MATURE stage completed yesterday then next day shows MAGNIFICENT stage with 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 161)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -278,8 +288,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when full FRAXINUS_EXCELSIOR completed today then remains MAGNIFICENT stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 28)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -292,8 +303,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when FRAXINUS_EXCELSIOR completed yesterday then next day shows GINKGO_BILOBA with TINY 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 28)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -306,8 +318,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when full GINKGO_BILOBA completed today then remains MAGNIFICENT stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 56)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -320,8 +333,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when GINKGO_BILOBA completed yesterday then next day shows SALIX_BABYLONICA with TINY 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 56)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -334,8 +348,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when full SALIX_BABYLONICA completed today then remains MAGNIFICENT stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 84)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -348,8 +363,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when SALIX_BABYLONICA completed yesterday then next day shows PINUS with TINY 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 84)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -362,8 +378,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when full PINUS completed today then remains MAGNIFICENT stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 112)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -376,8 +393,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when PINUS completed yesterday then next day shows ADANSONIA with TINY 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 112)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -390,8 +408,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when full ADANSONIA completed today then remains MAGNIFICENT stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 140)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -404,8 +423,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when ADANSONIA completed yesterday then next day shows MIMOSA_PUDICA with TINY 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 140)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -418,8 +438,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when full MIMOSA_PUDICA completed today then remains MAGNIFICENT stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 168)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -432,8 +453,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when MIMOSA_PUDICA completed yesterday then next day shows SEQUOIA_SEMPERVIRENS with TINY 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 168)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -446,8 +468,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when full SEQUOIA_SEMPERVIRENS completed today then remains MAGNIFICENT stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 196)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -460,8 +483,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when SEQUOIA_SEMPERVIRENS completed yesterday then next day shows BETULA with TINY 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 196)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -474,8 +498,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when full BETULA completed today then remains MAGNIFICENT stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 224)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -488,8 +513,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when BETULA completed yesterday then next day shows FICUS_BENJAMINA with TINY 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 224)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -502,8 +528,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when full FICUS_BENJAMINA completed today then remains MAGNIFICENT stage 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 252)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -516,8 +543,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when FICUS_BENJAMINA completed yesterday then next day shows QUERCUS_ROBUR with TINY 0 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 252)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -530,8 +558,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when all trees completed then remains QUERCUS_ROBUR MAGNIFICENT 100 percent`() = runTest(testScheduler) {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 280)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -544,8 +573,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when progress exceeds full cycle then remains QUERCUS_ROBUR MAGNIFICENT 100 percent`() = runTest(testScheduler) {
         // 281 день полного прогресса (280 + 1 лишний)
         val calendar = FakeData.getCalendarWithFullDays(now, 281)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         val result = watcher.tree.first()
 
@@ -558,8 +588,9 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when progress significantly exceeds full cycle then still QUERCUS_ROBUR MAGNIFICENT 100 percent`() = runTest(testScheduler) {
         // 300 дней — намного больше 280
         val calendar = FakeData.getCalendarWithFullDays(now, 300)
-        everySuspend { database.currentCalendar() } returns flowOf(calendar)
+        every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         val result = watcher.tree.first()
 

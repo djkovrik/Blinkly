@@ -3,12 +3,16 @@ package com.sedsoftware.blinkly.domain.base
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.Workout
+import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Instant
 
 abstract class BaseAchievementTest {
 
     abstract val achievement: UnlockableAchievement
+
+    protected val timeZone: TimeZone
+        get() = TimeZone.UTC
 
     protected val now: Instant
         get() = Clock.System.now()

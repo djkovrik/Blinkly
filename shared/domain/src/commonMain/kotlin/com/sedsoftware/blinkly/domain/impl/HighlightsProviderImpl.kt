@@ -17,7 +17,7 @@ class HighlightsProviderImpl(
 
     override suspend fun get(): HighlightOfTheDay =
         withContext(dispatchers.io) {
-            val today = timeUtils.now().asLocalDate()
+            val today = timeUtils.now().asLocalDate(timeUtils.timeZone())
 
             if (shouldUpdateHighlight(today)) {
                 generateAndSaveNewHighlight(today)
@@ -71,7 +71,7 @@ class HighlightsProviderImpl(
 
     override suspend fun forceNextHighlight(): HighlightOfTheDay =
         withContext(dispatchers.io) {
-            val today = timeUtils.now().asLocalDate()
+            val today = timeUtils.now().asLocalDate(timeUtils.timeZone())
             generateAndSaveNewHighlight(today)
         }
 

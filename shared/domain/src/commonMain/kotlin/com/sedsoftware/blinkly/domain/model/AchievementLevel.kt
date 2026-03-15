@@ -6,9 +6,4 @@ enum class AchievementLevel(val index: Int) {
     PRO(3),
     EXPERT(4),
     HIDDEN(5);
-
-    companion object {
-        fun fromIndex(index: Int): AchievementLevel =
-            entries.firstOrNull { it.index == index } ?: BEGINNER
-    }
 }

@@ -54,8 +54,9 @@ kover {
             }
             includes {
                 classes(
-                    "com.sedsoftware.*.domain.*",
+                    "com.sedsoftware.*.alarm.*",
                     "com.sedsoftware.*.database.*",
+                    "com.sedsoftware.*.domain.*",
                     "com.sedsoftware.*.notifier.*",
                     "com.sedsoftware.*.settings.*",
                     "com.sedsoftware.*.integration.*Default",

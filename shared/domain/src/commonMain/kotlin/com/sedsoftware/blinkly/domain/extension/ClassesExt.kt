@@ -5,11 +5,11 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
-val Instant.hour: Int
-    get() = toLocalDateTime(TimeZone.currentSystemDefault()).hour
+fun Instant.hour(timeZone: TimeZone): Int =
+    toLocalDateTime(timeZone).hour
 
-val Instant.minute: Int
-    get() = toLocalDateTime(TimeZone.currentSystemDefault()).minute
+fun Instant.minute(timeZone: TimeZone): Int =
+    toLocalDateTime(timeZone).minute
 
-fun Instant.asLocalDate(): LocalDate =
-    this.toLocalDateTime(TimeZone.currentSystemDefault()).date
+fun Instant.asLocalDate(timeZone: TimeZone): LocalDate =
+    toLocalDateTime(timeZone).date

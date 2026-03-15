@@ -11,7 +11,7 @@ import kotlin.test.Test
 
 internal class DiamondEyesTest : BaseAchievementTest() {
 
-    override val achievement: UnlockableAchievement = DiamondEyes()
+    override val achievement: UnlockableAchievement = DiamondEyes(timeZone)
 
     private val amountOfDaysToCheck: Int = 9
 

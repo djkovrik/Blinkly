@@ -24,6 +24,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class AchievementsWatcherTest : BaseDomainTest() {
+
     private val achievementsFlow: MutableStateFlow<List<Achievement>> = MutableStateFlow(emptyList())
     private val calendarFlow: MutableStateFlow<List<Workout>> = MutableStateFlow(emptyList())
 

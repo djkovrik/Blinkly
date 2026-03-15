@@ -8,6 +8,7 @@ import com.sedsoftware.blinkly.domain.fakes.FakeData
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.TimeZone
 import kotlin.test.Test
 import kotlin.time.Clock
 
@@ -71,14 +72,15 @@ class ModelExtTest {
     fun `hasNConsecutiveDays should check for consecutive days`() = runTest {
         // given
         val now = Clock.System.now()
+        val timeZone = TimeZone.UTC
         val amountOfDays = 5
         val calendarWithConsecutiveDays = FakeData.getCalendarWithFullDays(now, amountOfDays + 2).toMutableList()
         val calendarWithNoConsecutiveDays = FakeData.getCalendarWithFullDays(now, amountOfDays).toMutableList()
         calendarWithConsecutiveDays.removeAt(1)
         calendarWithNoConsecutiveDays.removeAt(2)
         // when
-        val result1 = calendarWithConsecutiveDays.hasNConsecutiveDays(amountOfDays)
-        val result2 = calendarWithNoConsecutiveDays.hasNConsecutiveDays(amountOfDays)
+        val result1 = calendarWithConsecutiveDays.hasNConsecutiveDays(amountOfDays, timeZone)
+        val result2 = calendarWithNoConsecutiveDays.hasNConsecutiveDays(amountOfDays, timeZone)
         // then
         assertThat(result1).isTrue()
         assertThat(result2).isFalse()

@@ -28,15 +28,17 @@ class HighlightsProviderTest : BaseDomainTest() {
     fun `when first launch then provider should return random fact or tip`() = runTest(testScheduler) {
         // given
         every { timeUtils.now() } returns now
+
         // when
         val highlight = provider.get()
         val index = when (highlight) {
             is HighlightOfTheDay.Tip -> highlight.index
             is HighlightOfTheDay.Fact -> highlight.index
         }
+
         // then
         assertThat(highlight is HighlightOfTheDay.Tip || highlight is HighlightOfTheDay.Fact).isTrue()
-        assertThat(settings.currentHighlightDate).isEqualTo(now.asLocalDate())
+        assertThat(settings.currentHighlightDate).isEqualTo(now.asLocalDate(timeUtils.timeZone()))
         assertThat(settings.displayedHighlights.size).isEqualTo(1)
         assertThat(settings.displayedHighlights).contains(index)
     }
@@ -45,9 +47,11 @@ class HighlightsProviderTest : BaseDomainTest() {
     fun `when provider returned a highlight today then should return the same for all today calls`() = runTest(testScheduler) {
         // given
         every { timeUtils.now() } returns now
+
         // when
         val highlight1 = provider.get()
         val highlight2 = provider.get()
+
         // then
         assertThat(highlight1).isEqualTo(highlight2)
     }
@@ -56,13 +60,15 @@ class HighlightsProviderTest : BaseDomainTest() {
     fun `when provider returned a highlight yesterday then should return a new one today`() = runTest(testScheduler) {
         // given
         every { timeUtils.now() } returns yesterday
+
         // when
         val indexYesterday = when (val highlightYesterday = provider.get()) {
             is HighlightOfTheDay.Tip -> highlightYesterday.index
             is HighlightOfTheDay.Fact -> highlightYesterday.index
         }
+
         // then
-        assertThat(settings.currentHighlightDate).isEqualTo(yesterday.asLocalDate())
+        assertThat(settings.currentHighlightDate).isEqualTo(yesterday.asLocalDate(timeUtils.timeZone()))
         assertThat(settings.displayedHighlights.size).isEqualTo(1)
 
         // given
@@ -72,8 +78,9 @@ class HighlightsProviderTest : BaseDomainTest() {
             is HighlightOfTheDay.Tip -> highlightToday.index
             is HighlightOfTheDay.Fact -> highlightToday.index
         }
+
         // then
-        assertThat(settings.currentHighlightDate).isEqualTo(now.asLocalDate())
+        assertThat(settings.currentHighlightDate).isEqualTo(now.asLocalDate(timeUtils.timeZone()))
         assertThat(settings.displayedHighlights.size).isEqualTo(2)
         assertThat(settings.displayedHighlights).contains(indexYesterday)
         assertThat(settings.displayedHighlights).contains(indexToday)
@@ -84,11 +91,13 @@ class HighlightsProviderTest : BaseDomainTest() {
         // given
         val highlights = mutableListOf<HighlightOfTheDay>()
         val expectedSize = 50
+
         // when
         repeat(expectedSize) {
             val highlight = provider.forceNextHighlight()
             highlights.add(highlight)
         }
+
         // then
         assertThat(highlights.size).isEqualTo(expectedSize)
     }
@@ -101,7 +110,7 @@ class HighlightsProviderTest : BaseDomainTest() {
             is HighlightOfTheDay.Tip -> highlightYesterday.index
             is HighlightOfTheDay.Fact -> highlightYesterday.index
         }
-        assertThat(settings.currentHighlightDate).isEqualTo(yesterday.asLocalDate())
+        assertThat(settings.currentHighlightDate).isEqualTo(yesterday.asLocalDate(timeUtils.timeZone()))
         assertThat(settings.displayedHighlights.size).isEqualTo(1)
 
         every { timeUtils.now() } returns now
@@ -110,13 +119,14 @@ class HighlightsProviderTest : BaseDomainTest() {
             is HighlightOfTheDay.Fact -> highlightToday.index
         }
 
-        assertThat(settings.currentHighlightDate).isEqualTo(now.asLocalDate())
+        assertThat(settings.currentHighlightDate).isEqualTo(now.asLocalDate(timeUtils.timeZone()))
         assertThat(settings.displayedHighlights.size).isEqualTo(2)
         assertThat(settings.displayedHighlights).contains(indexYesterday)
         assertThat(settings.displayedHighlights).contains(indexToday)
 
         // when
         provider.reset()
+
         // then
         assertThat(settings.currentHighlightDate).isEqualTo(null)
         assertThat(settings.displayedHighlights).isEmpty()
@@ -128,7 +138,7 @@ class HighlightsProviderTest : BaseDomainTest() {
         }
 
         // then
-        assertThat(settings.currentHighlightDate).isEqualTo(now.asLocalDate())
+        assertThat(settings.currentHighlightDate).isEqualTo(now.asLocalDate(timeUtils.timeZone()))
         assertThat(settings.displayedHighlights.size).isEqualTo(1)
         assertThat(settings.displayedHighlights).contains(newHighlightIndex)
     }
@@ -138,11 +148,11 @@ class HighlightsProviderTest : BaseDomainTest() {
         // given
         every { timeUtils.now() } returns yesterday
         val highlightYesterday = provider.get()
-        assertThat(settings.currentHighlightDate).isEqualTo(yesterday.asLocalDate())
+        assertThat(settings.currentHighlightDate).isEqualTo(yesterday.asLocalDate(timeUtils.timeZone()))
 
         every { timeUtils.now() } returns now
         val highlightToday = provider.get()
-        assertThat(settings.currentHighlightDate).isEqualTo(now.asLocalDate())
+        assertThat(settings.currentHighlightDate).isEqualTo(now.asLocalDate(timeUtils.timeZone()))
 
         // when
         val count = provider.getShownCount()

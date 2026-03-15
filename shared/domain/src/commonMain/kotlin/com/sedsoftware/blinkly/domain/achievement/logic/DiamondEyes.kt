@@ -5,17 +5,20 @@ import com.sedsoftware.blinkly.domain.extension.hasNConsecutiveDays
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.Workout
+import kotlinx.datetime.TimeZone
 
 /**
  * Achievement #8
  * Diamond Eyes - Exercise for 7 days in a row
  */
-internal class DiamondEyes : UnlockableAchievement {
+internal class DiamondEyes(
+    private val timeZone: TimeZone,
+) : UnlockableAchievement {
 
     override val type: AchievementType = AchievementType.DIAMOND_EYES
 
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
-        return calendar.hasNConsecutiveDays(ACHIEVEMENT_THRESHOLD)
+        return calendar.hasNConsecutiveDays(ACHIEVEMENT_THRESHOLD, timeZone)
     }
 
     private companion object {
