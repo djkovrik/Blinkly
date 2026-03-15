@@ -58,7 +58,7 @@ class BlinklyDatabaseTest {
     @BeforeTest
     fun setup() {
         driver = TestDriverFactory()
-        database = BlinklyDatabaseImpl(testDispatchers, driver, timeUtils)
+        database = BlinklyDatabaseImpl(dispatchers = testDispatchers, driver = driver, timeUtils = timeUtils)
     }
 
     @Test
@@ -66,6 +66,7 @@ class BlinklyDatabaseTest {
         // given
         // when
         val calendar = database.currentCalendar().first()
+
         // then
         assertThat(calendar).isEmpty()
     }
@@ -75,6 +76,7 @@ class BlinklyDatabaseTest {
         // given
         // when
         val achievements = database.currentAchievements().first()
+
         // then
         assertThat(achievements).isEmpty()
     }
@@ -84,6 +86,7 @@ class BlinklyDatabaseTest {
         // given
         // when
         val reminders = database.currentReminders().first()
+
         // then
         assertThat(reminders).isEmpty()
     }
@@ -235,6 +238,7 @@ class BlinklyDatabaseTest {
 
     @Test
     fun `when all reminders deleted then subscription updated`() = runTest(testScheduler) {
+        // given
         val now = Clock.System.now()
         val uuid1 = "test1"
         val uuid2 = "test2"
