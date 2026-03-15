@@ -5,17 +5,20 @@ import com.sedsoftware.blinkly.domain.extension.hasNConsecutiveDays
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.Workout
+import kotlinx.datetime.TimeZone
 
 /**
  * Achievement #28
  * Eternal Guardian - Exercise for 365 days in a row
  */
-internal class EternalGuardian : UnlockableAchievement {
+internal class EternalGuardian(
+    private val timeZone: TimeZone,
+) : UnlockableAchievement {
 
     override val type: AchievementType = AchievementType.ETERNAL_GUARDIAN
 
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
-        return calendar.hasNConsecutiveDays(ACHIEVEMENT_THRESHOLD)
+        return calendar.hasNConsecutiveDays(ACHIEVEMENT_THRESHOLD, timeZone)
     }
 
     private companion object {

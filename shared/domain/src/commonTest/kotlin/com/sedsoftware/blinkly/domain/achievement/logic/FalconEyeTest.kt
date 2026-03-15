@@ -11,7 +11,7 @@ import kotlin.test.Test
 
 internal class FalconEyeTest : BaseAchievementTest() {
 
-    override val achievement: UnlockableAchievement = FalconEye()
+    override val achievement: UnlockableAchievement = FalconEye(timeZone)
 
     private val amountOfDaysToCheck: Int = 102
 

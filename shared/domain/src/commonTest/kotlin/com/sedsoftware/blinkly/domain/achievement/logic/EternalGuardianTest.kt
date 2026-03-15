@@ -11,7 +11,7 @@ import kotlin.test.Test
 
 internal class EternalGuardianTest : BaseAchievementTest() {
 
-    override val achievement: UnlockableAchievement = EternalGuardian()
+    override val achievement: UnlockableAchievement = EternalGuardian(timeZone)
 
     private val amountOfDaysToCheck: Int = 367
 

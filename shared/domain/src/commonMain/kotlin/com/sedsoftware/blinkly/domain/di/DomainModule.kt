@@ -67,8 +67,8 @@ fun DomainModule(dependencies: DomainModuleDependencies): DomainModule {
 
         override val treeProgressWatcher: TreeProgressWatcher by lazy {
             TreeProgressWatcherImpl(
-                database = dependencies.database,
                 timeUtils = dependencies.timeUtils,
+                database = dependencies.database,
                 dispatchers = dependencies.dispatchers,
             )
         }

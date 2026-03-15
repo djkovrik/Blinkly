@@ -15,7 +15,6 @@ import dev.mokkery.mock
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class TreeProgressWatcherTest : BaseDomainTest() {
@@ -26,7 +25,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when no data in database then returns FRAXINUS_EXCELSIOR TINY with 0 percent`() = runTest(testScheduler) {
         // given
         every { database.currentCalendar() } returns flowOf(emptyList())
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -40,7 +39,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         // given
         val calendar = FakeData.getSingleExerciseCalendar(now)
         every { database.currentCalendar() } returns flowOf(calendar)
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -54,7 +53,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 1)
         every { database.currentCalendar() } returns flowOf(calendar)
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -68,7 +67,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 2)
         every { database.currentCalendar() } returns flowOf(calendar)
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -82,7 +81,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 3)
         every { database.currentCalendar() } returns flowOf(calendar)
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -96,7 +95,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 3)
         every { database.currentCalendar() } returns flowOf(calendar)
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -111,7 +110,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 1)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -126,7 +125,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 1)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -141,7 +140,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 31)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -156,7 +155,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 31)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -171,7 +170,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 62)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -186,7 +185,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 62)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -201,7 +200,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 94)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -216,7 +215,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 94)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -231,7 +230,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 127)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -246,7 +245,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 127)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -261,7 +260,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 161)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -276,7 +275,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 161)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -291,7 +290,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 28)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -306,7 +305,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 28)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -321,7 +320,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 56)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -336,7 +335,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 56)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -351,7 +350,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 84)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -366,7 +365,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 84)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -381,7 +380,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 112)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -396,7 +395,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 112)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -411,7 +410,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 140)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -426,7 +425,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 140)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -441,7 +440,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 168)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -456,7 +455,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 168)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -471,7 +470,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 196)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -486,7 +485,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 196)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -501,7 +500,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 224)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -516,7 +515,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 224)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -531,7 +530,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 252)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -546,7 +545,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 252)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -561,7 +560,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 280)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -576,7 +575,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 281)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         val result = watcher.tree.first()
 
@@ -591,7 +590,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 300)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(database, timeUtils, testDispatchers)
+        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         val result = watcher.tree.first()
 

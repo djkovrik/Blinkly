@@ -11,7 +11,7 @@ import kotlin.test.Test
 
 internal class NightOwlTest : BaseAchievementTest() {
 
-    override val achievement: UnlockableAchievement = NightOwl()
+    override val achievement: UnlockableAchievement = NightOwl(timeZone)
 
     @Test
     fun `when calendar and achievements match logic then unlocked`() = runTest {

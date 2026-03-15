@@ -15,10 +15,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.datetime.TimeZone
 
 class TreeProgressWatcherImpl(
-    private val database: BlinklyDatabase,
     private val timeUtils: BlinklyTimeUtils,
+    database: BlinklyDatabase,
     dispatchers: BlinklyDispatchers,
 ) : TreeProgressWatcher {
 
@@ -34,13 +35,15 @@ class TreeProgressWatcherImpl(
 
     private fun calculateCurrentTree(workouts: List<Workout>): Tree {
         val now = timeUtils.now()
+        val timeZone: TimeZone = timeUtils.timeZone()
+
         if (workouts.isEmpty()) {
             return Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f)
         }
 
-        val today = now.asLocalDate()
+        val today = now.asLocalDate(timeZone)
         val exercisesByDate = workouts.flatMap { it.exercises }
-            .groupBy { it.completedAt.asLocalDate() }
+            .groupBy { it.completedAt.asLocalDate(timeZone) }
 
         val dailyProgressByDate = exercisesByDate.mapValues { (_, exercises) ->
             val uniqueBlocks = exercises.map { it.block }.toSet().size

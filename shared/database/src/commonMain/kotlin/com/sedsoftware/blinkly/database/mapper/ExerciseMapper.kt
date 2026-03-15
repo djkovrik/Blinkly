@@ -4,8 +4,11 @@ import com.sedsoftware.blinkly.database.ExerciseEntity
 import com.sedsoftware.blinkly.domain.extension.asLocalDate
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.Workout
+import kotlinx.datetime.TimeZone
 
-internal object ExerciseMapper {
+internal class ExerciseMapper(
+    private val timeZone: TimeZone,
+) {
     fun toDomain(from: List<ExerciseEntity>): List<Exercise> =
         from.map { item: ExerciseEntity ->
             Exercise(
@@ -17,7 +20,7 @@ internal object ExerciseMapper {
 
     fun toWorkout(from: List<Exercise>): List<Workout> {
         val grouped = from.groupBy { exercise ->
-            exercise.completedAt.asLocalDate()
+            exercise.completedAt.asLocalDate(timeZone)
         }
 
         return grouped.entries

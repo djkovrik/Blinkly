@@ -10,6 +10,7 @@ import assertk.assertions.isNotNull
 import com.sedsoftware.blinkly.database.impl.BlinklyDatabaseImpl
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
+import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
@@ -20,6 +21,9 @@ import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import com.sedsoftware.blinkly.domain.model.Workout
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -43,6 +47,10 @@ class BlinklyDatabaseTest {
             override val io: CoroutineDispatcher = StandardTestDispatcher(testScheduler)
         }
 
+    private val timeUtils: BlinklyTimeUtils = mock {
+        every { now() } returns Clock.System.now()
+        every { timeZone() } returns TimeZone.UTC
+    }
 
     lateinit var driver: SqlDriver
     lateinit var database: BlinklyDatabase
@@ -50,7 +58,7 @@ class BlinklyDatabaseTest {
     @BeforeTest
     fun setup() {
         driver = TestDriverFactory()
-        database = BlinklyDatabaseImpl(testDispatchers, driver)
+        database = BlinklyDatabaseImpl(testDispatchers, driver, timeUtils)
     }
 
     @Test

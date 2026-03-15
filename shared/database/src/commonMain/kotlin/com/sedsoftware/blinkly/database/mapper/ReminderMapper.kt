@@ -3,7 +3,7 @@ package com.sedsoftware.blinkly.database.mapper
 import com.sedsoftware.blinkly.database.ReminderEntity
 import com.sedsoftware.blinkly.domain.model.Reminder
 
-internal object ReminderMapper {
+internal class ReminderMapper {
     fun toDomain(from: List<ReminderEntity>): List<Reminder> =
         from.map { item: ReminderEntity ->
             Reminder(

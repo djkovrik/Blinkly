@@ -3,15 +3,15 @@ package com.sedsoftware.blinkly.domain.achievement.logic
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import com.sedsoftware.blinkly.domain.fakes.FakeData
-import com.sedsoftware.blinkly.domain.base.BaseAchievementTest
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
+import com.sedsoftware.blinkly.domain.base.BaseAchievementTest
+import com.sedsoftware.blinkly.domain.fakes.FakeData
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 internal class TimelessGazeTest : BaseAchievementTest() {
 
-    override val achievement: UnlockableAchievement = TimelessGaze()
+    override val achievement: UnlockableAchievement = TimelessGaze(timeZone)
 
     @Test
     fun `when calendar and achievements match logic then unlocked`() = runTest {

@@ -1,6 +1,7 @@
 package com.sedsoftware.blinkly.alarm.impl
 
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
+import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import com.tweener.alarmee.AlarmeeService
@@ -13,9 +14,9 @@ import com.tweener.alarmee.model.AndroidNotificationPriority
 import com.tweener.alarmee.model.IosNotificationConfiguration
 import com.tweener.alarmee.model.RepeatInterval
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
 
 internal class BlinklyAlarmManagerImpl(
+    val timeUtils: BlinklyTimeUtils,
     val notificationConfigurations: Map<ReminderType, ReminderConfig>,
     val platformConfiguration: AlarmeePlatformConfiguration,
     val alarmeeService: AlarmeeService = createAlarmeeService(),
@@ -45,7 +46,6 @@ internal class BlinklyAlarmManagerImpl(
     private fun schedule(uuid: String, type: ReminderType, startingDate: LocalDateTime, interval: RepeatInterval) {
         val title: String = notificationConfigurations[type]?.title.orEmpty()
         val description: String = notificationConfigurations[type]?.description.orEmpty()
-        val timeZone: TimeZone = TimeZone.currentSystemDefault()
 
         service.schedule(
             alarmee = Alarmee(
@@ -53,7 +53,7 @@ internal class BlinklyAlarmManagerImpl(
                 notificationTitle = title,
                 notificationBody = description,
                 scheduledDateTime = startingDate,
-                timeZone = timeZone,
+                timeZone = timeUtils.timeZone(),
                 repeatInterval = interval,
                 androidNotificationConfiguration = AndroidNotificationConfiguration(
                     priority = AndroidNotificationPriority.MAXIMUM,

@@ -42,5 +42,6 @@ abstract class BaseDomainTest {
 
     protected val timeUtils: BlinklyTimeUtils = mock {
         every { now() } returns now
+        every { timeZone() } returns TimeZone.UTC
     }
 }

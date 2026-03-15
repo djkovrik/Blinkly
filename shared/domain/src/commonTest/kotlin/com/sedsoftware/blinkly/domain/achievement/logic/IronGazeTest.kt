@@ -3,15 +3,15 @@ package com.sedsoftware.blinkly.domain.achievement.logic
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import com.sedsoftware.blinkly.domain.fakes.FakeData
-import com.sedsoftware.blinkly.domain.base.BaseAchievementTest
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
+import com.sedsoftware.blinkly.domain.base.BaseAchievementTest
+import com.sedsoftware.blinkly.domain.fakes.FakeData
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 internal class IronGazeTest : BaseAchievementTest() {
 
-    override val achievement: UnlockableAchievement = IronGaze()
+    override val achievement: UnlockableAchievement = IronGaze(timeZone)
 
     private val amountOfDaysToCheck: Int = 32
 

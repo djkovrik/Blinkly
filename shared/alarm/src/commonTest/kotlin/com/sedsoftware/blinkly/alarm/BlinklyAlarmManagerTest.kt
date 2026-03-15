@@ -7,23 +7,35 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import com.sedsoftware.blinkly.alarm.impl.BlinklyAlarmManagerImpl
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
+import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import com.sedsoftware.blinkly.fakes.FakeAlarmeePlatformConfiguration
 import com.sedsoftware.blinkly.fakes.FakeAlarmeeService
 import com.tweener.alarmee.model.Alarmee
 import com.tweener.alarmee.model.RepeatInterval
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Clock
 import kotlin.uuid.Uuid
 
 class BlinklyAlarmManagerTest {
 
     private val fakeService: FakeAlarmeeService = FakeAlarmeeService()
 
+    private val timeUtils: BlinklyTimeUtils = mock {
+        every { now() } returns Clock.System.now()
+        every { timeZone() } returns TimeZone.UTC
+    }
+
     private val manager: BlinklyAlarmManager = BlinklyAlarmManagerImpl(
+        timeUtils = timeUtils,
         notificationConfigurations = mapOf(ReminderType.TWENTY_X3 to ReminderConfig(FAKE_TITLE, FAKE_TITLE)),
         platformConfiguration = FakeAlarmeePlatformConfiguration(),
         alarmeeService = fakeService,

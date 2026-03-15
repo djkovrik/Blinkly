@@ -18,6 +18,7 @@ import com.sedsoftware.blinkly.database.mapper.ExerciseMapper
 import com.sedsoftware.blinkly.database.mapper.ReminderMapper
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
+import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.Reminder
@@ -29,7 +30,12 @@ import kotlinx.coroutines.withContext
 internal class BlinklyDatabaseImpl(
     private val dispatchers: BlinklyDispatchers,
     private val driver: SqlDriver,
+    timeUtils: BlinklyTimeUtils,
 ) : BlinklyDatabase {
+
+    private val achievementMapper: AchievementMapper = AchievementMapper()
+    private val exerciseMapper: ExerciseMapper = ExerciseMapper(timeUtils.timeZone())
+    private val reminderMapper: ReminderMapper = ReminderMapper()
 
     private val database: BlinklyAppDatabase =
         BlinklyAppDatabase(
@@ -60,20 +66,20 @@ internal class BlinklyDatabaseImpl(
         queries.getExercises()
             .asFlow()
             .mapToList(dispatchers.io)
-            .map(ExerciseMapper::toDomain)
-            .map(ExerciseMapper::toWorkout)
+            .map(exerciseMapper::toDomain)
+            .map(exerciseMapper::toWorkout)
 
     override fun currentAchievements(): Flow<List<Achievement>> =
         queries.getAchievements()
             .asFlow()
             .mapToList(dispatchers.io)
-            .map(AchievementMapper::toDomain)
+            .map(achievementMapper::toDomain)
 
     override fun currentReminders(): Flow<List<Reminder>> =
         queries.getReminders()
             .asFlow()
             .mapToList(dispatchers.io)
-            .map(ReminderMapper::toDomain)
+            .map(reminderMapper::toDomain)
 
     override suspend fun saveExercise(exercise: Exercise) {
         withContext(dispatchers.io) {
