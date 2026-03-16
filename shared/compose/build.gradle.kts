@@ -9,9 +9,8 @@ plugins {
 }
 
 kotlin {
-    androidTarget() //We need the deprecated target to have working previews
+    androidTarget()
 
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
 
