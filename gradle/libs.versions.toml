@@ -22,7 +22,7 @@ androidx-material = "1.12.0"
 androidx-preferences = "1.2.1"
 
 # Ark
-decompose = "3.4.0"
+decompose = "3.5.0"
 mviKotlin = "4.3.0"
 essenty = "2.5.0"
 
