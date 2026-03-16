@@ -1,7 +1,7 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.window.ComposeUIViewController
-import com.sedsoftware.blinkly.compose.App
+import com.sedsoftware.blinkly.compose.BlinklyApp
 import platform.UIKit.UIApplication
 import platform.UIKit.UIStatusBarStyleDarkContent
 import platform.UIKit.UIStatusBarStyleLightContent
@@ -10,7 +10,7 @@ import platform.UIKit.setStatusBarStyle
 
 @Suppress("FunctionNaming")
 fun MainViewController(): UIViewController = ComposeUIViewController { 
-    App(onThemeChanged = { ThemeChanged(it) })
+    BlinklyApp(onThemeChanged = { ThemeChanged(it) })
 }
 
 @Composable

@@ -30,10 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import blinkly.shared.compose.generated.resources.IndieFlower_Regular
 import blinkly.shared.compose.generated.resources.Res
 import blinkly.shared.compose.generated.resources.cyclone
 import blinkly.shared.compose.generated.resources.ic_cyclone
@@ -44,18 +42,17 @@ import blinkly.shared.compose.generated.resources.open_github
 import blinkly.shared.compose.generated.resources.run
 import blinkly.shared.compose.generated.resources.stop
 import blinkly.shared.compose.generated.resources.theme
-import com.sedsoftware.blinkly.compose.theme.AppTheme
+import com.sedsoftware.blinkly.compose.theme.BlinklyAppTheme
 import com.sedsoftware.blinkly.compose.theme.LocalThemeIsDark
 import kotlinx.coroutines.isActive
-import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 @Preview
 @Composable
-fun App(
+fun BlinklyApp(
     onThemeChanged: @Composable (isDark: Boolean) -> Unit = {}
-) = AppTheme(onThemeChanged) {
+) = BlinklyAppTheme(onThemeChanged) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,7 +62,6 @@ fun App(
     ) {
         Text(
             text = stringResource(Res.string.cyclone),
-            fontFamily = FontFamily(Font(Res.font.IndieFlower_Regular)),
             style = MaterialTheme.typography.displayLarge
         )
 

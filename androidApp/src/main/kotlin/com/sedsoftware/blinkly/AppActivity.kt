@@ -9,14 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
-import com.sedsoftware.blinkly.compose.App
+import com.sedsoftware.blinkly.compose.BlinklyApp
 
 class AppActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            App(onThemeChanged = { ThemeChanged(it) })
+            BlinklyApp(onThemeChanged = { ThemeChanged(it) })
         }
     }
 }
