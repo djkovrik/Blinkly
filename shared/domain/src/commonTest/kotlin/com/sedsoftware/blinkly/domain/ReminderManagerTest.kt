@@ -186,7 +186,7 @@ class ReminderManagerTest : BaseDomainTest() {
         manager.scheduleWeeklyDayPeriod(
             from = LocalTime(hour = 10, minute = 0),
             to = LocalTime(hour = 18, minute = 0),
-            intervalHours = 4,
+            intervalMinutes = 240,
             days = targetDays,
         )
         testScheduler.advanceUntilIdle()
@@ -247,7 +247,7 @@ class ReminderManagerTest : BaseDomainTest() {
             manager.scheduleWeeklyDayPeriod(
                 from = LocalTime(hour = 10, minute = 0),
                 to = LocalTime(hour = 18, minute = 0),
-                intervalHours = 4,
+                intervalMinutes = 240,
                 days = targetDays,
             )
             testScheduler.advanceUntilIdle()
