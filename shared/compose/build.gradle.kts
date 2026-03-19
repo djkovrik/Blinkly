@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.android.kmp.library)
-    alias(libs.plugins.kotlinx.serialization)
 }
 
 kotlin {
@@ -26,8 +25,31 @@ kotlin {
             api(libs.compose.material3)
             implementation(libs.lib.kermit)
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
+
+            implementation(libs.ark.decompose.core)
+            implementation(libs.ark.decompose.extensions)
+
+            implementation(project(":shared:domain"))
+            implementation(project(":shared:component:root"))
+            implementation(project(":shared:component:onboarding"))
+            implementation(project(":shared:component:onboarding:child:step1"))
+            implementation(project(":shared:component:onboarding:child:step2"))
+            implementation(project(":shared:component:onboarding:child:step3"))
+            implementation(project(":shared:component:onboarding:child:step4"))
+            implementation(project(":shared:component:onboarding:child:step5"))
+            implementation(project(":shared:component:home"))
+            implementation(project(":shared:component:main"))
+            implementation(project(":shared:component:main:child:preferences"))
+            implementation(project(":shared:component:progress"))
+            implementation(project(":shared:component:progress:child:achievements"))
+            implementation(project(":shared:component:progress:child:garden"))
+            implementation(project(":shared:component:reminders"))
+            implementation(project(":shared:component:reminders:child:newreminder"))
+            implementation(project(":shared:component:trainings"))
+            implementation(project(":shared:component:trainings:child:blocka"))
+            implementation(project(":shared:component:trainings:child:blockb"))
+            implementation(project(":shared:component:trainings:child:blockc"))
         }
 
         commonTest.dependencies {
@@ -52,6 +74,10 @@ kotlin {
                 }
             }
         }
+
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=com.arkivanov.decompose.ExperimentalDecomposeApi")
+    }
 }
 
 dependencies {
@@ -65,7 +91,7 @@ android {
         minSdk = 23
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }

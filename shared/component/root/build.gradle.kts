@@ -10,8 +10,9 @@ kotlin {
                 implementation(project(":shared:domain"))
                 implementation(project(":shared:alarm"))
                 implementation(project(":shared:database"))
-                implementation(project(":shared:settings"))
                 implementation(project(":shared:notifier"))
+                implementation(project(":shared:settings"))
+                implementation(project(":shared:utils"))
                 implementation(project(":shared:component:onboarding"))
                 implementation(project(":shared:component:onboarding:child:step1"))
                 implementation(project(":shared:component:onboarding:child:step2"))
@@ -39,8 +40,25 @@ kotlin {
                 implementation(libs.ark.essenty)
 
                 implementation(libs.lib.alarmee)
+                implementation(libs.lib.moko.permissions)
                 implementation(libs.lib.multiplatform.settings.core)
             }
         }
+
+        androidMain {
+            dependencies {
+                implementation(libs.lib.alarmee)
+            }
+        }
+
+        iosMain {
+            dependencies {
+                implementation(libs.lib.alarmee)
+            }
+        }
+    }
+
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
     }
 }

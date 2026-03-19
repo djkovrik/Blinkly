@@ -10,6 +10,7 @@ kotlin {
                 implementation(project(":shared:domain"))
 
                 implementation(libs.lib.alarmee)
+                implementation(libs.compose.resources)
             }
         }
     }
