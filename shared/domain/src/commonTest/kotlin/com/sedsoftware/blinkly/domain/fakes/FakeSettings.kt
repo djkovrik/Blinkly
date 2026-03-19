@@ -19,4 +19,5 @@ class FakeSettings : BlinklySettings {
     override var lastTreeProgressCheckDate: LocalDate? = null
     override var displayedHighlights: List<Int> = emptyList()
     override var currentHighlightDate: LocalDate? = null
+    override var onboardingDisplayed: Boolean = false
 }

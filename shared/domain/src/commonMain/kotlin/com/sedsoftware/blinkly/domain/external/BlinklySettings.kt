@@ -18,4 +18,5 @@ interface BlinklySettings {
     var lastTreeProgressCheckDate: LocalDate?
     var displayedHighlights: List<Int>
     var currentHighlightDate: LocalDate?
+    var onboardingDisplayed: Boolean
 }
