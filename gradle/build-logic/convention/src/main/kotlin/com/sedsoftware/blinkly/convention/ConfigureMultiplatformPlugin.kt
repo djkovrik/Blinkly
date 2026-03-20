@@ -27,6 +27,7 @@ internal fun Project.configureKotlinMultiplatform() {
         @Suppress("DEPRECATION")
         androidTarget()
 
+        iosX64()
         iosArm64()
         iosSimulatorArm64()
 

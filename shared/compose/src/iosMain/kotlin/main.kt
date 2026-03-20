@@ -8,8 +8,6 @@ import com.sedsoftware.blinkly.component.root.RootComponentFactory
 import com.sedsoftware.blinkly.compose.ui.RootContent
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
-import com.tweener.alarmee.configuration.AlarmeeIosPlatformConfiguration
-import com.tweener.alarmee.configuration.AlarmeePlatformConfiguration
 import dev.icerock.moko.permissions.ios.PermissionsController
 import platform.UIKit.UIApplication
 import platform.UIKit.UIStatusBarStyleDarkContent
@@ -29,7 +27,6 @@ private val rootComponent: RootComponent by lazy {
     RootComponentFactory(
         componentContext = DefaultComponentContext(lifecycle),
         contentConfigurations = getNotificationConfigurations(),
-        platformConfiguration = getPlatformConfiguration(),
         permissionsController = permissionsController,
     )
 
@@ -61,8 +58,4 @@ private fun getNotificationConfigurations(): Map<ReminderType, ReminderConfig> {
             description = "Please take a break",
         )
     )
-}
-
-private fun getPlatformConfiguration(): AlarmeePlatformConfiguration {
-    return AlarmeeIosPlatformConfiguration
 }

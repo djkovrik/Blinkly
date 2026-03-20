@@ -24,17 +24,14 @@ import com.sedsoftware.blinkly.settings.SharedSettingsFactory
 import com.sedsoftware.blinkly.settings.di.SettingsModule
 import com.sedsoftware.blinkly.settings.di.SettingsModuleDependencies
 import com.sedsoftware.blinkly.utils.di.UtilsModule
-import com.tweener.alarmee.configuration.AlarmeePlatformConfiguration
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import dev.icerock.moko.permissions.ios.PermissionsController as PermissionsControllerIos
 
 @Suppress("FunctionName")
 fun RootComponentFactory(
     componentContext: ComponentContext,
     contentConfigurations: Map<ReminderType, ReminderConfig>,
-    platformConfiguration: AlarmeePlatformConfiguration,
     permissionsController: PermissionsController,
 ): RootComponent {
 
@@ -55,7 +52,6 @@ fun RootComponentFactory(
             dependencies = object : AlarmModuleDependencies {
                 override val timeUtils: BlinklyTimeUtils = timeUtils
                 override val contentConfigurations: Map<ReminderType, ReminderConfig> = contentConfigurations
-                override val platformConfiguration: AlarmeePlatformConfiguration = platformConfiguration
             }
         )
 
@@ -77,7 +73,7 @@ fun RootComponentFactory(
     val notifier: BlinklyNotifier by lazy {
         val notifierModule = NotifierModule(
             dependencies = object : NotifierModuleDependencies {
-                override val controller: PermissionsController = PermissionsControllerIos()
+                override val controller: PermissionsController = permissionsController
             }
         )
 

@@ -18,7 +18,7 @@ import kotlinx.datetime.LocalDateTime
 internal class BlinklyAlarmManagerImpl(
     val timeUtils: BlinklyTimeUtils,
     val notificationConfigurations: Map<ReminderType, ReminderConfig>,
-    val platformConfiguration: AlarmeePlatformConfiguration,
+    val platformConfiguration: AlarmeePlatformConfiguration = getAlarmeePlatformConfiguration(),
     val alarmeeService: AlarmeeService = createAlarmeeService(),
 ) : BlinklyAlarmManager {
 

@@ -39,21 +39,8 @@ kotlin {
                 implementation(libs.ark.mvikotlin.extensions)
                 implementation(libs.ark.essenty)
 
-                implementation(libs.lib.alarmee)
                 implementation(libs.lib.moko.permissions)
                 implementation(libs.lib.multiplatform.settings.core)
-            }
-        }
-
-        androidMain {
-            dependencies {
-                implementation(libs.lib.alarmee)
-            }
-        }
-
-        iosMain {
-            dependencies {
-                implementation(libs.lib.alarmee)
             }
         }
     }
