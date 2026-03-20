@@ -9,6 +9,7 @@ import com.sedsoftware.blinkly.compose.ui.RootContent
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import dev.icerock.moko.permissions.ios.PermissionsController
+import platform.Foundation.NSBundle
 import platform.UIKit.UIApplication
 import platform.UIKit.UIStatusBarStyleDarkContent
 import platform.UIKit.UIStatusBarStyleLightContent
@@ -52,10 +53,12 @@ private fun ThemeChanged(isDark: Boolean) {
 }
 
 private fun getNotificationConfigurations(): Map<ReminderType, ReminderConfig> {
+    val title = NSBundle.mainBundle.localizedStringForKey("notification_title", "", null)
+    val description = NSBundle.mainBundle.localizedStringForKey("notification_description", "", null)
     return mapOf(
         ReminderType.TWENTY_X3 to ReminderConfig(
-            title = "20-20-20",
-            description = "Please take a break",
+            title = title,
+            description = description,
         )
     )
 }

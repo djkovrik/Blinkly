@@ -1,0 +1,10 @@
+/* 
+  Localizable.strings
+  iosApp
+
+  Created by Sergey on 20.03.2026.
+  
+*/
+
+"notification_title" = "20-20-20";
+"notification_description" = "Пожалуйста, сделайте перерыв";
