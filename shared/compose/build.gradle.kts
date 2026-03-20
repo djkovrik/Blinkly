@@ -87,9 +87,9 @@ dependencies {
 
 android {
     namespace = "com.sedsoftware.blinkly.compose"
-    compileSdk = 36
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
-        minSdk = 23
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
