@@ -8,6 +8,9 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:domain"))
+
+                implementation(libs.ark.decompose.core)
+                implementation(libs.ark.essenty)
             }
         }
     }

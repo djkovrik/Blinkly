@@ -3,7 +3,6 @@ package com.sedsoftware.blinkly.component.onboarding.integration
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
@@ -83,9 +82,7 @@ class OnboardingComponentDefault private constructor(
     override val childStack: Value<ChildStack<*, OnboardingComponent.Child>> = stack
 
     override fun onBack() {
-        if (childStack.active.instance !is OnboardingComponent.Child.Step1) {
-            navigation.pop()
-        }
+        navigation.pop()
     }
 
     private fun createChild(config: Config, componentContext: ComponentContext): OnboardingComponent.Child =
