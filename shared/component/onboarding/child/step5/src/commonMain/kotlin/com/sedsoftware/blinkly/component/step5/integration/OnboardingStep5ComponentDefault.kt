@@ -10,7 +10,7 @@ class OnboardingStep5ComponentDefault(
 ) : OnboardingStep5Component, ComponentContext by componentContext {
 
     override fun nextStep() {
-        onboardingOutput(ComponentOutput.Common.OpenHomeScreen)
+        onboardingOutput(ComponentOutput.Onboarding.GoToHomeScreen)
     }
 
     override fun previousStep() {

@@ -108,16 +108,11 @@ class OnboardingComponentDefault private constructor(
 
     private fun onChildOutput(output: ComponentOutput) {
         when (output) {
-            is ComponentOutput.Onboarding -> {
-                when (output) {
-                    ComponentOutput.Onboarding.GoToStep2 -> navigation.push(Config.Step2)
-                    ComponentOutput.Onboarding.GoToStep3 -> navigation.push(Config.Step3)
-                    ComponentOutput.Onboarding.GoToStep4 -> navigation.push(Config.Step4)
-                    ComponentOutput.Onboarding.GoToStep5 -> navigation.push(Config.Step5)
-                    ComponentOutput.Onboarding.GoBack -> navigation.pop()
-                }
-            }
-
+            is ComponentOutput.Onboarding.GoToStep2 -> navigation.push(Config.Step2)
+            is ComponentOutput.Onboarding.GoToStep3 -> navigation.push(Config.Step3)
+            is ComponentOutput.Onboarding.GoToStep4 -> navigation.push(Config.Step4)
+            is ComponentOutput.Onboarding.GoToStep5 -> navigation.push(Config.Step5)
+            is ComponentOutput.Onboarding.GoBack -> navigation.pop()
             else -> onboardingOutput(output)
         }
     }

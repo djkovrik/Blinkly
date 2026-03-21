@@ -1,4 +1,4 @@
-package com.sedsoftware.blinkly.compose.ui.onboarding
+package com.sedsoftware.blinkly.compose.ui.exercises
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,24 +10,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sedsoftware.blinkly.component.step5.OnboardingStep5Component
+import com.sedsoftware.blinkly.component.blockc.BlockCComponent
 
 @Composable
-fun OnboardingContentStep5(
-    component: OnboardingStep5Component,
+fun BlockCContent(
+    component: BlockCComponent,
     modifier: Modifier = Modifier,
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
     ) {
-        Text("Step 5")
-        Button(onClick = component::previousStep, modifier = Modifier.padding(all = 8.dp)) {
-            Text("Previous")
-        }
-        Button(onClick = component::nextStep, modifier = Modifier.padding(all = 8.dp)) {
-            Text("Home screen")
+        Text("Block C")
+        Button(onClick = component::onBackClick, modifier = Modifier.padding(all = 8.dp)) {
+            Text("Close")
         }
     }
 }

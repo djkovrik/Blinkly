@@ -48,6 +48,8 @@ kover {
                     "com.sedsoftware.*.integration.*Preview",
                     "com.sedsoftware.*.database.*AppDatabase",
                     "com.sedsoftware.*.database.*AppDatabaseQueries",
+                    "com.sedsoftware.*.AlarmeePlatformConfigurationKt",
+                    "com.sedsoftware.*.PlatformKt",
                     "com.sedsoftware.*.*FactoryKt",
                     "com.sedsoftware.*.di.*",
                 )

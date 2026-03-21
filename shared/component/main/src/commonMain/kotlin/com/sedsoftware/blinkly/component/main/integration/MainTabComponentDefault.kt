@@ -5,6 +5,11 @@ import com.sedsoftware.blinkly.component.main.MainTabComponent
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 
 class MainTabComponentDefault(
-    componentContext: ComponentContext,
-    mainTabOutput: (ComponentOutput) -> Unit,
-) : MainTabComponent, ComponentContext by componentContext
+    private val componentContext: ComponentContext,
+    private val mainTabOutput: (ComponentOutput) -> Unit,
+) : MainTabComponent, ComponentContext by componentContext {
+
+    override fun onPreferencesClick() {
+        mainTabOutput(ComponentOutput.Main.OpenPreferences)
+    }
+}

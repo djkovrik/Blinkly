@@ -1,3 +1,5 @@
 package com.sedsoftware.blinkly.component.main
 
-interface MainTabComponent
+interface MainTabComponent {
+    fun onPreferencesClick()
+}

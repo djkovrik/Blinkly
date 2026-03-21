@@ -1,3 +1,5 @@
 package com.sedsoftware.blinkly.component.reminders
 
-interface RemindersTabComponent
+interface RemindersTabComponent {
+    fun onAddNewClick()
+}
