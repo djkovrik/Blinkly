@@ -3,6 +3,7 @@ package com.sedsoftware.blinkly.settings
 import assertk.assertThat
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import com.russhwolf.settings.MapSettings
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.model.ThemeState
@@ -32,6 +33,7 @@ class BlinklySettingsTest {
         val lastTreeProgressCheckDateDefault = settings.lastTreeProgressCheckDate
         val displayedHighlightsDefault = settings.displayedHighlights
         val currentHighlightDateDefault = settings.currentHighlightDate
+        val onboardingDisplayedDefault = settings.onboardingDisplayed
 
         // then
         assertThat(blinkBreakCountDefault).isEqualTo(BLINK_BREAK_COUNT_DEFAULT)
@@ -48,6 +50,7 @@ class BlinklySettingsTest {
         assertThat(lastTreeProgressCheckDateDefault).isEqualTo(null)
         assertThat(displayedHighlightsDefault).isEmpty()
         assertThat(currentHighlightDateDefault).isEqualTo(null)
+        assertThat(onboardingDisplayedDefault).isFalse()
     }
 
     @Test
@@ -58,6 +61,7 @@ class BlinklySettingsTest {
         val localDateValue = LocalDate.parse("2026-03-01")
         val themeValue = ThemeState.DARK
         val listValue = listOf(1, 2, 3)
+        val booleanValue = true
         // when
         settings.blinkBreakCount = intValue
         settings.nearFarFocusCount = intValue
@@ -73,6 +77,7 @@ class BlinklySettingsTest {
         settings.lastTreeProgressCheckDate = localDateValue
         settings.displayedHighlights = listValue
         settings.currentHighlightDate = localDateValue
+        settings.onboardingDisplayed = booleanValue
         // then
         assertThat(settings.blinkBreakCount).isEqualTo(intValue)
         assertThat(settings.nearFarFocusCount).isEqualTo(intValue)
@@ -88,6 +93,7 @@ class BlinklySettingsTest {
         assertThat(settings.lastTreeProgressCheckDate).isEqualTo(localDateValue)
         assertThat(settings.displayedHighlights).isEqualTo(listValue)
         assertThat(settings.currentHighlightDate).isEqualTo(localDateValue)
+        assertThat(settings.onboardingDisplayed).isEqualTo(booleanValue)
     }
 
     private companion object {

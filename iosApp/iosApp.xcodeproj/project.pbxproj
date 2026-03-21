@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A516EB4C2F6DB13A0040FD0E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A516EB4A2F6DB13A0040FD0E /* Localizable.strings */; };
 		A93A953B29CC810C00F8E227 /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93A953A29CC810C00F8E227 /* iosApp.swift */; };
 		A93A953F29CC810D00F8E227 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A93A953E29CC810D00F8E227 /* Assets.xcassets */; };
 		A93A954229CC810D00F8E227 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A93A954129CC810D00F8E227 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A516EB4B2F6DB13A0040FD0E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A516EB4D2F6DB13F0040FD0E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A93A953729CC810C00F8E227 /* Blinkly.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Blinkly.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A93A953A29CC810C00F8E227 /* iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosApp.swift; sourceTree = "<group>"; };
 		A93A953E29CC810D00F8E227 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -33,6 +36,7 @@
 		A93A952E29CC810C00F8E227 = {
 			isa = PBXGroup;
 			children = (
+				A516EB4A2F6DB13A0040FD0E /* Localizable.strings */,
 				A93A953929CC810C00F8E227 /* iosApp */,
 				A93A953829CC810C00F8E227 /* Products */,
 				C4127409AE3703430489E7BC /* Frameworks */,
@@ -114,6 +118,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = A93A952E29CC810C00F8E227;
 			productRefGroup = A93A953829CC810C00F8E227 /* Products */;
@@ -131,6 +136,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A93A954229CC810D00F8E227 /* Preview Assets.xcassets in Resources */,
+				A516EB4C2F6DB13A0040FD0E /* Localizable.strings in Resources */,
 				A93A953F29CC810D00F8E227 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -167,6 +173,18 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		A516EB4A2F6DB13A0040FD0E /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A516EB4B2F6DB13A0040FD0E /* en */,
+				A516EB4D2F6DB13F0040FD0E /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		A93A954329CC810D00F8E227 /* Debug */ = {
@@ -301,6 +319,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				"OTHER_LDFLAGS[arch=*]" = "-lsqlite3";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sedsoftware.blinkly.iosApp;
 				PRODUCT_NAME = Blinkly;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -326,6 +345,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				"OTHER_LDFLAGS[arch=*]" = "-lsqlite3";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sedsoftware.blinkly.iosApp;
 				PRODUCT_NAME = Blinkly;
 				SWIFT_EMIT_LOC_STRINGS = YES;

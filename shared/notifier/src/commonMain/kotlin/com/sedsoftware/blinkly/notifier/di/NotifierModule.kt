@@ -6,7 +6,7 @@ import com.sedsoftware.blinkly.notifier.impl.PermissionServiceImpl
 import dev.icerock.moko.permissions.PermissionsController
 
 interface NotifierModule {
-    val settings: BlinklyNotifier
+    val notifier: BlinklyNotifier
 }
 
 interface NotifierModuleDependencies {
@@ -15,7 +15,7 @@ interface NotifierModuleDependencies {
 
 fun NotifierModule(dependencies: NotifierModuleDependencies): NotifierModule {
     return object : NotifierModule {
-        override val settings: BlinklyNotifier by lazy {
+        override val notifier: BlinklyNotifier by lazy {
             BlinklyNotifierImpl(
                 permissionsService = PermissionServiceImpl(
                     controller = dependencies.controller,

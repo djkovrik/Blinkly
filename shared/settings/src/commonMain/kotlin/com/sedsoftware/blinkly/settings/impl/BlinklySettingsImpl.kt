@@ -129,6 +129,12 @@ internal class BlinklySettingsImpl(
             settings.setValue(PREF_CURRENT_HIGHLIGHT_DATE, stringValue)
         }
 
+    override var onboardingDisplayed: Boolean
+        get() = settings.getValue(PREF_ONBOARDING_DISPLAYED, false)
+        set(value) {
+            settings.setValue(PREF_ONBOARDING_DISPLAYED, value)
+        }
+
     private fun Settings.setValue(key: String, value: Any) {
         when (value) {
             is String -> putString(key, value)
@@ -174,5 +180,6 @@ internal class BlinklySettingsImpl(
         const val PREF_LAST_TREE_PROGRESS_CHECK_DATE = "ltpcd"
         const val PREF_DISPLAYED_HIGHLIGHTS = "dh"
         const val PREF_CURRENT_HIGHLIGHT_DATE = "chd"
+        const val PREF_ONBOARDING_DISPLAYED = "od"
     }
 }

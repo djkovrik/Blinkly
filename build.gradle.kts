@@ -48,6 +48,8 @@ kover {
                     "com.sedsoftware.*.integration.*Preview",
                     "com.sedsoftware.*.database.*AppDatabase",
                     "com.sedsoftware.*.database.*AppDatabaseQueries",
+                    "com.sedsoftware.*.AlarmeePlatformConfigurationKt",
+                    "com.sedsoftware.*.PlatformKt",
                     "com.sedsoftware.*.*FactoryKt",
                     "com.sedsoftware.*.di.*",
                 )
@@ -70,7 +72,7 @@ kover {
 
 dependencies {
     rootProject.subprojects {
-        if (!this.path.contains("root") && !this.path.contains("compose") && file("build.gradle.kts").exists()) {
+        if (!this.path.contains("compose") && file("build.gradle.kts").exists()) {
             kover(this)
         }
     }

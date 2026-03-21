@@ -33,13 +33,6 @@ internal fun Project.configureKotlinMultiplatform() {
 
         jvmToolchain(21)
 
-        targets.withType<KotlinNativeTarget>().configureEach {
-            binaries.configureEach {
-                linkerOpts("-lsqlite3")
-                freeCompilerArgs += "-Xdisable-phases=RemoveRedundantCallsToStaticInitializersPhase"
-            }
-        }
-
         sourceSets.apply {
             commonMain {
                 dependencies {

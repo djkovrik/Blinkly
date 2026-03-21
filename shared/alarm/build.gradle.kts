@@ -9,6 +9,30 @@ kotlin {
             dependencies {
                 implementation(project(":shared:domain"))
 
+                implementation(libs.compose.ui)
+            }
+        }
+
+        androidMain {
+            dependencies {
+                implementation(libs.lib.alarmee)
+            }
+        }
+
+        androidUnitTest {
+            dependencies {
+                implementation(libs.lib.alarmee)
+            }
+        }
+
+        iosArm64Main {
+            dependencies {
+                implementation(libs.lib.alarmee)
+            }
+        }
+
+        iosSimulatorArm64Main {
+            dependencies {
                 implementation(libs.lib.alarmee)
             }
         }
