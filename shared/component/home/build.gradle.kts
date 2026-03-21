@@ -8,6 +8,10 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:domain"))
+                implementation(project(":shared:component:main"))
+                implementation(project(":shared:component:progress"))
+                implementation(project(":shared:component:reminders"))
+                implementation(project(":shared:component:trainings"))
 
                 implementation(libs.ark.decompose.core)
                 implementation(libs.ark.decompose.extensions)
