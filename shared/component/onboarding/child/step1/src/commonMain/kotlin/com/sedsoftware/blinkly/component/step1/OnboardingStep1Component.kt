@@ -1,4 +1,5 @@
 package com.sedsoftware.blinkly.component.step1
 
-interface OnboardingStep4Component {
+interface OnboardingStep1Component {
+    fun nextStep()
 }

@@ -32,8 +32,8 @@ internal class ExerciseManagerImpl(
 ) : ExerciseManager {
 
     private val engine: ExerciseEngine = ExerciseEngine(dispatchers)
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + dispatchers.main)
-    private val _events: MutableSharedFlow<ExerciseEvent> = MutableSharedFlow<ExerciseEvent>()
+    private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
+    private val _events: MutableSharedFlow<ExerciseEvent> = MutableSharedFlow()
 
     override val events: Flow<ExerciseEvent> = _events
 

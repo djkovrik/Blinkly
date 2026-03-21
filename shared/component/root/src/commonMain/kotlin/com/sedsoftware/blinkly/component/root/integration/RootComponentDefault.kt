@@ -4,7 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
-import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.replaceCurrent
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.core.store.StoreFactory
@@ -24,10 +24,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.serialization.Serializable
 
-class RootComponentDefault internal constructor(
+class RootComponentDefault private constructor(
     private val settings: BlinklySettings,
-    dispatchers: BlinklyDispatchers,
-    componentContext: ComponentContext,
+    private val dispatchers: BlinklyDispatchers,
+    private val componentContext: ComponentContext,
     private val onboardingComponent: (ComponentContext, (ComponentOutput) -> Unit) -> OnboardingComponent,
     private val homeScreenComponent: (ComponentContext, (ComponentOutput) -> Unit) -> HomeScreenComponent,
 ) : RootComponent, ComponentContext by componentContext {
@@ -46,15 +46,15 @@ class RootComponentDefault internal constructor(
         dispatchers = dispatchers,
         settings = settings,
         onboardingComponent = { childContext, output ->
-            OnboardingComponentDefault()
+            OnboardingComponentDefault(childContext, dispatchers, output)
         },
         homeScreenComponent = { childContext, output ->
-            HomeScreenComponentDefault()
+            HomeScreenComponentDefault(childContext, dispatchers, settings, output)
         },
     )
 
     private val navigation: StackNavigation<Config> = StackNavigation()
-    private val scope: CoroutineScope = CoroutineScope(dispatchers.main)
+    private val scope: CoroutineScope = CoroutineScope(dispatchers.io)
 
     init {
         lifecycle.doOnDestroy {
@@ -73,10 +73,6 @@ class RootComponentDefault internal constructor(
 
     override val childStack: Value<ChildStack<*, RootComponent.Child>> = stack
 
-    override fun onBack() {
-        navigation.pop()
-    }
-
     private fun createChild(config: Config, componentContext: ComponentContext): RootComponent.Child =
         when (config) {
             is Config.Onboarding ->
@@ -86,7 +82,12 @@ class RootComponentDefault internal constructor(
                 RootComponent.Child.HomeScreen(homeScreenComponent(componentContext, ::onChildOutput))
         }
 
-    private fun onChildOutput(output: ComponentOutput) = Unit
+    private fun onChildOutput(output: ComponentOutput) {
+        when (output) {
+            is ComponentOutput.Common.OpenHomeScreen -> navigation.replaceCurrent(Config.HomeScreen)
+            else -> Unit
+        }
+    }
 
     private fun initialConfiguration(): Config =
         if (settings.onboardingDisplayed) {

@@ -9,12 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
-import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.PredictiveBackParams
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.stackAnimation
-import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.materialPredictiveBackAnimatable
 import com.sedsoftware.blinkly.component.root.RootComponent
 import com.sedsoftware.blinkly.compose.theme.BlinklyAppTheme
 import com.sedsoftware.blinkly.compose.ui.home.HomeScreenContent
@@ -31,13 +29,6 @@ fun RootContent(
             stack = component.childStack,
             animation = stackAnimation(
                 animator = fade() + scale(),
-                predictiveBackParams = {
-                    PredictiveBackParams(
-                        backHandler = component.backHandler,
-                        onBack = component::onBack,
-                        animatable = ::materialPredictiveBackAnimatable,
-                    )
-                }
             ),
             modifier = modifier
                 .windowInsetsPadding(WindowInsets.safeDrawing)
