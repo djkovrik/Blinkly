@@ -53,12 +53,30 @@ private fun ThemeChanged(isDark: Boolean) {
 }
 
 private fun getNotificationConfigurations(): Map<ReminderType, ReminderConfig> {
-    val title = NSBundle.mainBundle.localizedStringForKey("notification_title", "", null)
-    val description = NSBundle.mainBundle.localizedStringForKey("notification_description", "", null)
+    val texts = getRandomNotificationTexts()
+    val title = NSBundle.mainBundle.localizedStringForKey(texts.first, "", null)
+    val description = NSBundle.mainBundle.localizedStringForKey(texts.second, "", null)
     return mapOf(
         ReminderType.TWENTY_X3 to ReminderConfig(
             title = title,
             description = description,
         )
     )
+}
+
+private fun getRandomNotificationTexts(): Pair<String, String> {
+    val list = listOf(
+        "notification_title1" to "notification_description1",
+        "notification_title2" to "notification_description2",
+        "notification_title3" to "notification_description3",
+        "notification_title4" to "notification_description4",
+        "notification_title5" to "notification_description5",
+        "notification_title6" to "notification_description6",
+        "notification_title7" to "notification_description7",
+        "notification_title8" to "notification_description8",
+        "notification_title9" to "notification_description9",
+        "notification_title10" to "notification_description10",
+    )
+
+    return list.random()
 }

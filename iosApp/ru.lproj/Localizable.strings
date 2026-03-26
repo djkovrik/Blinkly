@@ -6,5 +6,23 @@
   
 */
 
-"notification_title" = "20-20-20";
-"notification_description" = "Пожалуйста, сделайте перерыв";
+"notification_title1" = "Пора отвести взгляд 👀";
+"notification_title2" = "Маленький перерыв для глаз";
+"notification_title3" = "Глаза просят отдыха";
+"notification_title4" = "Хватит пялиться в экран! 😅";
+"notification_title5" = "Твои глаза заслужили перерыв";
+"notification_title6" = "Время перезагрузки";
+"notification_title7" = "Минутка для фокуса 🧘";
+"notification_title8" = "Blinkly напоминает";
+"notification_title9" = "Не забудь моргнуть 😉";
+"notification_title10" = "Забота о зрении - это просто";
+"notification_description1" = "Правило 20-20-20: 20 секунд смотри на объект за 6 метров. Глаза скажут спасибо!";
+"notification_description2" = "Посмотри вдаль на 20 секунд - это снимает напряжение фокусировки.";
+"notification_description3" = "20 секунд вдаль - и усталость отступит. Готовы?";
+"notification_description4" = "Всего 20 секунд в сторону - и ты снова в строю. Сделаем?";
+"notification_description5" = "Взгляни на что-нибудь далёкое (от 6 метров) хотя бы на 20 секунд.";
+"notification_description6" = "20-20-20: посмотри вдаль, поморгай, отдохни.";
+"notification_description7" = "Отведи взгляд от экрана на 20 секунд. Это проще, чем кажется!";
+"notification_description8" = "Сделай перерыв: 20 секунд смотри вдаль. Глаза будут благодарны.";
+"notification_description9" = "Короткий взгляд вдаль помогает глазам расслабиться. Попробуй прямо сейчас!";
+"notification_description10" = "20 секунд на дальний объект - и ты уже молодец.";
