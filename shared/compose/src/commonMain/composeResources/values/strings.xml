@@ -1,0 +1,15 @@
+<resources>
+    <!--
+    The language is defined by a two-letter ISO 639-1 language code
+    https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+    -->
+
+    <!-- Non-translatable -->
+    <string name="app_label">Blinkly</string>
+
+    <!-- Onboarding navigation -->
+    <string name="onboarding_back">Back</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_done">Done</string>
+
+</resources>

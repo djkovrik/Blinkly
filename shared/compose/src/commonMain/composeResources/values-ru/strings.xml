@@ -1,0 +1,11 @@
+<resources>
+    <!-- Russian translation by djkovrik -->
+
+    <!-- Non-translatable -->
+    <string name="app_label">Blinkly</string>
+
+    <!-- Onboarding navigation -->
+    <string name="onboarding_back">Назад</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_done">Готово</string>
+</resources>

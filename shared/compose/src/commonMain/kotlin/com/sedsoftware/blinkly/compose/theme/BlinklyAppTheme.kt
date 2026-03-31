@@ -93,10 +93,10 @@ internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
 @Composable
 internal fun BlinklyAppTheme(
     onThemeChanged: @Composable (isDark: Boolean) -> Unit,
+    isDakTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    val systemIsDark = isSystemInDarkTheme()
-    val isDarkState = remember(systemIsDark) { mutableStateOf(systemIsDark) }
+    val isDarkState = remember(isDakTheme) { mutableStateOf(isDakTheme) }
     CompositionLocalProvider(
         LocalThemeIsDark provides isDarkState
     ) {
@@ -109,4 +109,16 @@ internal fun BlinklyAppTheme(
             content = { Surface(content = content) }
         )
     }
+}
+
+@Composable
+internal fun BlinklyWidgetPreview(
+    isDakTheme: Boolean = false,
+    content: @Composable () -> Unit,
+) {
+    BlinklyAppTheme(
+        onThemeChanged = {},
+        isDakTheme = isDakTheme,
+        content = content,
+    )
 }
