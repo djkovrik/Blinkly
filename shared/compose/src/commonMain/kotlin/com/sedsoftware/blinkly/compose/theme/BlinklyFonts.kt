@@ -82,10 +82,10 @@ internal object BlinklyFonts {
             ),
             titleSmall = TextStyle(
                 fontFamily = interFontFamily(),
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.Medium,
                 fontStyle = FontStyle.Normal,
-                fontSize = 20.sp,
-                lineHeight = 26.sp,
+                fontSize = 18.sp,
+                lineHeight = 22.sp,
                 letterSpacing = 0.1.sp,
             ),
             bodyLarge = TextStyle(

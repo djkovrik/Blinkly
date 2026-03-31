@@ -8,4 +8,35 @@
     <string name="onboarding_back">Назад</string>
     <string name="onboarding_next">Далее</string>
     <string name="onboarding_done">Готово</string>
+
+    <!-- Onboarding step 1 -->
+    <string name="onboarding_welcome">Добро пожаловать в Blinkly</string>
+    <string name="onboarding_welcome_description">Ваше пространство для отдыха глаз</string>
+
+    <!-- Onboarding step 2 -->
+    <string name="onboarding_why">Зачем это?</string>
+    <string name="onboarding_why_description1">Ваши глаза устают быстрее, чем вы думаете.</string>
+    <string name="onboarding_why_description2">Во время работы за экраном мы моргаем в 2–3 раза реже. Это может привести к сухости, напряжению и усталости глаз.</string>
+
+    <!-- Onboarding step 3 -->
+    <string name="onboarding_how">Как это поможет?</string>
+    <string name="onboarding_how_title1">Для мышц:</string>
+    <string name="onboarding_how_title2">Для увлажнения:</string>
+    <string name="onboarding_how_title3">Для кровообращения:</string>
+    <string name="onboarding_how_title4">Перезагрузка:</string>
+    <string name="onboarding_how_description1">Глазные мышцы, как и любые другие, нуждаются в разминке. Долгое смотрение в одну точку (экран) заставляет цилиарную мышцу «застывать» в напряжении. Гимнастика учит ее расслабляться (снимает спазм аккомодации), что может замедлить развитие ложной близорукости.</string>
+    <string name="onboarding_how_description2">При фокусировке на экране мы реже моргаем. Упражнения напоминают нам моргать, равномерно распределяя слезную пленку и предотвращая синдром сухого глаза.</string>
+    <string name="onboarding_how_description3">Движения глазами и зажмуривания усиливают приток крови к тканям глаза, улучшая их питание.</string>
+    <string name="onboarding_how_description4">Короткий перерыв, чтобы посмотреть вдаль, дает зрительной системе «перезагрузиться», снижая утомление и головную боль напряжения.</string>
+
+    <!-- Onboarding step 4 -->
+    <string name="onboarding_disclaimer1">Важная информация о здоровье</string>
+    <string name="onboarding_disclaimer2">Приложение Blinkly разработано исключительно для профилактики зрительного утомления и поддержания тонуса глазных мышц у здоровых людей. Оно не является медицинским изделием, лечебным средством или методом коррекции зрения.</string>
+    <string name="onboarding_disclaimer3">Не заменяет врача:</string>
+    <string name="onboarding_disclaimer4">Гимнастика не лечит такие заболевания, как глаукома, катаракта, отслоение сетчатки, прогрессирующая близорукость или инфекции.</string>
+    <string name="onboarding_disclaimer5">Противопоказания:</string>
+    <string name="onboarding_disclaimer6">Если у вас диагностированы какие-либо заболевания глаз (в том числе глаукома, так как некоторые упражнения могут повышать внутриглазное давление) или вы недавно перенесли операцию на глазах — перед началом занятий обязательно проконсультируйтесь с врачом-офтальмологом.</string>
+    <string name="onboarding_disclaimer7">При дискомфорте:</string>
+    <string name="onboarding_disclaimer8">В случае возникновения боли, рези, длительного ухудшения зрения или появления «мушек» перед глазами — прекратите занятия и немедленно обратитесь к специалисту.</string>
+    <string name="onboarding_disclaimer_got_it">Окей, я все понял(а)</string>
 </resources>

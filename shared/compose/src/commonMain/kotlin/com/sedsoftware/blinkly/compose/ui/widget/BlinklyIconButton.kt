@@ -1,5 +1,8 @@
 package com.sedsoftware.blinkly.compose.ui.widget
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,8 +15,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -36,6 +41,7 @@ import org.jetbrains.compose.resources.painterResource
 internal fun BlinklyIconButton(
     iconRes: DrawableResource,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     leftSideText: String? = null,
     rightSideText: String? = null,
     textStyle: TextStyle = MaterialTheme.typography.labelLarge,
@@ -46,16 +52,28 @@ internal fun BlinklyIconButton(
     iconSize: Dp = 22.dp,
     onClick: () -> Unit = {},
 ) {
+    val animatedAlpha: Float by animateFloatAsState(
+        targetValue = if (enabled) ALPHA_ENABLED else ALPHA_DISABLED,
+        animationSpec = tween(
+            easing = LinearEasing,
+            durationMillis = ALPHA_ANIM_DURATION,
+        )
+    )
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
             .clip(shape = buttonShape)
+            .alpha(alpha = animatedAlpha)
             .background(
                 color = buttonColor,
                 shape = buttonShape,
             )
-            .clickableOnce(onClick = onClick)
+            .alsoIf(
+                enabled,
+                Modifier.clickableOnce(onClick = onClick)
+            )
             .alsoIf(
                 leftSideText != null || rightSideText != null,
                 Modifier
@@ -100,34 +118,15 @@ internal fun BlinklyIconButton(
     }
 }
 
+private const val ALPHA_ENABLED = 1f
+private const val ALPHA_DISABLED = 0.4f
+private const val ALPHA_ANIM_DURATION = 150
+
 @Preview
 @Composable
 private fun BlinklyIconButtonPreviewLight() {
     BlinklyWidgetPreview {
-        Column {
-            BlinklyIconButton(
-                iconRes = Res.drawable.icon_next,
-                leftSideText = "Next",
-                modifier = Modifier.padding(all = 4.dp)
-            )
-
-            BlinklyIconButton(
-                iconRes = Res.drawable.icon_back,
-                rightSideText = "Back",
-                modifier = Modifier.padding(all = 4.dp)
-            )
-
-            BlinklyIconButton(
-                iconRes = Res.drawable.icon_done,
-                leftSideText = "Done",
-                modifier = Modifier.padding(all = 4.dp)
-            )
-
-            BlinklyIconButton(
-                iconRes = Res.drawable.icon_done,
-                modifier = Modifier.padding(all = 4.dp)
-            )
-        }
+        BlinklyIconButtonPreviewContent()
     }
 }
 
@@ -135,29 +134,41 @@ private fun BlinklyIconButtonPreviewLight() {
 @Composable
 private fun BlinklyIconButtonPreviewDark() {
     BlinklyWidgetPreview(isDakTheme = true) {
-        Column {
-            BlinklyIconButton(
-                iconRes = Res.drawable.icon_next,
-                leftSideText = "Далее",
-                modifier = Modifier.padding(all = 4.dp)
-            )
+        BlinklyIconButtonPreviewContent()
+    }
+}
 
-            BlinklyIconButton(
-                iconRes = Res.drawable.icon_back,
-                rightSideText = "Назад",
-                modifier = Modifier.padding(all = 4.dp)
-            )
+@Composable
+private fun BlinklyIconButtonPreviewContent() {
+    Column {
+        BlinklyIconButton(
+            iconRes = Res.drawable.icon_next,
+            leftSideText = "Next",
+            modifier = Modifier.padding(all = 4.dp)
+        )
 
-            BlinklyIconButton(
-                iconRes = Res.drawable.icon_done,
-                leftSideText = "Готово",
-                modifier = Modifier.padding(all = 4.dp)
-            )
+        BlinklyIconButton(
+            iconRes = Res.drawable.icon_back,
+            rightSideText = "Back",
+            modifier = Modifier.padding(all = 4.dp)
+        )
 
-            BlinklyIconButton(
-                iconRes = Res.drawable.icon_done,
-                modifier = Modifier.padding(all = 4.dp)
-            )
-        }
+        BlinklyIconButton(
+            iconRes = Res.drawable.icon_back,
+            enabled = false,
+            rightSideText = "Back",
+            modifier = Modifier.padding(all = 4.dp)
+        )
+
+        BlinklyIconButton(
+            iconRes = Res.drawable.icon_done,
+            leftSideText = "Done",
+            modifier = Modifier.padding(all = 4.dp)
+        )
+
+        BlinklyIconButton(
+            iconRes = Res.drawable.icon_done,
+            modifier = Modifier.padding(all = 4.dp)
+        )
     }
 }

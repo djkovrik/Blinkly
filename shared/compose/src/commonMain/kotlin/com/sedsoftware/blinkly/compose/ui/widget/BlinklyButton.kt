@@ -60,46 +60,36 @@ internal fun BlinklyButton(
 
 @Preview
 @Composable
-private fun BlinklyIconButtonPreviewLight() {
+private fun BlinklyButtonPreviewLight() {
     BlinklyWidgetPreview {
-        Column {
-            BlinklyButton(
-                text = "OK",
-                modifier = Modifier.padding(all = 4.dp)
-            )
-
-            BlinklyButton(
-                text = "Cancel",
-                modifier = Modifier.padding(all = 4.dp)
-            )
-
-            BlinklyButton(
-                text = "Long text here",
-                modifier = Modifier.padding(all = 4.dp)
-            )
-        }
+        BlinklyButtonPreviewContent()
     }
 }
 
 @Preview
 @Composable
-private fun BlinklyIconButtonPreviewDark() {
+private fun BlinklyButtonPreviewDark() {
     BlinklyWidgetPreview(isDakTheme = true) {
-        Column {
-            BlinklyButton(
-                text = "OK",
-                modifier = Modifier.padding(all = 4.dp)
-            )
+        BlinklyButtonPreviewContent()
+    }
+}
 
-            BlinklyButton(
-                text = "Cancel",
-                modifier = Modifier.padding(all = 4.dp)
-            )
+@Composable
+private fun BlinklyButtonPreviewContent() {
+    Column {
+        BlinklyButton(
+            text = "OK",
+            modifier = Modifier.padding(all = 4.dp)
+        )
 
-            BlinklyButton(
-                text = "Long text here",
-                modifier = Modifier.padding(all = 4.dp)
-            )
-        }
+        BlinklyButton(
+            text = "Cancel",
+            modifier = Modifier.padding(all = 4.dp)
+        )
+
+        BlinklyButton(
+            text = "Long text here",
+            modifier = Modifier.padding(all = 4.dp)
+        )
     }
 }

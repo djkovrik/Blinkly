@@ -12,4 +12,34 @@
     <string name="onboarding_next">Next</string>
     <string name="onboarding_done">Done</string>
 
+    <!-- Onboarding step 1 -->
+    <string name="onboarding_welcome">Welcome to Blinkly</string>
+    <string name="onboarding_welcome_description">A space where your eyes can rest</string>
+
+    <!-- Onboarding step 2 -->
+    <string name="onboarding_why">Why this?</string>
+    <string name="onboarding_why_description1">Your eyes get tired faster than you think.</string>
+    <string name="onboarding_why_description2">When we look at screens, we blink up to 3× less. This can lead to eyes dryness, tension, and fatigue.</string>
+
+    <!-- Onboarding step 3 -->
+    <string name="onboarding_how">How does it help?</string>
+    <string name="onboarding_how_title1">For your eye muscles:</string>
+    <string name="onboarding_how_title2">For hydration:</string>
+    <string name="onboarding_how_title3">For blood flow:</string>
+    <string name="onboarding_how_title4">A quick reset:</string>
+    <string name="onboarding_how_description1">Like any other muscles, your eyes need movement. Staring at a screen keeps the ciliary muscle locked in a constant state of tension. Simple exercises teach it to relax (relieving accommodative spasm), which can help prevent digital eye strain from progressing.</string>
+    <string name="onboarding_how_description2">When you focus on a screen, you blink up to 66% less often. Our exercises remind you to blink, helping spread the tear film evenly across your eyes and preventing that dry, gritty feeling.</string>
+    <string name="onboarding_how_description3">Gentle eye movements and firm blinking stimulate circulation around your eyes, bringing more oxygen and nutrients to the tissues. This helps reduce puffiness and keeps your eyes feeling fresh.</string>
+    <string name="onboarding_how_description4">Looking into the distance, even for a moment, gives your visual system a chance to "reboot." It reduces fatigue and can even help prevent tension headaches caused by prolonged screen time.</string>
+
+    <!-- Onboarding step 4 -->
+    <string name="onboarding_disclaimer1">Health and safety info</string>
+    <string name="onboarding_disclaimer2">Blinkly is designed solely for preventing digital eye strain and maintaining the tone of eye muscles in healthy individuals. It is not a medical device, a treatment, or a method of vision correction.</string>
+    <string name="onboarding_disclaimer3">Does not replace a doctor:</string>
+    <string name="onboarding_disclaimer4">This app does not treat conditions such as glaucoma, cataracts, retinal detachment, progressive myopia, or eye infections.</string>
+    <string name="onboarding_disclaimer5">Contraindications:</string>
+    <string name="onboarding_disclaimer6">If you have been diagnosed with any eye condition (including glaucoma, as some exercises may increase intraocular pressure) or have recently undergone eye surgery, please consult an ophthalmologist before starting.</string>
+    <string name="onboarding_disclaimer7">If discomfort occurs:</string>
+    <string name="onboarding_disclaimer8">If you experience pain, burning, prolonged blurred vision, or see spots (floaters), stop immediately and seek medical attention.</string>
+    <string name="onboarding_disclaimer_got_it">Got it, I understand</string>
 </resources>
