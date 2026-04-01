@@ -8,6 +8,7 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.sedsoftware.blinkly.component.onboarding.OnboardingComponent
 import com.sedsoftware.blinkly.component.step1.OnboardingStep1Component
 import com.sedsoftware.blinkly.component.step1.integration.OnboardingStep1ComponentDefault
@@ -38,6 +39,7 @@ class OnboardingComponentDefault private constructor(
 
     constructor(
         componentContext: ComponentContext,
+        storeFactory: StoreFactory,
         dispatchers: BlinklyDispatchers,
         onboardingOutput: (ComponentOutput) -> Unit,
     ) : this(
@@ -54,7 +56,7 @@ class OnboardingComponentDefault private constructor(
             OnboardingStep3ComponentDefault(childContext, output)
         },
         onboardingStep4 = { childContext, output ->
-            OnboardingStep4ComponentDefault(childContext, output)
+            OnboardingStep4ComponentDefault(childContext, storeFactory, dispatchers, output)
         },
         onboardingStep5 = { childContext, output ->
             OnboardingStep5ComponentDefault(childContext, output)

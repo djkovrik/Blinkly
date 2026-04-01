@@ -177,13 +177,13 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private fun completeOnboardingFlow(currentComponent: RootComponent) {
         val onboardingComponent = currentComponent.childStack.active.instance as? RootComponent.Child.Onboarding ?: return
         val step1 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step1
-        step1.component.nextStep()
+        step1.component.onNextClick()
         val step2 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step2
-        step2.component.nextStep()
+        step2.component.onNextClick()
         val step3 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step3
-        step3.component.nextStep()
+        step3.component.onNextClick()
         val step4 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step4
-        step4.component.nextStep()
+        step4.component.onNextClick()
         val step5 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step5
         step5.component.nextStep()
     }

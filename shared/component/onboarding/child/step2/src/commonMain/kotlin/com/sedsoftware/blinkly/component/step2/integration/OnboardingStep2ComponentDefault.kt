@@ -9,11 +9,11 @@ class OnboardingStep2ComponentDefault(
     private val onboardingOutput: (ComponentOutput) -> Unit,
 ) : OnboardingStep2Component, ComponentContext by componentContext {
 
-    override fun nextStep() {
+    override fun onNextClick() {
         onboardingOutput(ComponentOutput.Onboarding.GoToStep3)
     }
 
-    override fun previousStep() {
+    override fun onBackClick() {
         onboardingOutput(ComponentOutput.Onboarding.GoBack)
     }
 }

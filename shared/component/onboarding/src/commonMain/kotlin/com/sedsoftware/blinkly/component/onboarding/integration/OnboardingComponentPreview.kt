@@ -24,7 +24,7 @@ class OnboardingComponentPreview(
                     1 -> OnboardingComponent.Child.Step1(OnboardingStep1ComponentPreview())
                     2 -> OnboardingComponent.Child.Step2(OnboardingStep2ComponentPreview())
                     3 -> OnboardingComponent.Child.Step3(OnboardingStep3ComponentPreview())
-                    4 -> OnboardingComponent.Child.Step4(OnboardingStep4ComponentPreview())
+                    4 -> OnboardingComponent.Child.Step4(OnboardingStep4ComponentPreview(true))
                     else -> OnboardingComponent.Child.Step5(OnboardingStep5ComponentPreview())
                 }
             )

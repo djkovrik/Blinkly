@@ -110,7 +110,7 @@ complexity:
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
     ignoreNestingFunctions: false
-    ignoreAnnotated: ['StoreCreate']
+    ignoreAnnotated: ['StoreProvider']
     nestingFunctions:
       - 'also'
       - 'apply'
@@ -130,7 +130,7 @@ complexity:
   LongMethod:
     active: true
     threshold: 90
-    ignoreAnnotated: ['Composable','StoreCreate']
+    ignoreAnnotated: ['Composable','StoreProvider']
   LongParameterList:
     active: true
     functionThreshold: 12

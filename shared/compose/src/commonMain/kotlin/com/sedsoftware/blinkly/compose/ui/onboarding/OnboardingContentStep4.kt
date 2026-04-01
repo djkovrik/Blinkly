@@ -14,9 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +28,7 @@ import blinkly.shared.compose.generated.resources.onboarding_disclaimer6
 import blinkly.shared.compose.generated.resources.onboarding_disclaimer7
 import blinkly.shared.compose.generated.resources.onboarding_disclaimer8
 import blinkly.shared.compose.generated.resources.onboarding_disclaimer_got_it
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.sedsoftware.blinkly.component.step4.OnboardingStep4Component
 import com.sedsoftware.blinkly.component.step4.integration.OnboardingStep4ComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
@@ -41,8 +39,8 @@ fun OnboardingContentStep4(
     component: OnboardingStep4Component,
     modifier: Modifier = Modifier,
 ) {
+    val model: OnboardingStep4Component.Model by component.model.subscribeAsState()
     val scrollState: ScrollState = rememberScrollState()
-    var checked by remember { mutableStateOf(false) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -117,8 +115,8 @@ fun OnboardingContentStep4(
                 .padding(vertical = 4.dp)
         ) {
             Checkbox(
-                checked = checked,
-                onCheckedChange = { checked = it }
+                checked = model.checkboxSelected,
+                onCheckedChange = component::onCheckboxSelect,
             )
 
             Text(
@@ -131,9 +129,9 @@ fun OnboardingContentStep4(
         BottomNavigationButtons(
             previousStepAvailable = true,
             nextStepAvailable = true,
-            nextStepEnabled = true,
-            onPreviousClick = component::previousStep,
-            onNextClick = component::nextStep,
+            nextStepEnabled = model.checkboxSelected,
+            onPreviousClick = component::onBackClick,
+            onNextClick = component::onNextClick,
             modifier = Modifier
                 .padding(top = 16.dp, bottom = 32.dp)
                 .fillMaxWidth(),
@@ -145,7 +143,7 @@ fun OnboardingContentStep4(
 @Composable
 private fun OnboardingContentStep4PreviewLight() {
     BlinklyWidgetPreview {
-        OnboardingContentStep4(OnboardingStep4ComponentPreview())
+        OnboardingContentStep4(OnboardingStep4ComponentPreview(false))
     }
 }
 
@@ -153,6 +151,6 @@ private fun OnboardingContentStep4PreviewLight() {
 @Composable
 private fun OnboardingContentStep4PreviewDark() {
     BlinklyWidgetPreview(isDakTheme = true) {
-        OnboardingContentStep4(OnboardingStep4ComponentPreview())
+        OnboardingContentStep4(OnboardingStep4ComponentPreview(true))
     }
 }

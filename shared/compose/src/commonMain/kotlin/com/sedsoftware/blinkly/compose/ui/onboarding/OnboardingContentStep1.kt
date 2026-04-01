@@ -63,7 +63,7 @@ fun OnboardingContentStep1(
             nextStepAvailable = true,
             nextStepEnabled = true,
             onPreviousClick = null,
-            onNextClick = component::nextStep,
+            onNextClick = component::onNextClick,
             modifier = Modifier
                 .padding(bottom = 32.dp)
                 .fillMaxWidth(),
