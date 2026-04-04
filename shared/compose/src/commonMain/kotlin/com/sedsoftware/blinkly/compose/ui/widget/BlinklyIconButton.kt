@@ -50,13 +50,16 @@ internal fun BlinklyIconButton(
     buttonShape: Shape = MaterialTheme.shapes.extraLarge,
     buttonHeight: Dp = 44.dp,
     iconSize: Dp = 22.dp,
+    alphaEnabled: Float = 1f,
+    alphaDisabled: Float = 0.4f,
+    animationDuration: Int = 150,
     onClick: () -> Unit = {},
 ) {
     val animatedAlpha: Float by animateFloatAsState(
-        targetValue = if (enabled) ALPHA_ENABLED else ALPHA_DISABLED,
+        targetValue = if (enabled) alphaEnabled else alphaDisabled,
         animationSpec = tween(
             easing = LinearEasing,
-            durationMillis = ALPHA_ANIM_DURATION,
+            durationMillis = animationDuration,
         )
     )
 
@@ -117,10 +120,6 @@ internal fun BlinklyIconButton(
         }
     }
 }
-
-private const val ALPHA_ENABLED = 1f
-private const val ALPHA_DISABLED = 0.4f
-private const val ALPHA_ANIM_DURATION = 150
 
 @Preview
 @Composable

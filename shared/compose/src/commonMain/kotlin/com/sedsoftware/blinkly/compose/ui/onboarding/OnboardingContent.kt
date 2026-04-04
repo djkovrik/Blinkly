@@ -25,6 +25,7 @@ import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 fun OnboardingContent(
     component: OnboardingComponent,
     modifier: Modifier = Modifier,
+    totalPages: Int = 5,
 ) {
     val stack by component.childStack.subscribeAsState()
     val activeComponent: OnboardingComponent.Child = stack.active.instance
@@ -64,7 +65,7 @@ fun OnboardingContent(
         }
 
         PageIndicator(
-            pagesCount = TOTAL_PAGES,
+            pagesCount = totalPages,
             currentScrollPosition = animatedScrollValue,
             indicatorMarkerColor = MaterialTheme.colorScheme.onPrimaryContainer,
             indicatorBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
@@ -76,8 +77,6 @@ fun OnboardingContent(
         )
     }
 }
-
-private const val TOTAL_PAGES = 5
 
 @Preview
 @Composable

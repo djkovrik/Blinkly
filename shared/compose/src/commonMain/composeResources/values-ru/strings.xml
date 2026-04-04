@@ -4,6 +4,10 @@
     <!-- Non-translatable -->
     <string name="app_label">Blinkly</string>
 
+    <!-- Common -->
+    <string name="common_ok">ОК</string>
+    <string name="common_cancel">Отмена</string>
+
     <!-- Onboarding navigation -->
     <string name="onboarding_back">Назад</string>
     <string name="onboarding_next">Далее</string>
@@ -39,4 +43,17 @@
     <string name="onboarding_disclaimer7">При дискомфорте:</string>
     <string name="onboarding_disclaimer8">В случае возникновения боли, рези, длительного ухудшения зрения или появления «мушек» перед глазами — прекратите занятия и немедленно обратитесь к специалисту.</string>
     <string name="onboarding_disclaimer_got_it">Окей, я все понял(а)</string>
+
+    <!-- Reminder creator -->
+    <string name="period_label">Период для уведомлений</string>
+    <string name="period_from">С</string>
+    <string name="period_to">По</string>
+    <string name="week_label">Дни недели</string>
+    <string name="week_monday">ПН</string>
+    <string name="week_tuesday">ВТ</string>
+    <string name="week_wednesday">СР</string>
+    <string name="week_thursday">ЧТ</string>
+    <string name="week_friday">ПТ</string>
+    <string name="week_saturday">СБ</string>
+    <string name="week_sunday">ВС</string>
 </resources>
