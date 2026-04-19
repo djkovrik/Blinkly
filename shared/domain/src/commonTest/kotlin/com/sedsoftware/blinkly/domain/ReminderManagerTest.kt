@@ -185,7 +185,7 @@ class ReminderManagerTest : BaseDomainTest() {
         // when
         manager.scheduleWeeklyDayPeriod(
             from = LocalTime(hour = 10, minute = 0),
-            to = LocalTime(hour = 18, minute = 0),
+            until = LocalTime(hour = 18, minute = 0),
             intervalMinutes = 240,
             days = targetDays,
         )
@@ -246,7 +246,7 @@ class ReminderManagerTest : BaseDomainTest() {
             // when
             manager.scheduleWeeklyDayPeriod(
                 from = LocalTime(hour = 10, minute = 0),
-                to = LocalTime(hour = 18, minute = 0),
+                until = LocalTime(hour = 18, minute = 0),
                 intervalMinutes = 240,
                 days = targetDays,
             )

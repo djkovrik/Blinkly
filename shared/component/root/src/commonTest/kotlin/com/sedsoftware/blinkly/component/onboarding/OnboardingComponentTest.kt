@@ -55,7 +55,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         assertThat(childStep5).isNotNull()
         assertThat(component.childStack.items.size).isEqualTo(5)
         // when
-        childStep5?.component?.nextStep()
+        childStep5?.component?.onNextClick()
         // then
         assertThat(componentOutput).contains(ComponentOutput.Onboarding.GoToHomeScreen)
     }
@@ -74,7 +74,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         val childStep5 = component.childStack.active.instance as? OnboardingComponent.Child.Step5
         assertThat(childStep5).isNotNull()
         // when
-        childStep5?.component?.previousStep()
+        childStep5?.component?.onBackClick()
         childStep4 = component.childStack.active.instance as? OnboardingComponent.Child.Step4
         // then
         assertThat(childStep4).isNotNull()

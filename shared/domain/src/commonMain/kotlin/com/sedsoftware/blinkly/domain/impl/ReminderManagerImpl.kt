@@ -106,8 +106,8 @@ internal class ReminderManagerImpl(
         )
     }
 
-    override suspend fun scheduleWeeklyDayPeriod(from: LocalTime, to: LocalTime, intervalMinutes: Int, days: List<DayOfWeek>) {
-        if (intervalMinutes <= 0 || days.isEmpty() || from >= to) return
+    override suspend fun scheduleWeeklyDayPeriod(from: LocalTime, until: LocalTime, intervalMinutes: Int, days: List<DayOfWeek>) {
+        if (intervalMinutes <= 0 || days.isEmpty() || from >= until) return
 
         val nowInstant = timeUtils.now()
         val timeZone = timeUtils.timeZone()
@@ -120,7 +120,7 @@ internal class ReminderManagerImpl(
             .toInstant(timeZone)
             .plus(intervalMinutes.toLong(), DateTimeUnit.MINUTE)
 
-        val endInstant = LocalDateTime(baseDate, to).toInstant(timeZone)
+        val endInstant = LocalDateTime(baseDate, until).toInstant(timeZone)
 
         while (currentInstant <= endInstant) {
             val localTime = currentInstant.toLocalDateTime(timeZone).time

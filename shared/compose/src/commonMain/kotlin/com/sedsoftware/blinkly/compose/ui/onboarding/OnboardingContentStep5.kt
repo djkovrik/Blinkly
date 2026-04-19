@@ -23,10 +23,10 @@ fun OnboardingContentStep5(
         modifier = modifier.fillMaxSize(),
     ) {
         Text("Step 5")
-        Button(onClick = component::previousStep, modifier = Modifier.padding(all = 8.dp)) {
+        Button(onClick = component::onBackClick, modifier = Modifier.padding(all = 8.dp)) {
             Text("Previous")
         }
-        Button(onClick = component::nextStep, modifier = Modifier.padding(all = 8.dp)) {
+        Button(onClick = component::onNextClick, modifier = Modifier.padding(all = 8.dp)) {
             Text("Home screen")
         }
     }

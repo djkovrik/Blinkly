@@ -10,7 +10,7 @@ interface ReminderManager {
 
     suspend fun scheduleDaily(time: LocalTime)
     suspend fun scheduleWeeklySingle(time: LocalTime, dayOfWeek: DayOfWeek)
-    suspend fun scheduleWeeklyDayPeriod(from: LocalTime, to: LocalTime, intervalMinutes: Int, days: List<DayOfWeek>)
+    suspend fun scheduleWeeklyDayPeriod(from: LocalTime, until: LocalTime, intervalMinutes: Int, days: List<DayOfWeek>)
     suspend fun rescheduleAll()
     suspend fun cancel(uuid: String)
     suspend fun cancelAll()

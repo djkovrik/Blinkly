@@ -185,7 +185,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         val step4 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step4
         step4.component.onNextClick()
         val step5 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step5
-        step5.component.nextStep()
+        step5.component.onNextClick()
     }
 
     private fun switchTab(tab: HomeScreenTab) {
