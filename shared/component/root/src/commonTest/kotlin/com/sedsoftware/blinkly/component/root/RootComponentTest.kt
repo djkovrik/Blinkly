@@ -10,6 +10,12 @@ import com.sedsoftware.blinkly.component.home.HomeScreenComponent
 import com.sedsoftware.blinkly.component.home.model.HomeScreenTab
 import com.sedsoftware.blinkly.component.onboarding.OnboardingComponent
 import com.sedsoftware.blinkly.component.root.integration.RootComponentDefault
+import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
+import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
+import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
+import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
+import com.sedsoftware.blinkly.domain.BlinklyReminderManager
+import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
@@ -27,6 +33,12 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val settingsMock: BlinklySettings = mock()
     private val fakeSettings = FakeSettings(settingsMock = settingsMock)
     private val timeUtilsMock: BlinklyTimeUtils = mock()
+    private val achievementsWatcherMock: BlinklyAchievementsWatcher = mock()
+    private val calendarWatcherMock: BlinklyCalendarWatcher = mock()
+    private val exerciseManagerMock: BlinklyExerciseManager = mock()
+    private val highlightsProviderMock: BlinklyHighlightsProvider = mock()
+    private val reminderManagerMock: BlinklyReminderManager = mock()
+    private val treeProgressWatcherMock: BlinklyTreeProgressWatcher = mock()
 
     @Test
     fun `when component created for the first time then initial child is onboarding`() = runTest(testScheduler) {
@@ -203,5 +215,11 @@ class RootComponentTest : ComponentTest<RootComponent>() {
             notifier = notifierMock,
             settings = fakeSettings,
             timeUtils = timeUtilsMock,
+            achievementsWatcher = achievementsWatcherMock,
+            calendarWatcher = calendarWatcherMock,
+            exerciseManager = exerciseManagerMock,
+            highlightsProvider = highlightsProviderMock,
+            reminderManager = reminderManagerMock,
+            treeProgressWatcher = treeProgressWatcherMock,
         )
 }

@@ -1,6 +1,6 @@
 package com.sedsoftware.blinkly.domain.impl
 
-import com.sedsoftware.blinkly.domain.TreeProgressWatcher
+import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.extension.asLocalDate
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
@@ -17,11 +17,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.datetime.TimeZone
 
-class TreeProgressWatcherImpl(
+class BlinklyTreeProgressWatcherImpl(
     private val timeUtils: BlinklyTimeUtils,
     database: BlinklyDatabase,
     dispatchers: BlinklyDispatchers,
-) : TreeProgressWatcher {
+) : BlinklyTreeProgressWatcher {
 
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
 

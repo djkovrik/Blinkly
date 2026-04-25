@@ -7,7 +7,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.extension.asLocalDate
-import com.sedsoftware.blinkly.domain.impl.HighlightsProviderImpl
+import com.sedsoftware.blinkly.domain.impl.BlinklyHighlightsProviderImpl
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -15,13 +15,13 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class HighlightsProviderTest : BaseDomainTest() {
+class BlinklyHighlightsProviderTest : BaseDomainTest() {
 
-    lateinit var provider: HighlightsProvider
+    lateinit var provider: BlinklyHighlightsProvider
 
     @BeforeTest
     fun setup() {
-        provider = HighlightsProviderImpl(settings, timeUtils, testDispatchers)
+        provider = BlinklyHighlightsProviderImpl(settings, timeUtils, testDispatchers)
     }
 
     @Test

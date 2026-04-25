@@ -7,7 +7,7 @@ import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.fakes.FakeData
-import com.sedsoftware.blinkly.domain.impl.ReminderManagerImpl
+import com.sedsoftware.blinkly.domain.impl.BlinklyReminderManagerImpl
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
 import dev.mokkery.answering.calls
@@ -31,7 +31,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class ReminderManagerTest : BaseDomainTest() {
+class BlinklyReminderManagerTest : BaseDomainTest() {
 
     private val remindersFlow: MutableStateFlow<List<Reminder>> = MutableStateFlow(emptyList())
     private val createdReminders: MutableList<Reminder> = mutableListOf()
@@ -53,7 +53,7 @@ class ReminderManagerTest : BaseDomainTest() {
         everySuspend { deleteReminders() } calls { createdReminders.clear() }
     }
 
-    lateinit var manager: ReminderManager
+    lateinit var manager: BlinklyReminderManager
 
     @BeforeTest
     fun setup() {
@@ -349,8 +349,8 @@ class ReminderManagerTest : BaseDomainTest() {
         verifySuspend(exactly(1)) { database.deleteReminders() }
     }
 
-    private fun createManager(): ReminderManager =
-        ReminderManagerImpl(
+    private fun createManager(): BlinklyReminderManager =
+        BlinklyReminderManagerImpl(
             alarmManager = alarmManager,
             database = database,
             timeUtils = timeUtils,

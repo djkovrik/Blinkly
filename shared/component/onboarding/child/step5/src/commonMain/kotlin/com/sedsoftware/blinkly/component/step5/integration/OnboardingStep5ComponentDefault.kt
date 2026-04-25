@@ -10,7 +10,7 @@ import com.sedsoftware.blinkly.component.step5.OnboardingStep5Component.Model
 import com.sedsoftware.blinkly.component.step5.domain.InitialRemindersManager
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStoreProvider
-import com.sedsoftware.blinkly.domain.ReminderManager
+import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.utils.asValue
@@ -21,7 +21,7 @@ class OnboardingStep5ComponentDefault(
     private val componentContext: ComponentContext,
     private val storeFactory: StoreFactory,
     private val dispatchers: BlinklyDispatchers,
-    private val reminderManager: ReminderManager,
+    private val reminderManager: BlinklyReminderManager,
     private val onboardingOutput: (ComponentOutput) -> Unit,
 ) : OnboardingStep5Component, ComponentContext by componentContext {
 

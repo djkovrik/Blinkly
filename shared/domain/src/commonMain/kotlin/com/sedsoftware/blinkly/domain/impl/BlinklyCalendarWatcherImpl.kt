@@ -1,6 +1,6 @@
 package com.sedsoftware.blinkly.domain.impl
 
-import com.sedsoftware.blinkly.domain.CalendarWatcher
+import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.model.Workout
@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.shareIn
 
-internal class CalendarWatcherImpl(
+internal class BlinklyCalendarWatcherImpl(
     database: BlinklyDatabase,
     dispatchers: BlinklyDispatchers,
-) : CalendarWatcher {
+) : BlinklyCalendarWatcher {
 
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
 

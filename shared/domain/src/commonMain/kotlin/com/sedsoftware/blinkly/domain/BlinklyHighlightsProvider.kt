@@ -2,7 +2,7 @@ package com.sedsoftware.blinkly.domain
 
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 
-interface HighlightsProvider {
+interface BlinklyHighlightsProvider {
     suspend fun get(): HighlightOfTheDay
     suspend fun forceNextHighlight(): HighlightOfTheDay
     suspend fun reset()

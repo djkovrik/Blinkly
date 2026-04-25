@@ -11,11 +11,20 @@ import com.arkivanov.decompose.router.stack.items
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.onboarding.integration.OnboardingComponentDefault
+import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
+
+    private val reminderManagerMock: BlinklyReminderManager = mock {
+        every { reminders } returns flowOf(emptyList())
+    }
 
     @Test
     fun `when component created then onboarding first step is on top of the stack`() = runTest(testScheduler) {
@@ -133,6 +142,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         OnboardingComponentDefault(
             componentContext = DefaultComponentContext(lifecycle),
             storeFactory = DefaultStoreFactory(),
+            reminderManager = reminderManagerMock,
             dispatchers = testDispatchers,
             onboardingOutput = { componentOutput.add(it) },
         )

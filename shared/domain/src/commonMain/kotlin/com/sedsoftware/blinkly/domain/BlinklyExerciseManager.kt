@@ -4,7 +4,7 @@ import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ExerciseEvent
 import kotlinx.coroutines.flow.Flow
 
-interface ExerciseManager {
+interface BlinklyExerciseManager {
     val events: Flow<ExerciseEvent>
 
     fun startBlock(block: ExerciseBlock)

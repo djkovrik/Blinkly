@@ -7,7 +7,7 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
-import com.sedsoftware.blinkly.domain.impl.ExerciseManagerImpl
+import com.sedsoftware.blinkly.domain.impl.BlinklyExerciseManagerImpl
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ExerciseEvent
 import dev.mokkery.answering.returns
@@ -21,13 +21,13 @@ import kotlinx.coroutines.test.runTest
 import kotlin.math.sign
 import kotlin.test.Test
 
-class ExerciseManagerTest : BaseDomainTest() {
+class BlinklyExerciseManagerTest : BaseDomainTest() {
 
     private val database: BlinklyDatabase = mock {
         everySuspend { saveExercise(any()) } returns Unit
     }
 
-    private val manager: ExerciseManager = ExerciseManagerImpl(database, settings, timeUtils, testDispatchers)
+    private val manager: BlinklyExerciseManager = BlinklyExerciseManagerImpl(database, settings, timeUtils, testDispatchers)
 
     @Test
     fun `when block A started then first exercise emits events`() = runTest(testScheduler) {

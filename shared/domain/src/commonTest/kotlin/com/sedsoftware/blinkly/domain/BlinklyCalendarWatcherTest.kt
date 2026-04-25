@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.fakes.FakeData
-import com.sedsoftware.blinkly.domain.impl.CalendarWatcherImpl
+import com.sedsoftware.blinkly.domain.impl.BlinklyCalendarWatcherImpl
 import com.sedsoftware.blinkly.domain.model.Workout
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class CalendarWatcherTest : BaseDomainTest() {
+class BlinklyCalendarWatcherTest : BaseDomainTest() {
 
     private val calendarFlow: MutableStateFlow<List<Workout>> = MutableStateFlow(emptyList())
 
@@ -28,7 +28,7 @@ class CalendarWatcherTest : BaseDomainTest() {
         everySuspend { unlockAchievement(any()) } returns Unit
     }
 
-    private val watcher: CalendarWatcher = CalendarWatcherImpl(database, testDispatchers)
+    private val watcher: BlinklyCalendarWatcher = BlinklyCalendarWatcherImpl(database, testDispatchers)
 
     @Test
     fun `calendar flow emits workout list`() = runTest(testScheduler) {

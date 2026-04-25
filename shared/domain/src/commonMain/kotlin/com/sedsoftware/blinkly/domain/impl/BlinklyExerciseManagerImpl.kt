@@ -1,6 +1,6 @@
 package com.sedsoftware.blinkly.domain.impl
 
-import com.sedsoftware.blinkly.domain.ExerciseManager
+import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteBlockNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteExerciseNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.ExerciseNode
@@ -24,12 +24,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
-internal class ExerciseManagerImpl(
+internal class BlinklyExerciseManagerImpl(
     private val database: BlinklyDatabase,
     private val settings: BlinklySettings,
     private val timeUtils: BlinklyTimeUtils,
     dispatchers: BlinklyDispatchers,
-) : ExerciseManager {
+) : BlinklyExerciseManager {
 
     private val engine: ExerciseEngine = ExerciseEngine(dispatchers)
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())

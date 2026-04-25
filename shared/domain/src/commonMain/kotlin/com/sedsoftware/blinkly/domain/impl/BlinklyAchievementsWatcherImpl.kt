@@ -1,6 +1,6 @@
 package com.sedsoftware.blinkly.domain.impl
 
-import com.sedsoftware.blinkly.domain.AchievementsWatcher
+import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
 import com.sedsoftware.blinkly.domain.achievement.logic.BlinkExpert
 import com.sedsoftware.blinkly.domain.achievement.logic.BlinkLegend
@@ -65,13 +65,13 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 
-internal class AchievementsWatcherImpl(
+internal class BlinklyAchievementsWatcherImpl(
     private val database: BlinklyDatabase,
     private val notifier: BlinklyNotifier,
     private val settings: BlinklySettings,
     private val timeUtils: BlinklyTimeUtils,
     dispatchers: BlinklyDispatchers,
-) : AchievementsWatcher {
+) : BlinklyAchievementsWatcher {
 
     private val instances: List<UnlockableAchievement> = registerAchievements()
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())

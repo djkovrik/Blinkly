@@ -1,6 +1,6 @@
 package com.sedsoftware.blinkly.domain.impl
 
-import com.sedsoftware.blinkly.domain.HighlightsProvider
+import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.extension.asLocalDate
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
@@ -9,11 +9,11 @@ import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 
-class HighlightsProviderImpl(
+class BlinklyHighlightsProviderImpl(
     private val settings: BlinklySettings,
     private val timeUtils: BlinklyTimeUtils,
     private val dispatchers: BlinklyDispatchers,
-) : HighlightsProvider {
+) : BlinklyHighlightsProvider {
 
     override suspend fun get(): HighlightOfTheDay =
         withContext(dispatchers.io) {

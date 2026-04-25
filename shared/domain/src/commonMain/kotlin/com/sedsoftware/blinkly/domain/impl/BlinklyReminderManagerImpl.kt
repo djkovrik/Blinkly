@@ -1,6 +1,6 @@
 package com.sedsoftware.blinkly.domain.impl
 
-import com.sedsoftware.blinkly.domain.ReminderManager
+import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
@@ -24,12 +24,12 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.uuid.Uuid
 
-internal class ReminderManagerImpl(
+internal class BlinklyReminderManagerImpl(
     private val alarmManager: BlinklyAlarmManager,
     private val database: BlinklyDatabase,
     private val timeUtils: BlinklyTimeUtils,
     dispatchers: BlinklyDispatchers,
-) : ReminderManager {
+) : BlinklyReminderManager {
 
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
 

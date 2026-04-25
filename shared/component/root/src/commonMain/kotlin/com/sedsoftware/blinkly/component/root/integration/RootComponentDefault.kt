@@ -30,6 +30,12 @@ import com.sedsoftware.blinkly.component.onboarding.integration.OnboardingCompon
 import com.sedsoftware.blinkly.component.preferences.PreferencesComponent
 import com.sedsoftware.blinkly.component.preferences.integration.PreferencesComponentDefault
 import com.sedsoftware.blinkly.component.root.RootComponent
+import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
+import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
+import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
+import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
+import com.sedsoftware.blinkly.domain.BlinklyReminderManager
+import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
@@ -68,12 +74,18 @@ class RootComponentDefault private constructor(
         notifier: BlinklyNotifier,
         settings: BlinklySettings,
         timeUtils: BlinklyTimeUtils,
+        achievementsWatcher: BlinklyAchievementsWatcher,
+        calendarWatcher: BlinklyCalendarWatcher,
+        exerciseManager: BlinklyExerciseManager,
+        highlightsProvider: BlinklyHighlightsProvider,
+        reminderManager: BlinklyReminderManager,
+        treeProgressWatcher: BlinklyTreeProgressWatcher,
     ) : this(
         componentContext = componentContext,
         dispatchers = dispatchers,
         settings = settings,
         onboardingComponent = { childContext, output ->
-            OnboardingComponentDefault(childContext, storeFactory, dispatchers, output)
+            OnboardingComponentDefault(childContext, storeFactory, reminderManager, dispatchers, output)
         },
         homeScreenComponent = { childContext, output ->
             HomeScreenComponentDefault(childContext, dispatchers, settings, output)

@@ -6,7 +6,7 @@ import assertk.assertions.isEqualTo
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.fakes.FakeData
-import com.sedsoftware.blinkly.domain.impl.AchievementsWatcherImpl
+import com.sedsoftware.blinkly.domain.impl.BlinklyAchievementsWatcherImpl
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class AchievementsWatcherTest : BaseDomainTest() {
+class BlinklyAchievementsWatcherTest : BaseDomainTest() {
 
     private val achievementsFlow: MutableStateFlow<List<Achievement>> = MutableStateFlow(emptyList())
     private val calendarFlow: MutableStateFlow<List<Workout>> = MutableStateFlow(emptyList())
@@ -35,7 +35,7 @@ class AchievementsWatcherTest : BaseDomainTest() {
         everySuspend { unlockAchievement(any()) } returns Unit
     }
 
-    private val watcher: AchievementsWatcher = AchievementsWatcherImpl(
+    private val watcher: BlinklyAchievementsWatcher = BlinklyAchievementsWatcherImpl(
         database, notifier, settings, timeUtils, testDispatchers
     )
 

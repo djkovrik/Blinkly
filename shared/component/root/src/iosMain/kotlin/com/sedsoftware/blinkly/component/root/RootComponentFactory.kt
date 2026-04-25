@@ -10,6 +10,8 @@ import com.sedsoftware.blinkly.component.root.integration.RootComponentDefault
 import com.sedsoftware.blinkly.database.BlinklyDatabaseDriverFactory
 import com.sedsoftware.blinkly.database.di.DatabaseModule
 import com.sedsoftware.blinkly.database.di.DatabaseModuleDependencies
+import com.sedsoftware.blinkly.domain.di.DomainModule
+import com.sedsoftware.blinkly.domain.di.DomainModuleDependencies
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
@@ -90,6 +92,19 @@ fun RootComponentFactory(
         settingsModule.settings
     }
 
+    val domainModule: DomainModule by lazy {
+        DomainModule(
+            dependencies = object : DomainModuleDependencies {
+                override val alarmManager: BlinklyAlarmManager = alarmManager
+                override val database: BlinklyDatabase = database
+                override val notifier: BlinklyNotifier = notifier
+                override val settings: BlinklySettings = settings
+                override val timeUtils: BlinklyTimeUtils = timeUtils
+                override val dispatchers: BlinklyDispatchers = dispatchers
+            }
+        )
+    }
+
     return RootComponentDefault(
         componentContext = componentContext,
         storeFactory = DefaultStoreFactory(),
@@ -99,5 +114,11 @@ fun RootComponentFactory(
         notifier = notifier,
         settings = settings,
         timeUtils = timeUtils,
+        achievementsWatcher = domainModule.achievementsWatcher,
+        calendarWatcher = domainModule.calendarWatcher,
+        exerciseManager = domainModule.exerciseManager,
+        highlightsProvider = domainModule.highlightsProvider,
+        reminderManager = domainModule.reminderManager,
+        treeProgressWatcher = domainModule.treeProgressWatcher,
     )
 }

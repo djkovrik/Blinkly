@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.fakes.FakeData
-import com.sedsoftware.blinkly.domain.impl.TreeProgressWatcherImpl
+import com.sedsoftware.blinkly.domain.impl.BlinklyTreeProgressWatcherImpl
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeStage
 import com.sedsoftware.blinkly.domain.model.TreeType
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class TreeProgressWatcherTest : BaseDomainTest() {
+class BlinklyTreeProgressWatcherTest : BaseDomainTest() {
 
     private val database: BlinklyDatabase = mock()
 
@@ -25,7 +25,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
     fun `when no data in database then returns FRAXINUS_EXCELSIOR TINY with 0 percent`() = runTest(testScheduler) {
         // given
         every { database.currentCalendar() } returns flowOf(emptyList())
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -39,7 +39,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         // given
         val calendar = FakeData.getSingleExerciseCalendar(now)
         every { database.currentCalendar() } returns flowOf(calendar)
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -53,7 +53,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 1)
         every { database.currentCalendar() } returns flowOf(calendar)
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -67,7 +67,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 2)
         every { database.currentCalendar() } returns flowOf(calendar)
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -81,7 +81,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         // given
         val calendar = FakeData.getCalendarWithFullDays(now, 3)
         every { database.currentCalendar() } returns flowOf(calendar)
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -95,7 +95,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         // given
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 3)
         every { database.currentCalendar() } returns flowOf(calendar)
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -110,7 +110,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 1)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -125,7 +125,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 1)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -140,7 +140,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 31)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -155,7 +155,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 31)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -170,7 +170,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 62)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -185,7 +185,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 62)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -200,7 +200,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 94)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -215,7 +215,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 94)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -230,7 +230,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 127)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -245,7 +245,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 127)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -260,7 +260,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 161)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -275,7 +275,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 161)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -290,7 +290,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 28)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -305,7 +305,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 28)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -320,7 +320,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 56)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -335,7 +335,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 56)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -350,7 +350,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 84)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -365,7 +365,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 84)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -380,7 +380,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 112)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -395,7 +395,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 112)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -410,7 +410,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 140)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -425,7 +425,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 140)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -440,7 +440,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 168)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -455,7 +455,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 168)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -470,7 +470,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 196)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -485,7 +485,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 196)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -500,7 +500,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 224)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -515,7 +515,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 224)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -530,7 +530,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 252)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -545,7 +545,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(yesterday, 252)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -560,7 +560,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 280)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         // when
         val result = watcher.tree.first()
@@ -575,7 +575,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 281)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         val result = watcher.tree.first()
 
@@ -590,7 +590,7 @@ class TreeProgressWatcherTest : BaseDomainTest() {
         val calendar = FakeData.getCalendarWithFullDays(now, 300)
         every { database.currentCalendar() } returns flowOf(calendar)
         every { timeUtils.now() } returns now
-        val watcher = TreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
 
         val result = watcher.tree.first()
 

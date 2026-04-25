@@ -1,12 +1,12 @@
 package com.sedsoftware.blinkly.component.step5.domain
 
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore
-import com.sedsoftware.blinkly.domain.ReminderManager
+import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.model.Reminder
 import kotlinx.coroutines.flow.Flow
 
 internal class InitialRemindersManager(
-    private val reminderManager: ReminderManager,
+    private val reminderManager: BlinklyReminderManager,
 ) {
 
     fun observeReminders(): Flow<List<Reminder>> = reminderManager.reminders

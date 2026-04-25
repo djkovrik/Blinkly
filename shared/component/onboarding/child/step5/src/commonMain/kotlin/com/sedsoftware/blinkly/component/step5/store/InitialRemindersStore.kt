@@ -21,9 +21,9 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
 
     data class State(
         val shouldSkipSetup: Boolean = false,
-        val remindFrom: LocalTime = LocalTime(10, 0),
-        val remindUntil: LocalTime = LocalTime(18, 0),
-        val remindIntervalMinutes: Int = 20,
+        val remindFrom: LocalTime = LocalTime(0, 0),
+        val remindUntil: LocalTime = LocalTime(1, 0),
+        val remindIntervalMinutes: Int = 1,
         val selectedDays: List<DayOfWeek> = DayOfWeek.entries.toList(),
         val createdReminderDays: List<DayOfWeek> = emptyList(),
         val createdReminderTimes: List<LocalTime> = emptyList(),

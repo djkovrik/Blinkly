@@ -1,7 +1,6 @@
 package com.sedsoftware.blinkly.component.step5
 
 import com.arkivanov.decompose.value.Value
-import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.Intent
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 
@@ -29,6 +28,3 @@ interface OnboardingStep5Component {
         val initialRemindersVisible: Boolean,
     )
 }
-
-//data object OnInitialSetupApply : Intent
-//data object OnInitialSetupClear : Intent
