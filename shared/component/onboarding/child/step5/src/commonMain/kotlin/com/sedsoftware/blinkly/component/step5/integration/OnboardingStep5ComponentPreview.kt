@@ -21,7 +21,7 @@ class OnboardingStep5ComponentPreview(
     override val model: Value<Model> =
         MutableValue(
             Model(
-                skipInitialSetup = skipInitialSetup,
+                showInitialSetup = skipInitialSetup,
                 selectedTimeFrom = selectedTimeFrom,
                 selectedTimeUntil = selectedTimeUntil,
                 selectedInterval = selectedInterval,
@@ -34,7 +34,7 @@ class OnboardingStep5ComponentPreview(
 
     override fun onNextClick() = Unit
     override fun onBackClick() = Unit
-    override fun onSkipInitialSetupCheck(checked: Boolean) = Unit
+    override fun onInitialSetupChoice(agree: Boolean) = Unit
     override fun onSelectTimeFrom(time: LocalTime) = Unit
     override fun onSelectTimeUntil(time: LocalTime) = Unit
     override fun onSelectInterval(interval: Int) = Unit

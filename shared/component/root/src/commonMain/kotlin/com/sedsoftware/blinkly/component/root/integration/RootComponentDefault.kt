@@ -85,7 +85,7 @@ class RootComponentDefault private constructor(
         dispatchers = dispatchers,
         settings = settings,
         onboardingComponent = { childContext, output ->
-            OnboardingComponentDefault(childContext, storeFactory, reminderManager, dispatchers, output)
+            OnboardingComponentDefault(childContext, storeFactory, reminderManager, notifier, dispatchers, output)
         },
         homeScreenComponent = { childContext, output ->
             HomeScreenComponentDefault(childContext, dispatchers, settings, output)

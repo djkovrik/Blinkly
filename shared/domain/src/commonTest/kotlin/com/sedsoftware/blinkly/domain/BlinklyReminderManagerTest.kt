@@ -68,12 +68,12 @@ class BlinklyReminderManagerTest : BaseDomainTest() {
         val expectedReminders: List<Reminder> = listOf(reminder)
 
         // when
-        val collectJob = launch { manager.reminders.collect {} }
+        val collectJob = launch { manager.createdReminders().collect {} }
         remindersFlow.emit(expectedReminders)
         testScheduler.advanceUntilIdle()
 
         // then
-        val actualReminders = manager.reminders.first()
+        val actualReminders = manager.createdReminders().first()
         assertThat(expectedReminders).isEqualTo(actualReminders)
         collectJob.cancel()
     }

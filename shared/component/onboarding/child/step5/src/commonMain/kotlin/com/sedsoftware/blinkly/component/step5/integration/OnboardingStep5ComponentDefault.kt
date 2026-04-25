@@ -12,6 +12,7 @@ import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStoreProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
+import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.utils.asValue
 import kotlinx.datetime.DayOfWeek
@@ -22,6 +23,7 @@ class OnboardingStep5ComponentDefault(
     private val storeFactory: StoreFactory,
     private val dispatchers: BlinklyDispatchers,
     private val reminderManager: BlinklyReminderManager,
+    private val notifier: BlinklyNotifier,
     private val onboardingOutput: (ComponentOutput) -> Unit,
 ) : OnboardingStep5Component, ComponentContext by componentContext {
 
@@ -29,7 +31,7 @@ class OnboardingStep5ComponentDefault(
         instanceKeeper.getStore {
             InitialRemindersStoreProvider(
                 storeFactory = storeFactory,
-                manager = InitialRemindersManager(reminderManager),
+                manager = InitialRemindersManager(reminderManager, notifier),
                 mainContext = dispatchers.main,
                 ioContext = dispatchers.io,
             ).create()
@@ -45,8 +47,8 @@ class OnboardingStep5ComponentDefault(
         onboardingOutput(ComponentOutput.Onboarding.GoBack)
     }
 
-    override fun onSkipInitialSetupCheck(checked: Boolean) {
-        store.accept(InitialRemindersStore.Intent.OnInitialSetupSkip(checked))
+    override fun onInitialSetupChoice(agree: Boolean) {
+        store.accept(InitialRemindersStore.Intent.OnInitialSetupChoice(agree))
     }
 
     override fun onSelectTimeFrom(time: LocalTime) {

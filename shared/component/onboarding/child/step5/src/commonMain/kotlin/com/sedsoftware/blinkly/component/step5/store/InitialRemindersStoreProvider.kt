@@ -8,6 +8,7 @@ import com.sedsoftware.blinkly.component.step5.domain.InitialRemindersManager
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.Intent
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.Label
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.State
+import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
@@ -31,9 +32,38 @@ internal class InitialRemindersStoreProvider(
             initialState = State(),
             autoInit = autoInit,
             bootstrapper = coroutineBootstrapper(mainContext) {
+                dispatch(Action.CheckNotificationsPermission)
+                dispatch(Action.ObserveGrantedPermission)
                 dispatch(Action.ObserveCreatedReminders)
             },
             executorFactory = coroutineExecutorFactory(mainContext) {
+                onAction<Action.CheckNotificationsPermission> {
+                    launch {
+                        unwrap(
+                            result = withContext(ioContext) { manager.isNotificationsPermissionGranted() },
+                            onSuccess = { granted ->
+                                dispatch(Msg.NotificationPermissionChecked)
+                                dispatch(Msg.NotificationPermissionChanged(granted))
+                            },
+                            onError = { throwable ->
+                                publish(Label.ErrorCaught(throwable))
+                            }
+                        )
+                    }
+                }
+
+                onAction<Action.ObserveGrantedPermission> {
+                    launch {
+                        manager.observePermissionEvents()
+                            .catch { publish(Label.ErrorCaught(it)) }
+                            .collect { result ->
+                                val granted = result == PermissionResult.Granted
+                                dispatch(Msg.NotificationPermissionChanged(granted))
+                                dispatch(Msg.ShowInitialSetupChanged(granted))
+                            }
+                    }
+                }
+
                 onAction<Action.ObserveCreatedReminders> {
                     launch {
                         manager.observeReminders()
@@ -42,8 +72,20 @@ internal class InitialRemindersStoreProvider(
                     }
                 }
 
-                onIntent<Intent.OnInitialSetupSkip> {
-                    dispatch(Msg.SkipSelectionChanged(it.checked))
+                onIntent<Intent.OnInitialSetupChoice> {
+                    if (it.show && state().permissionChecked && !state().permissionGranted) {
+                        launch {
+                            unwrap(
+                                result = manager.requestNotificationsPermission(),
+                                onSuccess = {},
+                                onError = { throwable ->
+                                    publish(Label.ErrorCaught(throwable))
+                                }
+                            )
+                        }
+                    } else {
+                        dispatch(Msg.ShowInitialSetupChanged(it.show))
+                    }
                 }
 
                 onIntent<Intent.OnTimeSelectedFrom> {
@@ -92,6 +134,14 @@ internal class InitialRemindersStoreProvider(
             },
             reducer = { msg ->
                 when (msg) {
+                    is Msg.NotificationPermissionChecked -> copy(
+                        permissionChecked = true,
+                    )
+
+                    is Msg.NotificationPermissionChanged -> copy(
+                        permissionGranted = msg.granted,
+                    )
+
                     is Msg.RemindersRefreshed -> copy(
                         createdReminderDays = if (msg.items.isNotEmpty()) {
                             msg.items[0].weekDays
@@ -105,8 +155,8 @@ internal class InitialRemindersStoreProvider(
                         },
                     )
 
-                    is Msg.SkipSelectionChanged -> copy(
-                        shouldSkipSetup = msg.checked,
+                    is Msg.ShowInitialSetupChanged -> copy(
+                        showInitialSetup = msg.checked,
                     )
 
                     is Msg.TimeSelectedFrom -> copy(
@@ -141,12 +191,16 @@ internal class InitialRemindersStoreProvider(
         ) {}
 
     sealed interface Action {
+        data object CheckNotificationsPermission : Action
+        data object ObserveGrantedPermission : Action
         data object ObserveCreatedReminders : Action
     }
 
     sealed interface Msg {
+        data object NotificationPermissionChecked: Msg
+        data class NotificationPermissionChanged(val granted: Boolean) : Msg
         data class RemindersRefreshed(val items: List<Reminder>) : Msg
-        data class SkipSelectionChanged(val checked: Boolean) : Msg
+        data class ShowInitialSetupChanged(val checked: Boolean) : Msg
         data class TimeSelectedFrom(val time: LocalTime) : Msg
         data class TimeSelectedTo(val time: LocalTime) : Msg
         data class IntervalChanged(val interval: Int) : Msg

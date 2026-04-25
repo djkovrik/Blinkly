@@ -6,7 +6,7 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 
 interface BlinklyReminderManager {
-    val reminders: Flow<List<Reminder>>
+    fun createdReminders(): Flow<List<Reminder>>
 
     suspend fun scheduleDaily(time: LocalTime)
     suspend fun scheduleWeeklySingle(time: LocalTime, dayOfWeek: DayOfWeek)

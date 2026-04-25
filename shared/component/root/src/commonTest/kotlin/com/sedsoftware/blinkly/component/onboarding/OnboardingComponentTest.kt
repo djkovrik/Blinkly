@@ -17,7 +17,9 @@ import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.onboarding.integration.OnboardingComponentDefault
 import com.sedsoftware.blinkly.component.step5.OnboardingStep5Component
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
+import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
+import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
 import com.sedsoftware.blinkly.domain.model.ReminderType
@@ -26,7 +28,10 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode.Companion.exactly
+import dev.mokkery.verifySuspend
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
@@ -48,10 +53,18 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
 
     private val remindersFlow: MutableStateFlow<List<Reminder>> = MutableStateFlow(emptyList())
 
+    private val permissionsFlow: MutableStateFlow<PermissionResult?> = MutableStateFlow(null)
+
     private val reminderManagerMock: BlinklyReminderManager = mock {
-        every { reminders } returns remindersFlow
+        every { createdReminders() } returns remindersFlow
         everySuspend { scheduleWeeklyDayPeriod(any(), any(), any(), any()) } returns Unit
         everySuspend { cancelAll() } returns Unit
+    }
+
+    private val notifierMock: BlinklyNotifier = mock {
+        every { permissionEvents() } returns permissionsFlow.filterNotNull()
+        everySuspend { isNotificationPermissionGranted() } returns false
+        everySuspend { requestNotificationPermission() } returns Unit
     }
 
     @Test
@@ -167,19 +180,69 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
     }
 
     @Test
-    fun `when onSkipInitialSetupCheck then last step state updated`() = runTest(testScheduler) {
+    fun `when last step activated then subscribe store for events`() = runTest(testScheduler) {
+        // given
+        getStep5Component()
+        // when
+        testScheduler.advanceUntilIdle()
+        // then
+        verifySuspend(exactly(1)) { notifierMock.isNotificationPermissionGranted() }
+        verifySuspend(exactly(1)) { notifierMock.permissionEvents() }
+        verifySuspend(exactly(1)) { reminderManagerMock.createdReminders() }
+    }
+
+    @Test
+    fun `when agreed on initial setup and denied permission then switch back to disagreed choice`() = runTest(testScheduler) {
         // given
         val step5 = getStep5Component()
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns false
+        testScheduler.advanceUntilIdle()
         // when
-        step5.onSkipInitialSetupCheck(true)
+        step5.onInitialSetupChoice(true)
         testScheduler.advanceUntilIdle()
         // then
-        assertThat(step5.model.value.skipInitialSetup).isTrue()
+        verifySuspend(exactly(1)) { notifierMock.requestNotificationPermission() }
         // when
-        step5.onSkipInitialSetupCheck(false)
+        permissionsFlow.emit(PermissionResult.Denied)
         testScheduler.advanceUntilIdle()
         // then
-        assertThat(step5.model.value.skipInitialSetup).isFalse()
+        assertThat(step5.model.value.showInitialSetup).isFalse()
+    }
+
+    @Test
+    fun `when agreed on initial setup and granted permission then show initial setup`() = runTest(testScheduler) {
+        // given
+        val step5 = getStep5Component()
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns false
+        testScheduler.advanceUntilIdle()
+        // when
+        step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+        // then
+        verifySuspend(exactly(1)) { notifierMock.requestNotificationPermission() }
+        // when
+        permissionsFlow.emit(PermissionResult.Granted)
+        testScheduler.advanceUntilIdle()
+        // then
+        assertThat(step5.model.value.showInitialSetup).isTrue()
+    }
+
+    @Test
+    fun `when agreed on initial setup with permission then just toggle switch`() = runTest(testScheduler) {
+        // given
+        val step5 = getStep5Component()
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns true
+        testScheduler.advanceUntilIdle()
+        // when
+        step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+        // then
+        assertThat(step5.model.value.showInitialSetup).isTrue()
+        // when
+        step5.onInitialSetupChoice(false)
+        testScheduler.advanceUntilIdle()
+        // then
+        assertThat(step5.model.value.showInitialSetup).isFalse()
     }
 
     @Test
@@ -266,6 +329,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
             componentContext = DefaultComponentContext(lifecycle),
             storeFactory = DefaultStoreFactory(),
             reminderManager = reminderManagerMock,
+            notifier = notifierMock,
             dispatchers = testDispatchers,
             onboardingOutput = { componentOutput.add(it) },
         )

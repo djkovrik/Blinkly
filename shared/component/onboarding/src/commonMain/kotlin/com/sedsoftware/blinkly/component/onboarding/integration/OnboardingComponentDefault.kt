@@ -22,6 +22,7 @@ import com.sedsoftware.blinkly.component.step5.OnboardingStep5Component
 import com.sedsoftware.blinkly.component.step5.integration.OnboardingStep5ComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
+import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -42,6 +43,7 @@ class OnboardingComponentDefault private constructor(
         componentContext: ComponentContext,
         storeFactory: StoreFactory,
         reminderManager: BlinklyReminderManager,
+        notifier: BlinklyNotifier,
         dispatchers: BlinklyDispatchers,
         onboardingOutput: (ComponentOutput) -> Unit,
     ) : this(
@@ -61,7 +63,7 @@ class OnboardingComponentDefault private constructor(
             OnboardingStep4ComponentDefault(childContext, storeFactory, dispatchers, output)
         },
         onboardingStep5 = { childContext, output ->
-            OnboardingStep5ComponentDefault(childContext, storeFactory, dispatchers, reminderManager,output)
+            OnboardingStep5ComponentDefault(childContext, storeFactory, dispatchers, reminderManager, notifier,output)
         },
     )
 

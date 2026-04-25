@@ -5,7 +5,7 @@ import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.State
 
 internal val stateToModel: (State) -> Model = {
     Model(
-        skipInitialSetup = it.shouldSkipSetup,
+        showInitialSetup = it.showInitialSetup,
         selectedTimeFrom = it.remindFrom,
         selectedTimeUntil = it.remindUntil,
         selectedInterval = it.remindIntervalMinutes,

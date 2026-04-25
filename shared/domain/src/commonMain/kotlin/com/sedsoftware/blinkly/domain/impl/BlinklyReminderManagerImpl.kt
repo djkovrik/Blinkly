@@ -28,18 +28,19 @@ internal class BlinklyReminderManagerImpl(
     private val alarmManager: BlinklyAlarmManager,
     private val database: BlinklyDatabase,
     private val timeUtils: BlinklyTimeUtils,
-    dispatchers: BlinklyDispatchers,
+    private val dispatchers: BlinklyDispatchers,
 ) : BlinklyReminderManager {
 
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
 
-    override val reminders: Flow<List<Reminder>> = database.currentReminders()
-        .flowOn(dispatchers.io)
-        .shareIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_STOP_TIMEOUT),
-            replay = 1,
-        )
+    override fun createdReminders(): Flow<List<Reminder>> =
+        database.currentReminders()
+            .flowOn(dispatchers.io)
+            .shareIn(
+                scope = scope,
+                started = SharingStarted.WhileSubscribed(SUBSCRIPTION_STOP_TIMEOUT),
+                replay = 1,
+            )
 
     override suspend fun scheduleDaily(time: LocalTime) {
         val now = timeUtils.now()

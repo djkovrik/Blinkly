@@ -9,7 +9,7 @@ interface OnboardingStep5Component {
     val model: Value<Model>
     fun onNextClick()
     fun onBackClick()
-    fun onSkipInitialSetupCheck(checked: Boolean)
+    fun onInitialSetupChoice(agree: Boolean)
     fun onSelectTimeFrom(time: LocalTime)
     fun onSelectTimeUntil(time: LocalTime)
     fun onSelectInterval(interval: Int)
@@ -18,7 +18,7 @@ interface OnboardingStep5Component {
     fun onClearReminders()
 
     data class Model(
-        val skipInitialSetup: Boolean,
+        val showInitialSetup: Boolean,
         val selectedTimeFrom: LocalTime,
         val selectedTimeUntil: LocalTime,
         val selectedInterval: Int,

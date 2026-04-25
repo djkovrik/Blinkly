@@ -10,7 +10,7 @@ import kotlinx.datetime.LocalTime
 internal interface InitialRemindersStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
-        data class OnInitialSetupSkip(val checked: Boolean) : Intent
+        data class OnInitialSetupChoice(val show: Boolean) : Intent
         data class OnTimeSelectedFrom(val time: LocalTime) : Intent
         data class OnTimeSelectedUntil(val time: LocalTime) : Intent
         data class OnIntervalChanged(val interval: Int) : Intent
@@ -20,7 +20,9 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
     }
 
     data class State(
-        val shouldSkipSetup: Boolean = false,
+        val showInitialSetup: Boolean = false,
+        val permissionChecked: Boolean = false,
+        val permissionGranted: Boolean = false,
         val remindFrom: LocalTime = LocalTime(0, 0),
         val remindUntil: LocalTime = LocalTime(1, 0),
         val remindIntervalMinutes: Int = 1,
