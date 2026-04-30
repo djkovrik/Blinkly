@@ -24,3 +24,8 @@ Kotlin Multiplatform app for eye health support
 * [MOKO Permissions](https://github.com/icerockdev/moko-permissions)
 * [Alarmee](https://github.com/tweener/alarmee)
 * [Kermit](https://github.com/touchlab/Kermit)
+
+### Agent documentation and Blinkly skills
+* Main repository agent context: [AGENTS.md](AGENTS.md)
+* Local Blinkly skill sources: `docs/skills/blinkly-mvikotlin`, `docs/skills/blinkly-decompose`, `docs/skills/blinkly-decompose-component-tests`
+* If these skills are installed into the global Codex skills directory, keep the copies in this repository as the source of truth and update them together
