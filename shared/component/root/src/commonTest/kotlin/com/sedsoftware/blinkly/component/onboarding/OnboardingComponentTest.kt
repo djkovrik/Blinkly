@@ -24,6 +24,7 @@ import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -192,6 +193,20 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
     }
 
     @Test
+    fun `when notifications permission check failed then error output emitted`() = runTest(testScheduler) {
+        // given
+        val exception = IllegalStateException("permission check failed")
+        everySuspend { notifierMock.isNotificationPermissionGranted() } throws exception
+
+        // when
+        getStep5Component()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+    }
+
+    @Test
     fun `when agreed on initial setup and denied permission then switch back to disagreed choice`() = runTest(testScheduler) {
         // given
         val step5 = getStep5Component()
@@ -225,6 +240,23 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
         // then
         assertThat(step5.model.value.showInitialSetup).isTrue()
+    }
+
+    @Test
+    fun `when agreed on initial setup and permission request failed then error output emitted`() = runTest(testScheduler) {
+        // given
+        val exception = IllegalStateException("permission request failed")
+        val step5 = getStep5Component()
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns false
+        everySuspend { notifierMock.requestNotificationPermission() } throws exception
+        testScheduler.advanceUntilIdle()
+
+        // when
+        step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
     }
 
     @Test
@@ -281,6 +313,38 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
         // then
         assertThat(step5.model.value.selectedDays).contains(targetDay)
+    }
+
+    @Test
+    fun `when creating reminders failed then error output emitted`() = runTest(testScheduler) {
+        // given
+        val exception = IllegalStateException("create reminders failed")
+        val step5 = getStep5Component()
+        everySuspend { reminderManagerMock.scheduleWeeklyDayPeriod(any(), any(), any(), any()) } throws exception
+        testScheduler.advanceUntilIdle()
+
+        // when
+        step5.onCreateReminders()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+    }
+
+    @Test
+    fun `when clearing reminders failed then error output emitted`() = runTest(testScheduler) {
+        // given
+        val exception = IllegalStateException("clear reminders failed")
+        val step5 = getStep5Component()
+        everySuspend { reminderManagerMock.cancelAll() } throws exception
+        testScheduler.advanceUntilIdle()
+
+        // when
+        step5.onClearReminders()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
     }
 
     @Test
