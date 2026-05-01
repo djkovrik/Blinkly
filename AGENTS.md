@@ -9,7 +9,7 @@ Targets:
 - iOS app in `iosApp`
 - Shared business logic, navigation, and UI in `shared`
 
-Primary product areas:
+Planned product areas:
 - 20-20-20 break reminders
 - exercise blocks A, B, and C
 - onboarding flow
@@ -54,29 +54,35 @@ If Blinkly-specific skills are installed into the Codex skills directory, keep t
 
 ## Module Map
 
+Blinkly is in active development. Treat this map as the planned module
+structure plus currently available skeleton modules, not as a list of completed
+features.
+
 Top-level component modules:
 - `root` - app root, dependency composition, top-level navigation
-- `onboarding` - one-time onboarding flow with five child steps
-- `home` - shell with four tabs
-- `main` - main tab
-- `progress` - progress tab
-- `reminders` - reminders tab
-- `trainings` - trainings tab
+- `onboarding` - one-time onboarding flow with five child steps; currently the main implemented flow
+- `home` - planned shell with four tabs; currently a thin/skeleton component
+- `main` - planned main tab; currently a thin/skeleton component
+- `progress` - planned progress tab; currently a thin/skeleton component
+- `reminders` - planned reminders tab; currently a thin/skeleton component
+- `trainings` - planned trainings tab; currently a thin/skeleton component
 
 Nested component modules:
-- `main/child/preferences`
-- `onboarding/child/step1` through `step5`
-- `progress/child/achievements`
-- `progress/child/garden`
-- `reminders/child/newreminder`
-- `trainings/child/blocka`
-- `trainings/child/blockb`
-- `trainings/child/blockc`
+- `main/child/preferences` - planned/preferences skeleton
+- `onboarding/child/step1` through `step5` - current onboarding implementation area
+- `progress/child/achievements` - planned/skeleton
+- `progress/child/garden` - planned/skeleton
+- `reminders/child/newreminder` - planned/skeleton
+- `trainings/child/blocka` - planned/skeleton
+- `trainings/child/blockb` - planned/skeleton
+- `trainings/child/blockc` - planned/skeleton
 
 Current implementation notes:
-- Root navigation is already wired for onboarding, home, preferences, three exercise blocks, achievements, garden, and add-new-reminder.
+- Component work is only materially implemented for `onboarding` and its child steps `step1` through `step5`.
+- `step5` has component/store logic, but its Compose UI is not finished yet.
+- Root and home navigation may contain routes for future areas, but non-onboarding screens should be treated as work-in-progress skeletons.
 - `step4` and `step5` are the current reference implementations for MVIKotlin stores.
-- Most tab and leaf components are thin Decompose wrappers that emit `ComponentOutput` without a Store.
+- Most non-onboarding tab and leaf components are temporary thin Decompose wrappers that emit `ComponentOutput` without a Store.
 
 ## Architecture Rules
 
@@ -104,7 +110,7 @@ Apply these rules by default when changing Blinkly code:
 - Keep Compose as a rendering layer only. Do not move business logic, navigation decisions, or mutable feature state into composables.
 - Cover Decompose behaviour in `commonTest` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
 
-When unsure whether to follow a generic library pattern or the project pattern, follow the project pattern demonstrated in `step4`, `step5`, `onboarding`, `home`, and `root`.
+When unsure whether to follow a generic library pattern or the project pattern, follow the project pattern demonstrated in `step4`, `step5`, and `onboarding`. Treat `home`, `root`, and non-onboarding feature modules as navigation/skeleton references unless the code clearly shows completed behaviour.
 
 ### Manual dependency injection
 
@@ -158,9 +164,9 @@ Parent components use:
 - a child output handler that maps `ComponentOutput` to navigation operations
 
 Local reference patterns:
-- `RootComponentDefault` for app-level stack navigation
-- `OnboardingComponentDefault` for nested flow navigation
-- `HomeScreenComponentDefault` for tab switching with `bringToFront`
+- `OnboardingComponentDefault` for the currently implemented nested flow navigation
+- `RootComponentDefault` for app-level stack-navigation shape, with several future routes still pointing to skeleton screens
+- `HomeScreenComponentDefault` for tab-switching shape with `bringToFront`, not for completed tab feature behaviour
 
 Keep navigation on the main thread. This matches Decompose guidance.
 
@@ -187,13 +193,15 @@ Only create a scope when the component actually runs background work.
 ### When to use a Store
 
 Use MVIKotlin only when the component has meaningful state transitions or asynchronous business logic.
-The project is Work In Progress and has a very few Stores and Components implemented.
+The project is Work In Progress and has only a small number of Stores and fully shaped components implemented.
 
 Current store references:
 - `shared/component/onboarding/child/step4/.../store/DisclaimerStore.kt`
 - `shared/component/onboarding/child/step4/.../store/DisclaimerStoreProvider.kt`
 - `shared/component/onboarding/child/step5/.../store/InitialRemindersStore.kt`
 - `shared/component/onboarding/child/step5/.../store/InitialRemindersStoreProvider.kt`
+
+`step5` is a valid Store/component reference, but its user interface is not complete yet.
 
 ### Store structure
 
@@ -246,8 +254,8 @@ Rules:
 
 References:
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/RootContent.kt`
-- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/HomeScreenContent.kt`
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/onboarding/*`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/HomeScreenContent.kt` for shell shape only; tab contents are still WIP/skeletons
 
 Platform note:
 - Android creates the root `ComponentContext` once in `AppActivity.onCreate()` via `defaultComponentContext()`.

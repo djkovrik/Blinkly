@@ -7,6 +7,10 @@ description: Write unit tests for Blinkly Decompose components in commonTest. Us
 
 Read `AGENTS.md` first for architecture and test conventions.
 
+Blinkly is in active development. Component tests currently use onboarding and
+navigation shell code as references; non-onboarding feature components are
+mostly skeletons and should not be assumed complete.
+
 ## Use these local references first
 
 Base test utility:
@@ -16,7 +20,7 @@ Navigation-heavy tests:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/root/RootComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/onboarding/OnboardingComponentTest.kt`
 
-Simple component test:
+Simple shell/skeleton component test:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/home/HomeScreenComponentTest.kt`
 
 ## Default test harness
@@ -104,6 +108,9 @@ Do not assume immediate completion for work scheduled on `StandardTestDispatcher
 1. walk the child stack step by step
 2. call `onNextClick()` on each step component
 3. assert step transitions or final output
+
+`step5` has component/store logic, but its Compose UI is not finished. Test the
+component contract and Store-backed model, not final UI behaviour.
 
 ### Store-backed state change
 

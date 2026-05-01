@@ -7,6 +7,10 @@ description: Write or update MVIKotlin stores for the Blinkly Kotlin Multiplatfo
 
 Read `AGENTS.md` first for the project-level architecture.
 
+Blinkly is in active development. The current MVIKotlin references are limited
+to onboarding `step4` and `step5`; `step5` has component/store logic but its
+Compose UI is not finished.
+
 ## Use these local references first
 
 Minimal synchronous Store:
@@ -38,7 +42,7 @@ Use a Store when the feature needs one or more of these:
 - startup actions or subscriptions
 - one-off labels
 
-Blinkly already treats many leaf components as thin Decompose wrappers. Match that style.
+Many non-onboarding leaf components are currently thin work-in-progress skeletons. Match that style only when the feature really has no state yet; do not assume those screens are complete.
 
 ## Implement the Store in Blinkly style
 
@@ -82,7 +86,7 @@ Use these patterns:
 - `withContext(ioContext)` for IO or heavier domain calls
 - `publish(Label.ErrorCaught(...))` for one-off failures that should not live in state
 
-`step5` is the reference for subscribing to flows and translating stream updates into `Msg` values.
+`step5` is the reference for subscribing to flows and translating stream updates into `Msg` values, even though its Compose UI is still incomplete.
 
 ## Component integration rules
 

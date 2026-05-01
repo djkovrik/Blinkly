@@ -7,13 +7,18 @@
 
 Kotlin Multiplatform app for eye health support
 
-### Main features
-* Simple exercise blocks 👁️
-* Smart reminders ⏰
-* Progress tracking & calendar 📈
-* Grow your garden 🌱
-* Daily eye tips 💡
-* 40 achievements to unlock 🏆
+### Planned product scope
+Blinkly is in active development. The current implementation is focused on
+the onboarding flow; most other screens are still component/module skeletons
+or work in progress.
+
+Planned feature areas:
+* Simple exercise blocks
+* Smart reminders
+* Progress tracking & calendar
+* Grow your garden
+* Daily eye tips
+* 40 achievements to unlock
 
 ### Used libraries
 * [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform)

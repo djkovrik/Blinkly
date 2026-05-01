@@ -7,6 +7,11 @@ description: Build or update Decompose components and navigation for the Blinkly
 
 Read `AGENTS.md` first for the project-level architecture.
 
+Blinkly is in active development. The currently materialized component flow is
+`onboarding` with child steps `step1` through `step5`; `step5` still lacks a
+finished Compose UI. Non-onboarding component modules should be treated as
+navigation shape or skeleton references unless their code proves otherwise.
+
 ## Use these local references first
 
 Root app navigation:
@@ -19,10 +24,10 @@ Nested flow navigation:
 - `shared/component/onboarding/src/commonMain/kotlin/com/sedsoftware/blinkly/component/onboarding/OnboardingComponent.kt`
 - `shared/component/onboarding/src/commonMain/kotlin/com/sedsoftware/blinkly/component/onboarding/integration/OnboardingComponentDefault.kt`
 
-Tabbed home shell:
+Tabbed home shell skeleton:
 - `shared/component/home/src/commonMain/kotlin/com/sedsoftware/blinkly/component/home/integration/HomeScreenComponentDefault.kt`
 
-Thin leaf components:
+Thin work-in-progress leaf component skeletons:
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentDefault.kt`
 - `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/integration/TrainingsTabComponentDefault.kt`
 - `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/integration/ProgressTabComponentDefault.kt`
@@ -105,7 +110,7 @@ Preferred patterns:
 - `ChildStack(...)` in root or parent content when rendering navigation
 
 Do not create root components inside a composable unless there is no alternative.
-Blinkly already creates the root component in platform code before `setContent`.
+Blinkly creates the root component in platform code before `setContent`; treat this as the host wiring pattern, not as evidence that every routed screen is complete.
 
 ## Root dependency composition rules
 
@@ -128,6 +133,9 @@ Keep feature components constructor-injected.
 5. add navigation config and child mapping in the parent
 6. add Compose content in `shared/compose`
 7. add common tests for navigation or behaviour
+
+For currently skeleton modules outside onboarding, first decide whether you are
+filling in the real feature or only extending the placeholder navigation.
 
 ## Avoid these mistakes
 
