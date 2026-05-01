@@ -1,5 +1,6 @@
 package com.sedsoftware.blinkly.component.root.integration
 
+import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
@@ -205,6 +206,10 @@ class RootComponentDefault private constructor(
 
             is ComponentOutput.Common.BackPressed -> {
                 navigation.pop()
+            }
+
+            is ComponentOutput.Common.ErrorCaught -> {
+                Logger.e { "Blinkly error caught: ${output.throwable.message}" }
             }
 
             else -> Unit

@@ -239,8 +239,11 @@ Utility reference:
 
 ### Labels and errors
 
-The project already models one-off errors as `ComponentOutput.Common.ErrorCaught`, but current reference components mostly keep errors in Store `Label` only.
-If a new feature needs user-visible or parent-visible error routing, map labels deliberately in the component layer rather than leaking domain or platform exceptions into Compose.
+The project models one-off errors as `ComponentOutput.Common.ErrorCaught`.
+When a Store label must be visible outside the feature, collect `store.labels` in the component layer, map the label to a typed `ComponentOutput`, and let the parent decide whether to handle it locally or forward it upward.
+`OnboardingStep5ComponentDefault` is the current reference: it maps `InitialRemindersStore.Label.ErrorCaught` to `ComponentOutput.Common.ErrorCaught`; `OnboardingComponentDefault` handles onboarding navigation outputs locally and forwards common outputs to the root.
+
+Only route labels upward when a parent actually needs the event. Otherwise keep the event as a Store `Label` for local handling. Do not leak domain or platform exceptions into Compose.
 
 ## Compose Conventions
 

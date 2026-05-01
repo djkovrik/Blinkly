@@ -104,10 +104,17 @@ The component should:
 
 ## Error handling
 
-Blinkly does not currently route every Store label to parent output.
+Blinkly does not route every Store label to parent output.
 Choose one of these deliberately:
 - keep the error as a Store `Label` for local handling
 - map it to `ComponentOutput.Common.ErrorCaught` in the component layer
+
+When a label must leave a feature, collect `store.labels` from the component,
+map the label to a typed `ComponentOutput`, and cancel the collecting scope from
+`lifecycle.doOnDestroy`. `OnboardingStep5ComponentDefault` is the current
+reference: it maps `InitialRemindersStore.Label.ErrorCaught` to
+`ComponentOutput.Common.ErrorCaught`, then `OnboardingComponentDefault` forwards
+common outputs upward after handling onboarding navigation outputs locally.
 
 Do not leak platform-specific exceptions into Compose.
 
