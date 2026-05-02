@@ -21,9 +21,7 @@ class OnboardingComponentPreview(
     selectedTimeUntil: LocalTime = LocalTime(1, 0),
     selectedInterval: Int = 1,
     selectedDays: List<DayOfWeek> = DayOfWeek.entries.toList(),
-    initialReminderDays: List<DayOfWeek> = emptyList(),
-    initialReminderTimes: List<LocalTime> = emptyList(),
-    initialRemindersVisible: Boolean = false,
+    createdRemindersCount: Int = 99,
 ) : OnboardingComponent, ComponentContext by PreviewComponentContext {
 
     override val childStack: Value<ChildStack<*, OnboardingComponent.Child>> =
@@ -38,14 +36,12 @@ class OnboardingComponentPreview(
 
                     else -> OnboardingComponent.Child.Step5(
                         OnboardingStep5ComponentPreview(
-                            skipInitialSetup = skipInitialSetup,
+                            showInitialSetup = skipInitialSetup,
                             selectedTimeFrom = selectedTimeFrom,
                             selectedTimeUntil = selectedTimeUntil,
                             selectedInterval = selectedInterval,
                             selectedDays = selectedDays,
-                            initialReminderDays = initialReminderDays,
-                            initialReminderTimes = initialReminderTimes,
-                            initialRemindersVisible = initialRemindersVisible,
+                            createdRemindersCount = createdRemindersCount,
                         )
                     )
                 }

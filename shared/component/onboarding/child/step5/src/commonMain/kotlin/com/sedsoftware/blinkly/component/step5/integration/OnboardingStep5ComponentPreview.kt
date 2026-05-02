@@ -8,27 +8,23 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 
 class OnboardingStep5ComponentPreview(
-    val skipInitialSetup: Boolean,
+    val showInitialSetup: Boolean,
     val selectedTimeFrom: LocalTime,
     val selectedTimeUntil: LocalTime,
     val selectedInterval: Int,
     val selectedDays: List<DayOfWeek>,
-    val initialReminderDays: List<DayOfWeek>,
-    val initialReminderTimes: List<LocalTime>,
-    val initialRemindersVisible: Boolean,
+    val createdRemindersCount: Int,
 ) : OnboardingStep5Component {
 
     override val model: Value<Model> =
         MutableValue(
             Model(
-                showInitialSetup = skipInitialSetup,
+                showInitialSetup = showInitialSetup,
                 selectedTimeFrom = selectedTimeFrom,
                 selectedTimeUntil = selectedTimeUntil,
                 selectedInterval = selectedInterval,
                 selectedDays = selectedDays,
-                initialReminderDays = initialReminderDays,
-                initialReminderTimes = initialReminderTimes,
-                initialRemindersVisible = initialRemindersVisible,
+                createdRemindersCount = createdRemindersCount,
             )
         )
 

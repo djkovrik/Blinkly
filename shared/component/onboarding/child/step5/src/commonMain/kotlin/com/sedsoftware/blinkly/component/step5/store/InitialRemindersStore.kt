@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.Intent
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.Label
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.State
+import com.sedsoftware.blinkly.domain.model.Reminder
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 
@@ -27,9 +28,7 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
         val remindUntil: LocalTime = LocalTime(1, 0),
         val remindIntervalMinutes: Int = 1,
         val selectedDays: List<DayOfWeek> = DayOfWeek.entries.toList(),
-        val createdReminderDays: List<DayOfWeek> = emptyList(),
-        val createdReminderTimes: List<LocalTime> = emptyList(),
-        val displayCreatedReminders: Boolean = false,
+        val createdReminders: List<Reminder> = emptyList(),
     )
 
     sealed class Label {

@@ -23,8 +23,6 @@ interface OnboardingStep5Component {
         val selectedTimeUntil: LocalTime,
         val selectedInterval: Int,
         val selectedDays: List<DayOfWeek>,
-        val initialReminderDays: List<DayOfWeek>,
-        val initialReminderTimes: List<LocalTime>,
-        val initialRemindersVisible: Boolean,
+        val createdRemindersCount: Int,
     )
 }

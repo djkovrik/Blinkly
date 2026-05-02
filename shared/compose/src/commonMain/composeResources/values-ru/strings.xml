@@ -44,11 +44,25 @@
     <string name="onboarding_disclaimer8">В случае возникновения боли, рези, длительного ухудшения зрения или появления «мушек» перед глазами — прекратите занятия и немедленно обратитесь к специалисту.</string>
     <string name="onboarding_disclaimer_got_it">Окей, я все понял(а)</string>
 
+    <!-- Onboarding step 5 -->
+    <string name="onboarding_initial_setup_twenty_title">Правило 20-20-20</string>
+    <string name="onboarding_initial_setup_twenty_description">Каждые 20 минут делайте паузу на 20 секунд и смотрите на объект на расстоянии около 6 метров. Это помогает глазам расслабиться и снизить усталость.</string>
+    <string name="onboarding_initial_setup_title">Хотите включить напоминания для 20-20-20?</string>
+    <string name="onboarding_initial_setup_no">Нет, я сделаю это позже</string>
+    <string name="onboarding_initial_setup_yes">Да, сделаем это сейчас</string>
+    <string name="onboarding_initial_setup_label">Ежедневные напоминания:</string>
+    <string name="onboarding_initial_setup_interval">Интервал:</string>
+    <string name="onboarding_initial_setup_from">С</string>
+    <string name="onboarding_initial_setup_until">По</string>
+    <string name="onboarding_initial_setup_20">Каждые 20 минут</string>
+    <string name="onboarding_initial_setup_40">Каждые 40 минут</string>
+    <string name="onboarding_initial_setup_custom">Свой интервал, минут</string>
+    <string name="onboarding_initial_setup_weekdays">В следующие дли недели:</string>
+    <string name="onboarding_initial_setup_create">Создать</string>
+    <string name="onboarding_initial_setup_clear">Очистить</string>
+    <string name="onboarding_initial_setup_created">Создано:</string>
+
     <!-- Reminder creator -->
-    <string name="period_label">Период для уведомлений</string>
-    <string name="period_from">С</string>
-    <string name="period_to">По</string>
-    <string name="week_label">Дни недели</string>
     <string name="week_monday">ПН</string>
     <string name="week_tuesday">ВТ</string>
     <string name="week_wednesday">СР</string>

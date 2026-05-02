@@ -47,11 +47,25 @@
     <string name="onboarding_disclaimer8">If you experience pain, burning, prolonged blurred vision, or see spots (floaters), stop immediately and seek medical attention.</string>
     <string name="onboarding_disclaimer_got_it">Got it, I understand</string>
 
+    <!-- Onboarding step 5 -->
+    <string name="onboarding_initial_setup_twenty_title">The 20-20-20 rule</string>
+    <string name="onboarding_initial_setup_twenty_description">Every 20 minutes, take a 20-second break and look at something about 20 feet (6 meters) away. This helps your eyes relax and reduce strain.</string>
+    <string name="onboarding_initial_setup_title">Do you want to enable 20-20-20 reminders?</string>
+    <string name="onboarding_initial_setup_no">No, I'll do that later</string>
+    <string name="onboarding_initial_setup_yes">Yes, let's do it</string>
+    <string name="onboarding_initial_setup_label">Daily reminders:</string>
+    <string name="onboarding_initial_setup_interval">Interval:</string>
+    <string name="onboarding_initial_setup_from">From</string>
+    <string name="onboarding_initial_setup_until">Until</string>
+    <string name="onboarding_initial_setup_20">Every 20 minutes</string>
+    <string name="onboarding_initial_setup_40">Every 40 minutes</string>
+    <string name="onboarding_initial_setup_custom">Custom interval, minutes</string>
+    <string name="onboarding_initial_setup_weekdays">On these days of the week:</string>
+    <string name="onboarding_initial_setup_create">Create</string>
+    <string name="onboarding_initial_setup_clear">Clear</string>
+    <string name="onboarding_initial_setup_created">Created:</string>
+
     <!-- Reminder creator -->
-    <string name="period_label">Notifications period</string>
-    <string name="period_from">From</string>
-    <string name="period_to">To</string>
-    <string name="week_label">Days of the week</string>
     <string name="week_monday">MO</string>
     <string name="week_tuesday">TU</string>
     <string name="week_wednesday">WE</string>

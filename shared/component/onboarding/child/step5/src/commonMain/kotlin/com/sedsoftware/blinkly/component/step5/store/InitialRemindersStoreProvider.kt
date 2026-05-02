@@ -68,7 +68,7 @@ internal class InitialRemindersStoreProvider(
                     launch {
                         manager.observeReminders()
                             .catch { publish(Label.ErrorCaught(it)) }
-                            .collect { dispatch(Msg.RemindersRefreshed(it)) }
+                            .collect { dispatch(Msg.RemindersUpdated(it)) }
                     }
                 }
 
@@ -108,9 +108,7 @@ internal class InitialRemindersStoreProvider(
                     launch {
                         unwrap(
                             result = withContext(ioContext) { manager.setupInitial(state()) },
-                            onSuccess = {
-                                dispatch(Msg.RemindersCreated)
-                            },
+                            onSuccess = {},
                             onError = { throwable ->
                                 publish(Label.ErrorCaught(throwable))
                             }
@@ -142,17 +140,8 @@ internal class InitialRemindersStoreProvider(
                         permissionGranted = msg.granted,
                     )
 
-                    is Msg.RemindersRefreshed -> copy(
-                        createdReminderDays = if (msg.items.isNotEmpty()) {
-                            msg.items[0].weekDays
-                        } else {
-                            emptyList()
-                        },
-                        createdReminderTimes = if (msg.items.isNotEmpty()) {
-                            msg.items.map { it.date.time }
-                        } else {
-                            emptyList()
-                        },
+                    is Msg.RemindersUpdated -> copy(
+                        createdReminders = msg.items,
                     )
 
                     is Msg.ShowInitialSetupChanged -> copy(
@@ -179,12 +168,8 @@ internal class InitialRemindersStoreProvider(
                         }
                     )
 
-                    is Msg.RemindersCreated -> copy(
-                        displayCreatedReminders = true,
-                    )
-
                     is Msg.RemindersDeleted -> copy(
-                        displayCreatedReminders = false,
+                        createdReminders = emptyList(),
                     )
                 }
             }
@@ -197,15 +182,14 @@ internal class InitialRemindersStoreProvider(
     }
 
     sealed interface Msg {
-        data object NotificationPermissionChecked: Msg
+        data object NotificationPermissionChecked : Msg
         data class NotificationPermissionChanged(val granted: Boolean) : Msg
-        data class RemindersRefreshed(val items: List<Reminder>) : Msg
+        data class RemindersUpdated(val items: List<Reminder>) : Msg
         data class ShowInitialSetupChanged(val checked: Boolean) : Msg
         data class TimeSelectedFrom(val time: LocalTime) : Msg
         data class TimeSelectedTo(val time: LocalTime) : Msg
         data class IntervalChanged(val interval: Int) : Msg
         data class WeekDayToggled(val weekDay: DayOfWeek) : Msg
-        data object RemindersCreated : Msg
         data object RemindersDeleted : Msg
     }
 }

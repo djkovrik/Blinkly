@@ -8,7 +8,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
+import assertk.assertions.isNotZero
 import assertk.assertions.isTrue
+import assertk.assertions.isZero
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.items
@@ -352,9 +354,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         // given
         val step5 = getStep5Component()
         with(step5.model.value) {
-            assertThat(initialReminderDays).isEmpty()
-            assertThat(initialReminderTimes).isEmpty()
-            assertThat(initialRemindersVisible).isFalse()
+            assertThat(createdRemindersCount).isZero()
         }
 
         // when
@@ -363,9 +363,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
         // then
         with(step5.model.value) {
-            assertThat(initialReminderDays).isNotEmpty()
-            assertThat(initialReminderTimes).isNotEmpty()
-            assertThat(initialRemindersVisible).isTrue()
+            assertThat(createdRemindersCount).isNotZero()
         }
 
         // when
@@ -374,9 +372,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
         // then
         with(step5.model.value) {
-            assertThat(initialReminderDays).isEmpty()
-            assertThat(initialReminderTimes).isEmpty()
-            assertThat(initialRemindersVisible).isFalse()
+            assertThat(createdRemindersCount).isZero()
         }
     }
 

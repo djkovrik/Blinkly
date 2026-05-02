@@ -24,7 +24,7 @@ import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun TimePickerDialog(
+fun BlinklyTimePickerDialog(
     timePickerState: TimePickerState,
     modifier: Modifier = Modifier,
     dialogShape: Shape = MaterialTheme.shapes.medium,
@@ -32,7 +32,7 @@ fun TimePickerDialog(
     onDismiss: () -> Unit = {},
 ) {
     Dialog(onDismissRequest = { onDismiss() }) {
-        TimePickerDialogContent(
+        BlinklyTimePickerDialogDialogContent(
             timePickerState = timePickerState,
             dialogShape = dialogShape,
             modifier = modifier,
@@ -43,7 +43,7 @@ fun TimePickerDialog(
 }
 
 @Composable
-private fun TimePickerDialogContent(
+private fun BlinklyTimePickerDialogDialogContent(
     timePickerState: TimePickerState,
     dialogShape: Shape,
     modifier: Modifier = Modifier,
@@ -89,27 +89,27 @@ private fun TimePickerDialogContent(
 
 @Preview
 @Composable
-private fun TimePickerDialogPreviewLight() {
+private fun BlinklyTimePickerDialogPreviewLight() {
     BlinklyWidgetPreview {
-        TimePickerDialogPreviewContent()
+        BlinklyTimePickerDialogPreviewContent()
     }
 }
 
 @Preview
 @Composable
-private fun TimePickerDialogPreviewDark() {
+private fun BlinklyTimePickerDialogPreviewDark() {
     BlinklyWidgetPreview(isDakTheme = true) {
-        TimePickerDialogPreviewContent()
+        BlinklyTimePickerDialogPreviewContent()
     }
 }
 
 @Composable
-private fun TimePickerDialogPreviewContent() {
+private fun BlinklyTimePickerDialogPreviewContent() {
     val timePickerState: TimePickerState = rememberTimePickerState(
         initialHour = 23,
         initialMinute = 59,
         is24Hour = true,
     )
 
-    TimePickerDialog(timePickerState)
+    BlinklyTimePickerDialog(timePickerState)
 }

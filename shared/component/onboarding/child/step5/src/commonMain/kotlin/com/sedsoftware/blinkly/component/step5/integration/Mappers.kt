@@ -10,8 +10,6 @@ internal val stateToModel: (State) -> Model = {
         selectedTimeUntil = it.remindUntil,
         selectedInterval = it.remindIntervalMinutes,
         selectedDays = it.selectedDays,
-        initialReminderDays = it.createdReminderDays,
-        initialReminderTimes = it.createdReminderTimes,
-        initialRemindersVisible = it.displayCreatedReminders,
+        createdRemindersCount = it.createdReminders.size,
     )
 }
