@@ -33,8 +33,10 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
@@ -255,6 +257,40 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
 
         // when
         step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+    }
+
+    @Test
+    fun `when observing permission events failed then error output emitted`() = runTest(testScheduler) {
+        // given
+        val exception = IllegalStateException("permission events failed")
+        every { notifierMock.permissionEvents() } returns flow {
+            delay(1)
+            throw exception
+        }
+
+        // when
+        getStep5Component()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+    }
+
+    @Test
+    fun `when observing reminders failed then error output emitted`() = runTest(testScheduler) {
+        // given
+        val exception = IllegalStateException("reminders flow failed")
+        every { reminderManagerMock.createdReminders() } returns flow {
+            delay(1)
+            throw exception
+        }
+
+        // when
+        getStep5Component()
         testScheduler.advanceUntilIdle()
 
         // then

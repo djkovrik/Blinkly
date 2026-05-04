@@ -96,7 +96,37 @@ class BlinklySettingsTest {
         assertThat(settings.onboardingDisplayed).isEqualTo(booleanValue)
     }
 
+    @Test
+    fun `when displayed highlights contains malformed json then empty list returned`() {
+        // given
+        val rawSettings = MapSettings()
+        rawSettings.putString(PREF_DISPLAYED_HIGHLIGHTS, "{")
+        val settings = BlinklySettingsImpl(rawSettings)
+
+        // when
+        val result = settings.displayedHighlights
+
+        // then
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `when nullable dates set to null then null returned`() {
+        // given
+        settings.lastTreeProgressCheckDate = LocalDate.parse("2026-03-01")
+        settings.currentHighlightDate = LocalDate.parse("2026-03-02")
+
+        // when
+        settings.lastTreeProgressCheckDate = null
+        settings.currentHighlightDate = null
+
+        // then
+        assertThat(settings.lastTreeProgressCheckDate).isEqualTo(null)
+        assertThat(settings.currentHighlightDate).isEqualTo(null)
+    }
+
     private companion object {
+        const val PREF_DISPLAYED_HIGHLIGHTS = "dh"
         const val BLINK_BREAK_COUNT_DEFAULT = 60
         const val NEAR_FOCUS_COUNT_DEFAULT = 10
         const val NEAR_FOCUS_DURATION_DEFAULT = 5f

@@ -181,7 +181,7 @@ internal class BlinklyReminderManagerImpl(
 
         for (reminder in remindersToSchedule) {
             if (reminder.interval == ReminderInterval.DAILY) {
-                alarmManager.scheduleWeekly(
+                alarmManager.scheduleDaily(
                     uuid = reminder.uuid,
                     type = ReminderType.TWENTY_X3,
                     startingDate = reminder.date,

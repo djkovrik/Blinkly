@@ -2,6 +2,7 @@ package com.sedsoftware.blinkly.domain
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isEmpty
 import assertk.assertions.isNotEmpty
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
@@ -10,6 +11,7 @@ import com.sedsoftware.blinkly.domain.fakes.FakeData
 import com.sedsoftware.blinkly.domain.impl.BlinklyReminderManagerImpl
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
+import com.sedsoftware.blinkly.domain.model.ReminderType
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -167,6 +169,28 @@ class BlinklyReminderManagerTest : BaseDomainTest() {
     }
 
     @Test
+    fun `when scheduleWeeklySingle for current day with past time then reminder created with next week date`() = runTest(testScheduler) {
+        // given
+        val todayInstant = LocalDateTime(2026, 3, 17, 12, 34).toInstant(timeUtils.timeZone())
+        val reminderTarget = LocalDateTime(2026, 3, 24, 10, 11)
+        val targetTime = LocalTime(10, 11)
+        every { timeUtils.now() } returns todayInstant
+
+        // when
+        manager.scheduleWeeklySingle(targetTime, DayOfWeek.TUESDAY)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(createdReminders).isNotEmpty()
+        assertThat(createdReminders.first().interval).isEqualTo(ReminderInterval.WEEKLY)
+        assertThat(createdReminders.first().date).isEqualTo(reminderTarget)
+        assertThat(createdReminders.first().date.time).isEqualTo(targetTime)
+        val created = createdReminders.first()
+        verifySuspend(exactly(1)) { database.saveReminder(created) }
+        verifySuspend(exactly(1)) { alarmManager.scheduleWeekly(created.uuid, created.type, created.date) }
+    }
+
+    @Test
     fun `when schedule with all days in the future week then reminders created with upcoming week dates`() = runTest(testScheduler) {
         // given
         val expectedReminders = 14
@@ -288,6 +312,39 @@ class BlinklyReminderManagerTest : BaseDomainTest() {
         }
 
     @Test
+    fun `when scheduleWeeklyDayPeriod called with invalid params then reminders are not created`() = runTest(testScheduler) {
+        // given
+        val todayInstant = LocalDateTime(2026, 3, 15, 12, 34).toInstant(timeUtils.timeZone())
+        every { timeUtils.now() } returns todayInstant
+
+        // when
+        manager.scheduleWeeklyDayPeriod(
+            from = LocalTime(hour = 10, minute = 0),
+            until = LocalTime(hour = 18, minute = 0),
+            intervalMinutes = 0,
+            days = listOf(DayOfWeek.MONDAY),
+        )
+        manager.scheduleWeeklyDayPeriod(
+            from = LocalTime(hour = 10, minute = 0),
+            until = LocalTime(hour = 18, minute = 0),
+            intervalMinutes = 30,
+            days = emptyList(),
+        )
+        manager.scheduleWeeklyDayPeriod(
+            from = LocalTime(hour = 18, minute = 0),
+            until = LocalTime(hour = 10, minute = 0),
+            intervalMinutes = 30,
+            days = listOf(DayOfWeek.MONDAY),
+        )
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(createdReminders).isEmpty()
+        verifySuspend(exactly(0)) { database.saveReminders(any()) }
+        verify(exactly(0)) { alarmManager.scheduleWeekly(any(), any(), any()) }
+    }
+
+    @Test
     fun `when rescheduleAll then calls for alarm manager`() = runTest(testScheduler) {
         // given
         val todayInstant = LocalDateTime(2026, 3, 15, 12, 34).toInstant(timeUtils.timeZone())
@@ -307,6 +364,35 @@ class BlinklyReminderManagerTest : BaseDomainTest() {
         verify(exactly(1)) { alarmManager.cancelAll() }
         verify(exactly(1)) { alarmManager.scheduleDaily(any(), any(), any()) }
         verify(exactly(1)) { alarmManager.scheduleWeekly(any(), any(), any()) }
+    }
+
+    @Test
+    fun `when rescheduleAll then daily and weekly reminders keep their schedule type`() = runTest(testScheduler) {
+        // given
+        val daily = Reminder(
+            uuid = "daily",
+            date = LocalDateTime(2026, 3, 15, 13, 21),
+            type = ReminderType.TWENTY_X3,
+            interval = ReminderInterval.DAILY,
+            weekDays = emptyList(),
+        )
+        val weekly = Reminder(
+            uuid = "weekly",
+            date = LocalDateTime(2026, 3, 15, 14, 15),
+            type = ReminderType.TWENTY_X3,
+            interval = ReminderInterval.WEEKLY,
+            weekDays = listOf(DayOfWeek.SUNDAY),
+        )
+        remindersFlow.value = listOf(daily, weekly)
+
+        // when
+        manager.rescheduleAll()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        verify(exactly(1)) { alarmManager.cancelAll() }
+        verify(exactly(1)) { alarmManager.scheduleDaily(daily.uuid, daily.type, daily.date) }
+        verify(exactly(1)) { alarmManager.scheduleWeekly(weekly.uuid, weekly.type, weekly.date) }
     }
 
     @Test

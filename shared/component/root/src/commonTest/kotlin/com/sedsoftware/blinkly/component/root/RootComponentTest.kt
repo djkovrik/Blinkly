@@ -1,6 +1,7 @@
 package com.sedsoftware.blinkly.component.root
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.router.stack.active
@@ -21,7 +22,10 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.mock
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -186,6 +190,39 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         assertThat(component.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
     }
 
+    @Test
+    fun `when root back called from nested screen then navigation stack updated`() = runTest(testScheduler) {
+        // given
+        completeOnboardingFlow(component)
+        switchTab(HomeScreenTab.PROGRESS)
+        val homeScreenChild = component.childStack.active.instance as RootComponent.Child.HomeScreen
+        val currentTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.ProgressTab
+        currentTabChild.component.onGardenClick()
+        assertThat(component.childStack.active.instance is RootComponent.Child.Garden).isTrue()
+
+        // when
+        component.onBack()
+
+        // then
+        assertThat(component.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
+    }
+
+    @Test
+    fun `when child emits error then root keeps current child`() = runTest(testScheduler) {
+        // given
+        val exception = IllegalStateException("permission check failed")
+        prepareStep5Dependencies()
+        dev.mokkery.everySuspend { notifierMock.isNotificationPermissionGranted() } throws exception
+
+        // when
+        val before = component.childStack.active.instance::class
+        navigateToStep5(component)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(component.childStack.active.instance::class).isEqualTo(before)
+    }
+
     private fun completeOnboardingFlow(currentComponent: RootComponent) {
         val onboardingComponent = currentComponent.childStack.active.instance as? RootComponent.Child.Onboarding ?: return
         val step1 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step1
@@ -198,6 +235,23 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         step4.component.onNextClick()
         val step5 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step5
         step5.component.onNextClick()
+    }
+
+    private fun navigateToStep5(currentComponent: RootComponent) {
+        val onboardingComponent = currentComponent.childStack.active.instance as? RootComponent.Child.Onboarding ?: return
+        val step1 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step1
+        step1.component.onNextClick()
+        val step2 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step2
+        step2.component.onNextClick()
+        val step3 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step3
+        step3.component.onNextClick()
+        val step4 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step4
+        step4.component.onNextClick()
+    }
+
+    private fun prepareStep5Dependencies() {
+        dev.mokkery.every { notifierMock.permissionEvents() } returns emptyFlow()
+        dev.mokkery.every { reminderManagerMock.createdReminders() } returns emptyFlow()
     }
 
     private fun switchTab(tab: HomeScreenTab) {
