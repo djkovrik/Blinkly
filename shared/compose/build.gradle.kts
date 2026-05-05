@@ -32,6 +32,7 @@ kotlin {
             implementation(libs.ark.decompose.extensions)
 
             implementation(project(":shared:domain"))
+            implementation(project(":shared:utils"))
             implementation(project(":shared:component:root"))
             implementation(project(":shared:component:onboarding"))
             implementation(project(":shared:component:onboarding:child:step1"))
@@ -78,6 +79,7 @@ kotlin {
 
     compilerOptions {
         freeCompilerArgs.add("-opt-in=com.arkivanov.decompose.ExperimentalDecomposeApi")
+        freeCompilerArgs.add("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api")
     }
 }
 

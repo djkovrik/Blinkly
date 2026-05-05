@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A516EB4C2F6DB13A0040FD0E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A516EB4A2F6DB13A0040FD0E /* Localizable.strings */; };
+		A55F5A572F76F8F6005C275E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A55F5A562F76F8F6005C275E /* LaunchScreen.storyboard */; };
 		A93A953B29CC810C00F8E227 /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93A953A29CC810C00F8E227 /* iosApp.swift */; };
 		A93A953F29CC810D00F8E227 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A93A953E29CC810D00F8E227 /* Assets.xcassets */; };
 		A93A954229CC810D00F8E227 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A93A954129CC810D00F8E227 /* Preview Assets.xcassets */; };
@@ -16,6 +17,7 @@
 /* Begin PBXFileReference section */
 		A516EB4B2F6DB13A0040FD0E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A516EB4D2F6DB13F0040FD0E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A55F5A562F76F8F6005C275E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A93A953729CC810C00F8E227 /* Blinkly.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Blinkly.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A93A953A29CC810C00F8E227 /* iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosApp.swift; sourceTree = "<group>"; };
 		A93A953E29CC810D00F8E227 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -56,6 +58,7 @@
 			children = (
 				A93A953A29CC810C00F8E227 /* iosApp.swift */,
 				A93A953E29CC810D00F8E227 /* Assets.xcassets */,
+				A55F5A562F76F8F6005C275E /* LaunchScreen.storyboard */,
 				A93A954029CC810D00F8E227 /* Preview Content */,
 			);
 			path = iosApp;
@@ -136,6 +139,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A93A954229CC810D00F8E227 /* Preview Assets.xcassets in Resources */,
+				A55F5A572F76F8F6005C275E /* LaunchScreen.storyboard in Resources */,
 				A516EB4C2F6DB13A0040FD0E /* Localizable.strings in Resources */,
 				A93A953F29CC810D00F8E227 /* Assets.xcassets in Resources */,
 			);
@@ -314,6 +318,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -340,6 +345,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

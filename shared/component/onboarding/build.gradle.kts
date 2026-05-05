@@ -8,6 +8,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:domain"))
+                implementation(project(":shared:utils"))
 
                 implementation(project(":shared:component:onboarding:child:step1"))
                 implementation(project(":shared:component:onboarding:child:step2"))

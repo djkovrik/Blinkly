@@ -110,7 +110,7 @@ complexity:
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
     ignoreNestingFunctions: false
-    ignoreAnnotated: ['StoreCreate']
+    ignoreAnnotated: ['StoreProvider']
     nestingFunctions:
       - 'also'
       - 'apply'
@@ -130,7 +130,7 @@ complexity:
   LongMethod:
     active: true
     threshold: 90
-    ignoreAnnotated: ['Composable','StoreCreate']
+    ignoreAnnotated: ['Composable','StoreProvider']
   LongParameterList:
     active: true
     functionThreshold: 12
@@ -628,7 +628,7 @@ style:
     ignoreEnums: true
     ignoreRanges: false
     ignoreExtensionFunctions: true
-    ignoreAnnotated: ['Preview']
+    ignoreAnnotated: ['Preview', 'PreviewContent']
   MandatoryBracesLoops:
     active: false
   MaxChainedCallsOnSameLine:

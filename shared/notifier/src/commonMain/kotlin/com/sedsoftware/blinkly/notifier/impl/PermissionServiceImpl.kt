@@ -37,11 +37,11 @@ internal class PermissionServiceImpl(
                 controller.providePermission(permission)
                 PermissionResult.Granted
 
-            } catch (_: DeniedException) {
-                PermissionResult.Denied
-
             } catch (_: DeniedAlwaysException) {
                 PermissionResult.DeniedAlways
+
+            } catch (_: DeniedException) {
+                PermissionResult.Denied
             }
 
             _events.emit(permission to result)

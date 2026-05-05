@@ -8,6 +8,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:domain"))
+                implementation(project(":shared:utils"))
                 implementation(project(":shared:component:main"))
                 implementation(project(":shared:component:progress"))
                 implementation(project(":shared:component:reminders"))

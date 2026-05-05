@@ -8,6 +8,7 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.sedsoftware.blinkly.component.onboarding.OnboardingComponent
 import com.sedsoftware.blinkly.component.step1.OnboardingStep1Component
 import com.sedsoftware.blinkly.component.step1.integration.OnboardingStep1ComponentDefault
@@ -19,7 +20,9 @@ import com.sedsoftware.blinkly.component.step4.OnboardingStep4Component
 import com.sedsoftware.blinkly.component.step4.integration.OnboardingStep4ComponentDefault
 import com.sedsoftware.blinkly.component.step5.OnboardingStep5Component
 import com.sedsoftware.blinkly.component.step5.integration.OnboardingStep5ComponentDefault
+import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
+import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -38,6 +41,9 @@ class OnboardingComponentDefault private constructor(
 
     constructor(
         componentContext: ComponentContext,
+        storeFactory: StoreFactory,
+        reminderManager: BlinklyReminderManager,
+        notifier: BlinklyNotifier,
         dispatchers: BlinklyDispatchers,
         onboardingOutput: (ComponentOutput) -> Unit,
     ) : this(
@@ -54,10 +60,10 @@ class OnboardingComponentDefault private constructor(
             OnboardingStep3ComponentDefault(childContext, output)
         },
         onboardingStep4 = { childContext, output ->
-            OnboardingStep4ComponentDefault(childContext, output)
+            OnboardingStep4ComponentDefault(childContext, storeFactory, dispatchers, output)
         },
         onboardingStep5 = { childContext, output ->
-            OnboardingStep5ComponentDefault(childContext, output)
+            OnboardingStep5ComponentDefault(childContext, storeFactory, dispatchers, reminderManager, notifier,output)
         },
     )
 

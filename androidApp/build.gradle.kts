@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":shared:domain"))
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.splash)
     implementation(libs.lib.alarmee)
     implementation(libs.lib.moko.permissions)
     implementation(libs.ark.decompose.core)

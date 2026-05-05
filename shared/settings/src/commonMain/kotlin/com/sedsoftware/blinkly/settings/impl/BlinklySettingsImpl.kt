@@ -93,7 +93,7 @@ internal class BlinklySettingsImpl(
             }
         }
         set(value) {
-            val stringValue = value.toString()
+            val stringValue = value?.toString().orEmpty()
             settings.setValue(PREF_LAST_TREE_PROGRESS_CHECK_DATE, stringValue)
         }
 
@@ -125,7 +125,7 @@ internal class BlinklySettingsImpl(
             }
         }
         set(value) {
-            val stringValue = value.toString()
+            val stringValue = value?.toString().orEmpty()
             settings.setValue(PREF_CURRENT_HIGHLIGHT_DATE, stringValue)
         }
 

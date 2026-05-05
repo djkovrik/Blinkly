@@ -11,6 +11,8 @@ kotlin {
 
                 implementation(libs.ark.decompose.core)
                 implementation(libs.ark.essenty)
+                implementation(libs.ark.mvikotlin.core)
+                implementation(libs.ark.mvikotlin.extensions)
             }
         }
     }

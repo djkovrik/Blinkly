@@ -1,0 +1,73 @@
+<resources>
+    <!-- Russian translation by djkovrik -->
+
+    <!-- Non-translatable -->
+    <string name="app_label">Blinkly</string>
+
+    <!-- Common -->
+    <string name="common_ok">ОК</string>
+    <string name="common_cancel">Отмена</string>
+
+    <!-- Onboarding navigation -->
+    <string name="onboarding_back">Назад</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_done">Готово</string>
+
+    <!-- Onboarding step 1 -->
+    <string name="onboarding_welcome">Добро пожаловать в Blinkly</string>
+    <string name="onboarding_welcome_description">Ваше пространство для отдыха глаз</string>
+
+    <!-- Onboarding step 2 -->
+    <string name="onboarding_why">Зачем это?</string>
+    <string name="onboarding_why_description1">Ваши глаза устают быстрее, чем вы думаете.</string>
+    <string name="onboarding_why_description2">Во время работы за экраном мы моргаем в 2–3 раза реже. Это может привести к сухости, напряжению и усталости глаз.</string>
+
+    <!-- Onboarding step 3 -->
+    <string name="onboarding_how">Как это поможет?</string>
+    <string name="onboarding_how_title1">Для мышц:</string>
+    <string name="onboarding_how_title2">Для увлажнения:</string>
+    <string name="onboarding_how_title3">Для кровообращения:</string>
+    <string name="onboarding_how_title4">Перезагрузка:</string>
+    <string name="onboarding_how_description1">Глазные мышцы, как и любые другие, нуждаются в разминке. Долгое смотрение в одну точку (экран) заставляет цилиарную мышцу «застывать» в напряжении. Гимнастика учит ее расслабляться (снимает спазм аккомодации), что может замедлить развитие ложной близорукости.</string>
+    <string name="onboarding_how_description2">При фокусировке на экране мы реже моргаем. Упражнения напоминают нам моргать, равномерно распределяя слезную пленку и предотвращая синдром сухого глаза.</string>
+    <string name="onboarding_how_description3">Движения глазами и зажмуривания усиливают приток крови к тканям глаза, улучшая их питание.</string>
+    <string name="onboarding_how_description4">Короткий перерыв, чтобы посмотреть вдаль, дает зрительной системе «перезагрузиться», снижая утомление и головную боль напряжения.</string>
+
+    <!-- Onboarding step 4 -->
+    <string name="onboarding_disclaimer1">Важная информация о здоровье</string>
+    <string name="onboarding_disclaimer2">Приложение Blinkly разработано исключительно для профилактики зрительного утомления и поддержания тонуса глазных мышц у здоровых людей. Оно не является медицинским изделием, лечебным средством или методом коррекции зрения.</string>
+    <string name="onboarding_disclaimer3">Не заменяет врача:</string>
+    <string name="onboarding_disclaimer4">Гимнастика не лечит такие заболевания, как глаукома, катаракта, отслоение сетчатки, прогрессирующая близорукость или инфекции.</string>
+    <string name="onboarding_disclaimer5">Противопоказания:</string>
+    <string name="onboarding_disclaimer6">Если у вас диагностированы какие-либо заболевания глаз (в том числе глаукома, так как некоторые упражнения могут повышать внутриглазное давление) или вы недавно перенесли операцию на глазах — перед началом занятий обязательно проконсультируйтесь с врачом-офтальмологом.</string>
+    <string name="onboarding_disclaimer7">При дискомфорте:</string>
+    <string name="onboarding_disclaimer8">В случае возникновения боли, рези, длительного ухудшения зрения или появления «мушек» перед глазами — прекратите занятия и немедленно обратитесь к специалисту.</string>
+    <string name="onboarding_disclaimer_got_it">Окей, я все понял(а)</string>
+
+    <!-- Onboarding step 5 -->
+    <string name="onboarding_initial_setup_twenty_title">Правило 20-20-20</string>
+    <string name="onboarding_initial_setup_twenty_description">Каждые 20 минут делайте паузу на 20 секунд и смотрите на объект на расстоянии около 6 метров. Это помогает глазам расслабиться и снизить усталость.</string>
+    <string name="onboarding_initial_setup_title">Хотите включить напоминания для 20-20-20?</string>
+    <string name="onboarding_initial_setup_no">Нет, я сделаю это позже</string>
+    <string name="onboarding_initial_setup_yes">Да, сделаем это сейчас</string>
+    <string name="onboarding_initial_setup_label">Ежедневные напоминания:</string>
+    <string name="onboarding_initial_setup_interval">Интервал:</string>
+    <string name="onboarding_initial_setup_from">С</string>
+    <string name="onboarding_initial_setup_until">По</string>
+    <string name="onboarding_initial_setup_20">Каждые 20 минут</string>
+    <string name="onboarding_initial_setup_40">Каждые 40 минут</string>
+    <string name="onboarding_initial_setup_custom">Свой интервал, минут</string>
+    <string name="onboarding_initial_setup_weekdays">В следующие дли недели:</string>
+    <string name="onboarding_initial_setup_create">Создать</string>
+    <string name="onboarding_initial_setup_clear">Очистить</string>
+    <string name="onboarding_initial_setup_created">Создано:</string>
+
+    <!-- Reminder creator -->
+    <string name="week_monday">ПН</string>
+    <string name="week_tuesday">ВТ</string>
+    <string name="week_wednesday">СР</string>
+    <string name="week_thursday">ЧТ</string>
+    <string name="week_friday">ПТ</string>
+    <string name="week_saturday">СБ</string>
+    <string name="week_sunday">ВС</string>
+</resources>

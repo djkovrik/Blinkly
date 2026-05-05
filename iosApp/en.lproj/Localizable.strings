@@ -6,5 +6,23 @@
   
 */
 
-"notification_title" = "20-20-20";
-"notification_description" = "Please take a break";
+"notification_title1" = "Time to look away 👀";
+"notification_title2" = "A tiny break for your eyes";
+"notification_title3" = "Your eyes need a rest";
+"notification_title4" = "Stop staring at that screen! 😅";
+"notification_title5" = "Your eyes deserve a break";
+"notification_title6" = "Time to recharge";
+"notification_title7" = "A moment of focus 🧘";
+"notification_title8" = "Blinkly reminds you";
+"notification_title9" = "Don’t forget to blink 😉";
+"notification_title10" = "Eye care made simple";
+"notification_description1" = "20-20-20 rule: look at something 20 feet away for 20 seconds. Your eyes will thank you!";
+"notification_description2" = "Look into the distance for 20 seconds - it releases focusing strain.";
+"notification_description3" = "20 seconds of faraway gaze and the fatigue starts to fade. Ready?";
+"notification_description4" = "Just 20 seconds of looking away - you will be back in action. Let's do it!";
+"notification_description5" = "Find something far away (at least 20 feet) and gaze at it for 20 seconds.";
+"notification_description6" = "20–20-20: look far away, blink, and relax.";
+"notification_description7" = "Look away from your screen for 20 seconds. Easier than you think!";
+"notification_description8" = "Take a break: look into the distance for 20 seconds. Your eyes will love it.";
+"notification_description9" = "A quick glance far away helps your eyes unwind. Try it right now!";
+"notification_description10" = "Just 20 seconds looking far away — and you've already done something great.";
