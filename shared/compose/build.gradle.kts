@@ -32,6 +32,7 @@ kotlin {
             implementation(libs.ark.decompose.extensions)
 
             implementation(project(":shared:domain"))
+            implementation(project(":shared:utils"))
             implementation(project(":shared:component:root"))
             implementation(project(":shared:component:onboarding"))
             implementation(project(":shared:component:onboarding:child:step1"))

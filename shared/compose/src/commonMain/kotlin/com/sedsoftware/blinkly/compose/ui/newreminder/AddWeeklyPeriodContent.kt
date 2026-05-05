@@ -43,6 +43,7 @@ import com.sedsoftware.blinkly.compose.ui.widget.BlinklyOutlineButton
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyTimePickerDialog
 import com.sedsoftware.blinkly.compose.ui.widget.WeekDayToggle
 import com.sedsoftware.blinkly.domain.extension.toHumanReadableString
+import com.sedsoftware.blinkly.utils.PreviewContent
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 import org.jetbrains.compose.resources.stringResource
@@ -100,6 +101,7 @@ fun AddWeeklyPeriodContent(
             onConfirm = {
                 val selectedTime = LocalTime(timePickerStateFrom.hour, timePickerStateFrom.minute)
                 onTimeFromSelect.invoke(selectedTime)
+                timePickerFromVisible = false
             },
             onDismiss = {
                 timePickerFromVisible = false
@@ -113,6 +115,7 @@ fun AddWeeklyPeriodContent(
             onConfirm = {
                 val selectedTime = LocalTime(timePickerStateUntil.hour, timePickerStateUntil.minute)
                 onTimeUntilSelect.invoke(selectedTime)
+                timePickerUntilVisible = false
             },
             onDismiss = {
                 timePickerUntilVisible = false
@@ -150,7 +153,9 @@ fun AddWeeklyPeriodContent(
             )
 
             BlinklyOutlineButton(
-                text = "${stringResource(resource = Res.string.onboarding_initial_setup_until)} ${selectedTimeUntil.toHumanReadableString()}",
+                text = "${stringResource(
+                    resource = Res.string.onboarding_initial_setup_until)
+                } ${selectedTimeUntil.toHumanReadableString()}",
                 buttonShape = MaterialTheme.shapes.small,
                 modifier = Modifier.padding(horizontal = 8.dp),
                 onClick = {
@@ -297,6 +302,7 @@ private fun AddWeeklyPeriodContentPreviewDark() {
 }
 
 @Composable
+@PreviewContent
 private fun AddWeeklyPeriodContentPreviewContent() {
     Column {
         AddWeeklyPeriodContent(

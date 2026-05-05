@@ -8,7 +8,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,6 +37,7 @@ import com.sedsoftware.blinkly.component.step5.OnboardingStep5Component
 import com.sedsoftware.blinkly.component.step5.integration.OnboardingStep5ComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import com.sedsoftware.blinkly.compose.ui.newreminder.AddWeeklyPeriodContent
+import com.sedsoftware.blinkly.utils.PreviewContent
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 import org.jetbrains.compose.resources.stringResource
@@ -140,7 +140,7 @@ fun OnboardingContentStep5(
             ) {
                 AddWeeklyPeriodContent(
                     selectedTimeFrom = model.selectedTimeFrom,
-                    selectedTimeUntil = model.selectedTimeFrom,
+                    selectedTimeUntil = model.selectedTimeUntil,
                     selectedDays = model.selectedDays,
                     selectedInterval = model.selectedInterval,
                     createdRemindersCount = model.createdRemindersCount,
@@ -184,6 +184,7 @@ private fun OnboardingContentStep5PreviewDark() {
 }
 
 @Composable
+@PreviewContent
 private fun OnboardingContentStep5PreviewContent() {
     OnboardingContentStep5(
         OnboardingStep5ComponentPreview(

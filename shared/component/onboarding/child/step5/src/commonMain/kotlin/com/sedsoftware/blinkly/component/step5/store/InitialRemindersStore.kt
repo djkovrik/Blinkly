@@ -24,14 +24,19 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
         val showInitialSetup: Boolean = false,
         val permissionChecked: Boolean = false,
         val permissionGranted: Boolean = false,
-        val remindFrom: LocalTime = LocalTime(0, 0),
-        val remindUntil: LocalTime = LocalTime(1, 0),
-        val remindIntervalMinutes: Int = 1,
+        val remindFrom: LocalTime = LocalTime(DEFAULT_HOUR_START, 0),
+        val remindUntil: LocalTime = LocalTime(DEFAULT_HOUR_END, 0),
+        val remindIntervalMinutes: Int = 20,
         val selectedDays: List<DayOfWeek> = DayOfWeek.entries.toList(),
         val createdReminders: List<Reminder> = emptyList(),
     )
 
     sealed class Label {
         data class ErrorCaught(val exception: Throwable) : Label()
+    }
+
+    private companion object {
+        const val DEFAULT_HOUR_START = 9
+        const val DEFAULT_HOUR_END = 18
     }
 }

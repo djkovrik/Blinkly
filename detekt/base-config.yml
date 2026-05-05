@@ -628,7 +628,7 @@ style:
     ignoreEnums: true
     ignoreRanges: false
     ignoreExtensionFunctions: true
-    ignoreAnnotated: ['Preview']
+    ignoreAnnotated: ['Preview', 'PreviewContent']
   MandatoryBracesLoops:
     active: false
   MaxChainedCallsOnSameLine:
