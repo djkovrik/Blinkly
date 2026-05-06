@@ -1,1 +1,1 @@
-D:/Sources/Android/Blinkly/AGENTS.md
+AGENTS.md
