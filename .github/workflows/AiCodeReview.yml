@@ -1,0 +1,30 @@
+name: AiCodeReview
+
+on:
+  pull_request_target:
+    branches: [ master ]
+    types: [ opened, reopened, synchronize, ready_for_review ]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+
+jobs:
+  review:
+    name: AI code review
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_REVIEW_MODEL: gpt-5.4-mini
+      MAX_REVIEW_CHARS: 120000
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Check out base branch
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Run AI code review
+        run: node .github/scripts/ai-code-review.mjs
