@@ -8,6 +8,7 @@ const openAiKey = env.OPENAI_API_KEY;
 const repository = env.GITHUB_REPOSITORY;
 const prNumber = env.PR_NUMBER;
 const prHeadSha = env.PR_HEAD_SHA || env.GITHUB_SHA || 'unknown';
+const stepSummaryPath = env.GITHUB_STEP_SUMMARY;
 const model = env.OPENAI_REVIEW_MODEL || DEFAULT_MODEL;
 const maxReviewChars = Number(env.MAX_REVIEW_CHARS || DEFAULT_MAX_REVIEW_CHARS);
 
@@ -30,7 +31,7 @@ async function main() {
   const { diffText, truncated, includedFiles, skippedFiles } = buildReviewDiff(files);
 
   if (!diffText.trim()) {
-    await upsertComment(renderComment({
+    await publishComment(renderComment({
       summary: 'No reviewable text diff was found.',
       findings: [],
       truncated,
@@ -41,7 +42,7 @@ async function main() {
   }
 
   const review = await requestOpenAiReview(agentGuide, diffText, truncated);
-  await upsertComment(renderComment({
+  await publishComment(renderComment({
     summary: review.summary,
     findings: review.findings,
     truncated,
@@ -310,10 +311,11 @@ function renderComment({ summary, findings, truncated, includedFiles, skippedFil
 async function postDiagnostic(message) {
   if (!githubToken || !repository || !prNumber) {
     console.warn(message);
+    await appendStepSummary(message);
     return;
   }
 
-  await upsertComment([
+  await publishComment([
     MARKER,
     '## AI Code Review',
     '',
@@ -328,6 +330,20 @@ async function tryPostDiagnostic(message) {
     await postDiagnostic(message);
   } catch (error) {
     console.warn(`Could not post AI code review diagnostic: ${formatError(error)}`);
+    await appendStepSummary(message);
+  }
+}
+
+async function publishComment(body) {
+  try {
+    await upsertComment(body);
+  } catch (error) {
+    if (!isPermissionDeniedError(error)) {
+      throw error;
+    }
+
+    console.warn(`Could not post AI code review comment: ${formatError(error)}`);
+    await appendStepSummary(body);
   }
 }
 
@@ -377,7 +393,9 @@ async function githubRequest(url, options = {}) {
 
   const text = await response.text();
   if (!response.ok) {
-    throw new Error(`GitHub API request failed with ${response.status}: ${text}`);
+    const error = new Error(`GitHub API request failed with ${response.status}: ${text}`);
+    error.githubStatus = response.status;
+    throw error;
   }
   return text ? JSON.parse(text) : null;
 }
@@ -388,6 +406,20 @@ function githubApiUrl(path, query = {}) {
     url.searchParams.set(key, value);
   }
   return url;
+}
+
+async function appendStepSummary(markdown) {
+  if (!stepSummaryPath) {
+    console.warn(markdown);
+    return;
+  }
+
+  const fs = await import('node:fs/promises');
+  await fs.appendFile(stepSummaryPath, `${markdown}\n`, 'utf8');
+}
+
+function isPermissionDeniedError(error) {
+  return error && error.githubStatus === 403;
 }
 
 function normalizeSeverity(severity) {
