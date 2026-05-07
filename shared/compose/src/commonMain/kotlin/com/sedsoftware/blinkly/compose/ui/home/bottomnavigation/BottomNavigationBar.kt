@@ -53,7 +53,6 @@ internal fun BottomNavigationBar(
     activeTab: HomeScreenTab,
     onTabClick: (HomeScreenTab) -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = MaterialTheme.colorScheme.primary,
     inactiveContentColor: Color = MaterialTheme.colorScheme.tertiary,
     indicatorSize: Dp = 8.dp,
@@ -62,9 +61,8 @@ internal fun BottomNavigationBar(
 
     BoxWithConstraints(
         modifier = modifier
-            .background(color = backgroundColor)
             .navigationBarsPadding()
-            .height(height = 76.dp),
+            .height(height = 84.dp),
     ) {
         val itemWidth: Dp = maxWidth / tabs.size
         val indicatorPosition: Float by animateFloatAsState(
@@ -76,7 +74,7 @@ internal fun BottomNavigationBar(
             verticalAlignment = Alignment.Top,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(height = 76.dp),
+                .height(height = 84.dp),
         ) {
             tabs.forEach { tab ->
                 BottomNavigationBarItem(
@@ -92,7 +90,7 @@ internal fun BottomNavigationBar(
 
         Box(
             modifier = Modifier
-                .offset(y = 68.dp)
+                .offset(y = 70.dp)
                 .fillMaxWidth()
                 .height(height = indicatorSize)
                 .bottomNavigationWormTransition(
@@ -123,33 +121,39 @@ private fun BottomNavigationBarItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
         modifier = modifier
-            .height(height = 76.dp)
+            .height(height = 84.dp)
             .clip(shape = MaterialTheme.shapes.small)
             .clickableOnce(onClick = onClick)
-            .padding(top = 8.dp),
+            .padding(top = 4.dp),
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.size(size = 36.dp),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
         ) {
-            Icon(
-                painter = painterResource(resource = tab.iconRes),
-                contentDescription = null,
-                tint = if (isActive) contentColor else inactiveContentColor,
-                modifier = Modifier.size(size = iconSize),
-            )
-        }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(size = 36.dp),
+            ) {
+                Icon(
+                    painter = painterResource(resource = tab.iconRes),
+                    contentDescription = null,
+                    tint = if (isActive) contentColor else inactiveContentColor,
+                    modifier = Modifier.size(size = iconSize),
+                )
+            }
 
-        Spacer(modifier = Modifier.height(height = 6.dp))
+            Spacer(modifier = Modifier.height(height = 4.dp))
 
-        if (isActive) {
-            Text(
-                text = tab.label,
-                color = contentColor,
-                style = MaterialTheme.typography.labelSmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (isActive) {
+                Text(
+                    text = tab.label,
+                    color = contentColor,
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }
