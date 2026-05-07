@@ -233,7 +233,7 @@ private fun BottomNavigationBarPreviewDark() {
 
 @Composable
 private fun BottomNavigationBarPreviewContent() {
-    var activeTab: HomeScreenTab by remember { mutableStateOf(HomeScreenTab.MAIN) }
+    var activeTab: HomeScreenTab by remember { mutableStateOf(HomeScreenTab.TRAININGS) }
 
     Column(
         modifier = Modifier
