@@ -6,6 +6,7 @@ import assertk.assertions.isTrue
 import com.sedsoftware.blinkly.domain.fakes.FakeData
 import com.sedsoftware.blinkly.domain.base.BaseAchievementTest
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
+import com.sedsoftware.blinkly.domain.model.AchievementType
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -17,6 +18,7 @@ internal class MasterOfClarityTest : BaseAchievementTest() {
     fun `when calendar and achievements match logic then unlocked`() = runTest {
         // given
         val achievements = FakeData.getFullAchievementsList(now)
+            .filter { it.type != AchievementType.MASTER_OF_CLARITY }
         // when
         val unlocked = achievement.unlocked(achievements, emptyCalendar)
         // then
