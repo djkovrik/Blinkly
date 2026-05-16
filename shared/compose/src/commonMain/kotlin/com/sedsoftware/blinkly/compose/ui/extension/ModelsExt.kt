@@ -185,6 +185,7 @@ fun DayOfWeek.asLabel(): String =
     }
 
 @Composable
+@Suppress("CyclomaticComplexMethod")
 fun AchievementType.asImage(): DrawableResource =
     when (this) {
         AchievementType.FIRST_SPARK -> Res.drawable.achievement1_first_spark
@@ -230,6 +231,7 @@ fun AchievementType.asImage(): DrawableResource =
     }
 
 @Composable
+@Suppress("CyclomaticComplexMethod")
 fun AchievementType.asTitle(): String =
     when (this) {
         AchievementType.FIRST_SPARK -> stringResource(Res.string.achievement1_first_spark)
@@ -275,6 +277,7 @@ fun AchievementType.asTitle(): String =
     }
 
 @Composable
+@Suppress("CyclomaticComplexMethod")
 fun AchievementType.asDescription(): String =
     when (this) {
         AchievementType.FIRST_SPARK -> stringResource(Res.string.achievement1_first_spark_description)
@@ -330,6 +333,7 @@ fun AchievementLevel.asLabel(): String =
     }
 
 @Composable
+@Suppress("CyclomaticComplexMethod")
 fun Tree.asImage(): DrawableResource =
     when (type) {
         TreeType.FRAXINUS_EXCELSIOR ->
