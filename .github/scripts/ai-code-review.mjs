@@ -1,6 +1,8 @@
 const MARKER = '<!-- blinkly-ai-code-review -->';
-const DEFAULT_MODEL = 'gpt-5.4-mini';
-const DEFAULT_MAX_REVIEW_CHARS = 120000;
+const DEFAULT_MODEL = 'gpt-5.4-nano';
+const DEFAULT_MAX_REVIEW_CHARS = 24000;
+const DEFAULT_MAX_AGENT_GUIDE_CHARS = 12000;
+const DEFAULT_MAX_OUTPUT_TOKENS = 2000;
 
 const env = process.env;
 const githubToken = env.GITHUB_TOKEN;
@@ -11,6 +13,8 @@ const prHeadSha = env.PR_HEAD_SHA || env.GITHUB_SHA || 'unknown';
 const stepSummaryPath = env.GITHUB_STEP_SUMMARY;
 const model = env.OPENAI_REVIEW_MODEL || DEFAULT_MODEL;
 const maxReviewChars = Number(env.MAX_REVIEW_CHARS || DEFAULT_MAX_REVIEW_CHARS);
+const maxAgentGuideChars = Number(env.MAX_AGENT_GUIDE_CHARS || DEFAULT_MAX_AGENT_GUIDE_CHARS);
+const maxOutputTokens = Number(env.OPENAI_MAX_OUTPUT_TOKENS || DEFAULT_MAX_OUTPUT_TOKENS);
 
 main().catch(async (error) => {
   console.error(error);
@@ -26,7 +30,10 @@ async function main() {
     return;
   }
 
-  const agentGuide = await readTextFile('AGENTS.md');
+  const agentGuide = truncateText(
+    await readTextFile('AGENTS.md'),
+    sanitizePositiveNumber(maxAgentGuideChars, DEFAULT_MAX_AGENT_GUIDE_CHARS),
+  );
   const files = await fetchPullRequestFiles();
   const { diffText, truncated, includedFiles, skippedFiles } = buildReviewDiff(files);
 
@@ -82,9 +89,7 @@ async function fetchPullRequestFiles() {
 function buildReviewDiff(files) {
   const included = [];
   const skipped = [];
-  let remaining = Number.isFinite(maxReviewChars) && maxReviewChars > 0
-    ? maxReviewChars
-    : DEFAULT_MAX_REVIEW_CHARS;
+  let remaining = sanitizePositiveNumber(maxReviewChars, DEFAULT_MAX_REVIEW_CHARS);
   let truncated = false;
   let text = '';
 
@@ -129,6 +134,18 @@ function buildReviewDiff(files) {
   };
 }
 
+function sanitizePositiveNumber(value, fallback) {
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+function truncateText(text, maxChars) {
+  if (typeof text !== 'string' || text.length <= maxChars) {
+    return text;
+  }
+
+  return `${text.slice(0, maxChars)}\n\n[Truncated to ${maxChars} characters for the AI review prompt budget.]`;
+}
+
 async function requestOpenAiReview(agentGuide, diffText, truncated) {
   const payload = {
     model,
@@ -157,7 +174,7 @@ async function requestOpenAiReview(agentGuide, diffText, truncated) {
         ],
       },
     ],
-    max_output_tokens: 6000,
+    max_output_tokens: sanitizePositiveNumber(maxOutputTokens, DEFAULT_MAX_OUTPUT_TOKENS),
     text: {
       format: {
         type: 'json_schema',

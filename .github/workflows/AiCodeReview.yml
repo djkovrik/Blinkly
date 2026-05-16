@@ -18,8 +18,10 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      OPENAI_REVIEW_MODEL: gpt-5.4-mini
-      MAX_REVIEW_CHARS: 120000
+      OPENAI_REVIEW_MODEL: gpt-5.4-nano
+      MAX_REVIEW_CHARS: 24000
+      MAX_AGENT_GUIDE_CHARS: 12000
+      OPENAI_MAX_OUTPUT_TOKENS: 2000
       PR_NUMBER: ${{ github.event.pull_request.number }}
       PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
     steps:
