@@ -3,6 +3,30 @@ const DEFAULT_MODEL = 'gpt-5.4-nano';
 const DEFAULT_MAX_REVIEW_CHARS = 24000;
 const DEFAULT_MAX_AGENT_GUIDE_CHARS = 12000;
 const DEFAULT_MAX_OUTPUT_TOKENS = 2000;
+const DEFAULT_EXCLUDED_EXTENSIONS = [
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  '.avif',
+  '.ico',
+  '.pdf',
+  '.zip',
+  '.gz',
+  '.tgz',
+  '.mp3',
+  '.mp4',
+  '.mov',
+  '.webm',
+  '.ttf',
+  '.otf',
+  '.woff',
+  '.woff2',
+];
+const DEFAULT_EXCLUDED_PATHS = [
+  'gradle/wrapper/gradle-wrapper.jar',
+];
 
 const env = process.env;
 const githubToken = env.GITHUB_TOKEN;
@@ -15,6 +39,9 @@ const model = env.OPENAI_REVIEW_MODEL || DEFAULT_MODEL;
 const maxReviewChars = Number(env.MAX_REVIEW_CHARS || DEFAULT_MAX_REVIEW_CHARS);
 const maxAgentGuideChars = Number(env.MAX_AGENT_GUIDE_CHARS || DEFAULT_MAX_AGENT_GUIDE_CHARS);
 const maxOutputTokens = Number(env.OPENAI_MAX_OUTPUT_TOKENS || DEFAULT_MAX_OUTPUT_TOKENS);
+const excludedExtensions = parseListEnv(env.AI_REVIEW_EXCLUDED_EXTENSIONS, DEFAULT_EXCLUDED_EXTENSIONS)
+  .map((extension) => extension.toLowerCase());
+const excludedPaths = parseListEnv(env.AI_REVIEW_EXCLUDED_PATHS, DEFAULT_EXCLUDED_PATHS);
 
 main().catch(async (error) => {
   console.error(error);
@@ -94,6 +121,12 @@ function buildReviewDiff(files) {
   let text = '';
 
   for (const file of files) {
+    const skipReason = getReviewSkipReason(file.filename);
+    if (skipReason) {
+      skipped.push(`${file.filename} (${file.status}, ${skipReason})`);
+      continue;
+    }
+
     if (!file.patch) {
       skipped.push(`${file.filename} (${file.status}, no text patch)`);
       continue;
@@ -132,6 +165,32 @@ function buildReviewDiff(files) {
     includedFiles: included,
     skippedFiles: skipped,
   };
+}
+
+function getReviewSkipReason(filename) {
+  const normalized = filename.replaceAll('\\', '/');
+  const lower = normalized.toLowerCase();
+
+  if (excludedPaths.some((path) => normalized === path || normalized.startsWith(`${path}/`))) {
+    return 'excluded path';
+  }
+
+  if (excludedExtensions.some((extension) => lower.endsWith(extension))) {
+    return 'excluded file type';
+  }
+
+  return '';
+}
+
+function parseListEnv(value, fallback) {
+  if (typeof value !== 'string' || !value.trim()) {
+    return fallback;
+  }
+
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 function sanitizePositiveNumber(value, fallback) {

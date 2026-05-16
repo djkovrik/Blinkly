@@ -22,6 +22,8 @@ jobs:
       MAX_REVIEW_CHARS: 24000
       MAX_AGENT_GUIDE_CHARS: 12000
       OPENAI_MAX_OUTPUT_TOKENS: 2000
+      AI_REVIEW_EXCLUDED_EXTENSIONS: .png,.jpg,.jpeg,.gif,.webp,.avif,.ico,.pdf,.zip,.gz,.tgz,.mp3,.mp4,.mov,.webm,.ttf,.otf,.woff,.woff2
+      AI_REVIEW_EXCLUDED_PATHS: gradle/wrapper/gradle-wrapper.jar
       PR_NUMBER: ${{ github.event.pull_request.number }}
       PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
     steps:
