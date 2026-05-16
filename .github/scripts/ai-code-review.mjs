@@ -1,6 +1,44 @@
 const MARKER = '<!-- blinkly-ai-code-review -->';
-const DEFAULT_MODEL = 'gpt-5.4-mini';
-const DEFAULT_MAX_REVIEW_CHARS = 120000;
+const DEFAULT_MODEL = 'gpt-5.4-nano';
+const DEFAULT_MAX_REVIEW_CHARS = 24000;
+const DEFAULT_MAX_AGENT_GUIDE_CHARS = 12000;
+const DEFAULT_MAX_OUTPUT_TOKENS = 2000;
+const AGENT_GUIDE_REVIEW_SECTIONS = [
+  'Project Summary',
+  'Repository Layout',
+  'Module Map',
+  'Architecture Rules',
+  'Agent Operating Rules',
+  'Decompose Conventions',
+  'MVIKotlin Conventions',
+  'Compose Conventions',
+  'Testing Conventions',
+  'Change Guidance For Agents',
+];
+const DEFAULT_EXCLUDED_EXTENSIONS = [
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  '.avif',
+  '.ico',
+  '.pdf',
+  '.zip',
+  '.gz',
+  '.tgz',
+  '.mp3',
+  '.mp4',
+  '.mov',
+  '.webm',
+  '.ttf',
+  '.otf',
+  '.woff',
+  '.woff2',
+];
+const DEFAULT_EXCLUDED_PATHS = [
+  'gradle/wrapper/gradle-wrapper.jar',
+];
 
 const env = process.env;
 const githubToken = env.GITHUB_TOKEN;
@@ -11,6 +49,12 @@ const prHeadSha = env.PR_HEAD_SHA || env.GITHUB_SHA || 'unknown';
 const stepSummaryPath = env.GITHUB_STEP_SUMMARY;
 const model = env.OPENAI_REVIEW_MODEL || DEFAULT_MODEL;
 const maxReviewChars = Number(env.MAX_REVIEW_CHARS || DEFAULT_MAX_REVIEW_CHARS);
+const maxAgentGuideChars = Number(env.MAX_AGENT_GUIDE_CHARS || DEFAULT_MAX_AGENT_GUIDE_CHARS);
+const maxOutputTokens = Number(env.OPENAI_MAX_OUTPUT_TOKENS || DEFAULT_MAX_OUTPUT_TOKENS);
+const excludedExtensions = parseListEnv(env.AI_REVIEW_EXCLUDED_EXTENSIONS, DEFAULT_EXCLUDED_EXTENSIONS)
+  .map((extension) => extension.toLowerCase());
+const excludedPathPatterns = parseListEnv(env.AI_REVIEW_EXCLUDED_PATHS, DEFAULT_EXCLUDED_PATHS)
+  .map((pattern) => normalizeRepositoryPath(pattern).toLowerCase());
 
 main().catch(async (error) => {
   console.error(error);
@@ -26,7 +70,10 @@ async function main() {
     return;
   }
 
-  const agentGuide = await readTextFile('AGENTS.md');
+  const agentGuide = compactAgentGuide(
+    await readTextFile('AGENTS.md'),
+    sanitizePositiveNumber(maxAgentGuideChars, DEFAULT_MAX_AGENT_GUIDE_CHARS),
+  );
   const files = await fetchPullRequestFiles();
   const { diffText, truncated, includedFiles, skippedFiles } = buildReviewDiff(files);
 
@@ -82,13 +129,17 @@ async function fetchPullRequestFiles() {
 function buildReviewDiff(files) {
   const included = [];
   const skipped = [];
-  let remaining = Number.isFinite(maxReviewChars) && maxReviewChars > 0
-    ? maxReviewChars
-    : DEFAULT_MAX_REVIEW_CHARS;
+  let remaining = sanitizePositiveNumber(maxReviewChars, DEFAULT_MAX_REVIEW_CHARS);
   let truncated = false;
   let text = '';
 
   for (const file of files) {
+    const skipReason = getReviewSkipReason(file.filename);
+    if (skipReason) {
+      skipped.push(`${file.filename} (${file.status}, ${skipReason})`);
+      continue;
+    }
+
     if (!file.patch) {
       skipped.push(`${file.filename} (${file.status}, no text patch)`);
       continue;
@@ -129,6 +180,131 @@ function buildReviewDiff(files) {
   };
 }
 
+function getReviewSkipReason(filename) {
+  const normalized = normalizeRepositoryPath(filename);
+  const lower = normalized.toLowerCase();
+
+  if (excludedPathPatterns.some((pattern) => matchesPathPattern(lower, pattern))) {
+    return 'excluded path';
+  }
+
+  if (excludedExtensions.some((extension) => lower.endsWith(extension))) {
+    return 'excluded file type';
+  }
+
+  return '';
+}
+
+function normalizeRepositoryPath(path) {
+  return path
+    .replaceAll('\\', '/')
+    .split('/')
+    .filter((segment) => segment && segment !== '.')
+    .join('/');
+}
+
+function matchesPathPattern(path, pattern) {
+  if (!pattern.includes('*')) {
+    return path === pattern || path.startsWith(`${pattern}/`);
+  }
+
+  return globPatternToRegExp(pattern).test(path);
+}
+
+function globPatternToRegExp(pattern) {
+  let source = '^';
+
+  for (let index = 0; index < pattern.length; index += 1) {
+    const char = pattern[index];
+    const next = pattern[index + 1];
+
+    if (char === '*' && next === '*') {
+      source += '.*';
+      index += 1;
+    } else if (char === '*') {
+      source += '[^/]*';
+    } else {
+      source += escapeRegExp(char);
+    }
+  }
+
+  return new RegExp(`${source}$`);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function parseListEnv(value, fallback) {
+  if (typeof value !== 'string' || !value.trim()) {
+    return fallback;
+  }
+
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function sanitizePositiveNumber(value, fallback) {
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+function compactAgentGuide(text, maxChars) {
+  if (typeof text !== 'string' || text.length <= maxChars) {
+    return text;
+  }
+
+  const sections = extractMarkdownSections(text);
+  const selectedSections = AGENT_GUIDE_REVIEW_SECTIONS
+    .map((title) => sections.get(title))
+    .filter(Boolean);
+
+  if (selectedSections.length === 0) {
+    return truncateText(text, maxChars, 'AGENTS.md truncated for the AI review prompt budget.');
+  }
+
+  const header = [
+    '[AGENTS.md compacted for the AI review prompt budget.]',
+    '[Included review-critical sections by heading instead of taking the first characters only.]',
+    '',
+  ].join('\n');
+  const separatorBudget = Math.max(0, selectedSections.length - 1) * 2;
+  const availableSectionChars = maxChars - header.length - separatorBudget;
+  const perSectionLimit = Math.max(1, Math.floor(availableSectionChars / selectedSections.length));
+  const compacted = header + selectedSections
+    .map((section) => truncateText(section.trim(), perSectionLimit, 'Section truncated for the AI review prompt budget.'))
+    .join('\n\n');
+
+  return truncateText(compacted, maxChars, 'Compacted AGENTS.md truncated for the AI review prompt budget.');
+}
+
+function extractMarkdownSections(text) {
+  const sections = new Map();
+  const matches = [...text.matchAll(/^##\s+(.+)$/gm)];
+
+  for (let index = 0; index < matches.length; index += 1) {
+    const match = matches[index];
+    const nextMatch = matches[index + 1];
+    const title = match[1].trim();
+    const start = match.index;
+    const end = nextMatch ? nextMatch.index : text.length;
+
+    sections.set(title, text.slice(start, end).trim());
+  }
+
+  return sections;
+}
+
+function truncateText(text, maxChars, reason) {
+  if (typeof text !== 'string' || text.length <= maxChars) {
+    return text;
+  }
+
+  const suffix = `\n\n[${reason}]`;
+  return `${text.slice(0, Math.max(0, maxChars - suffix.length))}${suffix}`;
+}
+
 async function requestOpenAiReview(agentGuide, diffText, truncated) {
   const payload = {
     model,
@@ -157,7 +333,7 @@ async function requestOpenAiReview(agentGuide, diffText, truncated) {
         ],
       },
     ],
-    max_output_tokens: 6000,
+    max_output_tokens: sanitizePositiveNumber(maxOutputTokens, DEFAULT_MAX_OUTPUT_TOKENS),
     text: {
       format: {
         type: 'json_schema',
