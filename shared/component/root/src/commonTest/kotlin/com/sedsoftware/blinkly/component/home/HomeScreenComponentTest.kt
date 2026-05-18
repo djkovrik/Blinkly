@@ -36,7 +36,7 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
         // then
         assertThat(component.childStack.active.instance is HomeScreenComponent.Child.MainTab).isTrue()
         // when
-        component.onTabClick(HomeScreenTab.TRAININGS)
+        component.onTabClick(HomeScreenTab.TRAINING)
         // then
         assertThat(component.childStack.active.instance is HomeScreenComponent.Child.TrainingsTab).isTrue()
         // when

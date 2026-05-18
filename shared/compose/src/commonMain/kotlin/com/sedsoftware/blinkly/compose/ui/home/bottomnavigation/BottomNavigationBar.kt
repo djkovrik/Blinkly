@@ -39,6 +39,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import blinkly.shared.compose.generated.resources.Res
 import blinkly.shared.compose.generated.resources.tab_main
+import blinkly.shared.compose.generated.resources.tab_name_main
+import blinkly.shared.compose.generated.resources.tab_name_progress
+import blinkly.shared.compose.generated.resources.tab_name_reminders
+import blinkly.shared.compose.generated.resources.tab_name_training
 import blinkly.shared.compose.generated.resources.tab_progress
 import blinkly.shared.compose.generated.resources.tab_reminders
 import blinkly.shared.compose.generated.resources.tab_trainings
@@ -46,7 +50,9 @@ import com.sedsoftware.blinkly.component.home.model.HomeScreenTab
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import com.sedsoftware.blinkly.compose.ui.extension.clickableOnce
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun BottomNavigationBar(
@@ -147,7 +153,7 @@ private fun BottomNavigationBarItem(
 
             if (isActive) {
                 Text(
-                    text = tab.label,
+                    text = stringResource(resource = tab.labelRes),
                     color = contentColor,
                     style = MaterialTheme.typography.labelSmall,
                     maxLines = 1,
@@ -160,7 +166,7 @@ private fun BottomNavigationBarItem(
 
 private data class BottomNavigationTab(
     val type: HomeScreenTab,
-    val label: String,
+    val labelRes: StringResource,
     val iconRes: DrawableResource,
 )
 
@@ -168,22 +174,22 @@ private fun bottomNavigationTabs(): List<BottomNavigationTab> =
     listOf(
         BottomNavigationTab(
             type = HomeScreenTab.MAIN,
-            label = "Main",
+            labelRes = Res.string.tab_name_main,
             iconRes = Res.drawable.tab_main,
         ),
         BottomNavigationTab(
-            type = HomeScreenTab.TRAININGS,
-            label = "Trainings",
+            type = HomeScreenTab.TRAINING,
+            labelRes = Res.string.tab_name_training,
             iconRes = Res.drawable.tab_trainings,
         ),
         BottomNavigationTab(
             type = HomeScreenTab.PROGRESS,
-            label = "Progress",
+            labelRes = Res.string.tab_name_progress,
             iconRes = Res.drawable.tab_progress,
         ),
         BottomNavigationTab(
             type = HomeScreenTab.REMINDERS,
-            label = "Reminders",
+            labelRes = Res.string.tab_name_reminders,
             iconRes = Res.drawable.tab_reminders,
         ),
     )
@@ -237,7 +243,7 @@ private fun BottomNavigationBarPreviewDark() {
 
 @Composable
 private fun BottomNavigationBarPreviewContent() {
-    var activeTab: HomeScreenTab by remember { mutableStateOf(HomeScreenTab.TRAININGS) }
+    var activeTab: HomeScreenTab by remember { mutableStateOf(HomeScreenTab.TRAINING) }
 
     Column(
         modifier = Modifier

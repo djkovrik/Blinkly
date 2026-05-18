@@ -86,7 +86,7 @@ class HomeScreenComponentDefault private constructor(
     override fun onTabClick(tab: HomeScreenTab) {
         when (tab) {
             HomeScreenTab.MAIN -> navigation.bringToFront(Config.MainTab)
-            HomeScreenTab.TRAININGS -> navigation.bringToFront(Config.TrainingsTab)
+            HomeScreenTab.TRAINING -> navigation.bringToFront(Config.TrainingsTab)
             HomeScreenTab.PROGRESS -> navigation.bringToFront(Config.ProgressTab)
             HomeScreenTab.REMINDERS -> navigation.bringToFront(Config.RemindersTab)
         }

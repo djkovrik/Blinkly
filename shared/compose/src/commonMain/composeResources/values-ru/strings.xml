@@ -71,6 +71,12 @@
     <string name="week_saturday">СБ</string>
     <string name="week_sunday">ВС</string>
 
+    <!-- Bottom navigation -->
+    <string name="tab_name_main">Главная</string>
+    <string name="tab_name_training">Тренировки</string>
+    <string name="tab_name_progress">Прогресс</string>
+    <string name="tab_name_reminders">Напоминания</string>
+
     <!-- Achievements -->
     <string name="achievement1_first_spark">Первая искра</string>
     <string name="achievement1_first_spark_description">Выполнить первую тренировку (любое упражнение)</string>

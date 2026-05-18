@@ -26,7 +26,7 @@ internal fun HomeScreenContent(
     val activeComponent: HomeScreenComponent.Child = stack.active.instance
     val activeTab: HomeScreenTab = when (activeComponent) {
         is HomeScreenComponent.Child.MainTab -> HomeScreenTab.MAIN
-        is HomeScreenComponent.Child.TrainingsTab -> HomeScreenTab.TRAININGS
+        is HomeScreenComponent.Child.TrainingsTab -> HomeScreenTab.TRAINING
         is HomeScreenComponent.Child.ProgressTab -> HomeScreenTab.PROGRESS
         is HomeScreenComponent.Child.RemindersTab -> HomeScreenTab.REMINDERS
     }

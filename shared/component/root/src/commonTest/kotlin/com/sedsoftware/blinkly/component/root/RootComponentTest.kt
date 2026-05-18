@@ -92,7 +92,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     fun `when block A clicked then navigation stack updated`() = runTest(testScheduler) {
         // given
         completeOnboardingFlow(component)
-        switchTab(HomeScreenTab.TRAININGS)
+        switchTab(HomeScreenTab.TRAINING)
         val homeScreenChild = component.childStack.active.instance as RootComponent.Child.HomeScreen
         val currentTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.TrainingsTab
         // when
@@ -109,7 +109,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     fun `when block B clicked then navigation stack updated`() = runTest(testScheduler) {
         // given
         completeOnboardingFlow(component)
-        switchTab(HomeScreenTab.TRAININGS)
+        switchTab(HomeScreenTab.TRAINING)
         val homeScreenChild = component.childStack.active.instance as RootComponent.Child.HomeScreen
         val currentTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.TrainingsTab
         // when
@@ -126,7 +126,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     fun `when block C clicked then navigation stack updated`() = runTest(testScheduler) {
         // given
         completeOnboardingFlow(component)
-        switchTab(HomeScreenTab.TRAININGS)
+        switchTab(HomeScreenTab.TRAINING)
         val homeScreenChild = component.childStack.active.instance as RootComponent.Child.HomeScreen
         val currentTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.TrainingsTab
         // when

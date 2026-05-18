@@ -74,6 +74,12 @@
     <string name="week_saturday">SA</string>
     <string name="week_sunday">SU</string>
 
+    <!-- Bottom navigation -->
+    <string name="tab_name_main">Main</string>
+    <string name="tab_name_training">Training</string>
+    <string name="tab_name_progress">Progress</string>
+    <string name="tab_name_reminders">Reminders</string>
+
     <!-- Achievements -->
     <string name="achievement1_first_spark">First spark</string>
     <string name="achievement1_first_spark_description">Complete your first workout (any exercise)</string>
