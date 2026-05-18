@@ -13,6 +13,7 @@ sealed class ComponentOutput {
 
     sealed class Main : ComponentOutput() {
         data object OpenPreferences : Main()
+        data object OpenProgressTab : Main()
     }
 
     sealed class Trainings : ComponentOutput() {
