@@ -23,6 +23,13 @@ Navigation-heavy tests:
 Simple shell/skeleton component test:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/home/HomeScreenComponentTest.kt`
 
+## Test location
+
+Put Blinkly component tests under `shared/component/root/src/commonTest`, even
+when the component under test belongs to another component module. The root
+component module owns the shared `ComponentTest` harness and already depends on
+the component modules needed for cross-component navigation tests.
+
 ## Default test harness
 
 Extend `ComponentTest<ComponentType>`.

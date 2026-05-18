@@ -50,6 +50,7 @@ Create an internal Store contract:
 - `internal interface FeatureStore : Store<Intent, State, Label>`
 - keep `Intent`, `State`, and `Label` nested inside the Store interface
 - use `Nothing` for labels when the feature has no one-off events
+- keep Store contracts independent from component UI contracts: `State` must not reference `Component.Model` or other component-facing model classes
 
 Create a provider class:
 - name it `FeatureStoreProvider`
@@ -97,6 +98,7 @@ Expose UI state as:
 - `store.asValue().map(stateToModel)`
 
 Keep the mapper in `integration/Mappers.kt`.
+Build the public component `Model` only in this mapper from Store fields. The Store may keep raw feature fields or feature/domain snapshots, but it should not store the component `Model` directly.
 The component should:
 - translate UI actions into Store intents
 - translate Store labels into parent outputs only if a parent actually needs the event
@@ -120,8 +122,9 @@ Do not leak platform-specific exceptions into Compose.
 
 ## Testing expectations
 
-If the Store has non-trivial behaviour, cover it through component tests in `commonTest`.
+If the Store has non-trivial behaviour, cover it through component tests in `shared/component/root/src/commonTest`, even when the component itself lives in another module.
 Reference:
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/ComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/onboarding/OnboardingComponentTest.kt`
 
 Test these behaviours:

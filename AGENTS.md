@@ -104,11 +104,12 @@ Apply these rules by default when changing Blinkly code:
 - Prefer a thin Decompose component without MVIKotlin when the feature only forwards user actions to `ComponentOutput`.
 - Add MVIKotlin only when the feature needs reducer-owned state, async work, startup subscriptions, or one-off labels.
 - Retain Stores with `instanceKeeper.getStore { ... }` and expose UI state through `store.asValue().map(stateToModel)`.
+- Keep Store contracts independent from component UI contracts. Do not put `Component.Model` or other component-facing UI models into Store `State`; keep Store state as raw feature fields or feature/domain state and build the component `Model` only in `integration/Mappers.kt`.
 - Keep Store reducers pure. Put side effects, subscriptions, and IO switching in the executor.
 - Route cross-component events upward through `ComponentOutput`; do not let child components manipulate parent navigation directly.
 - Keep dependencies in constructors and root or parent factories; never place dependencies into Decompose navigation configs.
 - Keep Compose as a rendering layer only. Do not move business logic, navigation decisions, or mutable feature state into composables.
-- Cover Decompose behaviour in `commonTest` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
+- Cover Decompose behaviour in `shared/component/root/src/commonTest`, extending `ComponentTest<T>` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
 
 When unsure whether to follow a generic library pattern or the project pattern, follow the project pattern demonstrated in `step4`, `step5`, and `onboarding`. Treat `home`, `root`, and non-onboarding feature modules as navigation/skeleton references unless the code clearly shows completed behaviour.
 
@@ -232,7 +233,8 @@ Expose component state as Decompose `Value<Model>`.
 Local pattern:
 - `store.asValue().map(stateToModel)`
 - keep `stateToModel` in `integration/Mappers.kt`
-- component `Model` should be UI-oriented and decoupled from raw Store state where practical
+- component `Model` should be UI-oriented and decoupled from raw Store state
+- Store `State` should not reference component interfaces or component `Model` classes; map raw Store fields to component `Model` in `stateToModel`
 
 Utility reference:
 - `shared/utils/src/commonMain/kotlin/com/sedsoftware/blinkly/utils/StoreExt.kt`
@@ -267,6 +269,7 @@ Platform note:
 ## Testing Conventions
 
 Component tests are common tests, not instrumentation tests.
+Local convention: component tests live in `shared/component/root/src/commonTest`, even when the component under test belongs to another component module. This keeps shared component test utilities and cross-component navigation coverage in one module.
 Base test utility:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/ComponentTest.kt`
 
