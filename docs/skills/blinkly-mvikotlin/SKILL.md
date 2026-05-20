@@ -85,6 +85,9 @@ Use these patterns:
 - `onAction<...> { ... }` for bootstrapper actions
 - `launch { ... }` for async work
 - `withContext(ioContext)` for IO or heavier domain calls
+- feature-local managers in component `domain` packages return `Result<T>` from suspend/business operations using `runCatching`
+- handle manager results with `unwrap(result = ..., onSuccess = ..., onError = ...)` in the executor
+- keep manager flow subscriptions as `Flow<T>` and protect them with `.catch { publish(Label.ErrorCaught(it)) }`
 - `publish(Label.ErrorCaught(...))` for one-off failures that should not live in state
 
 `step5` is the reference for subscribing to flows and translating stream updates into `Msg` values, even though its Compose UI is still incomplete.

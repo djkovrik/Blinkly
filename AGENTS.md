@@ -223,6 +223,8 @@ These match both local code and official MVIKotlin guidance:
 - reducer work stays on the main thread
 - switch to `dispatchers.io` inside executor coroutines for IO or long-running operations
 - publish one-off failures through `Label` when they should not live in state
+- feature-local managers in component `domain` packages should wrap suspend/business operations in `Result<T>` via `runCatching`; Store executors handle those results with `unwrap(...)`
+- flow subscriptions may remain as `Flow<T>` from managers and should be protected with `.catch { publish(Label.ErrorCaught(it)) }` in the executor
 
 `step5` is the reference for bootstrapper plus subscriptions.
 `step4` is the reference for a minimal synchronous Store.

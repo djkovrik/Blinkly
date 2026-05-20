@@ -13,6 +13,7 @@ import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.Workout
 import com.sedsoftware.blinkly.utils.StoreProvider
+import com.sedsoftware.blinkly.utils.unwrap
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,10 +43,15 @@ internal class MainTabStoreProvider(
                             .catch { publish(Label.ErrorCaught(it)) }
                             .collect { calendar ->
                                 dispatch(Msg.CalendarUpdated(calendar))
-                                val data = withContext(ioContext) {
-                                    manager.calculateData(calendar)
-                                }
-                                dispatch(Msg.DataUpdated(data))
+                                unwrap(
+                                    result = withContext(ioContext) { manager.calculateData(calendar) },
+                                    onSuccess = { data ->
+                                        dispatch(Msg.DataUpdated(data))
+                                    },
+                                    onError = { throwable ->
+                                        publish(Label.ErrorCaught(throwable))
+                                    }
+                                )
                             }
                     }
                 }
@@ -62,13 +68,15 @@ internal class MainTabStoreProvider(
 
                 onAction<Action.LoadHighlight> {
                     launch {
-                        runCatching {
-                            withContext(ioContext) { manager.getHighlight() }
-                        }.onSuccess { highlight ->
-                            dispatch(Msg.HighlightUpdated(highlight))
-                        }.onFailure { throwable ->
-                            publish(Label.ErrorCaught(throwable))
-                        }
+                        unwrap(
+                            result = withContext(ioContext) { manager.getHighlight() },
+                            onSuccess = { highlight ->
+                                dispatch(Msg.HighlightUpdated(highlight))
+                            },
+                            onError = { throwable ->
+                                publish(Label.ErrorCaught(throwable))
+                            }
+                        )
                     }
                 }
             },

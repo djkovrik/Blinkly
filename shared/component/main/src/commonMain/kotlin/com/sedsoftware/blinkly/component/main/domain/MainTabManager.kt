@@ -39,10 +39,12 @@ internal class MainTabManager(
     val tree: Flow<Tree>
         get() = treeProgressWatcher.tree
 
-    suspend fun getHighlight(): HighlightOfTheDay =
-        highlightsProvider.get()
+    suspend fun getHighlight(): Result<HighlightOfTheDay> =
+        runCatching {
+            highlightsProvider.get()
+        }
 
-    fun calculateData(calendar: List<Workout>): MainTabData {
+    fun calculateData(calendar: List<Workout>): Result<MainTabData> = runCatching {
         val now = timeUtils.now()
         val timeZone = timeUtils.timeZone()
         val today = now.asLocalDate(timeZone)
@@ -52,7 +54,7 @@ internal class MainTabManager(
         val twentyX3Count = exercisesToday.count { it.type == ExerciseType.TWENTY_X3 }
         val palmingCount = exercisesToday.count { it.type == ExerciseType.PALMING }
 
-        return MainTabData(
+        MainTabData(
             greetingPeriod = localTime.toGreetingPeriod(),
             restMinutesToday = exercisesToday.sumRestMinutes(),
             exercisesToday = exercisesToday.size,

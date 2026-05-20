@@ -9,8 +9,8 @@ import assertk.assertions.isTrue
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
-import com.sedsoftware.blinkly.component.main.MainTabComponent.GreetingPeriod
-import com.sedsoftware.blinkly.component.main.MainTabComponent.MainCtaState
+import com.sedsoftware.blinkly.component.main.domain.model.GreetingPeriod
+import com.sedsoftware.blinkly.component.main.domain.model.MainCtaState
 import com.sedsoftware.blinkly.component.main.integration.MainTabComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
