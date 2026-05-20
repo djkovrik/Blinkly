@@ -4,8 +4,8 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineExecutorFactory
-import com.sedsoftware.blinkly.component.main.domain.MainTabData
 import com.sedsoftware.blinkly.component.main.domain.MainTabManager
+import com.sedsoftware.blinkly.component.main.domain.model.MainTabData
 import com.sedsoftware.blinkly.component.main.store.MainTabStore.Intent
 import com.sedsoftware.blinkly.component.main.store.MainTabStore.Label
 import com.sedsoftware.blinkly.component.main.store.MainTabStore.State

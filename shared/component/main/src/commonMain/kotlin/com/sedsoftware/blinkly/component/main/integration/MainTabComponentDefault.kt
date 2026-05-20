@@ -8,9 +8,9 @@ import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.sedsoftware.blinkly.component.main.MainTabComponent
-import com.sedsoftware.blinkly.component.main.MainTabComponent.MainCtaState
 import com.sedsoftware.blinkly.component.main.MainTabComponent.Model
 import com.sedsoftware.blinkly.component.main.domain.MainTabManager
+import com.sedsoftware.blinkly.component.main.domain.model.MainCtaState
 import com.sedsoftware.blinkly.component.main.store.MainTabStore
 import com.sedsoftware.blinkly.component.main.store.MainTabStoreProvider
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
@@ -22,8 +22,8 @@ import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.utils.asValue
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 

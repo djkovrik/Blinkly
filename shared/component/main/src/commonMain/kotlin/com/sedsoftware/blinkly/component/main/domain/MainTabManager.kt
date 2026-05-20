@@ -1,7 +1,8 @@
 package com.sedsoftware.blinkly.component.main.domain
 
-import com.sedsoftware.blinkly.component.main.MainTabComponent.GreetingPeriod
-import com.sedsoftware.blinkly.component.main.MainTabComponent.MainCtaState
+import com.sedsoftware.blinkly.component.main.domain.model.GreetingPeriod
+import com.sedsoftware.blinkly.component.main.domain.model.MainCtaState
+import com.sedsoftware.blinkly.component.main.domain.model.MainTabData
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
@@ -22,17 +23,6 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
-
-internal data class MainTabData(
-    val greetingPeriod: GreetingPeriod,
-    val restMinutesToday: Int,
-    val exercisesToday: Int,
-    val twentyX3Today: Int,
-    val palmingToday: Int,
-    val dailyProgressPercent: Int,
-    val treeGrowthStreakDays: Int,
-    val ctaState: MainCtaState,
-)
 
 @OptIn(ExperimentalTime::class)
 internal class MainTabManager(

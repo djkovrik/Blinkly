@@ -1,8 +1,8 @@
 package com.sedsoftware.blinkly.component.main.store
 
 import com.arkivanov.mvikotlin.core.store.Store
-import com.sedsoftware.blinkly.component.main.MainTabComponent.GreetingPeriod
-import com.sedsoftware.blinkly.component.main.MainTabComponent.MainCtaState
+import com.sedsoftware.blinkly.component.main.domain.model.GreetingPeriod
+import com.sedsoftware.blinkly.component.main.domain.model.MainCtaState
 import com.sedsoftware.blinkly.component.main.store.MainTabStore.Intent
 import com.sedsoftware.blinkly.component.main.store.MainTabStore.Label
 import com.sedsoftware.blinkly.component.main.store.MainTabStore.State
