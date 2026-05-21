@@ -87,6 +87,51 @@ import blinkly.shared.compose.generated.resources.achievement_level_expert
 import blinkly.shared.compose.generated.resources.achievement_level_hidden
 import blinkly.shared.compose.generated.resources.achievement_level_intermediate
 import blinkly.shared.compose.generated.resources.achievement_level_pro
+import blinkly.shared.compose.generated.resources.block_a
+import blinkly.shared.compose.generated.resources.block_a_desc
+import blinkly.shared.compose.generated.resources.block_a_title
+import blinkly.shared.compose.generated.resources.block_b
+import blinkly.shared.compose.generated.resources.block_b_desc
+import blinkly.shared.compose.generated.resources.block_b_title
+import blinkly.shared.compose.generated.resources.block_c
+import blinkly.shared.compose.generated.resources.block_c_desc
+import blinkly.shared.compose.generated.resources.block_c_title
+import blinkly.shared.compose.generated.resources.cta_afternoon_warm_up
+import blinkly.shared.compose.generated.resources.cta_afternoon_warm_up_desc
+import blinkly.shared.compose.generated.resources.cta_day_closing
+import blinkly.shared.compose.generated.resources.cta_day_closing_desc
+import blinkly.shared.compose.generated.resources.cta_evening_relax
+import blinkly.shared.compose.generated.resources.cta_evening_relax_desc
+import blinkly.shared.compose.generated.resources.cta_morning_warmup
+import blinkly.shared.compose.generated.resources.cta_morning_warmup_desc
+import blinkly.shared.compose.generated.resources.cta_perfect_day
+import blinkly.shared.compose.generated.resources.cta_perfect_day_desc
+import blinkly.shared.compose.generated.resources.cta_work_break
+import blinkly.shared.compose.generated.resources.cta_work_break_desc
+import blinkly.shared.compose.generated.resources.exercise_blink_break
+import blinkly.shared.compose.generated.resources.exercise_blink_break_desc
+import blinkly.shared.compose.generated.resources.exercise_clock_rolls
+import blinkly.shared.compose.generated.resources.exercise_clock_rolls_desc
+import blinkly.shared.compose.generated.resources.exercise_diagonal_gazes
+import blinkly.shared.compose.generated.resources.exercise_diagonal_gazes_desc
+import blinkly.shared.compose.generated.resources.exercise_figure_eight
+import blinkly.shared.compose.generated.resources.exercise_figure_eight_desc
+import blinkly.shared.compose.generated.resources.exercise_near_far_focus
+import blinkly.shared.compose.generated.resources.exercise_near_far_focus_desc
+import blinkly.shared.compose.generated.resources.exercise_palming
+import blinkly.shared.compose.generated.resources.exercise_palming_desc
+import blinkly.shared.compose.generated.resources.exercise_twenty_x3
+import blinkly.shared.compose.generated.resources.exercise_twenty_x3_desc
+import blinkly.shared.compose.generated.resources.greetings_afternoon
+import blinkly.shared.compose.generated.resources.greetings_evening
+import blinkly.shared.compose.generated.resources.greetings_morning
+import blinkly.shared.compose.generated.resources.stage_growing
+import blinkly.shared.compose.generated.resources.stage_magnificent
+import blinkly.shared.compose.generated.resources.stage_mature
+import blinkly.shared.compose.generated.resources.stage_small
+import blinkly.shared.compose.generated.resources.stage_strong
+import blinkly.shared.compose.generated.resources.stage_tiny
+import blinkly.shared.compose.generated.resources.stage_young
 import blinkly.shared.compose.generated.resources.tree10_quercus_robur_stage1
 import blinkly.shared.compose.generated.resources.tree10_quercus_robur_stage2
 import blinkly.shared.compose.generated.resources.tree10_quercus_robur_stage3
@@ -157,14 +202,28 @@ import blinkly.shared.compose.generated.resources.tree9_ficus_benjamina_stage4
 import blinkly.shared.compose.generated.resources.tree9_ficus_benjamina_stage5
 import blinkly.shared.compose.generated.resources.tree9_ficus_benjamina_stage6
 import blinkly.shared.compose.generated.resources.tree9_ficus_benjamina_stage7
+import blinkly.shared.compose.generated.resources.tree_adansonia
+import blinkly.shared.compose.generated.resources.tree_betula
+import blinkly.shared.compose.generated.resources.tree_ficus_benjamina
+import blinkly.shared.compose.generated.resources.tree_fraxinus_excelsior
+import blinkly.shared.compose.generated.resources.tree_ginkgo_biloba
+import blinkly.shared.compose.generated.resources.tree_mimosa_pudica
+import blinkly.shared.compose.generated.resources.tree_pinus
+import blinkly.shared.compose.generated.resources.tree_quercus_robur
+import blinkly.shared.compose.generated.resources.tree_salix_babylonica
+import blinkly.shared.compose.generated.resources.tree_sequoia_sempervirens
 import blinkly.shared.compose.generated.resources.week_monday
 import blinkly.shared.compose.generated.resources.week_saturday
 import blinkly.shared.compose.generated.resources.week_sunday
 import blinkly.shared.compose.generated.resources.week_thursday
 import blinkly.shared.compose.generated.resources.week_tuesday
 import blinkly.shared.compose.generated.resources.week_wednesday
+import com.sedsoftware.blinkly.component.main.domain.model.GreetingPeriod
+import com.sedsoftware.blinkly.component.main.domain.model.MainCtaState
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
+import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeStage
 import com.sedsoftware.blinkly.domain.model.TreeType
@@ -330,6 +389,113 @@ fun AchievementLevel.asLabel(): String =
         AchievementLevel.PRO -> stringResource(Res.string.achievement_level_pro)
         AchievementLevel.EXPERT -> stringResource(Res.string.achievement_level_expert)
         AchievementLevel.HIDDEN -> stringResource(Res.string.achievement_level_hidden)
+    }
+
+@Composable
+fun TreeType.asLabel(): String =
+    when (this) {
+        TreeType.FRAXINUS_EXCELSIOR -> stringResource(Res.string.tree_fraxinus_excelsior)
+        TreeType.GINKGO_BILOBA -> stringResource(Res.string.tree_ginkgo_biloba)
+        TreeType.SALIX_BABYLONICA -> stringResource(Res.string.tree_salix_babylonica)
+        TreeType.PINUS -> stringResource(Res.string.tree_pinus)
+        TreeType.ADANSONIA -> stringResource(Res.string.tree_adansonia)
+        TreeType.MIMOSA_PUDICA -> stringResource(Res.string.tree_mimosa_pudica)
+        TreeType.SEQUOIA_SEMPERVIRENS -> stringResource(Res.string.tree_sequoia_sempervirens)
+        TreeType.BETULA -> stringResource(Res.string.tree_betula)
+        TreeType.FICUS_BENJAMINA -> stringResource(Res.string.tree_ficus_benjamina)
+        TreeType.QUERCUS_ROBUR -> stringResource(Res.string.tree_quercus_robur)
+    }
+
+@Composable
+fun TreeStage.asLabel(): String =
+    when (this) {
+        TreeStage.TINY -> stringResource(Res.string.stage_tiny)
+        TreeStage.SMALL -> stringResource(Res.string.stage_small)
+        TreeStage.YOUNG -> stringResource(Res.string.stage_young)
+        TreeStage.GROWING -> stringResource(Res.string.stage_growing)
+        TreeStage.STRONG -> stringResource(Res.string.stage_strong)
+        TreeStage.MATURE -> stringResource(Res.string.stage_mature)
+        TreeStage.MAGNIFICENT -> stringResource(Res.string.stage_magnificent)
+    }
+
+@Composable
+fun GreetingPeriod.asLabel(): String =
+    when (this) {
+        GreetingPeriod.MORNING -> stringResource(Res.string.greetings_morning)
+        GreetingPeriod.DAY -> stringResource(Res.string.greetings_afternoon)
+        GreetingPeriod.EVENING -> stringResource(Res.string.greetings_evening)
+    }
+
+@Composable
+fun MainCtaState.asTitle(): String =
+    when (this) {
+        MainCtaState.MorningWarmUp,
+        MainCtaState.Idle -> stringResource(Res.string.cta_morning_warmup)
+        MainCtaState.WorkBreakDue -> stringResource(Res.string.cta_work_break)
+        MainCtaState.AfternoonWarmUp -> stringResource(Res.string.cta_afternoon_warm_up)
+        MainCtaState.EveningRelax -> stringResource(Res.string.cta_evening_relax)
+        MainCtaState.DayClosing -> stringResource(Res.string.cta_day_closing)
+        MainCtaState.PerfectDay -> stringResource(Res.string.cta_perfect_day)
+    }
+
+@Composable
+fun MainCtaState.asDescription(): String =
+    when (this) {
+        MainCtaState.MorningWarmUp,
+        MainCtaState.Idle -> stringResource(Res.string.cta_morning_warmup_desc)
+        MainCtaState.WorkBreakDue -> stringResource(Res.string.cta_work_break_desc)
+        MainCtaState.AfternoonWarmUp -> stringResource(Res.string.cta_afternoon_warm_up_desc)
+        MainCtaState.EveningRelax -> stringResource(Res.string.cta_evening_relax_desc)
+        MainCtaState.DayClosing -> stringResource(Res.string.cta_day_closing_desc)
+        MainCtaState.PerfectDay -> stringResource(Res.string.cta_perfect_day_desc)
+    }
+
+@Composable
+fun ExerciseBlock.asLabel(): String =
+    when(this) {
+        ExerciseBlock.A -> stringResource(Res.string.block_a)
+        ExerciseBlock.B -> stringResource(Res.string.block_b)
+        ExerciseBlock.C -> stringResource(Res.string.block_c)
+    }
+
+@Composable
+fun ExerciseBlock.asTitle(): String =
+    when(this) {
+        ExerciseBlock.A -> stringResource(Res.string.block_a_title)
+        ExerciseBlock.B -> stringResource(Res.string.block_b_title)
+        ExerciseBlock.C -> stringResource(Res.string.block_c_title)
+    }
+
+@Composable
+fun ExerciseBlock.asDescription(): String =
+    when(this) {
+        ExerciseBlock.A -> stringResource(Res.string.block_a_desc)
+        ExerciseBlock.B -> stringResource(Res.string.block_b_desc)
+        ExerciseBlock.C -> stringResource(Res.string.block_c_desc)
+    }
+
+@Composable
+fun ExerciseType.asTitle(): String =
+    when (this) {
+        ExerciseType.BLINK_BREAK -> stringResource(Res.string.exercise_blink_break)
+        ExerciseType.NEAR_FAR_FOCUS -> stringResource(Res.string.exercise_near_far_focus)
+        ExerciseType.DIAGONAL_GAZES -> stringResource(Res.string.exercise_diagonal_gazes)
+        ExerciseType.FIGURE_EIGHT -> stringResource(Res.string.exercise_figure_eight)
+        ExerciseType.CLOCK_ROLLS -> stringResource(Res.string.exercise_clock_rolls)
+        ExerciseType.PALMING -> stringResource(Res.string.exercise_palming)
+        ExerciseType.TWENTY_X3 -> stringResource(Res.string.exercise_twenty_x3)
+    }
+
+@Composable
+fun ExerciseType.asDescription(): String =
+    when (this) {
+        ExerciseType.BLINK_BREAK -> stringResource(Res.string.exercise_blink_break_desc)
+        ExerciseType.NEAR_FAR_FOCUS -> stringResource(Res.string.exercise_near_far_focus_desc)
+        ExerciseType.DIAGONAL_GAZES -> stringResource(Res.string.exercise_diagonal_gazes_desc)
+        ExerciseType.FIGURE_EIGHT -> stringResource(Res.string.exercise_figure_eight_desc)
+        ExerciseType.CLOCK_ROLLS -> stringResource(Res.string.exercise_clock_rolls_desc)
+        ExerciseType.PALMING -> stringResource(Res.string.exercise_palming_desc)
+        ExerciseType.TWENTY_X3 -> stringResource(Res.string.exercise_twenty_x3_desc)
     }
 
 @Composable

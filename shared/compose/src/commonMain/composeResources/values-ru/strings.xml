@@ -164,4 +164,73 @@
     <string name="achievement_level_pro">Профи</string>
     <string name="achievement_level_expert">Эксперт</string>
     <string name="achievement_level_hidden">Скрытые</string>
+
+    <!-- Main tab -->
+    <string name="tree_fraxinus_excelsior">Ясный взгляд</string>
+    <string name="tree_ginkgo_biloba">Гинкго-зрение</string>
+    <string name="tree_salix_babylonica">Капучая ива</string>
+    <string name="tree_pinus">Зоркая сосна</string>
+    <string name="tree_adansonia">Баобаб-силач</string>
+    <string name="tree_mimosa_pudica">Мимоза-моргалка</string>
+    <string name="tree_sequoia_sempervirens">Высокий фокус</string>
+    <string name="tree_betula">Светлая береза</string>
+    <string name="tree_ficus_benjamina">Фокус-фикус</string>
+    <string name="tree_quercus_robur">Вечный дуб</string>
+
+    <string name="stage_tiny">Крошечное</string>
+    <string name="stage_small">Маленькое</string>
+    <string name="stage_young">Юное</string>
+    <string name="stage_growing">Растущее</string>
+    <string name="stage_strong">Крепкое</string>
+    <string name="stage_mature">Взрослое</string>
+    <string name="stage_magnificent">Величественное</string>
+
+    <string name="greetings_morning">Доброе утро 👋</string>
+    <string name="greetings_afternoon">Добрый день ☕</string>
+    <string name="greetings_evening">Добрый вечер 🌙</string>
+
+    <string name="cta_morning_warmup">Начните день с заботы о глазах</string>
+    <string name="cta_morning_warmup_desc">Короткая разминка поможет снизить напряжение во время работы</string>
+    <string name="cta_work_break">Вашим глазам нужен короткий отдых</string>
+    <string name="cta_work_break_desc">Посмотрите вдаль всего на 20 секунд</string>
+    <string name="cta_afternoon_warm_up">Пора немного размять глаза</string>
+    <string name="cta_afternoon_warm_up_desc">Несколько простых упражнений помогут снять напряжение</string>
+    <string name="cta_evening_relax">Время расслабить глаза</string>
+    <string name="cta_evening_relax_desc">Спокойный вечерний комплекс для снятия напряжения</string>
+    <string name="cta_day_closing">Отличная работа сегодня ✨</string>
+    <string name="cta_day_closing_desc">Ваши глаза уже получили достаточно отдыха</string>
+    <string name="cta_perfect_day">Сегодня вы отлично позаботились о своих глазах</string>
+    <string name="cta_perfect_day_desc">Ваше дерево стало ещё сильнее ✨</string>
+
+    <string name="into_days">д</string>
+    <string name="into_tree_streak">Серия роста:</string>
+    <string name="into_activities">Активностей сегодня:</string>
+    <string name="into_activities_exercises">👁 Упражнения:</string>
+    <string name="into_activities_breaks">⏱ Перерывы 20-20-20:</string>
+    <string name="into_activities_relax">🌙 Релакс:</string>
+
+    <!-- Тренировки и упражнения -->
+    <string name="block_a">Блок А</string>
+    <string name="block_a_title">Разминка на рабочем месте</string>
+    <string name="block_a_desc">Идеально для быстрого перерыва за столом. Не нужно вставать — просто отвлекитесь от экрана.</string>
+    <string name="block_b">Блок Б</string>
+    <string name="block_b_title">Расслабление и отдых</string>
+    <string name="block_b_desc">Успокаивающий вечерний ритуал, чтобы снять напряжение после долгого дня у экрана.</string>
+    <string name="block_c">Блок В</string>
+    <string name="block_c_title">Экспресс-правило 20-20-20</string>
+    <string name="block_c_desc">Золотое правило цифровой гигиены глаз. Используйте его в любое время и в любом месте.</string>
+    <string name="exercise_blink_break">Моргание</string>
+    <string name="exercise_blink_break_desc">Моргайте быстро и мягко. Это увлажняет слезную плёнку и снимает сухость. (За экраном вы моргаете реже — это упражнение всё исправляет!)</string>
+    <string name="exercise_near_far_focus">Фокусировка «Близко-далеко»</string>
+    <string name="exercise_near_far_focus_desc">Держите большой палец в 15 см от носа. Сфокусируйтесь на нём. Затем переведите взгляд на что-то далёкое (в окно или на другой конец комнаты). Задерживайтесь на пару секунд.</string>
+    <string name="exercise_diagonal_gazes">Диагональные взгляды</string>
+    <string name="exercise_diagonal_gazes_desc">Голова неподвижна. Посмотрите вверх-влево, затем вниз-вправо. Повторите в другую сторону: вверх-вправо, затем вниз-влево.</string>
+    <string name="exercise_figure_eight">Восьмёрка</string>
+    <string name="exercise_figure_eight_desc">Представьте перед собой огромную горизонтальную восьмёрку (∞). Медленно обведите её глазами. Пройдите в одну сторону, затем поменяйте направление.</string>
+    <string name="exercise_clock_rolls">Часы</string>
+    <string name="exercise_clock_rolls_desc">Представьте большой циферблат. Медленно переводите взгляд с 12 → 3 → 6 → 9 → обратно на 12. Голова остаётся неподвижной.</string>
+    <string name="exercise_palming">Пальминг</string>
+    <string name="exercise_palming_desc">Потрите ладони друг о друга, чтобы их согреть. Мягко положите ладони на закрытые глаза (пальцы скрещены на лбу). Убедитесь, что свет не проникает. Дышите глубоко и представьте полную черноту или спокойное место.</string>
+    <string name="exercise_twenty_x3">Правило 20-20-20</string>
+    <string name="exercise_twenty_x3_desc">Каждые 20 минут смотрите на объект, находящийся не менее чем в 6 метрах от вас, в течение хотя бы 20 секунд.</string>
 </resources>

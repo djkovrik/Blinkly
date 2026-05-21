@@ -167,4 +167,73 @@
     <string name="achievement_level_pro">Pro</string>
     <string name="achievement_level_expert">Expert</string>
     <string name="achievement_level_hidden">Hidden</string>
+
+    <!-- Main tab -->
+    <string name="tree_fraxinus_excelsior">Clear Ash</string>
+    <string name="tree_ginkgo_biloba">Ginkgo Vision</string>
+    <string name="tree_salix_babylonica">Weeping Dew</string>
+    <string name="tree_pinus">Sharp Pine</string>
+    <string name="tree_adansonia">Mighty Baobab</string>
+    <string name="tree_mimosa_pudica">Blushing Blink</string>
+    <string name="tree_sequoia_sempervirens">Focus Giant</string>
+    <string name="tree_betula">Bright Birch</string>
+    <string name="tree_ficus_benjamina">Focus Ficus</string>
+    <string name="tree_quercus_robur">Eternal Oak</string>
+
+    <string name="stage_tiny">Tiny</string>
+    <string name="stage_small">Small</string>
+    <string name="stage_young">Young</string>
+    <string name="stage_growing">Growing</string>
+    <string name="stage_strong">Strong</string>
+    <string name="stage_mature">Mature</string>
+    <string name="stage_magnificent">Magnificent</string>
+
+    <string name="greetings_morning">Good morning 👋</string>
+    <string name="greetings_afternoon">Good afternoon ☕</string>
+    <string name="greetings_evening">Good evening 🌙</string>
+
+    <string name="cta_morning_warmup">Start your day with eye care</string>
+    <string name="cta_morning_warmup_desc">A short exercise can help reduce eye strain during the day</string>
+    <string name="cta_work_break">Your eyes need a short break</string>
+    <string name="cta_work_break_desc">Look into the distance for just 20 seconds</string>
+    <string name="cta_afternoon_warm_up">Time to stretch your eyes a little</string>
+    <string name="cta_afternoon_warm_up_desc">A few simple exercises can help relieve eye strain</string>
+    <string name="cta_evening_relax">Time to relax your eyes</string>
+    <string name="cta_evening_relax_desc">A calming evening routine to release tension</string>
+    <string name="cta_day_closing">Great job today ✨</string>
+    <string name="cta_day_closing_desc">Your eyes have already had enough rest for today</string>
+    <string name="cta_perfect_day">You took great care of your eyes today</string>
+    <string name="cta_perfect_day_desc">Your tree has grown even stronger ✨</string>
+
+    <string name="into_days">d</string>
+    <string name="into_tree_streak">Growth streak:</string>
+    <string name="into_activities">Activities today:</string>
+    <string name="into_activities_exercises">👁 Exercises:</string>
+    <string name="into_activities_breaks">⏱ 20-20-20 breaks:</string>
+    <string name="into_activities_relax">🌙 Relax:</string>
+
+    <!-- Exercising -->
+    <string name="block_a">Block A</string>
+    <string name="block_a_title">Workplace Warm-up</string>
+    <string name="block_a_desc">Perfect for a quick break at your desk. No need to move - just look up from your screen.</string>
+    <string name="block_b">Block B</string>
+    <string name="block_b_title">Relax and Unwind</string>
+    <string name="block_b_desc">A calming evening routine to release tension after a long day of screen time.</string>
+    <string name="block_c">Block C</string>
+    <string name="block_c_title">The 20-20-20 Express</string>
+    <string name="block_c_desc">The golden rule of digital eye care. Use this anytime, anywhere.</string>
+    <string name="exercise_blink_break">Blink Break</string>
+    <string name="exercise_blink_break_desc">Blink rapidly and gently. This refreshes your tear film and relieves dryness. (You blink less when staring at screens — this resets it!)</string>
+    <string name="exercise_near_far_focus">Near-Far Focus</string>
+    <string name="exercise_near_far_focus_desc">Hold your thumb 6 inches (15 cm) from your nose. Focus on it. Then, shift your focus to something far away (out a window or across the room). Hold for a few seconds each time.</string>
+    <string name="exercise_diagonal_gazes">Diagonal Gazes</string>
+    <string name="exercise_diagonal_gazes_desc">Keep your head still. Look up to the left, then down to the right. Repeat on the other side: up to the right, down to the left.</string>
+    <string name="exercise_figure_eight">Figure 8</string>
+    <string name="exercise_figure_eight_desc">Imagine a giant figure 8 (∞) lying on its side in front of you. Slowly trace it with your eyes. Go one direction, then switch.</string>
+    <string name="exercise_clock_rolls">Clock Rolls</string>
+    <string name="exercise_clock_rolls_desc">Imagine a large clock face. Slowly move your eyes from 12 → 3 → 6 → 9 → back to 12. Keep your head still.</string>
+    <string name="exercise_palming">Palming</string>
+    <string name="exercise_palming_desc">Rub your hands together to warm them. Gently cup your palms over your closed eyes (fingers crossed on your forehead). Make sure no light gets in. Breathe deeply and imagine pure blackness or a peaceful scene.</string>
+    <string name="exercise_twenty_x3">20-20-20 Rule</string>
+    <string name="exercise_twenty_x3_desc">Every 20 minutes, look at something at least 20 feet (6 meters) away for at least 20 seconds.</string>
 </resources>
