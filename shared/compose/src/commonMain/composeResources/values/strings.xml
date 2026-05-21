@@ -236,4 +236,7 @@
     <string name="exercise_palming_desc">Rub your hands together to warm them. Gently cup your palms over your closed eyes (fingers crossed on your forehead). Make sure no light gets in. Breathe deeply and imagine pure blackness or a peaceful scene.</string>
     <string name="exercise_twenty_x3">20-20-20 Rule</string>
     <string name="exercise_twenty_x3_desc">Every 20 minutes, look at something at least 20 feet (6 meters) away for at least 20 seconds.</string>
+
+    <!-- Content descriptions -->
+    <string name="content_description_settings">Settings</string>
 </resources>

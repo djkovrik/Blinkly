@@ -143,7 +143,7 @@ private fun BottomNavigationBarItem(
             ) {
                 Icon(
                     painter = painterResource(resource = tab.iconRes),
-                    contentDescription = null,
+                    contentDescription = stringResource(tab.labelRes),
                     tint = if (isActive) contentColor else inactiveContentColor,
                     modifier = Modifier.size(size = iconSize),
                 )

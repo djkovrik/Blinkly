@@ -233,4 +233,7 @@
     <string name="exercise_palming_desc">Потрите ладони друг о друга, чтобы их согреть. Мягко положите ладони на закрытые глаза (пальцы скрещены на лбу). Убедитесь, что свет не проникает. Дышите глубоко и представьте полную черноту или спокойное место.</string>
     <string name="exercise_twenty_x3">Правило 20-20-20</string>
     <string name="exercise_twenty_x3_desc">Каждые 20 минут смотрите на объект, находящийся не менее чем в 6 метрах от вас, в течение хотя бы 20 секунд.</string>
+
+    <!-- Content descriptions -->
+    <string name="content_description_settings">Настройки</string>
 </resources>
