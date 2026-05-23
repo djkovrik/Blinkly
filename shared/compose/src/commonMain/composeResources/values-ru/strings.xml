@@ -39,9 +39,9 @@
     <string name="onboarding_disclaimer3">Не заменяет врача:</string>
     <string name="onboarding_disclaimer4">Гимнастика не лечит такие заболевания, как глаукома, катаракта, отслоение сетчатки, прогрессирующая близорукость или инфекции.</string>
     <string name="onboarding_disclaimer5">Противопоказания:</string>
-    <string name="onboarding_disclaimer6">Если у вас диагностированы какие-либо заболевания глаз (в том числе глаукома, так как некоторые упражнения могут повышать внутриглазное давление) или вы недавно перенесли операцию на глазах — перед началом занятий обязательно проконсультируйтесь с врачом-офтальмологом.</string>
+    <string name="onboarding_disclaimer6">Если у вас диагностированы какие-либо заболевания глаз (в том числе глаукома, так как некоторые упражнения могут повышать внутриглазное давление) или вы недавно перенесли операцию на глазах - перед началом занятий обязательно проконсультируйтесь с врачом-офтальмологом.</string>
     <string name="onboarding_disclaimer7">При дискомфорте:</string>
-    <string name="onboarding_disclaimer8">В случае возникновения боли, рези, длительного ухудшения зрения или появления «мушек» перед глазами — прекратите занятия и немедленно обратитесь к специалисту.</string>
+    <string name="onboarding_disclaimer8">В случае возникновения боли, рези, длительного ухудшения зрения или появления «мушек» перед глазами - прекратите занятия и немедленно обратитесь к специалисту.</string>
     <string name="onboarding_disclaimer_got_it">Окей, я все понял(а)</string>
 
     <!-- Onboarding step 5 -->
@@ -212,7 +212,7 @@
     <!-- Тренировки и упражнения -->
     <string name="block_a">Блок А</string>
     <string name="block_a_title">Разминка на рабочем месте</string>
-    <string name="block_a_desc">Идеально для быстрого перерыва за столом. Не нужно вставать — просто отвлекитесь от экрана.</string>
+    <string name="block_a_desc">Идеально для быстрого перерыва за столом. Не нужно вставать - просто отвлекитесь от экрана.</string>
     <string name="block_b">Блок Б</string>
     <string name="block_b_title">Расслабление и отдых</string>
     <string name="block_b_desc">Успокаивающий вечерний ритуал, чтобы снять напряжение после долгого дня у экрана.</string>
@@ -220,7 +220,7 @@
     <string name="block_c_title">Экспресс-правило 20-20-20</string>
     <string name="block_c_desc">Золотое правило цифровой гигиены глаз. Используйте его в любое время и в любом месте.</string>
     <string name="exercise_blink_break">Моргание</string>
-    <string name="exercise_blink_break_desc">Моргайте быстро и мягко. Это увлажняет слезную плёнку и снимает сухость. (За экраном вы моргаете реже — это упражнение всё исправляет!)</string>
+    <string name="exercise_blink_break_desc">Моргайте быстро и мягко. Это увлажняет слезную плёнку и снимает сухость. (За экраном вы моргаете реже - это упражнение всё исправляет!)</string>
     <string name="exercise_near_far_focus">Фокусировка «Близко-далеко»</string>
     <string name="exercise_near_far_focus_desc">Держите большой палец в 15 см от носа. Сфокусируйтесь на нём. Затем переведите взгляд на что-то далёкое (в окно или на другой конец комнаты). Задерживайтесь на пару секунд.</string>
     <string name="exercise_diagonal_gazes">Диагональные взгляды</string>
@@ -233,6 +233,122 @@
     <string name="exercise_palming_desc">Потрите ладони друг о друга, чтобы их согреть. Мягко положите ладони на закрытые глаза (пальцы скрещены на лбу). Убедитесь, что свет не проникает. Дышите глубоко и представьте полную черноту или спокойное место.</string>
     <string name="exercise_twenty_x3">Правило 20-20-20</string>
     <string name="exercise_twenty_x3_desc">Каждые 20 минут смотрите на объект, находящийся не менее чем в 6 метрах от вас, в течение хотя бы 20 секунд.</string>
+
+    <!-- Highlights -->
+    <string name="fact_of_the_day">Факт дня</string>
+    <string name="tip_of_the_day">Совет дня</string>
+    <!-- Tips of the Day (1–30) -->
+    <string name="highlight_tip1_title">Правило 20-20-20</string>
+    <string name="highlight_tip1_description">Каждые 20 минут работы за экраном переводите взгляд на 20 секунд на объект, находящийся на расстоянии 6 метров (20 футов).</string>
+
+    <string name="highlight_tip2_title">Часто моргайте</string>
+    <string name="highlight_tip2_description">При использовании гаджетов мы моргаем в 3 раза реже. Старайтесь моргать чаще, чтобы увлажнять глаза.</string>
+
+    <string name="highlight_tip3_title">Проверьте освещение</string>
+    <string name="highlight_tip3_description">Рабочее место должно быть освещено равномерно. Свет не должен падать прямо в глаза или создавать блики на экране.</string>
+
+    <string name="highlight_tip4_title">Увлажнение изнутри</string>
+    <string name="highlight_tip4_description">Пейте достаточно воды. Обезвоживание организма может привести к сухости глаз.</string>
+
+    <string name="highlight_tip5_title">Держите телефон подальше</string>
+    <string name="highlight_tip5_description">Старайтесь держать смартфон или книгу на расстоянии 30–40 см от глаз.</string>
+
+    <string name="highlight_tip6_title">Массаж век</string>
+    <string name="highlight_tip6_description">Легкий массаж закрытых век круговыми движениями улучшает кровообращение и помогает расслабиться.</string>
+
+    <string name="highlight_tip7_title">Носите солнцезащитные очки</string>
+    <string name="highlight_tip7_description">Ультрафиолет вреден для глаз так же, как и для кожи. Выбирайте очки с пометкой UV400.</string>
+
+    <string name="highlight_tip8_title">Сделайте разминку для шеи</string>
+    <string name="highlight_tip8_description">Напряжение в шее и плечах напрямую влияет на зрение. Простая разминка улучшит кровоток к голове и глазам.</string>
+
+    <string name="highlight_tip9_title">Снимите макияж на ночь</string>
+    <string name="highlight_tip9_description">Всегда удаляйте косметику с глаз перед сном, чтобы избежать воспаления ресничных фолликулов.</string>
+
+    <string name="highlight_tip10_title">Ешьте зелень</string>
+    <string name="highlight_tip10_description">Шпинат, капуста кале и другая листовая зелень богаты лютеином и зеаксантином, которые защищают сетчатку.</string>
+
+    <string name="highlight_tip11_title">Контрастный душ для глаз</string>
+    <string name="highlight_tip11_description">Умывайтесь попеременно теплой и прохладной водой (не ледяной и не горячей). Это тонизирует сосуды.</string>
+
+    <string name="highlight_tip12_title">Пальминг</string>
+    <string name="highlight_tip12_description">Растирайте ладони до тепла и прикройте ими закрытые глаза на пару минут, не надавливая. Полная темнота помогает нервам расслабиться.</string>
+
+    <string name="highlight_tip13_title">Смотрите вдаль</string>
+    <string name="highlight_tip13_description">Если вы весь день смотрите на экран, найдите время посмотреть в окно на горизонт или облака. Это расслабляет мышцы фокусировки.</string>
+
+    <string name="highlight_tip14_title">Не трите глаза грязными руками</string>
+    <string name="highlight_tip14_description">Это основная причина занесения инфекций, таких как конъюнктивит.</string>
+
+    <string name="highlight_tip15_title">Правильно питайтесь для ночного зрения</string>
+    <string name="highlight_tip15_description">Витамин А (содержится в моркови и печени) критически важен для зрения в сумерках.</string>
+
+    <string name="highlight_tip16_title">Ограничьте время непрерывной работы</string>
+    <string name="highlight_tip16_description">Каждый час работы за компьютером делайте перерыв минимум на 5–10 минут.</string>
+
+    <string name="highlight_tip17_title">Следите за воздухом</string>
+    <string name="highlight_tip17_description">Кондиционеры и обогреватели сильно сушат воздух. Используйте увлажнитель или ставьте стакан воды рядом с рабочим местом.</string>
+
+    <string name="highlight_tip18_title">Проверьте осанку</string>
+    <string name="highlight_tip18_description">Сидите прямо. Если вы горбитесь, расстояние до экрана искажается, и глазам приходится сильнее напрягаться.</string>
+
+    <string name="highlight_tip19_title">Фокусировка «Близко-Далеко»</string>
+    <string name="highlight_tip19_description">Научите глаза перестраиваться: посмотрите на палец около носа, затем переведите взгляд на дальний объект за окном. Повторите 10 раз.</string>
+
+    <string name="highlight_tip20_title">Ешьте рыбу</string>
+    <string name="highlight_tip20_description">Омега-3 жирные кислоты (лосось, тунец) помогают бороться с синдромом сухого глаза.</string>
+
+    <string name="highlight_tip21_title">Рисуйте глазами</string>
+    <string name="highlight_tip21_description">Закройте глаза и попробуйте «нарисовать» ими в воздухе цифры от 0 до 9. Это отличная гимнастика.</string>
+
+    <string name="highlight_tip22_title">Регулярно проверяйте зрение</string>
+    <string name="highlight_tip22_description">Даже если вам кажется, что вы видите хорошо, раз в год посещайте офтальмолога для профилактики.</string>
+
+    <string name="highlight_tip23_title">Не читайте в движущемся транспорте</string>
+    <string name="highlight_tip23_description">Тряска заставляет глаза постоянно перенастраивать фокус, что вызывает быстрое утомление.</string>
+
+    <string name="highlight_tip24_title">Защита на работе</string>
+    <string name="highlight_tip24_description">Если вы работаете с химикатами или строительной пылью, всегда используйте защитные очки.</string>
+
+    <string name="highlight_tip25_title">Цветовая терапия</string>
+    <string name="highlight_tip25_description">Посмотрите на зеленый цвет (растения, обои). Зеленый цвет успокаивает и расслабляет глазные мышцы.</string>
+
+    <string name="highlight_tip26_title">Меньше соли</string>
+    <string name="highlight_tip26_description">Избыток соли может задерживать жидкость и повышать внутриглазное давление.</string>
+
+    <string name="highlight_tip27_title">Правильно храните линзы</string>
+    <string name="highlight_tip27_description">Никогда не промывайте контактные линзы водопроводной водой. Используйте только специальный раствор.</string>
+
+    <string name="highlight_tip28_title">Сон лечит глаза</string>
+    <string name="highlight_tip28_description">Во сне глаза очищаются от загрязнений, накопившихся за день, и восстанавливаются.</string>
+
+    <string name="highlight_tip29_title">Смотрите телевизор на расстоянии</string>
+    <string name="highlight_tip29_description">Расстояние до телевизора должно быть не менее 3-4 диагоналей экрана.</string>
+
+    <string name="highlight_tip30_title">Используйте увлажняющие капли</string>
+    <string name="highlight_tip30_description">Если вы чувствуете сухость или "песок" в глазах, используйте искусственную слезу (предварительно посоветовавшись с врачом).</string>
+
+    <!-- Facts of the Day (31–50) -->
+    <string name="highlight_fact31">Человеческий глаз способен различать около 10 миллионов различных цветов.</string>
+    <string name="highlight_fact32">Мышцы глаз - самые активные мышцы в теле человека. Они двигаются более 100 000 раз в день.</string>
+    <string name="highlight_fact33">Все дети рождаются с серо-голубыми глазами, так как меланин в радужной оболочке вырабатывается под воздействием света только через несколько месяцев.</string>
+    <string name="highlight_fact34">Роговица глаза - единственная часть тела, которая не получает кислород из кровеносной системы. Она поглощает его прямо из воздуха.</string>
+    <string name="highlight_fact35">Вы моргаете около 15–20 раз в минуту. Это означает, что ваши глаза закрыты примерно 10% времени бодрствования.</string>
+    <string name="highlight_fact36">Глаза передают в мозг огромный объем информации. Эта "пропускная способность" сопоставима с интернет-каналом.</string>
+    <string name="highlight_fact37">У каждого человека (даже у однояйцевых близнецов) уникальный рисунок радужной оболочки и отпечаток сетчатки.</string>
+    <string name="highlight_fact38">Страусы имеют глаза больше, чем их мозг.</string>
+    <string name="highlight_fact39">Диабет часто выявляют именно офтальмологи, так как изменения в сосудах глаз - один из первых симптомов болезни.</string>
+    <string name="highlight_fact40">Глазные мышцы - одни из самых быстрых в теле. Именно благодаря им мы можем мгновенно переводить взгляд с одного объекта на другой.</string>
+    <string name="highlight_fact41">Человек - единственное существо на Земле, которое может плакать от сильных эмоций.</string>
+    <string name="highlight_fact42">Размер ваших глаз практически не меняется с рождения до смерти. В отличие от ушей или носа.</string>
+    <string name="highlight_fact43">Глаза быстрее привыкают к темноте, если не смотреть на красный свет. Именно поэтому в приборах ночного видения используют красную подсветку.</string>
+    <string name="highlight_fact44">Линзы для глаз были придуманы Леонардо да Винчи еще в 1508 году.</string>
+    <string name="highlight_fact45">Глаз весит около 7-8 граммов.</string>
+    <string name="highlight_fact46">Если бы глаз был цифровой камерой, он бы имел разрешение около 576 мегапикселей.</string>
+    <string name="highlight_fact47">"Эффект красных глаз" на фото возникает из-за отражения света вспышки от сосудистой оболочки глаза (которая пронизана кровеносными сосудами).</string>
+    <string name="highlight_fact48">Невозможно чихнуть с открытыми глазами. Это рефлекс организма.</string>
+    <string name="highlight_fact49">Только 2% людей на планете имеют зеленый цвет глаз. Это самый редкий цвет.</string>
+    <string name="highlight_fact50">Проводя много времени на улице в детстве, вы снижаете риск развития близорукости. Солнечный свет стимулирует выработку дофамина в сетчатке, который сдерживает рост глаза.</string>
 
     <!-- Content descriptions -->
     <string name="content_description_settings">Настройки</string>

@@ -237,6 +237,122 @@
     <string name="exercise_twenty_x3">20-20-20 Rule</string>
     <string name="exercise_twenty_x3_desc">Every 20 minutes, look at something at least 20 feet (6 meters) away for at least 20 seconds.</string>
 
+    <!-- Highlights -->
+    <string name="fact_of_the_day">Fact of the Day</string>
+    <string name="tip_of_the_day">Tip of the Day</string>
+    <!-- Tips of the Day (1–30) -->
+    <string name="highlight_tip1_title">20-20-20 Rule</string>
+    <string name="highlight_tip1_description">Every 20 minutes, look at something 20 feet away for 20 seconds.</string>
+
+    <string name="highlight_tip2_title">Blink Frequently</string>
+    <string name="highlight_tip2_description">We blink 3 times less often when using gadgets. Try to blink more to keep your eyes moist.</string>
+
+    <string name="highlight_tip3_title">Check Your Lighting</string>
+    <string name="highlight_tip3_description">Your workspace should be evenly lit. Light should not shine directly into your eyes or create glare on the screen.</string>
+
+    <string name="highlight_tip4_title">Hydrate From Within</string>
+    <string name="highlight_tip4_description">Drink enough water. Dehydration can lead to dry eyes.</string>
+
+    <string name="highlight_tip5_title">Keep Your Phone at a Distance</string>
+    <string name="highlight_tip5_description">Try to keep your smartphone or book at a distance of 30-40 cm (12-16 inches) from your eyes.</string>
+
+    <string name="highlight_tip6_title">Eyelid Massage</string>
+    <string name="highlight_tip6_description">Gently massaging your closed eyelids in a circular motion improves blood circulation and helps you relax.</string>
+
+    <string name="highlight_tip7_title">Wear Sunglasses</string>
+    <string name="highlight_tip7_description">UV rays are as harmful to your eyes as they are to your skin. Choose sunglasses labeled UV400.</string>
+
+    <string name="highlight_tip8_title">Do a Neck Workout</string>
+    <string name="highlight_tip8_description">Tension in the neck and shoulders directly affects your vision. A simple warm-up improves blood flow to the head and eyes.</string>
+
+    <string name="highlight_tip9_title">Remove Makeup at Night</string>
+    <string name="highlight_tip9_description">Always remove eye makeup before bed to prevent inflammation of the eyelash follicles.</string>
+
+    <string name="highlight_tip10_title">Eat Your Greens</string>
+    <string name="highlight_tip10_description">Spinach, kale, and other leafy greens are rich in lutein and zeaxanthin, which protect the retina.</string>
+
+    <string name="highlight_tip11_title">Contrast Shower for Eyes</string>
+    <string name="highlight_tip11_description">Rinse your eyes alternately with warm and cool water (not ice-cold or hot). This tones the blood vessels.</string>
+
+    <string name="highlight_tip12_title">Palming</string>
+    <string name="highlight_tip12_description">Rub your palms together until they are warm and gently place them over your closed eyes for a couple of minutes. Complete darkness helps the nerves relax.</string>
+
+    <string name="highlight_tip13_title">Look Into the Distance</string>
+    <string name="highlight_tip13_description">If you stare at a screen all day, take time to look out the window at the horizon or clouds. This relaxes the focusing muscles.</string>
+
+    <string name="highlight_tip14_title">Don't Rub Your Eyes With Dirty Hands</string>
+    <string name="highlight_tip14_description">This is the primary cause of infections like conjunctivitis.</string>
+
+    <string name="highlight_tip15_title">Eat Right for Night Vision</string>
+    <string name="highlight_tip15_description">Vitamin A (found in carrots and liver) is critical for vision in dim light.</string>
+
+    <string name="highlight_tip16_title">Limit Continuous Work Time</string>
+    <string name="highlight_tip16_description">Every hour of computer work, take a break for at least 5-10 minutes.</string>
+
+    <string name="highlight_tip17_title">Watch the Air</string>
+    <string name="highlight_tip17_description">Air conditioners and heaters dry out the air. Use a humidifier or place a glass of water near your workspace.</string>
+
+    <string name="highlight_tip18_title">Check Your Posture</string>
+    <string name="highlight_tip18_description">Sit up straight. If you slouch, the distance to the screen changes, and your eyes have to work harder.</string>
+
+    <string name="highlight_tip19_title">Near-Far Focus</string>
+    <string name="highlight_tip19_description">Train your eyes to refocus: look at your finger near your nose, then switch your gaze to a distant object outside. Repeat 10 times.</string>
+
+    <string name="highlight_tip20_title">Eat Fish</string>
+    <string name="highlight_tip20_description">Omega-3 fatty acids (salmon, tuna) help combat dry eye syndrome.</string>
+
+    <string name="highlight_tip21_title">Draw With Your Eyes</string>
+    <string name="highlight_tip21_description">Close your eyes and try to "draw" numbers from 0 to 9 in the air with them. This is great exercise.</string>
+
+    <string name="highlight_tip22_title">Get Regular Eye Exams</string>
+    <string name="highlight_tip22_description">Even if you think you see well, visit an ophthalmologist once a year for a check-up.</string>
+
+    <string name="highlight_tip23_title">Don't Read in Moving Vehicles</string>
+    <string name="highlight_tip23_description">The shaking forces your eyes to constantly refocus, causing rapid fatigue.</string>
+
+    <string name="highlight_tip24_title">Protection at Work</string>
+    <string name="highlight_tip24_description">If you work with chemicals or construction dust, always wear safety goggles.</string>
+
+    <string name="highlight_tip25_title">Color Therapy</string>
+    <string name="highlight_tip25_description">Look at the color green (plants, wallpaper). Green is calming and relaxes the eye muscles.</string>
+
+    <string name="highlight_tip26_title">Less Salt</string>
+    <string name="highlight_tip26_description">Excess salt can retain fluid and increase intraocular pressure.</string>
+
+    <string name="highlight_tip27_title">Store Lenses Properly</string>
+    <string name="highlight_tip27_description">Never rinse contact lenses with tap water. Only use a special solution.</string>
+
+    <string name="highlight_tip28_title">Sleep Heals the Eyes</string>
+    <string name="highlight_tip28_description">During sleep, eyes clear themselves of debris accumulated during the day and recover.</string>
+
+    <string name="highlight_tip29_title">Watch TV at a Distance</string>
+    <string name="highlight_tip29_description">The distance to the TV should be at least 3-4 times the screen diagonal.</string>
+
+    <string name="highlight_tip30_title">Use Moisturizing Drops</string>
+    <string name="highlight_tip30_description">If you feel dryness or "sand" in your eyes, use artificial tears (after consulting with a doctor).</string>
+
+    <!-- Facts of the Day (31–50) -->
+    <string name="highlight_fact31">The human eye can distinguish about 10 million different colors.</string>
+    <string name="highlight_fact32">The eye muscles are the most active muscles in the human body. They move more than 100,000 times a day.</string>
+    <string name="highlight_fact33">All babies are born with gray-blue eyes because melanin in the iris is produced only after exposure to light over several months.</string>
+    <string name="highlight_fact34">The cornea is the only part of the body that doesn't receive oxygen from the blood supply. It absorbs it directly from the air.</string>
+    <string name="highlight_fact35">You blink about 15-20 times per minute. This means your eyes are closed for roughly 10% of your waking hours.</string>
+    <string name="highlight_fact36">The eyes transmit a huge amount of information to the brain. This "bandwidth" is comparable to an internet cable.</string>
+    <string name="highlight_fact37">Every person (even identical twins) has a unique iris pattern and retinal print.</string>
+    <string name="highlight_fact38">Ostriches have eyes that are bigger than their brains.</string>
+    <string name="highlight_fact39">Diabetes is often detected by ophthalmologists because changes in the eye's blood vessels are one of the first symptoms of the disease.</string>
+    <string name="highlight_fact40">Eye muscles are among the fastest in the body. They allow us to instantly shift our gaze from one object to another.</string>
+    <string name="highlight_fact41">Humans are the only beings on Earth who can cry from strong emotions.</string>
+    <string name="highlight_fact42">The size of your eyes remains almost the same from birth to death. Unlike your ears or nose.</string>
+    <string name="highlight_fact43">Eyes adapt to the dark faster if you don't look at red light. This is why night vision devices use red illumination.</string>
+    <string name="highlight_fact44">Contact lenses were conceptualized by Leonardo da Vinci back in 1508.</string>
+    <string name="highlight_fact45">An eyeball weighs about 7-8 grams.</string>
+    <string name="highlight_fact46">If the eye were a digital camera, it would have a resolution of about 576 megapixels.</string>
+    <string name="highlight_fact47">The "red-eye effect" in photos occurs because the flash light reflects off the choroid (which is full of blood vessels) at the back of the eye.</string>
+    <string name="highlight_fact48">It's impossible to sneeze with your eyes open. It's a bodily reflex.</string>
+    <string name="highlight_fact49">Only 2% of people on the planet have green eyes. It is the rarest color.</string>
+    <string name="highlight_fact50">Spending time outdoors in childhood reduces the risk of developing myopia (nearsightedness). Sunlight stimulates dopamine production in the retina, which inhibits excessive eye growth.</string>
+
     <!-- Content descriptions -->
     <string name="content_description_settings">Settings</string>
 </resources>
