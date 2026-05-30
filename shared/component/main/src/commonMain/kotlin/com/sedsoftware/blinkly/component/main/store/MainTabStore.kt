@@ -18,7 +18,7 @@ internal interface MainTabStore : Store<Intent, State, Label> {
 
     data class State(
         val calendar: List<Workout> = emptyList(),
-        val tree: Tree = Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f),
+        val tree: Tree? = null,
         val highlight: HighlightOfTheDay? = null,
         val greetingPeriod: GreetingPeriod = GreetingPeriod.DAY,
         val restMinutesToday: Int = 0,

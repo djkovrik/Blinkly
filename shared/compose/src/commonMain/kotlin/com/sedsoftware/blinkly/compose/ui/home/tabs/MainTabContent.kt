@@ -4,15 +4,18 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,18 +23,32 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import blinkly.shared.compose.generated.resources.Res
 import blinkly.shared.compose.generated.resources.content_description_settings
 import blinkly.shared.compose.generated.resources.icon_settings
+import blinkly.shared.compose.generated.resources.info_activities
+import blinkly.shared.compose.generated.resources.info_activities_breaks
+import blinkly.shared.compose.generated.resources.info_activities_exercises
+import blinkly.shared.compose.generated.resources.info_activities_relax
+import blinkly.shared.compose.generated.resources.info_current_tree
+import blinkly.shared.compose.generated.resources.info_days
+import blinkly.shared.compose.generated.resources.info_tree_streak
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.sedsoftware.blinkly.component.main.MainTabComponent
 import com.sedsoftware.blinkly.component.main.domain.model.GreetingPeriod
 import com.sedsoftware.blinkly.component.main.domain.model.MainCtaState
 import com.sedsoftware.blinkly.component.main.integration.MainTabComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
+import com.sedsoftware.blinkly.compose.ui.extension.asDescription
 import com.sedsoftware.blinkly.compose.ui.extension.asLabel
+import com.sedsoftware.blinkly.compose.ui.extension.asTitle
+import com.sedsoftware.blinkly.compose.ui.extension.shimmering
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeStage
@@ -51,10 +68,14 @@ fun MainTabContent(
             TopAppBar(
                 title = {},
                 actions = {
-                    IconButton(onClick = component::onPreferencesClick) {
+                    IconButton(
+                        onClick = component::onPreferencesClick,
+                        modifier = Modifier.padding(all = 8.dp)
+                    ) {
                         Icon(
-                            painter = painterResource(Res.drawable.icon_settings),
-                            contentDescription = stringResource(Res.string.content_description_settings),
+                            painter = painterResource(resource = Res.drawable.icon_settings),
+                            tint = MaterialTheme.colorScheme.primary,
+                            contentDescription = stringResource(resource = Res.string.content_description_settings),
                         )
                     }
                 }
@@ -63,6 +84,7 @@ fun MainTabContent(
         modifier = modifier.systemBarsPadding()
     ) { paddingValues ->
         Column(
+            verticalArrangement = Arrangement.spacedBy(space = 16.dp),
             modifier = Modifier
                 .padding(paddingValues = paddingValues)
                 .padding(all = 16.dp)
@@ -72,15 +94,183 @@ fun MainTabContent(
             Text(
                 text = model.greetingPeriod.asLabel(),
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            SecondCardTreeGrowth(
+                model = model,
+                onTreeClick = component::onTreeClick,
+                modifier = Modifier
+                    .shimmering(visible = model.tree == null)
+                    .fillMaxWidth()
+            )
+
+            ThirdCardActivities(
+                model = model,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+
+            FourthCardHighlights(
+                highlight = model.highlight,
+                modifier = Modifier
+                    .shimmering(visible = model.highlight == null)
+                    .fillMaxWidth()
             )
         }
     }
 }
 
 @Composable
-@Preview(widthDp = 1600, heightDp = 1200)
+private fun SecondCardTreeGrowth(
+    model: MainTabComponent.Model,
+    onTreeClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ElevatedCard(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ),
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 1.dp,
+        ),
+        onClick = onTreeClick,
+        modifier = modifier,
+    ) {
+        Column(modifier = Modifier.padding(all = 16.dp)) {
+            Text(
+                text = stringResource(resource = Res.string.info_current_tree),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = model.tree?.type?.asLabel()?.uppercase().orEmpty(),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.titleSmall,
+            )
+
+            Text(
+                text = model.tree?.stage?.asLabel().orEmpty(),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .alpha(alpha = 0.7f),
+            )
+
+            Text(
+                text = "${stringResource(resource = Res.string.info_tree_streak)} " +
+                        "${model.treeGrowthStreakDays}${stringResource(resource = Res.string.info_days)}",
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun ThirdCardActivities(
+    model: MainTabComponent.Model,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ),
+        modifier = modifier,
+    ) {
+        Column(modifier = Modifier.padding(all = 16.dp)) {
+            Text(
+                text = stringResource(resource = Res.string.info_activities),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = "${stringResource(resource = Res.string.info_activities_exercises)} ${model.exercisesToday}",
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = "${stringResource(resource = Res.string.info_activities_relax)} ${model.palmingToday}",
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = "${stringResource(resource = Res.string.info_activities_breaks)} ${model.twentyX3Today}",
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            LinearProgressIndicator(
+                progress = { model.dailyProgressPercent / 100f },
+                color = MaterialTheme.colorScheme.secondary,
+                trackColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun FourthCardHighlights(
+    highlight: HighlightOfTheDay?,
+    modifier: Modifier = Modifier,
+) {
+    val annotatedString = buildAnnotatedString {
+        when (highlight) {
+            is HighlightOfTheDay.Tip -> {
+                pushStyle(SpanStyle(fontWeight = FontWeight.SemiBold))
+                append(highlight.asTitle())
+                append(": ")
+                pop()
+                append(highlight.asDescription())
+            }
+
+            is HighlightOfTheDay.Fact -> {
+                append(highlight.asDescription())
+            }
+
+            else -> Unit
+        }
+    }
+
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        ),
+        modifier = modifier,
+    ) {
+        Column(modifier = Modifier.padding(all = 16.dp)) {
+            Text(
+                text = highlight?.asTitle().orEmpty(),
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = annotatedString,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
+    }
+}
+
+@Composable
+@Preview(widthDp = 1200, heightDp = 1800)
 private fun MainTabContentPreviewLight() {
     BlinklyWidgetPreview {
         MainTabPreviewContent()
@@ -88,7 +278,7 @@ private fun MainTabContentPreviewLight() {
 }
 
 @Composable
-@Preview(widthDp = 1600, heightDp = 1200)
+@Preview(widthDp = 1200, heightDp = 1800)
 private fun MainTabContentPreviewDark() {
     BlinklyWidgetPreview(isDakTheme = true) {
         MainTabPreviewContent()
@@ -109,17 +299,9 @@ private fun MainTabPreviewContent() {
         ) {
             MainTabPreviewDefault(
                 greetingPeriod = GreetingPeriod.MORNING,
-                ctaState = MainCtaState.Idle,
-                highlight = null,
-                modifier = Modifier
-                    .weight(weight = 1f)
-                    .previewTileBorder(),
-            )
-
-            MainTabPreviewDefault(
-                greetingPeriod = GreetingPeriod.MORNING,
                 ctaState = MainCtaState.MorningWarmUp,
-                highlight = HighlightOfTheDay.Fact(47),
+                highlight = HighlightOfTheDay.Tip(21),
+                tree = Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f),
                 modifier = Modifier
                     .weight(weight = 1f)
                     .previewTileBorder(),
@@ -129,6 +311,7 @@ private fun MainTabPreviewContent() {
                 greetingPeriod = GreetingPeriod.DAY,
                 ctaState = MainCtaState.WorkBreakDue,
                 highlight = HighlightOfTheDay.Fact(48),
+                tree = Tree(TreeStage.SMALL, TreeType.GINKGO_BILOBA, 20f),
                 modifier = Modifier
                     .weight(weight = 1f)
                     .previewTileBorder(),
@@ -137,7 +320,8 @@ private fun MainTabPreviewContent() {
             MainTabPreviewDefault(
                 greetingPeriod = GreetingPeriod.DAY,
                 ctaState = MainCtaState.AfternoonWarmUp,
-                highlight = HighlightOfTheDay.Tip(21),
+                highlight = HighlightOfTheDay.Fact(47),
+                tree = Tree(TreeStage.YOUNG, TreeType.MIMOSA_PUDICA, 40f),
                 modifier = Modifier
                     .weight(weight = 1f)
                     .previewTileBorder(),
@@ -154,6 +338,7 @@ private fun MainTabPreviewContent() {
                 greetingPeriod = GreetingPeriod.EVENING,
                 ctaState = MainCtaState.EveningRelax,
                 highlight = HighlightOfTheDay.Tip(30),
+                tree = Tree(TreeStage.GROWING, TreeType.QUERCUS_ROBUR, 60f),
                 modifier = Modifier
                     .weight(weight = 1f)
                     .previewTileBorder(),
@@ -163,6 +348,7 @@ private fun MainTabPreviewContent() {
                 greetingPeriod = GreetingPeriod.EVENING,
                 ctaState = MainCtaState.DayClosing,
                 highlight = HighlightOfTheDay.Tip(15),
+                tree = Tree(TreeStage.STRONG, TreeType.PINUS, 80f),
                 modifier = Modifier
                     .weight(weight = 1f)
                     .previewTileBorder(),
@@ -172,12 +358,11 @@ private fun MainTabPreviewContent() {
                 greetingPeriod = GreetingPeriod.EVENING,
                 ctaState = MainCtaState.PerfectDay,
                 highlight = HighlightOfTheDay.Fact(32),
+                tree = Tree(TreeStage.MAGNIFICENT, TreeType.BETULA, 100f),
                 modifier = Modifier
                     .weight(weight = 1f)
                     .previewTileBorder(),
             )
-
-            Spacer(modifier = Modifier.weight(weight = 1f))
         }
     }
 }
@@ -187,6 +372,7 @@ private fun MainTabPreviewDefault(
     greetingPeriod: GreetingPeriod,
     ctaState: MainCtaState,
     highlight: HighlightOfTheDay?,
+    tree: Tree?,
     modifier: Modifier,
 ) {
     MainTabContent(
@@ -198,8 +384,8 @@ private fun MainTabPreviewDefault(
             exercisesToday = 8,
             twentyX3Today = 2,
             palmingToday = 4,
-            dailyProgressPercent = 75,
-            tree = Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 50f),
+            dailyProgressPercent = 50,
+            tree = tree,
             treeGrowthStreakDays = 5,
         ),
         modifier = modifier,

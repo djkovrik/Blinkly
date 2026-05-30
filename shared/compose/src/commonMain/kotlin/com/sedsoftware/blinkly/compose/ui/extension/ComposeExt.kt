@@ -3,6 +3,7 @@ package com.sedsoftware.blinkly.compose.ui.extension
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -26,6 +27,7 @@ import androidx.compose.ui.graphics.Shape
 import kotlinx.coroutines.delay
 
 private const val DEFAULT_SHIMMER_DURATION_MS: Int = 1_200
+private const val DEFAULT_SHIMMER_FADE_DURATION_MS: Int = 300
 private const val DEFAULT_SHIMMER_WIDTH_RATIO: Float = 0.7f
 
 fun Modifier.alsoIf(condition: Boolean, other: Modifier) = if (condition) this.then(other) else this
@@ -39,8 +41,18 @@ fun Modifier.shimmering(
         Color.White.copy(alpha = 0.00f),
     ),
     durationMillis: Int = DEFAULT_SHIMMER_DURATION_MS,
+    fadeDurationMillis: Int = DEFAULT_SHIMMER_FADE_DURATION_MS,
 ): Modifier = composed {
-    if (!visible) {
+    val shimmerAlpha: Float by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = fadeDurationMillis,
+            easing = LinearEasing,
+        ),
+        label = "shimmerAlpha",
+    )
+
+    if (!visible && shimmerAlpha == 0f) {
         return@composed this
     }
 
@@ -59,7 +71,7 @@ fun Modifier.shimmering(
     )
 
     this
-        .clip(shape)
+        .clip(shape = shape)
         .drawWithContent {
             drawContent()
 
@@ -77,6 +89,7 @@ fun Modifier.shimmering(
 
             drawRect(
                 brush = brush,
+                alpha = shimmerAlpha,
             )
         }
 }

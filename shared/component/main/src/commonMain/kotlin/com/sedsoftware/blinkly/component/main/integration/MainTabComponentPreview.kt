@@ -18,7 +18,7 @@ class MainTabComponentPreview(
     private val twentyX3Today: Int = 0,
     private val palmingToday: Int = 0,
     private val dailyProgressPercent: Int = 0,
-    private val tree: Tree = Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f),
+    private val tree: Tree? = null,
     private val treeGrowthStreakDays: Int = 0,
     private val highlight: HighlightOfTheDay? = null,
     private val ctaState: MainCtaState = MainCtaState.Idle,

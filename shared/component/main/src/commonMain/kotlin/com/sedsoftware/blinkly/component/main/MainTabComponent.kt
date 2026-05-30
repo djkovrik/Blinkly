@@ -21,7 +21,7 @@ interface MainTabComponent {
         val twentyX3Today: Int,
         val palmingToday: Int,
         val dailyProgressPercent: Int,
-        val tree: Tree,
+        val tree: Tree?,
         val treeGrowthStreakDays: Int,
         val highlight: HighlightOfTheDay?,
         val ctaState: MainCtaState,

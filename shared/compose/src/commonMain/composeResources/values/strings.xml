@@ -205,12 +205,13 @@
     <string name="cta_perfect_day">You took great care of your eyes today</string>
     <string name="cta_perfect_day_desc">Your tree has grown even stronger ✨</string>
 
-    <string name="into_days">d</string>
-    <string name="into_tree_streak">Growth streak:</string>
-    <string name="into_activities">Activities today:</string>
-    <string name="into_activities_exercises">👁 Exercises:</string>
-    <string name="into_activities_breaks">⏱ 20-20-20 breaks:</string>
-    <string name="into_activities_relax">🌙 Relax:</string>
+    <string name="info_days">d</string>
+    <string name="info_current_tree">Growth Tree</string>
+    <string name="info_tree_streak">Growth streak:</string>
+    <string name="info_activities">Activities today:</string>
+    <string name="info_activities_exercises">👁 Exercises:</string>
+    <string name="info_activities_breaks">⏱ 20-20-20 breaks:</string>
+    <string name="info_activities_relax">🌙 Relax:</string>
 
     <!-- Exercising -->
     <string name="block_a">Block A</string>

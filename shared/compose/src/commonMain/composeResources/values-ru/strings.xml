@@ -202,12 +202,13 @@
     <string name="cta_perfect_day">Сегодня вы отлично позаботились о своих глазах</string>
     <string name="cta_perfect_day_desc">Ваше дерево стало ещё сильнее ✨</string>
 
-    <string name="into_days">д</string>
-    <string name="into_tree_streak">Серия роста:</string>
-    <string name="into_activities">Активностей сегодня:</string>
-    <string name="into_activities_exercises">👁 Упражнения:</string>
-    <string name="into_activities_breaks">⏱ Перерывы 20-20-20:</string>
-    <string name="into_activities_relax">🌙 Релакс:</string>
+    <string name="info_days">д</string>
+    <string name="info_current_tree">Дерево роста</string>
+    <string name="info_tree_streak">Серия роста:</string>
+    <string name="info_activities">Активностей сегодня:</string>
+    <string name="info_activities_exercises">👁 Упражнения:</string>
+    <string name="info_activities_breaks">⏱ Перерывы 20-20-20:</string>
+    <string name="info_activities_relax">🌙 Релакс:</string>
 
     <!-- Тренировки и упражнения -->
     <string name="block_a">Блок А</string>
