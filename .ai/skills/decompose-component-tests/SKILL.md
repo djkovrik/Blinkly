@@ -1,6 +1,6 @@
 ---
-name: blinkly-decompose-component-tests
-description: Write unit tests for Blinkly Decompose components in commonTest. Use when validating child stack navigation, parent-child output propagation, Store-backed component state, onboarding and tab flows, or side effects triggered from Decompose components.
+name: decompose-component-tests
+description: Use in the Blinkly Kotlin Multiplatform repository when writing, updating, or reviewing commonTest coverage for Decompose components, including child stack navigation, onboarding flow transitions, home tab navigation, parent-child `ComponentOutput` propagation, Store-backed component models, lifecycle handling, coroutine side effects, and Mokkery-based collaborator verification.
 ---
 
 # Blinkly Decompose Component Tests

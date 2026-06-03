@@ -30,14 +30,37 @@ Core stack:
 
 ## Local Skills
 
-Local project skills live in `docs/skills`:
-- `blinkly-mvikotlin` - [docs/skills/blinkly-mvikotlin/SKILL.md](D:/Sources/Android/Blinkly/docs/skills/blinkly-mvikotlin/SKILL.md)
-- `blinkly-decompose` - [docs/skills/blinkly-decompose/SKILL.md](D:/Sources/Android/Blinkly/docs/skills/blinkly-decompose/SKILL.md)
-- `blinkly-decompose-component-tests` - [docs/skills/blinkly-decompose-component-tests/SKILL.md](D:/Sources/Android/Blinkly/docs/skills/blinkly-decompose-component-tests/SKILL.md)
+Blinkly-specific skills are project-local. Treat the copies in `.ai/skills`
+as the source of truth:
+- `mvikotlin` - [.ai/skills/mvikotlin/SKILL.md](D:/Sources/Android/Blinkly/.ai/skills/mvikotlin/SKILL.md)
+- `decompose` - [.ai/skills/decompose/SKILL.md](D:/Sources/Android/Blinkly/.ai/skills/decompose/SKILL.md)
+- `decompose-component-tests` - [.ai/skills/decompose-component-tests/SKILL.md](D:/Sources/Android/Blinkly/.ai/skills/decompose-component-tests/SKILL.md)
 
-These files are local project references. They improve discoverability for agents and contributors reading this repository, but they are not automatically installed as Codex skills unless copied or installed into the Codex skills directory.
+Read local skills lazily:
+- Before reading a skill body, match the current task against the skill's
+  `name` and `description`.
+- Read only the matching `SKILL.md` files, and only after `AGENTS.md` gives
+  enough project context to decide that the skill applies.
+- Do not preload all local skills at the start of a task.
+- If multiple skills could apply, read the minimal set needed for the current
+  change and explain the order briefly.
 
-If Blinkly-specific skills are installed into the Codex skills directory, keep the repository copies in `docs/skills` as the source of truth and update both the installed and repository versions together.
+Use `decompose` when work touches Decompose component contracts, default
+implementations, factories, navigation stacks, child outputs, tab navigation,
+or Compose bindings to component state.
+
+Use `mvikotlin` when a Blinkly component needs or already has an MVIKotlin
+Store, StoreProvider, reducer, executor, bootstrapper, label, integration
+mapper, or Store-backed model.
+
+Use `decompose-component-tests` when writing or reviewing commonTest coverage
+for component navigation, parent-child output propagation, Store-backed
+component state, lifecycle behaviour, coroutine side effects, or Mokkery
+collaborator verification.
+
+These skills should not be duplicated in the global Codex skills directory for
+normal Blinkly work. If a global copy exists temporarily, update the
+repository copy first and remove or refresh the global copy immediately after.
 
 ## Repository Layout
 

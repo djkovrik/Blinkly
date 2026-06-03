@@ -1,6 +1,6 @@
 ---
-name: blinkly-mvikotlin
-description: Write or update MVIKotlin stores for the Blinkly Kotlin Multiplatform project. Use when a Blinkly component needs state, reducer-driven updates, startup actions, asynchronous business logic, or one-off labels. Prefer this skill over generic MVIKotlin advice whenever work touches `shared/component/**/store` or a component that may need a Store.
+name: mvikotlin
+description: Use in the Blinkly Kotlin Multiplatform repository when adding, changing, or reviewing MVIKotlin Store contracts, StoreProviders, reducers, coroutine executors, bootstrappers, labels, integration mappers, or Store-backed component models under `shared/component/**`; prefer this over generic MVIKotlin guidance whenever a Blinkly component may need reducer-owned state, startup work, subscriptions, async business logic, or one-off errors.
 ---
 
 # Blinkly MVIKotlin
