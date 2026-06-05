@@ -89,7 +89,17 @@ class RootComponentDefault private constructor(
             OnboardingComponentDefault(childContext, storeFactory, reminderManager, notifier, dispatchers, output)
         },
         homeScreenComponent = { childContext, output ->
-            HomeScreenComponentDefault(childContext, dispatchers, settings, output)
+            HomeScreenComponentDefault(
+                componentContext = childContext,
+                storeFactory = storeFactory,
+                dispatchers = dispatchers,
+                settings = settings,
+                timeUtils = timeUtils,
+                calendarWatcher = calendarWatcher,
+                highlightsProvider = highlightsProvider,
+                treeProgressWatcher = treeProgressWatcher,
+                homeScreenOutput = output,
+            )
         },
         preferencesComponent = { childContext, output ->
             PreferencesComponentDefault(childContext, output)
@@ -183,6 +193,8 @@ class RootComponentDefault private constructor(
             is ComponentOutput.Main.OpenPreferences -> {
                 navigation.push(Config.Preferences)
             }
+
+            is ComponentOutput.Main.OpenProgressTab -> Unit
 
             is ComponentOutput.Trainings.OpenExerciseBlock -> {
                 when (output.block) {

@@ -101,7 +101,11 @@ internal fun BlinklyIconButton(
 
         Icon(
             painter = painterResource(resource = iconRes),
-            contentDescription = null,
+            contentDescription = when {
+                leftSideText != null -> leftSideText
+                rightSideText != null -> rightSideText
+                else -> null
+            },
             tint = textColor,
             modifier = Modifier
                 .padding(horizontal = 8.dp)

@@ -32,5 +32,5 @@ Planned feature areas:
 
 ### Agent documentation and Blinkly skills
 * Main repository agent context: [AGENTS.md](AGENTS.md)
-* Local Blinkly skill sources: `docs/skills/blinkly-mvikotlin`, `docs/skills/blinkly-decompose`, `docs/skills/blinkly-decompose-component-tests`
-* If these skills are installed into the global Codex skills directory, keep the copies in this repository as the source of truth and update them together
+* Local Blinkly skill sources: `.ai/skills/mvikotlin`, `.ai/skills/decompose`, `.ai/skills/decompose-component-tests`
+* Treat the repository copies as the source of truth; avoid keeping duplicate global Codex skill copies for normal Blinkly work

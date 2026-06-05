@@ -1,6 +1,6 @@
 ---
-name: blinkly-decompose
-description: Build or update Decompose components and navigation for the Blinkly Kotlin Multiplatform project. Use when work touches `shared/component/**`, nested child navigation, tab navigation, parent-child output propagation, or Compose integration with Decompose `Value` and `ChildStack`.
+name: decompose
+description: Use in the Blinkly Kotlin Multiplatform repository when adding, changing, or reviewing Decompose component contracts, default implementations, factories, navigation stacks, child outputs, tab navigation, or Compose bindings to Decompose `Value`, `ChildStack`, and component models under `shared/component/**` or `shared/compose/**`.
 ---
 
 # Blinkly Decompose

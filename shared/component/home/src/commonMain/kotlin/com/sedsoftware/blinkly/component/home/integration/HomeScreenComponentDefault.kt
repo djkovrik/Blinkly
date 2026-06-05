@@ -7,6 +7,7 @@ import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.sedsoftware.blinkly.component.home.HomeScreenComponent
 import com.sedsoftware.blinkly.component.home.model.HomeScreenTab
 import com.sedsoftware.blinkly.component.main.MainTabComponent
@@ -17,14 +18,19 @@ import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent
 import com.sedsoftware.blinkly.component.reminders.integration.RemindersTabComponentDefault
 import com.sedsoftware.blinkly.component.trainings.TrainingsTabComponent
 import com.sedsoftware.blinkly.component.trainings.integration.TrainingsTabComponentDefault
+import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
+import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
+import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
+import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
+@Suppress("LongParameterList")
 class HomeScreenComponentDefault private constructor(
     private val componentContext: ComponentContext,
     private val dispatchers: BlinklyDispatchers,
@@ -38,8 +44,13 @@ class HomeScreenComponentDefault private constructor(
 
     constructor(
         componentContext: ComponentContext,
+        storeFactory: StoreFactory,
         dispatchers: BlinklyDispatchers,
         settings: BlinklySettings,
+        timeUtils: BlinklyTimeUtils,
+        calendarWatcher: BlinklyCalendarWatcher,
+        highlightsProvider: BlinklyHighlightsProvider,
+        treeProgressWatcher: BlinklyTreeProgressWatcher,
         homeScreenOutput: (ComponentOutput) -> Unit,
     ) : this(
         componentContext = componentContext,
@@ -47,7 +58,17 @@ class HomeScreenComponentDefault private constructor(
         settings = settings,
         homeScreenOutput = homeScreenOutput,
         mainTabComponent = { childContext, componentOutput ->
-            MainTabComponentDefault(childContext, componentOutput)
+            MainTabComponentDefault(
+                componentContext = childContext,
+                storeFactory = storeFactory,
+                dispatchers = dispatchers,
+                settings = settings,
+                timeUtils = timeUtils,
+                calendarWatcher = calendarWatcher,
+                highlightsProvider = highlightsProvider,
+                treeProgressWatcher = treeProgressWatcher,
+                mainTabOutput = componentOutput,
+            )
         },
         trainingsTabComponent = { childContext, componentOutput ->
             TrainingsTabComponentDefault(childContext, componentOutput)
@@ -86,25 +107,32 @@ class HomeScreenComponentDefault private constructor(
     override fun onTabClick(tab: HomeScreenTab) {
         when (tab) {
             HomeScreenTab.MAIN -> navigation.bringToFront(Config.MainTab)
-            HomeScreenTab.TRAININGS -> navigation.bringToFront(Config.TrainingsTab)
+            HomeScreenTab.TRAINING -> navigation.bringToFront(Config.TrainingsTab)
             HomeScreenTab.PROGRESS -> navigation.bringToFront(Config.ProgressTab)
             HomeScreenTab.REMINDERS -> navigation.bringToFront(Config.RemindersTab)
+        }
+    }
+
+    private fun onChildOutput(output: ComponentOutput) {
+        when (output) {
+            is ComponentOutput.Main.OpenProgressTab -> navigation.bringToFront(Config.ProgressTab)
+            else -> homeScreenOutput(output)
         }
     }
 
     private fun createChild(config: Config, componentContext: ComponentContext): HomeScreenComponent.Child =
         when (config) {
             is Config.MainTab ->
-                HomeScreenComponent.Child.MainTab(mainTabComponent(componentContext, homeScreenOutput))
+                HomeScreenComponent.Child.MainTab(mainTabComponent(componentContext, ::onChildOutput))
 
             is Config.TrainingsTab ->
-                HomeScreenComponent.Child.TrainingsTab(trainingsTabComponent(componentContext, homeScreenOutput))
+                HomeScreenComponent.Child.TrainingsTab(trainingsTabComponent(componentContext, ::onChildOutput))
 
             is Config.ProgressTab ->
-                HomeScreenComponent.Child.ProgressTab(progressTabComponent(componentContext, homeScreenOutput))
+                HomeScreenComponent.Child.ProgressTab(progressTabComponent(componentContext, ::onChildOutput))
 
             is Config.RemindersTab ->
-                HomeScreenComponent.Child.RemindersTab(remindersTabComponent(componentContext, homeScreenOutput))
+                HomeScreenComponent.Child.RemindersTab(remindersTabComponent(componentContext, ::onChildOutput))
         }
 
     private fun markOnboardingCompleted() {

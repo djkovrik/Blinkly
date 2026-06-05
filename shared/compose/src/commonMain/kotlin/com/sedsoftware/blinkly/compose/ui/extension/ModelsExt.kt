@@ -87,6 +87,132 @@ import blinkly.shared.compose.generated.resources.achievement_level_expert
 import blinkly.shared.compose.generated.resources.achievement_level_hidden
 import blinkly.shared.compose.generated.resources.achievement_level_intermediate
 import blinkly.shared.compose.generated.resources.achievement_level_pro
+import blinkly.shared.compose.generated.resources.block_a
+import blinkly.shared.compose.generated.resources.block_a_desc
+import blinkly.shared.compose.generated.resources.block_a_title
+import blinkly.shared.compose.generated.resources.block_b
+import blinkly.shared.compose.generated.resources.block_b_desc
+import blinkly.shared.compose.generated.resources.block_b_title
+import blinkly.shared.compose.generated.resources.block_c
+import blinkly.shared.compose.generated.resources.block_c_desc
+import blinkly.shared.compose.generated.resources.block_c_title
+import blinkly.shared.compose.generated.resources.cta_afternoon_warm_up
+import blinkly.shared.compose.generated.resources.cta_afternoon_warm_up_desc
+import blinkly.shared.compose.generated.resources.cta_day_closing
+import blinkly.shared.compose.generated.resources.cta_day_closing_desc
+import blinkly.shared.compose.generated.resources.cta_evening_relax
+import blinkly.shared.compose.generated.resources.cta_evening_relax_desc
+import blinkly.shared.compose.generated.resources.cta_morning_warmup
+import blinkly.shared.compose.generated.resources.cta_morning_warmup_desc
+import blinkly.shared.compose.generated.resources.cta_perfect_day
+import blinkly.shared.compose.generated.resources.cta_perfect_day_desc
+import blinkly.shared.compose.generated.resources.cta_work_break
+import blinkly.shared.compose.generated.resources.cta_work_break_desc
+import blinkly.shared.compose.generated.resources.exercise_blink_break
+import blinkly.shared.compose.generated.resources.exercise_blink_break_desc
+import blinkly.shared.compose.generated.resources.exercise_clock_rolls
+import blinkly.shared.compose.generated.resources.exercise_clock_rolls_desc
+import blinkly.shared.compose.generated.resources.exercise_diagonal_gazes
+import blinkly.shared.compose.generated.resources.exercise_diagonal_gazes_desc
+import blinkly.shared.compose.generated.resources.exercise_figure_eight
+import blinkly.shared.compose.generated.resources.exercise_figure_eight_desc
+import blinkly.shared.compose.generated.resources.exercise_near_far_focus
+import blinkly.shared.compose.generated.resources.exercise_near_far_focus_desc
+import blinkly.shared.compose.generated.resources.exercise_palming
+import blinkly.shared.compose.generated.resources.exercise_palming_desc
+import blinkly.shared.compose.generated.resources.exercise_twenty_x3
+import blinkly.shared.compose.generated.resources.exercise_twenty_x3_desc
+import blinkly.shared.compose.generated.resources.fact_of_the_day
+import blinkly.shared.compose.generated.resources.greetings_afternoon
+import blinkly.shared.compose.generated.resources.greetings_evening
+import blinkly.shared.compose.generated.resources.greetings_morning
+import blinkly.shared.compose.generated.resources.highlight_fact31
+import blinkly.shared.compose.generated.resources.highlight_fact32
+import blinkly.shared.compose.generated.resources.highlight_fact33
+import blinkly.shared.compose.generated.resources.highlight_fact34
+import blinkly.shared.compose.generated.resources.highlight_fact35
+import blinkly.shared.compose.generated.resources.highlight_fact36
+import blinkly.shared.compose.generated.resources.highlight_fact37
+import blinkly.shared.compose.generated.resources.highlight_fact38
+import blinkly.shared.compose.generated.resources.highlight_fact39
+import blinkly.shared.compose.generated.resources.highlight_fact40
+import blinkly.shared.compose.generated.resources.highlight_fact41
+import blinkly.shared.compose.generated.resources.highlight_fact42
+import blinkly.shared.compose.generated.resources.highlight_fact43
+import blinkly.shared.compose.generated.resources.highlight_fact44
+import blinkly.shared.compose.generated.resources.highlight_fact45
+import blinkly.shared.compose.generated.resources.highlight_fact46
+import blinkly.shared.compose.generated.resources.highlight_fact47
+import blinkly.shared.compose.generated.resources.highlight_fact48
+import blinkly.shared.compose.generated.resources.highlight_fact49
+import blinkly.shared.compose.generated.resources.highlight_fact50
+import blinkly.shared.compose.generated.resources.highlight_tip10_description
+import blinkly.shared.compose.generated.resources.highlight_tip10_title
+import blinkly.shared.compose.generated.resources.highlight_tip11_description
+import blinkly.shared.compose.generated.resources.highlight_tip11_title
+import blinkly.shared.compose.generated.resources.highlight_tip12_description
+import blinkly.shared.compose.generated.resources.highlight_tip12_title
+import blinkly.shared.compose.generated.resources.highlight_tip13_description
+import blinkly.shared.compose.generated.resources.highlight_tip13_title
+import blinkly.shared.compose.generated.resources.highlight_tip14_description
+import blinkly.shared.compose.generated.resources.highlight_tip14_title
+import blinkly.shared.compose.generated.resources.highlight_tip15_description
+import blinkly.shared.compose.generated.resources.highlight_tip15_title
+import blinkly.shared.compose.generated.resources.highlight_tip16_description
+import blinkly.shared.compose.generated.resources.highlight_tip16_title
+import blinkly.shared.compose.generated.resources.highlight_tip17_description
+import blinkly.shared.compose.generated.resources.highlight_tip17_title
+import blinkly.shared.compose.generated.resources.highlight_tip18_description
+import blinkly.shared.compose.generated.resources.highlight_tip18_title
+import blinkly.shared.compose.generated.resources.highlight_tip19_description
+import blinkly.shared.compose.generated.resources.highlight_tip19_title
+import blinkly.shared.compose.generated.resources.highlight_tip1_description
+import blinkly.shared.compose.generated.resources.highlight_tip1_title
+import blinkly.shared.compose.generated.resources.highlight_tip20_description
+import blinkly.shared.compose.generated.resources.highlight_tip20_title
+import blinkly.shared.compose.generated.resources.highlight_tip21_description
+import blinkly.shared.compose.generated.resources.highlight_tip21_title
+import blinkly.shared.compose.generated.resources.highlight_tip22_description
+import blinkly.shared.compose.generated.resources.highlight_tip22_title
+import blinkly.shared.compose.generated.resources.highlight_tip23_description
+import blinkly.shared.compose.generated.resources.highlight_tip23_title
+import blinkly.shared.compose.generated.resources.highlight_tip24_description
+import blinkly.shared.compose.generated.resources.highlight_tip24_title
+import blinkly.shared.compose.generated.resources.highlight_tip25_description
+import blinkly.shared.compose.generated.resources.highlight_tip25_title
+import blinkly.shared.compose.generated.resources.highlight_tip26_description
+import blinkly.shared.compose.generated.resources.highlight_tip26_title
+import blinkly.shared.compose.generated.resources.highlight_tip27_description
+import blinkly.shared.compose.generated.resources.highlight_tip27_title
+import blinkly.shared.compose.generated.resources.highlight_tip28_description
+import blinkly.shared.compose.generated.resources.highlight_tip28_title
+import blinkly.shared.compose.generated.resources.highlight_tip29_description
+import blinkly.shared.compose.generated.resources.highlight_tip29_title
+import blinkly.shared.compose.generated.resources.highlight_tip2_description
+import blinkly.shared.compose.generated.resources.highlight_tip2_title
+import blinkly.shared.compose.generated.resources.highlight_tip30_description
+import blinkly.shared.compose.generated.resources.highlight_tip30_title
+import blinkly.shared.compose.generated.resources.highlight_tip3_description
+import blinkly.shared.compose.generated.resources.highlight_tip3_title
+import blinkly.shared.compose.generated.resources.highlight_tip4_description
+import blinkly.shared.compose.generated.resources.highlight_tip4_title
+import blinkly.shared.compose.generated.resources.highlight_tip5_description
+import blinkly.shared.compose.generated.resources.highlight_tip5_title
+import blinkly.shared.compose.generated.resources.highlight_tip6_description
+import blinkly.shared.compose.generated.resources.highlight_tip6_title
+import blinkly.shared.compose.generated.resources.highlight_tip7_description
+import blinkly.shared.compose.generated.resources.highlight_tip7_title
+import blinkly.shared.compose.generated.resources.highlight_tip8_description
+import blinkly.shared.compose.generated.resources.highlight_tip8_title
+import blinkly.shared.compose.generated.resources.highlight_tip9_description
+import blinkly.shared.compose.generated.resources.highlight_tip9_title
+import blinkly.shared.compose.generated.resources.stage_growing
+import blinkly.shared.compose.generated.resources.stage_magnificent
+import blinkly.shared.compose.generated.resources.stage_mature
+import blinkly.shared.compose.generated.resources.stage_small
+import blinkly.shared.compose.generated.resources.stage_strong
+import blinkly.shared.compose.generated.resources.stage_tiny
+import blinkly.shared.compose.generated.resources.stage_young
 import blinkly.shared.compose.generated.resources.tree10_quercus_robur_stage1
 import blinkly.shared.compose.generated.resources.tree10_quercus_robur_stage2
 import blinkly.shared.compose.generated.resources.tree10_quercus_robur_stage3
@@ -157,19 +283,36 @@ import blinkly.shared.compose.generated.resources.tree9_ficus_benjamina_stage4
 import blinkly.shared.compose.generated.resources.tree9_ficus_benjamina_stage5
 import blinkly.shared.compose.generated.resources.tree9_ficus_benjamina_stage6
 import blinkly.shared.compose.generated.resources.tree9_ficus_benjamina_stage7
+import blinkly.shared.compose.generated.resources.tree_adansonia
+import blinkly.shared.compose.generated.resources.tree_betula
+import blinkly.shared.compose.generated.resources.tree_ficus_benjamina
+import blinkly.shared.compose.generated.resources.tree_fraxinus_excelsior
+import blinkly.shared.compose.generated.resources.tree_ginkgo_biloba
+import blinkly.shared.compose.generated.resources.tree_mimosa_pudica
+import blinkly.shared.compose.generated.resources.tree_pinus
+import blinkly.shared.compose.generated.resources.tree_quercus_robur
+import blinkly.shared.compose.generated.resources.tree_salix_babylonica
+import blinkly.shared.compose.generated.resources.tree_sequoia_sempervirens
+import blinkly.shared.compose.generated.resources.tip_of_the_day
 import blinkly.shared.compose.generated.resources.week_monday
 import blinkly.shared.compose.generated.resources.week_saturday
 import blinkly.shared.compose.generated.resources.week_sunday
 import blinkly.shared.compose.generated.resources.week_thursday
 import blinkly.shared.compose.generated.resources.week_tuesday
 import blinkly.shared.compose.generated.resources.week_wednesday
+import com.sedsoftware.blinkly.component.main.domain.model.GreetingPeriod
+import com.sedsoftware.blinkly.component.main.domain.model.MainCtaState
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
+import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.ExerciseType
+import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeStage
 import com.sedsoftware.blinkly.domain.model.TreeType
 import kotlinx.datetime.DayOfWeek
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -330,6 +473,229 @@ fun AchievementLevel.asLabel(): String =
         AchievementLevel.PRO -> stringResource(Res.string.achievement_level_pro)
         AchievementLevel.EXPERT -> stringResource(Res.string.achievement_level_expert)
         AchievementLevel.HIDDEN -> stringResource(Res.string.achievement_level_hidden)
+    }
+
+@Composable
+fun TreeType.asLabel(): String =
+    when (this) {
+        TreeType.FRAXINUS_EXCELSIOR -> stringResource(Res.string.tree_fraxinus_excelsior)
+        TreeType.GINKGO_BILOBA -> stringResource(Res.string.tree_ginkgo_biloba)
+        TreeType.SALIX_BABYLONICA -> stringResource(Res.string.tree_salix_babylonica)
+        TreeType.PINUS -> stringResource(Res.string.tree_pinus)
+        TreeType.ADANSONIA -> stringResource(Res.string.tree_adansonia)
+        TreeType.MIMOSA_PUDICA -> stringResource(Res.string.tree_mimosa_pudica)
+        TreeType.SEQUOIA_SEMPERVIRENS -> stringResource(Res.string.tree_sequoia_sempervirens)
+        TreeType.BETULA -> stringResource(Res.string.tree_betula)
+        TreeType.FICUS_BENJAMINA -> stringResource(Res.string.tree_ficus_benjamina)
+        TreeType.QUERCUS_ROBUR -> stringResource(Res.string.tree_quercus_robur)
+    }
+
+@Composable
+fun TreeStage.asLabel(): String =
+    when (this) {
+        TreeStage.TINY -> stringResource(Res.string.stage_tiny)
+        TreeStage.SMALL -> stringResource(Res.string.stage_small)
+        TreeStage.YOUNG -> stringResource(Res.string.stage_young)
+        TreeStage.GROWING -> stringResource(Res.string.stage_growing)
+        TreeStage.STRONG -> stringResource(Res.string.stage_strong)
+        TreeStage.MATURE -> stringResource(Res.string.stage_mature)
+        TreeStage.MAGNIFICENT -> stringResource(Res.string.stage_magnificent)
+    }
+
+@Composable
+fun GreetingPeriod.asLabel(): String =
+    when (this) {
+        GreetingPeriod.MORNING -> stringResource(Res.string.greetings_morning)
+        GreetingPeriod.DAY -> stringResource(Res.string.greetings_afternoon)
+        GreetingPeriod.EVENING -> stringResource(Res.string.greetings_evening)
+    }
+
+@Composable
+fun MainCtaState.asTitle(): String =
+    when (this) {
+        MainCtaState.MorningWarmUp,
+        MainCtaState.Idle -> stringResource(Res.string.cta_morning_warmup)
+        MainCtaState.WorkBreakDue -> stringResource(Res.string.cta_work_break)
+        MainCtaState.AfternoonWarmUp -> stringResource(Res.string.cta_afternoon_warm_up)
+        MainCtaState.EveningRelax -> stringResource(Res.string.cta_evening_relax)
+        MainCtaState.DayClosing -> stringResource(Res.string.cta_day_closing)
+        MainCtaState.PerfectDay -> stringResource(Res.string.cta_perfect_day)
+    }
+
+@Composable
+fun MainCtaState.asDescription(): String =
+    when (this) {
+        MainCtaState.MorningWarmUp,
+        MainCtaState.Idle -> stringResource(Res.string.cta_morning_warmup_desc)
+        MainCtaState.WorkBreakDue -> stringResource(Res.string.cta_work_break_desc)
+        MainCtaState.AfternoonWarmUp -> stringResource(Res.string.cta_afternoon_warm_up_desc)
+        MainCtaState.EveningRelax -> stringResource(Res.string.cta_evening_relax_desc)
+        MainCtaState.DayClosing -> stringResource(Res.string.cta_day_closing_desc)
+        MainCtaState.PerfectDay -> stringResource(Res.string.cta_perfect_day_desc)
+    }
+
+@Composable
+fun ExerciseBlock.asLabel(): String =
+    when(this) {
+        ExerciseBlock.A -> stringResource(Res.string.block_a)
+        ExerciseBlock.B -> stringResource(Res.string.block_b)
+        ExerciseBlock.C -> stringResource(Res.string.block_c)
+    }
+
+@Composable
+fun ExerciseBlock.asTitle(): String =
+    when(this) {
+        ExerciseBlock.A -> stringResource(Res.string.block_a_title)
+        ExerciseBlock.B -> stringResource(Res.string.block_b_title)
+        ExerciseBlock.C -> stringResource(Res.string.block_c_title)
+    }
+
+@Composable
+fun ExerciseBlock.asDescription(): String =
+    when(this) {
+        ExerciseBlock.A -> stringResource(Res.string.block_a_desc)
+        ExerciseBlock.B -> stringResource(Res.string.block_b_desc)
+        ExerciseBlock.C -> stringResource(Res.string.block_c_desc)
+    }
+
+@Composable
+fun ExerciseType.asTitle(): String =
+    when (this) {
+        ExerciseType.BLINK_BREAK -> stringResource(Res.string.exercise_blink_break)
+        ExerciseType.NEAR_FAR_FOCUS -> stringResource(Res.string.exercise_near_far_focus)
+        ExerciseType.DIAGONAL_GAZES -> stringResource(Res.string.exercise_diagonal_gazes)
+        ExerciseType.FIGURE_EIGHT -> stringResource(Res.string.exercise_figure_eight)
+        ExerciseType.CLOCK_ROLLS -> stringResource(Res.string.exercise_clock_rolls)
+        ExerciseType.PALMING -> stringResource(Res.string.exercise_palming)
+        ExerciseType.TWENTY_X3 -> stringResource(Res.string.exercise_twenty_x3)
+    }
+
+@Composable
+fun ExerciseType.asDescription(): String =
+    when (this) {
+        ExerciseType.BLINK_BREAK -> stringResource(Res.string.exercise_blink_break_desc)
+        ExerciseType.NEAR_FAR_FOCUS -> stringResource(Res.string.exercise_near_far_focus_desc)
+        ExerciseType.DIAGONAL_GAZES -> stringResource(Res.string.exercise_diagonal_gazes_desc)
+        ExerciseType.FIGURE_EIGHT -> stringResource(Res.string.exercise_figure_eight_desc)
+        ExerciseType.CLOCK_ROLLS -> stringResource(Res.string.exercise_clock_rolls_desc)
+        ExerciseType.PALMING -> stringResource(Res.string.exercise_palming_desc)
+        ExerciseType.TWENTY_X3 -> stringResource(Res.string.exercise_twenty_x3_desc)
+    }
+
+@Composable
+fun HighlightOfTheDay.asTitle(): String =
+    when (this) {
+        is HighlightOfTheDay.Tip -> stringResource(Res.string.tip_of_the_day)
+        is HighlightOfTheDay.Fact -> stringResource(Res.string.fact_of_the_day)
+    }
+
+@Composable
+fun HighlightOfTheDay.Tip.asTitle(): String =
+    stringResource(titleResource())
+
+@Composable
+fun HighlightOfTheDay.Tip.asDescription(): String =
+    stringResource(descriptionResource())
+
+@Composable
+fun HighlightOfTheDay.Fact.asDescription(): String =
+    stringResource(descriptionResource())
+
+@Suppress("CyclomaticComplexMethod")
+private fun HighlightOfTheDay.Tip.titleResource(): StringResource =
+    when (index) {
+        1 -> Res.string.highlight_tip1_title
+        2 -> Res.string.highlight_tip2_title
+        3 -> Res.string.highlight_tip3_title
+        4 -> Res.string.highlight_tip4_title
+        5 -> Res.string.highlight_tip5_title
+        6 -> Res.string.highlight_tip6_title
+        7 -> Res.string.highlight_tip7_title
+        8 -> Res.string.highlight_tip8_title
+        9 -> Res.string.highlight_tip9_title
+        10 -> Res.string.highlight_tip10_title
+        11 -> Res.string.highlight_tip11_title
+        12 -> Res.string.highlight_tip12_title
+        13 -> Res.string.highlight_tip13_title
+        14 -> Res.string.highlight_tip14_title
+        15 -> Res.string.highlight_tip15_title
+        16 -> Res.string.highlight_tip16_title
+        17 -> Res.string.highlight_tip17_title
+        18 -> Res.string.highlight_tip18_title
+        19 -> Res.string.highlight_tip19_title
+        20 -> Res.string.highlight_tip20_title
+        21 -> Res.string.highlight_tip21_title
+        22 -> Res.string.highlight_tip22_title
+        23 -> Res.string.highlight_tip23_title
+        24 -> Res.string.highlight_tip24_title
+        25 -> Res.string.highlight_tip25_title
+        26 -> Res.string.highlight_tip26_title
+        27 -> Res.string.highlight_tip27_title
+        28 -> Res.string.highlight_tip28_title
+        29 -> Res.string.highlight_tip29_title
+        30 -> Res.string.highlight_tip30_title
+        else -> Res.string.highlight_tip1_title
+    }
+
+@Suppress("CyclomaticComplexMethod")
+private fun HighlightOfTheDay.Tip.descriptionResource(): StringResource =
+    when (index) {
+        1 -> Res.string.highlight_tip1_description
+        2 -> Res.string.highlight_tip2_description
+        3 -> Res.string.highlight_tip3_description
+        4 -> Res.string.highlight_tip4_description
+        5 -> Res.string.highlight_tip5_description
+        6 -> Res.string.highlight_tip6_description
+        7 -> Res.string.highlight_tip7_description
+        8 -> Res.string.highlight_tip8_description
+        9 -> Res.string.highlight_tip9_description
+        10 -> Res.string.highlight_tip10_description
+        11 -> Res.string.highlight_tip11_description
+        12 -> Res.string.highlight_tip12_description
+        13 -> Res.string.highlight_tip13_description
+        14 -> Res.string.highlight_tip14_description
+        15 -> Res.string.highlight_tip15_description
+        16 -> Res.string.highlight_tip16_description
+        17 -> Res.string.highlight_tip17_description
+        18 -> Res.string.highlight_tip18_description
+        19 -> Res.string.highlight_tip19_description
+        20 -> Res.string.highlight_tip20_description
+        21 -> Res.string.highlight_tip21_description
+        22 -> Res.string.highlight_tip22_description
+        23 -> Res.string.highlight_tip23_description
+        24 -> Res.string.highlight_tip24_description
+        25 -> Res.string.highlight_tip25_description
+        26 -> Res.string.highlight_tip26_description
+        27 -> Res.string.highlight_tip27_description
+        28 -> Res.string.highlight_tip28_description
+        29 -> Res.string.highlight_tip29_description
+        30 -> Res.string.highlight_tip30_description
+        else -> Res.string.highlight_tip1_description
+    }
+
+private fun HighlightOfTheDay.Fact.descriptionResource(): StringResource =
+    when (index) {
+        31 -> Res.string.highlight_fact31
+        32 -> Res.string.highlight_fact32
+        33 -> Res.string.highlight_fact33
+        34 -> Res.string.highlight_fact34
+        35 -> Res.string.highlight_fact35
+        36 -> Res.string.highlight_fact36
+        37 -> Res.string.highlight_fact37
+        38 -> Res.string.highlight_fact38
+        39 -> Res.string.highlight_fact39
+        40 -> Res.string.highlight_fact40
+        41 -> Res.string.highlight_fact41
+        42 -> Res.string.highlight_fact42
+        43 -> Res.string.highlight_fact43
+        44 -> Res.string.highlight_fact44
+        45 -> Res.string.highlight_fact45
+        46 -> Res.string.highlight_fact46
+        47 -> Res.string.highlight_fact47
+        48 -> Res.string.highlight_fact48
+        49 -> Res.string.highlight_fact49
+        50 -> Res.string.highlight_fact50
+        else -> Res.string.highlight_fact31
     }
 
 @Composable

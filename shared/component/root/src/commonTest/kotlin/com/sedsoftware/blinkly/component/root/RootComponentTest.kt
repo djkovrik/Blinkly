@@ -24,10 +24,14 @@ import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
+import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.datetime.TimeZone
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.time.Clock
 
 class RootComponentTest : ComponentTest<RootComponent>() {
 
@@ -36,13 +40,22 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val notifierMock: BlinklyNotifier = mock()
     private val settingsMock: BlinklySettings = mock()
     private val fakeSettings = FakeSettings(settingsMock = settingsMock)
-    private val timeUtilsMock: BlinklyTimeUtils = mock()
+    private val timeUtilsMock: BlinklyTimeUtils = mock {
+        every { now() } returns Clock.System.now()
+        every { timeZone() } returns TimeZone.UTC
+    }
     private val achievementsWatcherMock: BlinklyAchievementsWatcher = mock()
-    private val calendarWatcherMock: BlinklyCalendarWatcher = mock()
+    private val calendarWatcherMock: BlinklyCalendarWatcher = mock {
+        every { calendar } returns emptyFlow()
+    }
     private val exerciseManagerMock: BlinklyExerciseManager = mock()
-    private val highlightsProviderMock: BlinklyHighlightsProvider = mock()
+    private val highlightsProviderMock: BlinklyHighlightsProvider = mock {
+        everySuspend { get() } returns com.sedsoftware.blinkly.domain.model.HighlightOfTheDay.Tip(1)
+    }
     private val reminderManagerMock: BlinklyReminderManager = mock()
-    private val treeProgressWatcherMock: BlinklyTreeProgressWatcher = mock()
+    private val treeProgressWatcherMock: BlinklyTreeProgressWatcher = mock {
+        every { tree } returns kotlinx.coroutines.flow.emptyFlow()
+    }
 
     @Test
     fun `when component created for the first time then initial child is onboarding`() = runTest(testScheduler) {
@@ -92,7 +105,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     fun `when block A clicked then navigation stack updated`() = runTest(testScheduler) {
         // given
         completeOnboardingFlow(component)
-        switchTab(HomeScreenTab.TRAININGS)
+        switchTab(HomeScreenTab.TRAINING)
         val homeScreenChild = component.childStack.active.instance as RootComponent.Child.HomeScreen
         val currentTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.TrainingsTab
         // when
@@ -109,7 +122,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     fun `when block B clicked then navigation stack updated`() = runTest(testScheduler) {
         // given
         completeOnboardingFlow(component)
-        switchTab(HomeScreenTab.TRAININGS)
+        switchTab(HomeScreenTab.TRAINING)
         val homeScreenChild = component.childStack.active.instance as RootComponent.Child.HomeScreen
         val currentTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.TrainingsTab
         // when
@@ -126,7 +139,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     fun `when block C clicked then navigation stack updated`() = runTest(testScheduler) {
         // given
         completeOnboardingFlow(component)
-        switchTab(HomeScreenTab.TRAININGS)
+        switchTab(HomeScreenTab.TRAINING)
         val homeScreenChild = component.childStack.active.instance as RootComponent.Child.HomeScreen
         val currentTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.TrainingsTab
         // when

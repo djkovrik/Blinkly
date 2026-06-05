@@ -1,6 +1,6 @@
 ---
-name: blinkly-mvikotlin
-description: Write or update MVIKotlin stores for the Blinkly Kotlin Multiplatform project. Use when a Blinkly component needs state, reducer-driven updates, startup actions, asynchronous business logic, or one-off labels. Prefer this skill over generic MVIKotlin advice whenever work touches `shared/component/**/store` or a component that may need a Store.
+name: mvikotlin
+description: Use in the Blinkly Kotlin Multiplatform repository when adding, changing, or reviewing MVIKotlin Store contracts, StoreProviders, reducers, coroutine executors, bootstrappers, labels, integration mappers, or Store-backed component models under `shared/component/**`; prefer this over generic MVIKotlin guidance whenever a Blinkly component may need reducer-owned state, startup work, subscriptions, async business logic, or one-off errors.
 ---
 
 # Blinkly MVIKotlin
@@ -50,6 +50,7 @@ Create an internal Store contract:
 - `internal interface FeatureStore : Store<Intent, State, Label>`
 - keep `Intent`, `State`, and `Label` nested inside the Store interface
 - use `Nothing` for labels when the feature has no one-off events
+- keep Store contracts independent from component UI contracts: `State` must not reference `Component.Model` or other component-facing model classes
 
 Create a provider class:
 - name it `FeatureStoreProvider`
@@ -84,6 +85,9 @@ Use these patterns:
 - `onAction<...> { ... }` for bootstrapper actions
 - `launch { ... }` for async work
 - `withContext(ioContext)` for IO or heavier domain calls
+- feature-local managers in component `domain` packages return `Result<T>` from suspend/business operations using `runCatching`
+- handle manager results with `unwrap(result = ..., onSuccess = ..., onError = ...)` in the executor
+- keep manager flow subscriptions as `Flow<T>` and protect them with `.catch { publish(Label.ErrorCaught(it)) }`
 - `publish(Label.ErrorCaught(...))` for one-off failures that should not live in state
 
 `step5` is the reference for subscribing to flows and translating stream updates into `Msg` values, even though its Compose UI is still incomplete.
@@ -97,6 +101,7 @@ Expose UI state as:
 - `store.asValue().map(stateToModel)`
 
 Keep the mapper in `integration/Mappers.kt`.
+Build the public component `Model` only in this mapper from Store fields. The Store may keep raw feature fields or feature/domain snapshots, but it should not store the component `Model` directly.
 The component should:
 - translate UI actions into Store intents
 - translate Store labels into parent outputs only if a parent actually needs the event
@@ -120,8 +125,9 @@ Do not leak platform-specific exceptions into Compose.
 
 ## Testing expectations
 
-If the Store has non-trivial behaviour, cover it through component tests in `commonTest`.
+If the Store has non-trivial behaviour, cover it through component tests in `shared/component/root/src/commonTest`, even when the component itself lives in another module.
 Reference:
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/ComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/onboarding/OnboardingComponentTest.kt`
 
 Test these behaviours:

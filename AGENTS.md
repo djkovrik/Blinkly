@@ -30,14 +30,37 @@ Core stack:
 
 ## Local Skills
 
-Local project skills live in `docs/skills`:
-- `blinkly-mvikotlin` - [docs/skills/blinkly-mvikotlin/SKILL.md](D:/Sources/Android/Blinkly/docs/skills/blinkly-mvikotlin/SKILL.md)
-- `blinkly-decompose` - [docs/skills/blinkly-decompose/SKILL.md](D:/Sources/Android/Blinkly/docs/skills/blinkly-decompose/SKILL.md)
-- `blinkly-decompose-component-tests` - [docs/skills/blinkly-decompose-component-tests/SKILL.md](D:/Sources/Android/Blinkly/docs/skills/blinkly-decompose-component-tests/SKILL.md)
+Blinkly-specific skills are project-local. Treat the copies in `.ai/skills`
+as the source of truth:
+- `mvikotlin` - [.ai/skills/mvikotlin/SKILL.md](D:/Sources/Android/Blinkly/.ai/skills/mvikotlin/SKILL.md)
+- `decompose` - [.ai/skills/decompose/SKILL.md](D:/Sources/Android/Blinkly/.ai/skills/decompose/SKILL.md)
+- `decompose-component-tests` - [.ai/skills/decompose-component-tests/SKILL.md](D:/Sources/Android/Blinkly/.ai/skills/decompose-component-tests/SKILL.md)
 
-These files are local project references. They improve discoverability for agents and contributors reading this repository, but they are not automatically installed as Codex skills unless copied or installed into the Codex skills directory.
+Read local skills lazily:
+- Before reading a skill body, match the current task against the skill's
+  `name` and `description`.
+- Read only the matching `SKILL.md` files, and only after `AGENTS.md` gives
+  enough project context to decide that the skill applies.
+- Do not preload all local skills at the start of a task.
+- If multiple skills could apply, read the minimal set needed for the current
+  change and explain the order briefly.
 
-If Blinkly-specific skills are installed into the Codex skills directory, keep the repository copies in `docs/skills` as the source of truth and update both the installed and repository versions together.
+Use `decompose` when work touches Decompose component contracts, default
+implementations, factories, navigation stacks, child outputs, tab navigation,
+or Compose bindings to component state.
+
+Use `mvikotlin` when a Blinkly component needs or already has an MVIKotlin
+Store, StoreProvider, reducer, executor, bootstrapper, label, integration
+mapper, or Store-backed model.
+
+Use `decompose-component-tests` when writing or reviewing commonTest coverage
+for component navigation, parent-child output propagation, Store-backed
+component state, lifecycle behaviour, coroutine side effects, or Mokkery
+collaborator verification.
+
+These skills should not be duplicated in the global Codex skills directory for
+normal Blinkly work. If a global copy exists temporarily, update the
+repository copy first and remove or refresh the global copy immediately after.
 
 ## Repository Layout
 
@@ -104,11 +127,12 @@ Apply these rules by default when changing Blinkly code:
 - Prefer a thin Decompose component without MVIKotlin when the feature only forwards user actions to `ComponentOutput`.
 - Add MVIKotlin only when the feature needs reducer-owned state, async work, startup subscriptions, or one-off labels.
 - Retain Stores with `instanceKeeper.getStore { ... }` and expose UI state through `store.asValue().map(stateToModel)`.
+- Keep Store contracts independent from component UI contracts. Do not put `Component.Model` or other component-facing UI models into Store `State`; keep Store state as raw feature fields or feature/domain state and build the component `Model` only in `integration/Mappers.kt`.
 - Keep Store reducers pure. Put side effects, subscriptions, and IO switching in the executor.
 - Route cross-component events upward through `ComponentOutput`; do not let child components manipulate parent navigation directly.
 - Keep dependencies in constructors and root or parent factories; never place dependencies into Decompose navigation configs.
 - Keep Compose as a rendering layer only. Do not move business logic, navigation decisions, or mutable feature state into composables.
-- Cover Decompose behaviour in `commonTest` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
+- Cover Decompose behaviour in `shared/component/root/src/commonTest`, extending `ComponentTest<T>` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
 
 When unsure whether to follow a generic library pattern or the project pattern, follow the project pattern demonstrated in `step4`, `step5`, and `onboarding`. Treat `home`, `root`, and non-onboarding feature modules as navigation/skeleton references unless the code clearly shows completed behaviour.
 
@@ -222,6 +246,8 @@ These match both local code and official MVIKotlin guidance:
 - reducer work stays on the main thread
 - switch to `dispatchers.io` inside executor coroutines for IO or long-running operations
 - publish one-off failures through `Label` when they should not live in state
+- feature-local managers in component `domain` packages should wrap suspend/business operations in `Result<T>` via `runCatching`; Store executors handle those results with `unwrap(...)`
+- flow subscriptions may remain as `Flow<T>` from managers and should be protected with `.catch { publish(Label.ErrorCaught(it)) }` in the executor
 
 `step5` is the reference for bootstrapper plus subscriptions.
 `step4` is the reference for a minimal synchronous Store.
@@ -232,7 +258,8 @@ Expose component state as Decompose `Value<Model>`.
 Local pattern:
 - `store.asValue().map(stateToModel)`
 - keep `stateToModel` in `integration/Mappers.kt`
-- component `Model` should be UI-oriented and decoupled from raw Store state where practical
+- component `Model` should be UI-oriented and decoupled from raw Store state
+- Store `State` should not reference component interfaces or component `Model` classes; map raw Store fields to component `Model` in `stateToModel`
 
 Utility reference:
 - `shared/utils/src/commonMain/kotlin/com/sedsoftware/blinkly/utils/StoreExt.kt`
@@ -267,6 +294,7 @@ Platform note:
 ## Testing Conventions
 
 Component tests are common tests, not instrumentation tests.
+Local convention: component tests live in `shared/component/root/src/commonTest`, even when the component under test belongs to another component module. This keeps shared component test utilities and cross-component navigation coverage in one module.
 Base test utility:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/ComponentTest.kt`
 
