@@ -85,7 +85,7 @@ fun MainTabContent(
                             painter = painterResource(resource = Res.drawable.icon_settings),
                             tint = MaterialTheme.colorScheme.primary,
                             contentDescription = stringResource(resource = Res.string.content_description_settings),
-                            modifier = Modifier.size(size = 32.dp)
+                            modifier = Modifier.size(size = 28.dp)
                         )
                     }
                 }
