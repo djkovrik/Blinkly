@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,13 +25,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.LayoutDirection
 import blinkly.shared.compose.generated.resources.Res
 import blinkly.shared.compose.generated.resources.content_description_settings
+import blinkly.shared.compose.generated.resources.cta_start
 import blinkly.shared.compose.generated.resources.icon_settings
 import blinkly.shared.compose.generated.resources.info_activities
 import blinkly.shared.compose.generated.resources.info_activities_breaks
@@ -55,6 +63,7 @@ import com.sedsoftware.blinkly.domain.model.TreeStage
 import com.sedsoftware.blinkly.domain.model.TreeType
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.roundToInt
 
 @Composable
 fun MainTabContent(
@@ -76,6 +85,7 @@ fun MainTabContent(
                             painter = painterResource(resource = Res.drawable.icon_settings),
                             tint = MaterialTheme.colorScheme.primary,
                             contentDescription = stringResource(resource = Res.string.content_description_settings),
+                            modifier = Modifier.size(size = 32.dp)
                         )
                     }
                 }
@@ -87,7 +97,6 @@ fun MainTabContent(
             verticalArrangement = Arrangement.spacedBy(space = 16.dp),
             modifier = Modifier
                 .padding(paddingValues = paddingValues)
-                .padding(all = 16.dp)
                 .fillMaxSize()
                 .verticalScroll(state = rememberScrollState())
         ) {
@@ -96,6 +105,12 @@ fun MainTabContent(
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            FirstCardTreeGrowth(
+                model = model,
+                onCtaClick = component::onPrimaryCtaClick,
+                modifier = Modifier,
             )
 
             SecondCardTreeGrowth(
@@ -118,6 +133,132 @@ fun MainTabContent(
                     .shimmering(visible = model.highlight == null)
                     .fillMaxWidth()
             )
+        }
+    }
+}
+
+@Composable
+private fun FirstCardTreeGrowth(
+    model: MainTabComponent.Model,
+    onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ElevatedCard(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 1.dp,
+        ),
+        onClick = onCtaClick,
+        modifier = modifier,
+    ) {
+        FirstCardTreeGrowthContent(
+            title = model.ctaState.asTitle(),
+            description = model.ctaState.asDescription(),
+            cta = stringResource(resource = Res.string.cta_start).uppercase(),
+            modifier = Modifier.padding(all = 16.dp),
+        )
+    }
+}
+
+@Composable
+private fun FirstCardTreeGrowthContent(
+    title: String,
+    description: String,
+    cta: String,
+    modifier: Modifier = Modifier,
+) {
+    val textMeasurer = rememberTextMeasurer()
+    val titleStyle = MaterialTheme.typography.titleMedium
+    val descriptionStyle = MaterialTheme.typography.bodyLarge
+    val ctaStyle = MaterialTheme.typography.titleSmall
+    val titleBottomPadding = 16.dp
+    val descriptionBottomPadding = 8.dp
+    val inlineCtaMinGap = 8.dp
+    val inlineCtaVerticalOffset = 8.dp
+
+    Layout(
+        content = {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                style = titleStyle,
+            )
+
+            Text(
+                text = description,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                style = descriptionStyle,
+            )
+
+            Text(
+                text = cta,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f),
+                style = ctaStyle,
+            )
+        },
+        modifier = modifier,
+    ) { measurables, constraints ->
+        val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+        val titlePlaceable = measurables[0].measure(looseConstraints)
+        val descriptionPlaceable = measurables[1].measure(looseConstraints)
+        val ctaPlaceable = measurables[2].measure(looseConstraints)
+
+        val width = maxOf(
+            titlePlaceable.width,
+            descriptionPlaceable.width,
+            ctaPlaceable.width,
+            constraints.minWidth,
+        ).coerceAtMost(maximumValue = constraints.maxWidth)
+
+        val titleBottomPaddingPx = titleBottomPadding.roundToPx()
+        val descriptionBottomPaddingPx = descriptionBottomPadding.roundToPx()
+        val inlineCtaMinGapPx = inlineCtaMinGap.roundToPx()
+        val inlineCtaVerticalOffsetPx = inlineCtaVerticalOffset.roundToPx()
+        val descriptionY = titlePlaceable.height + titleBottomPaddingPx
+
+        val descriptionLayoutResult = textMeasurer.measure(
+            text = AnnotatedString(description),
+            style = descriptionStyle,
+            constraints = looseConstraints,
+            layoutDirection = layoutDirection,
+        )
+        val lastLineIndex = descriptionLayoutResult.lineCount - 1
+        val ctaX = width - ctaPlaceable.width
+        val canPlaceCtaInline = if (lastLineIndex < 0) {
+            false
+        } else if (layoutDirection == LayoutDirection.Ltr) {
+            descriptionLayoutResult.getLineRight(lastLineIndex).roundToInt() + inlineCtaMinGapPx <= ctaX
+        } else {
+            ctaPlaceable.width + inlineCtaMinGapPx <= descriptionLayoutResult.getLineLeft(lastLineIndex).roundToInt()
+        }
+
+        val ctaY = if (canPlaceCtaInline) {
+            val ctaBaseline = ctaPlaceable[FirstBaseline]
+
+            if (ctaBaseline != AlignmentLine.Unspecified) {
+                descriptionY +
+                        descriptionLayoutResult.getLineBaseline(lastLineIndex).roundToInt() -
+                        ctaBaseline +
+                        inlineCtaVerticalOffsetPx
+            } else {
+                descriptionY + descriptionLayoutResult.getLineTop(lastLineIndex).roundToInt() + inlineCtaVerticalOffsetPx
+            }
+        } else {
+            descriptionY + descriptionPlaceable.height + descriptionBottomPaddingPx
+        }
+        val height = maxOf(
+            descriptionY + descriptionPlaceable.height,
+            ctaY + ctaPlaceable.height,
+            constraints.minHeight,
+        ).coerceAtMost(maximumValue = constraints.maxHeight)
+
+        layout(width = width, height = height) {
+            titlePlaceable.placeRelative(x = 0, y = 0)
+            descriptionPlaceable.placeRelative(x = 0, y = descriptionY)
+            ctaPlaceable.placeRelative(x = ctaX, y = ctaY)
         }
     }
 }
@@ -148,7 +289,7 @@ private fun SecondCardTreeGrowth(
             )
 
             Text(
-                text = model.tree?.type?.asLabel()?.uppercase().orEmpty(),
+                text = model.tree?.type?.asLabel().orEmpty(),
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.titleSmall,
             )
@@ -171,7 +312,6 @@ private fun SecondCardTreeGrowth(
         }
     }
 }
-
 
 @Composable
 private fun ThirdCardActivities(
@@ -286,6 +426,7 @@ private fun MainTabContentPreviewDark() {
 }
 
 @Composable
+@Suppress("MagicNumber")
 private fun MainTabPreviewContent() {
     Column(
         verticalArrangement = Arrangement.spacedBy(space = 1.dp),

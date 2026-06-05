@@ -200,10 +200,11 @@
     <string name="cta_afternoon_warm_up_desc">A few simple exercises can help relieve eye strain</string>
     <string name="cta_evening_relax">Time to relax your eyes</string>
     <string name="cta_evening_relax_desc">A calming evening routine to release tension</string>
-    <string name="cta_day_closing">Great job today ✨</string>
+    <string name="cta_day_closing">Great job today 😎</string>
     <string name="cta_day_closing_desc">Your eyes have already had enough rest for today</string>
     <string name="cta_perfect_day">You took great care of your eyes today</string>
-    <string name="cta_perfect_day_desc">Your tree has grown even stronger ✨</string>
+    <string name="cta_perfect_day_desc">Your tree has grown even stronger 🌳</string>
+    <string name="cta_start">Start</string>
 
     <string name="info_days">d</string>
     <string name="info_current_tree">Growth Tree</string>
@@ -211,7 +212,7 @@
     <string name="info_activities">Activities today:</string>
     <string name="info_activities_exercises">👁 Exercises:</string>
     <string name="info_activities_breaks">⏱ 20-20-20 breaks:</string>
-    <string name="info_activities_relax">🌙 Relax:</string>
+    <string name="info_activities_relax">🌴 Relax:</string>
 
     <!-- Exercising -->
     <string name="block_a">Block A</string>

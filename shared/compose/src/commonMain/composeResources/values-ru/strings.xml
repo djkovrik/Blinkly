@@ -197,10 +197,11 @@
     <string name="cta_afternoon_warm_up_desc">Несколько простых упражнений помогут снять напряжение</string>
     <string name="cta_evening_relax">Время расслабить глаза</string>
     <string name="cta_evening_relax_desc">Спокойный вечерний комплекс для снятия напряжения</string>
-    <string name="cta_day_closing">Отличная работа сегодня ✨</string>
+    <string name="cta_day_closing">Отличная работа сегодня 😎</string>
     <string name="cta_day_closing_desc">Ваши глаза уже получили достаточно отдыха</string>
     <string name="cta_perfect_day">Сегодня вы отлично позаботились о своих глазах</string>
-    <string name="cta_perfect_day_desc">Ваше дерево стало ещё сильнее ✨</string>
+    <string name="cta_perfect_day_desc">Ваше дерево стало ещё сильнее 🌳</string>
+    <string name="cta_start">Начать</string>
 
     <string name="info_days">д</string>
     <string name="info_current_tree">Дерево роста</string>
@@ -208,7 +209,7 @@
     <string name="info_activities">Активностей сегодня:</string>
     <string name="info_activities_exercises">👁 Упражнения:</string>
     <string name="info_activities_breaks">⏱ Перерывы 20-20-20:</string>
-    <string name="info_activities_relax">🌙 Релакс:</string>
+    <string name="info_activities_relax">🌴 Релакс:</string>
 
     <!-- Тренировки и упражнения -->
     <string name="block_a">Блок А</string>
