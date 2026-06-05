@@ -18,10 +18,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.math.ceil
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -47,8 +51,9 @@ internal class MainTabManager(
     fun calculateData(calendar: List<Workout>): Result<MainTabData> = runCatching {
         val now = timeUtils.now()
         val timeZone = timeUtils.timeZone()
-        val today = now.asLocalDate(timeZone)
-        val localTime = now.toLocalDateTime(timeZone).time
+        val localDateTime = now.toLocalDateTime(timeZone)
+        val today = localDateTime.date
+        val localTime = localDateTime.time
         val exercisesToday = calendar.flatMap { it.exercises }
             .filter { it.completedAt.asLocalDate(timeZone) == today }
         val twentyX3Count = exercisesToday.count { it.type == ExerciseType.TWENTY_X3 }
@@ -62,7 +67,7 @@ internal class MainTabManager(
             palmingToday = palmingCount,
             dailyProgressPercent = exercisesToday.calculateDailyProgressPercent(),
             treeGrowthStreakDays = calendar.calculateGrowthStreakDays(today),
-            ctaState = exercisesToday.calculateCtaState(localTime),
+            ctaState = exercisesToday.calculateCtaState(localTime, timeZone),
         )
     }
 
@@ -73,24 +78,34 @@ internal class MainTabManager(
             else -> GreetingPeriod.EVENING
         }
 
-    private fun List<Exercise>.calculateCtaState(time: LocalTime): MainCtaState {
+    private fun List<Exercise>.calculateCtaState(currentTime: LocalTime, timeZone: TimeZone): MainCtaState {
         val blockACompleted = isBlockACompleted()
         val blockBCompleted = isBlockBCompleted()
         val twentyX3Count = count { it.type == ExerciseType.TWENTY_X3 }
         val hasActivity = isNotEmpty()
         val lastTwentyX3 = filter { it.type == ExerciseType.TWENTY_X3 }.maxByOrNull { it.completedAt }
-        val now = timeUtils.now()
+        val lastTwentyX3Time = lastTwentyX3?.completedAt?.toLocalDateTime(timeZone)?.time
 
         return when {
             blockACompleted && blockBCompleted && twentyX3Count >= MIN_TWENTY_X3_DAILY -> MainCtaState.PerfectDay
-            time >= LATE_EVENING_START -> MainCtaState.DayClosing
-            time.hour in MORNING_CTA_HOUR_START..MORNING_CTA_HOUR_END && !hasActivity -> MainCtaState.MorningWarmUp
-            time >= AFTERNOON_START && !blockACompleted && twentyX3Count > 0 -> MainCtaState.AfternoonWarmUp
-            time in EVENING_START..<LATE_EVENING_START && !blockBCompleted && hasActivity -> MainCtaState.EveningRelax
-            time.hour in WORK_HOUR_START..WORK_HOUR_END && twentyX3Count < MIN_TWENTY_X3_DAILY &&
-                (lastTwentyX3 == null || now - lastTwentyX3.completedAt >= WORK_BREAK_THRESHOLD) -> MainCtaState.WorkBreakDue
+            currentTime >= LATE_EVENING_START -> MainCtaState.DayClosing
+            currentTime.hour in MORNING_CTA_HOUR_START..MORNING_CTA_HOUR_END && !hasActivity -> MainCtaState.MorningWarmUp
+            currentTime >= AFTERNOON_START && !blockACompleted && twentyX3Count > 0 -> MainCtaState.AfternoonWarmUp
+            currentTime in EVENING_START..<LATE_EVENING_START && !blockBCompleted -> MainCtaState.EveningRelax
+            currentTime.hour in WORK_HOUR_START..WORK_HOUR_END && twentyX3Count < MIN_TWENTY_X3_DAILY &&
+                (lastTwentyX3Time == null || currentTime.durationSince(lastTwentyX3Time) >= WORK_BREAK_THRESHOLD) -> {
+                MainCtaState.WorkBreakDue
+            }
             else -> MainCtaState.Idle
         }
+    }
+
+    private fun LocalTime.durationSince(other: LocalTime): Duration {
+        val seconds = (hour - other.hour) * SECONDS_IN_HOUR +
+            (minute - other.minute) * SECONDS_IN_MINUTE +
+            second - other.second
+        val nanoseconds = nanosecond - other.nanosecond
+        return seconds.seconds + nanoseconds.nanoseconds
     }
 
     private fun List<Exercise>.calculateDailyProgressPercent(): Int {
@@ -176,6 +191,7 @@ internal class MainTabManager(
         const val DAILY_GOALS = 4
         const val HUNDRED_PERCENT = 100
         const val SECONDS_IN_MINUTE = 60
+        const val SECONDS_IN_HOUR = 60 * SECONDS_IN_MINUTE
         const val TWENTY_X3_SECONDS = 20
         const val BLINK_BREAK_STEP_SECONDS = 0.25
         const val NEAR_FAR_PHASES = 2

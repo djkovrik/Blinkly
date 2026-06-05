@@ -134,6 +134,45 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
     }
 
     @Test
+    fun `when clean install starts during work hours then CTA suggests twenty x3`() = runTest(testScheduler) {
+        // given
+        timeUtils.current = instantAt(hour = 12, minute = 0)
+        calendarFlow.value = emptyList()
+
+        // when
+        testScheduler.advanceUntilIdle()
+        component.onPrimaryCtaClick()
+
+        // then
+        assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.WorkBreakDue)
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+    }
+
+    @Test
+    fun `when work break is due in non UTC time zone then CTA uses local time`() = runTest(testScheduler) {
+        // given
+        val localTimeZone = TimeZone.of("Europe/Moscow")
+        timeUtils.zone = localTimeZone
+        timeUtils.current = instantAt(hour = 12, minute = 0, timeZone = localTimeZone)
+        calendarFlow.value = listOf(
+            Workout(
+                exercises = listOf(
+                    exercise(ExerciseBlock.C, ExerciseType.TWENTY_X3, hour = 11, minute = 30, timeZone = localTimeZone),
+                )
+            )
+        )
+
+        // when
+        testScheduler.advanceUntilIdle()
+        component.onPrimaryCtaClick()
+
+        // then
+        assertThat(component.model.value.greetingPeriod).isEqualTo(GreetingPeriod.DAY)
+        assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.WorkBreakDue)
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+    }
+
+    @Test
     fun `when afternoon and warm up is not completed after short breaks then CTA suggests warm up`() = runTest(testScheduler) {
         // given
         timeUtils.current = instantAt(hour = 14, minute = 0)
@@ -165,6 +204,21 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
                 )
             )
         )
+
+        // when
+        testScheduler.advanceUntilIdle()
+        component.onPrimaryCtaClick()
+
+        // then
+        assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.EveningRelax)
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.B))
+    }
+
+    @Test
+    fun `when clean install starts in the evening then CTA suggests relax`() = runTest(testScheduler) {
+        // given
+        timeUtils.current = instantAt(hour = 19, minute = 0)
+        calendarFlow.value = emptyList()
 
         // when
         testScheduler.advanceUntilIdle()
@@ -276,21 +330,23 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
         day: Int = 15,
         hour: Int,
         minute: Int,
+        timeZone: TimeZone = TimeZone.UTC,
     ): Exercise =
         Exercise(
             block = block,
             type = type,
-            completedAt = instantAt(day = day, hour = hour, minute = minute),
+            completedAt = instantAt(day = day, hour = hour, minute = minute, timeZone = timeZone),
         )
 
-    private fun instantAt(day: Int = 15, hour: Int, minute: Int): Instant =
-        LocalDateTime(year = 2026, month = 3, day = day, hour = hour, minute = minute).toInstant(TimeZone.UTC)
+    private fun instantAt(day: Int = 15, hour: Int, minute: Int, timeZone: TimeZone = TimeZone.UTC): Instant =
+        LocalDateTime(year = 2026, month = 3, day = day, hour = hour, minute = minute).toInstant(timeZone)
 
     private class FakeTimeUtils : BlinklyTimeUtils {
         var current: Instant = LocalDateTime(year = 2026, month = 3, day = 15, hour = 12, minute = 0).toInstant(TimeZone.UTC)
+        var zone: TimeZone = TimeZone.UTC
 
         override fun now(): Instant = current
-        override fun timeZone(): TimeZone = TimeZone.UTC
+        override fun timeZone(): TimeZone = zone
     }
 
     private class FakeHighlightsProvider : BlinklyHighlightsProvider {
