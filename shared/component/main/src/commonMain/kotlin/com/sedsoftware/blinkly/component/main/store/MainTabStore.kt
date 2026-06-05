@@ -8,8 +8,6 @@ import com.sedsoftware.blinkly.component.main.store.MainTabStore.Label
 import com.sedsoftware.blinkly.component.main.store.MainTabStore.State
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.Tree
-import com.sedsoftware.blinkly.domain.model.TreeStage
-import com.sedsoftware.blinkly.domain.model.TreeType
 import com.sedsoftware.blinkly.domain.model.Workout
 
 internal interface MainTabStore : Store<Intent, State, Label> {

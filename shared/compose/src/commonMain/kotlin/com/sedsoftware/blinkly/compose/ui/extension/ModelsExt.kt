@@ -601,6 +601,7 @@ fun HighlightOfTheDay.Tip.asDescription(): String =
 fun HighlightOfTheDay.Fact.asDescription(): String =
     stringResource(descriptionResource())
 
+@Suppress("CyclomaticComplexMethod")
 private fun HighlightOfTheDay.Tip.titleResource(): StringResource =
     when (index) {
         1 -> Res.string.highlight_tip1_title
@@ -636,6 +637,7 @@ private fun HighlightOfTheDay.Tip.titleResource(): StringResource =
         else -> Res.string.highlight_tip1_title
     }
 
+@Suppress("CyclomaticComplexMethod")
 private fun HighlightOfTheDay.Tip.descriptionResource(): StringResource =
     when (index) {
         1 -> Res.string.highlight_tip1_description

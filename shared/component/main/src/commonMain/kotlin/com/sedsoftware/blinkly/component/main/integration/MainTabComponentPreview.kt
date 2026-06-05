@@ -8,8 +8,6 @@ import com.sedsoftware.blinkly.component.main.domain.model.GreetingPeriod
 import com.sedsoftware.blinkly.component.main.domain.model.MainCtaState
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.Tree
-import com.sedsoftware.blinkly.domain.model.TreeStage
-import com.sedsoftware.blinkly.domain.model.TreeType
 
 class MainTabComponentPreview(
     private val greetingPeriod: GreetingPeriod = GreetingPeriod.DAY,
