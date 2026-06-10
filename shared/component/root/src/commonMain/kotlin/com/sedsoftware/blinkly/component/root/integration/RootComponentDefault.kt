@@ -102,7 +102,7 @@ class RootComponentDefault private constructor(
             )
         },
         preferencesComponent = { childContext, output ->
-            PreferencesComponentDefault(childContext, output)
+            PreferencesComponentDefault(childContext, storeFactory, dispatchers, settings, output)
         },
         blockAComponent = { childContext, output ->
             BlockAComponentDefault(childContext, output)
