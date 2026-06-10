@@ -84,8 +84,8 @@ features.
 Top-level component modules:
 - `root` - app root, dependency composition, top-level navigation
 - `onboarding` - one-time onboarding flow with five child steps; currently the main implemented flow
-- `home` - planned shell with four tabs; currently a thin/skeleton component
-- `main` - planned main tab; currently a thin/skeleton component
+- `home` - shell with four tabs; routes tab outputs and owns tab stack navigation
+- `main` - implemented main dashboard tab with MVIKotlin Store, feature-local manager, Compose UI, preview component, and common tests
 - `progress` - planned progress tab; currently a thin/skeleton component
 - `reminders` - planned reminders tab; currently a thin/skeleton component
 - `trainings` - planned trainings tab; currently a thin/skeleton component
@@ -101,11 +101,12 @@ Nested component modules:
 - `trainings/child/blockc` - planned/skeleton
 
 Current implementation notes:
-- Component work is only materially implemented for `onboarding` and its child steps `step1` through `step5`.
+- Component work is materially implemented for `onboarding` and its child steps `step1` through `step5`, plus the `main` tab.
+- `main` is the current reference for a Store-backed tab component with domain-derived dashboard state, one-off error labels, a Compose screen, preview-only component implementation, and common component tests.
 - `step5` has component/store logic, but its Compose UI is not finished yet.
-- Root and home navigation may contain routes for future areas, but non-onboarding screens should be treated as work-in-progress skeletons.
-- `step4` and `step5` are the current reference implementations for MVIKotlin stores.
-- Most non-onboarding tab and leaf components are temporary thin Decompose wrappers that emit `ComponentOutput` without a Store.
+- Root and home navigation contain both completed routes and future routes; check the target module before treating it as complete.
+- `step4`, `step5`, and `main` are the current reference implementations for MVIKotlin stores.
+- `progress`, `reminders`, `trainings`, and their current leaf routes are still mostly temporary thin Decompose wrappers that emit `ComponentOutput` without a Store.
 
 ## Architecture Rules
 
@@ -128,13 +129,15 @@ Apply these rules by default when changing Blinkly code:
 - Add MVIKotlin only when the feature needs reducer-owned state, async work, startup subscriptions, or one-off labels.
 - Retain Stores with `instanceKeeper.getStore { ... }` and expose UI state through `store.asValue().map(stateToModel)`.
 - Keep Store contracts independent from component UI contracts. Do not put `Component.Model` or other component-facing UI models into Store `State`; keep Store state as raw feature fields or feature/domain state and build the component `Model` only in `integration/Mappers.kt`.
-- Keep Store reducers pure. Put side effects, subscriptions, and IO switching in the executor.
+- Put feature-specific business calculations and external reads behind a small manager class in the component module's `domain` package when the Store would otherwise mix orchestration and calculations. `MainTabManager` is the reference: it exposes watcher flows, wraps suspend calls in `Result`, and derives `MainTabData` from workouts, settings, and time utilities.
+- Keep Store reducers pure. Put side effects, subscriptions, manager calls, and IO switching in the executor.
 - Route cross-component events upward through `ComponentOutput`; do not let child components manipulate parent navigation directly.
 - Keep dependencies in constructors and root or parent factories; never place dependencies into Decompose navigation configs.
 - Keep Compose as a rendering layer only. Do not move business logic, navigation decisions, or mutable feature state into composables.
 - Cover Decompose behaviour in `shared/component/root/src/commonTest`, extending `ComponentTest<T>` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
+- Keep `*Default` component implementations as the real runtime wiring for Stores, dependencies, labels, lifecycle, and output routing. Use separate `*Preview` implementations only for Compose previews; they should implement the same public component interface with static `MutableValue` model data and no production dependencies.
 
-When unsure whether to follow a generic library pattern or the project pattern, follow the project pattern demonstrated in `step4`, `step5`, and `onboarding`. Treat `home`, `root`, and non-onboarding feature modules as navigation/skeleton references unless the code clearly shows completed behaviour.
+When unsure whether to follow a generic library pattern or the project pattern, follow the project pattern demonstrated in `main`, `step4`, `step5`, `onboarding`, and `home`. Treat `progress`, `reminders`, `trainings`, and unfinished leaf routes as skeleton references unless the code clearly shows completed behaviour.
 
 ### Manual dependency injection
 
@@ -169,6 +172,10 @@ The standard component shape in Blinkly is:
 4. optional parent component that owns child navigation
 
 Reference files:
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/MainTabComponent.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentDefault.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentPreview.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/Mappers.kt`
 - `shared/component/onboarding/child/step4/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step4/OnboardingStep4Component.kt`
 - `shared/component/onboarding/child/step4/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step4/integration/OnboardingStep4ComponentDefault.kt`
 - `shared/component/onboarding/src/commonMain/kotlin/com/sedsoftware/blinkly/component/onboarding/integration/OnboardingComponentDefault.kt`
@@ -189,8 +196,8 @@ Parent components use:
 
 Local reference patterns:
 - `OnboardingComponentDefault` for the currently implemented nested flow navigation
-- `RootComponentDefault` for app-level stack-navigation shape, with several future routes still pointing to skeleton screens
-- `HomeScreenComponentDefault` for tab-switching shape with `bringToFront`, not for completed tab feature behaviour
+- `RootComponentDefault` for app-level stack-navigation shape and root-level interpretation of child outputs
+- `HomeScreenComponentDefault` for tab-switching shape with `bringToFront`, creation of the real `MainTabComponentDefault`, and local handling of `ComponentOutput.Main.OpenProgressTab`
 
 Keep navigation on the main thread. This matches Decompose guidance.
 
@@ -220,11 +227,17 @@ Use MVIKotlin only when the component has meaningful state transitions or asynch
 The project is Work In Progress and has only a small number of Stores and fully shaped components implemented.
 
 Current store references:
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/store/MainTabStore.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/store/MainTabStoreProvider.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/domain/MainTabManager.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentDefault.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/Mappers.kt`
 - `shared/component/onboarding/child/step4/.../store/DisclaimerStore.kt`
 - `shared/component/onboarding/child/step4/.../store/DisclaimerStoreProvider.kt`
 - `shared/component/onboarding/child/step5/.../store/InitialRemindersStore.kt`
 - `shared/component/onboarding/child/step5/.../store/InitialRemindersStoreProvider.kt`
 
+`main` is the reference for a tab Store with bootstrapper subscriptions, manager-based business logic, domain-derived model data, and labels mapped to parent output.
 `step5` is a valid Store/component reference, but its user interface is not complete yet.
 
 ### Store structure
@@ -247,9 +260,11 @@ These match both local code and official MVIKotlin guidance:
 - switch to `dispatchers.io` inside executor coroutines for IO or long-running operations
 - publish one-off failures through `Label` when they should not live in state
 - feature-local managers in component `domain` packages should wrap suspend/business operations in `Result<T>` via `runCatching`; Store executors handle those results with `unwrap(...)`
+- managers may expose watcher flows directly when the Store only needs to subscribe and map stream values; protect those subscriptions with `.catch { publish(Label.ErrorCaught(it)) }`
 - flow subscriptions may remain as `Flow<T>` from managers and should be protected with `.catch { publish(Label.ErrorCaught(it)) }` in the executor
 
-`step5` is the reference for bootstrapper plus subscriptions.
+`main` is the reference for bootstrapper plus subscriptions that also derive aggregate dashboard state through a manager.
+`step5` is the reference for bootstrapper plus subscription-driven setup logic.
 `step4` is the reference for a minimal synchronous Store.
 
 ### Component-to-model mapping
@@ -284,8 +299,15 @@ Rules:
 
 References:
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/RootContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/HomeScreenContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/tabs/MainTabContent.kt`
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/onboarding/*`
-- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/HomeScreenContent.kt` for shell shape only; tab contents are still WIP/skeletons
+
+`MainTabContent` is the reference for connecting a component to Compose:
+- subscribe to `component.model` with `subscribeAsState()`
+- render only the public `MainTabComponent.Model`
+- call public component methods from UI events
+- use `MainTabComponentPreview` to supply stable fake data for `@Preview` variants without creating a `ComponentContext`, Store, manager, or platform dependencies
 
 Platform note:
 - Android creates the root `ComponentContext` once in `AppActivity.onCreate()` via `defaultComponentContext()`.
@@ -309,6 +331,7 @@ Current references:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/root/RootComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/home/HomeScreenComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/onboarding/OnboardingComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/main/MainTabComponentTest.kt`
 
 Preferred assertions:
 - inspect `childStack.active.instance` for navigation state
@@ -321,6 +344,7 @@ Testing defaults for Blinkly components:
 - drive behaviour through the public component API, not internal navigation objects or Store internals
 - use `advanceUntilIdle()` after component creation, flow emission, or callbacks that launch coroutines
 - use `MutableStateFlow` for subscription-driven scenarios
+- for Store-backed business state, fake external interfaces and assert `component.model.value`; `MainTabComponentTest` is the reference for calendar flow, tree flow, fake time, fake settings, highlight failure labels, and CTA output mapping
 - prefer component tests over Compose tests for navigation and business-state validation
 
 ## Change Guidance For Agents

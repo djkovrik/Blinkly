@@ -7,9 +7,12 @@ description: Use in the Blinkly Kotlin Multiplatform repository when writing, up
 
 Read `AGENTS.md` first for architecture and test conventions.
 
-Blinkly is in active development. Component tests currently use onboarding and
-navigation shell code as references; non-onboarding feature components are
-mostly skeletons and should not be assumed complete.
+Blinkly is in active development. Component tests currently use onboarding,
+home navigation, and the implemented `main` tab as references. `MainTabComponentTest`
+is the reference for a Store-backed tab with manager-derived state, watcher
+flows, fake time/settings, error labels, and CTA output mapping. `progress`,
+`reminders`, `trainings`, and many leaf routes remain skeletons unless their
+code proves otherwise.
 
 ## Use these local references first
 
@@ -22,6 +25,9 @@ Navigation-heavy tests:
 
 Simple shell/skeleton component test:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/home/HomeScreenComponentTest.kt`
+
+Store-backed tab component test:
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/main/MainTabComponentTest.kt`
 
 ## Test location
 
@@ -60,6 +66,9 @@ For Store-backed child components, verify:
 - async updates after `advanceUntilIdle()`
 - reactions to emitted flows
 - collaborator interactions with `verify` or `verifySuspend`
+- manager-derived calculations through public component state when the manager
+  is intentionally tested through the component, as in `MainTabComponentTest`
+- one-off Store labels that must leave the component as `ComponentOutput`
 
 ## Preferred assertion style
 
@@ -86,9 +95,12 @@ The current project already uses:
 - `verifySuspend(...)`
 
 When settings state matters, use the local fake wrapper pattern from `ComponentTest.FakeSettings` instead of trying to mock mutable properties directly.
+`MainTabComponentTest.FakeSettings` is also a valid reference when a component
+needs many settings values for business calculations.
 
 When flows matter, prefer `MutableStateFlow` in tests and emit values explicitly.
-This is the reference pattern in `OnboardingComponentTest`.
+This is the reference pattern in `OnboardingComponentTest` and
+`MainTabComponentTest`.
 
 ## Async rules
 
@@ -127,6 +139,10 @@ component contract and Store-backed model, not final UI behaviour.
 4. advance the scheduler if async work is involved
 5. assert the updated `model.value`
 
+For components like `MainTabComponent` where the Store is driven by bootstrapper
+subscriptions rather than UI intents, update the fake flows or fake time before
+`advanceUntilIdle()`, then assert `component.model.value`.
+
 ### Subscription-driven updates
 
 1. expose test flows from mocks
@@ -135,6 +151,14 @@ component contract and Store-backed model, not final UI behaviour.
 4. emit test values into the flow
 5. advance again
 6. assert component model and collaborator calls
+
+### Store-derived output mapping
+
+1. set fake time, settings, and flow values so the Store derives the target model state
+2. call `advanceUntilIdle()`
+3. call the public component callback, for example `onPrimaryCtaClick()`
+4. assert both `component.model.value` and the emitted `ComponentOutput`
+5. assert no output is emitted for non-navigating states such as MainTab idle or day-closing states
 
 ## Avoid these mistakes
 
