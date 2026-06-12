@@ -71,6 +71,7 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
         // then
         assertThat(settings.themeState).isEqualTo(ThemeState.LIGHT)
         assertThat(component.model.value.themeState).isEqualTo(ThemeState.LIGHT)
+        assertThat(componentOutput).contains(ComponentOutput.Preferences.ThemeStateChanged(ThemeState.LIGHT))
     }
 
     @Test

@@ -8,6 +8,7 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceCurrent
+import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackCallback
 import com.arkivanov.essenty.lifecycle.doOnDestroy
@@ -45,6 +46,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.ThemeState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.serialization.Serializable
@@ -126,6 +128,7 @@ class RootComponentDefault private constructor(
 
     private val navigation: StackNavigation<Config> = StackNavigation()
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io)
+    private val themeStateValue: MutableValue<ThemeState> = MutableValue(settings.themeState)
 
     private val backCallback: BackCallback = BackCallback { onBack() }
 
@@ -148,6 +151,7 @@ class RootComponentDefault private constructor(
         )
 
     override val childStack: Value<ChildStack<*, RootComponent.Child>> = stack
+    override val themeState: Value<ThemeState> = themeStateValue
 
     override fun onBack() {
         navigation.pop()
@@ -214,6 +218,10 @@ class RootComponentDefault private constructor(
 
             is ComponentOutput.Reminders.OpenAddNew -> {
                 navigation.push(Config.AddNewReminder)
+            }
+
+            is ComponentOutput.Preferences.ThemeStateChanged -> {
+                themeStateValue.value = output.value
             }
 
             is ComponentOutput.Common.BackPressed -> {

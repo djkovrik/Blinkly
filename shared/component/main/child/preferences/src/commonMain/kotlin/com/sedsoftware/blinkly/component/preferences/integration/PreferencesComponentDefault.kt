@@ -18,7 +18,6 @@ import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import com.sedsoftware.blinkly.utils.asValue
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
@@ -46,7 +45,11 @@ class PreferencesComponentDefault(
         scope.launch {
             store.labels.collect { label ->
                 when (label) {
-                    is PreferencesStore.Label.ErrorCaught -> preferencesOutput(ComponentOutput.Common.ErrorCaught(label.exception))
+                    is PreferencesStore.Label.ErrorCaught ->
+                        preferencesOutput(ComponentOutput.Common.ErrorCaught(label.exception))
+
+                    is PreferencesStore.Label.ThemeStateChanged ->
+                        preferencesOutput(ComponentOutput.Preferences.ThemeStateChanged(label.value))
                 }
             }
         }

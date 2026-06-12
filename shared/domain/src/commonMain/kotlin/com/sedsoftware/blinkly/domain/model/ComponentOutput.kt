@@ -29,6 +29,10 @@ sealed class ComponentOutput {
         data object OpenAddNew : Reminders()
     }
 
+    sealed class Preferences : ComponentOutput() {
+        data class ThemeStateChanged(val value: ThemeState) : Preferences()
+    }
+
     sealed class Common : ComponentOutput() {
         data object BackPressed : Common()
         data class ErrorCaught(val throwable: Throwable) : Common()

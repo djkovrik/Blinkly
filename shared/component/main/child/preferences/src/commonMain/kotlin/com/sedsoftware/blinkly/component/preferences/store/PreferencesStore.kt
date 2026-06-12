@@ -34,5 +34,6 @@ internal interface PreferencesStore : Store<Intent, State, Label> {
 
     sealed class Label {
         data class ErrorCaught(val exception: Throwable) : Label()
+        data class ThemeStateChanged(val value: ThemeState) : Label()
     }
 }

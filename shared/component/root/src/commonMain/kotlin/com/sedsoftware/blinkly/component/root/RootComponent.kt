@@ -12,10 +12,12 @@ import com.sedsoftware.blinkly.component.home.HomeScreenComponent
 import com.sedsoftware.blinkly.component.newreminder.AddNewReminderComponent
 import com.sedsoftware.blinkly.component.onboarding.OnboardingComponent
 import com.sedsoftware.blinkly.component.preferences.PreferencesComponent
+import com.sedsoftware.blinkly.domain.model.ThemeState
 
 interface RootComponent : BackHandlerOwner {
 
     val childStack: Value<ChildStack<*, Child>>
+    val themeState: Value<ThemeState>
 
     fun onBack()
 

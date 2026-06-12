@@ -135,7 +135,10 @@ internal class PreferencesStoreProvider(
                     launch {
                         unwrap(
                             result = withContext(ioContext) { manager.saveThemeState(value) },
-                            onSuccess = { dispatch(Msg.ThemeStateChanged(value)) },
+                            onSuccess = {
+                                dispatch(Msg.ThemeStateChanged(value))
+                                publish(Label.ThemeStateChanged(value))
+                            },
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
                     }
@@ -188,4 +191,5 @@ internal class PreferencesStoreProvider(
 
 private fun Int.atLeastOne(): Int = coerceAtLeast(1)
 
+@Suppress("MagicNumber")
 private fun Float.atLeastHalf(): Float = coerceAtLeast(0.5f)
