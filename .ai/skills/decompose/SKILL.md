@@ -7,10 +7,12 @@ description: Use in the Blinkly Kotlin Multiplatform repository when adding, cha
 
 Read `AGENTS.md` first for the project-level architecture.
 
-Blinkly is in active development. The currently materialized component flow is
-`onboarding` with child steps `step1` through `step5`; `step5` still lacks a
-finished Compose UI. Non-onboarding component modules should be treated as
-navigation shape or skeleton references unless their code proves otherwise.
+Blinkly is in active development. The materialized component areas are
+`onboarding` with child steps `step1` through `step5`, and the `main` tab.
+`MainTabComponent` is the current reference for a Store-backed tab component
+with real Compose UI and preview-only component implementation. `progress`,
+`reminders`, `trainings`, and many leaf routes remain skeletons unless their
+code proves otherwise.
 
 ## Use these local references first
 
@@ -24,17 +26,22 @@ Nested flow navigation:
 - `shared/component/onboarding/src/commonMain/kotlin/com/sedsoftware/blinkly/component/onboarding/OnboardingComponent.kt`
 - `shared/component/onboarding/src/commonMain/kotlin/com/sedsoftware/blinkly/component/onboarding/integration/OnboardingComponentDefault.kt`
 
-Tabbed home shell skeleton:
+Tabbed home shell and implemented main tab:
 - `shared/component/home/src/commonMain/kotlin/com/sedsoftware/blinkly/component/home/integration/HomeScreenComponentDefault.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/MainTabComponent.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentDefault.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentPreview.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/Mappers.kt`
 
 Thin work-in-progress leaf component skeletons:
-- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentDefault.kt`
 - `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/integration/TrainingsTabComponentDefault.kt`
 - `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/integration/ProgressTabComponentDefault.kt`
 - `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/integration/RemindersTabComponentDefault.kt`
 
 Compose integration:
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/RootContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/HomeScreenContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/tabs/MainTabContent.kt`
 
 Official docs:
 - https://arkivanov.github.io/Decompose/component/overview/
@@ -46,13 +53,24 @@ Official docs:
 For a normal feature component, create:
 1. interface in the module root package
 2. `integration/FeatureComponentDefault.kt`
-3. optional `Model` in the interface
-4. optional `store/`, `domain/`, and `integration/Mappers.kt`
+3. `integration/FeatureComponentPreview.kt` when Compose previews need stable fake data
+4. optional `Model` in the interface
+5. optional `store/`, `domain/`, and `integration/Mappers.kt`
 
 Implementation rule:
 - `class FeatureComponentDefault(...) : FeatureComponent, ComponentContext by componentContext`
 
 If the module only forwards output, keep it thin and skip MVIKotlin.
+
+Default vs Preview rule:
+- `*Default` is the production implementation. It receives `ComponentContext`
+  and real dependencies, creates retained Stores, subscribes to labels, owns
+  lifecycle cleanup, and emits `ComponentOutput`.
+- `*Preview` is only for Compose previews. It implements the same public
+  component interface with `MutableValue(Model(...))`, static constructor
+  parameters, and no Store, `ComponentContext`, manager, or platform dependency.
+- `MainTabComponentDefault` and `MainTabComponentPreview` are the reference
+  pair. Do not wire preview implementations into parent factories.
 
 ## Navigation rules
 
@@ -91,6 +109,8 @@ For parent components with children, follow the existing Blinkly pattern:
 - expose a secondary public constructor that wires real child implementations
 
 This makes tests simpler because children can be swapped without reflection or a DI framework.
+`HomeScreenComponentDefault` is the reference for passing real dependencies to
+`MainTabComponentDefault` while still keeping the private constructor testable.
 
 ## Lifecycle and scopes
 
@@ -108,6 +128,10 @@ Preferred patterns:
 - `val model by component.model.subscribeAsState()` for component models
 - `val stack by component.childStack.subscribeAsState()` when observing `Value` manually
 - `ChildStack(...)` in root or parent content when rendering navigation
+- render child tabs through the child component interface; `HomeScreenContent`
+  maps `HomeScreenComponent.Child.MainTab` to `MainTabContent(child.component)`
+- previews should pass a `*Preview` component to the same production composable,
+  as `MainTabContent` does with `MainTabComponentPreview`
 
 Do not create root components inside a composable unless there is no alternative.
 Blinkly creates the root component in platform code before `setContent`; treat this as the host wiring pattern, not as evidence that every routed screen is complete.
@@ -134,8 +158,9 @@ Keep feature components constructor-injected.
 6. add Compose content in `shared/compose`
 7. add common tests for navigation or behaviour
 
-For currently skeleton modules outside onboarding, first decide whether you are
-filling in the real feature or only extending the placeholder navigation.
+For currently skeleton modules outside `onboarding` and `main`, first decide
+whether you are filling in the real feature or only extending placeholder
+navigation.
 
 ## Avoid these mistakes
 

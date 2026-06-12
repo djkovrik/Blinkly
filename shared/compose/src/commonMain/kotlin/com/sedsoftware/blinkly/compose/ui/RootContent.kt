@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
@@ -14,6 +15,7 @@ import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.f
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.materialPredictiveBackAnimatable
 import com.sedsoftware.blinkly.component.root.RootComponent
 import com.sedsoftware.blinkly.compose.theme.BlinklyAppTheme
@@ -33,7 +35,12 @@ fun RootContent(
     modifier: Modifier = Modifier,
     onThemeChanged: @Composable (isDark: Boolean) -> Unit = {},
 ) {
-    BlinklyAppTheme(onThemeChanged) {
+    val themeState by component.themeState.subscribeAsState()
+
+    BlinklyAppTheme(
+        onThemeChanged = onThemeChanged,
+        themeState = themeState,
+    ) {
         ChildStack(
             stack = component.childStack,
             animation = stackAnimation(

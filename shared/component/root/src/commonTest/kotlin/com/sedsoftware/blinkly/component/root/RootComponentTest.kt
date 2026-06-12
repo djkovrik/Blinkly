@@ -22,14 +22,16 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.model.ThemeState
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.datetime.TimeZone
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlin.test.Test
 import kotlin.time.Clock
 
@@ -38,8 +40,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val alarmManagerMock: BlinklyAlarmManager = mock()
     private val databaseMock: BlinklyDatabase = mock()
     private val notifierMock: BlinklyNotifier = mock()
-    private val settingsMock: BlinklySettings = mock()
-    private val fakeSettings = FakeSettings(settingsMock = settingsMock)
+    private val fakeSettings = FakeSettings()
     private val timeUtilsMock: BlinklyTimeUtils = mock {
         every { now() } returns Clock.System.now()
         every { timeZone() } returns TimeZone.UTC
@@ -73,6 +74,24 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         val testComponent = createComponent()
         // then
         assertThat(testComponent.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
+    }
+
+    @Test
+    fun `when Preferences theme changed then root theme state is updated`() = runTest(testScheduler) {
+        // given
+        fakeSettings.onboardingDisplayed = true
+        val testComponent = createComponent()
+        val homeScreenChild = testComponent.childStack.active.instance as RootComponent.Child.HomeScreen
+        val currentTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.MainTab
+
+        // when
+        currentTabChild.component.onPreferencesClick()
+        val preferencesChild = testComponent.childStack.active.instance as RootComponent.Child.Preferences
+        preferencesChild.component.onThemeStateChanged(ThemeState.DARK)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(testComponent.themeState.value).isEqualTo(ThemeState.DARK)
     }
 
     @Test
@@ -289,4 +308,22 @@ class RootComponentTest : ComponentTest<RootComponent>() {
             reminderManager = reminderManagerMock,
             treeProgressWatcher = treeProgressWatcherMock,
         )
+
+    private class FakeSettings : BlinklySettings {
+        override var blinkBreakCount: Int = 60
+        override var nearFarFocusCount: Int = 10
+        override var nearFarFocusDuration: Float = 5f
+        override var diagonalGazesCount: Int = 5
+        override var diagonalGazesDuration: Float = 3f
+        override var figureEightCount: Int = 10
+        override var clockRollsEachSide: Int = 5
+        override var palmingDuration: Int = 120
+        override var themeState: ThemeState = ThemeState.SYSTEM
+        override var lightThemeWorkoutIndex: Int = 0
+        override var darkThemeWorkoutIndex: Int = 0
+        override var lastTreeProgressCheckDate: LocalDate? = null
+        override var displayedHighlights: List<Int> = emptyList()
+        override var currentHighlightDate: LocalDate? = null
+        override var onboardingDisplayed: Boolean = false
+    }
 }

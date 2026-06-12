@@ -7,9 +7,10 @@ description: Use in the Blinkly Kotlin Multiplatform repository when adding, cha
 
 Read `AGENTS.md` first for the project-level architecture.
 
-Blinkly is in active development. The current MVIKotlin references are limited
-to onboarding `step4` and `step5`; `step5` has component/store logic but its
-Compose UI is not finished.
+Blinkly is in active development. The current MVIKotlin references are
+`main`, onboarding `step4`, and onboarding `step5`. Use `main` as the primary
+reference for a Store-backed tab with manager-based business logic, real
+Compose UI, preview-only component implementation, and common component tests.
 
 ## Use these local references first
 
@@ -19,6 +20,12 @@ Minimal synchronous Store:
 - `shared/component/onboarding/child/step4/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step4/integration/OnboardingStep4ComponentDefault.kt`
 
 Store with bootstrapper, flows, and IO:
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/store/MainTabStore.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/store/MainTabStoreProvider.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/domain/MainTabManager.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/domain/model/MainTabData.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentDefault.kt`
+- `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/Mappers.kt`
 - `shared/component/onboarding/child/step5/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step5/store/InitialRemindersStore.kt`
 - `shared/component/onboarding/child/step5/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step5/store/InitialRemindersStoreProvider.kt`
 - `shared/component/onboarding/child/step5/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step5/integration/OnboardingStep5ComponentDefault.kt`
@@ -42,7 +49,9 @@ Use a Store when the feature needs one or more of these:
 - startup actions or subscriptions
 - one-off labels
 
-Many non-onboarding leaf components are currently thin work-in-progress skeletons. Match that style only when the feature really has no state yet; do not assume those screens are complete.
+Many leaf components are currently thin work-in-progress skeletons. Match that
+style only when the feature really has no state yet; do not assume those
+screens are complete. `MainTabComponent` is no longer a skeleton.
 
 ## Implement the Store in Blinkly style
 
@@ -64,6 +73,21 @@ Create the Store with `storeFactory.create(...)`.
 Prefer the coroutine DSL already used in the project:
 - `coroutineExecutorFactory(mainContext)`
 - `coroutineBootstrapper(mainContext)` when startup actions are needed
+
+Feature-local manager rule:
+- create a manager in the component module's `domain` package when calculations
+  or external reads would make the Store executor hard to read
+- let the manager expose watcher flows when the Store only needs to subscribe
+- wrap suspend calls and calculations that can fail in `Result<T>` with
+  `runCatching`
+- return compact domain data objects, such as `MainTabData`, instead of
+  component UI models
+- keep the Store responsible for orchestration: subscribe, call the manager,
+  `unwrap(...)` results, dispatch `Msg`, and publish labels
+
+`MainTabManager` is the reference: it exposes `calendar` and `tree` flows,
+loads the highlight, derives greeting period, daily progress, rest minutes,
+growth streak, and CTA state from workouts, settings, and time utilities.
 
 ## Reducer rules
 
@@ -90,7 +114,10 @@ Use these patterns:
 - keep manager flow subscriptions as `Flow<T>` and protect them with `.catch { publish(Label.ErrorCaught(it)) }`
 - `publish(Label.ErrorCaught(...))` for one-off failures that should not live in state
 
-`step5` is the reference for subscribing to flows and translating stream updates into `Msg` values, even though its Compose UI is still incomplete.
+`MainTabStoreProvider` is the reference for bootstrapper actions that subscribe
+to multiple flows, run manager calculations on `ioContext`, and translate
+stream updates into `Msg` values. `step5` remains a valid subscription
+reference, even though its Compose UI is still incomplete.
 
 ## Component integration rules
 
@@ -107,6 +134,11 @@ The component should:
 - translate Store labels into parent outputs only if a parent actually needs the event
 - avoid duplicating Store state in local component fields
 
+When a component has no UI intents but still has Store-backed state, keep the
+Store `Intent` sealed interface empty as in `MainTabStore`. Component callbacks
+can use current `model.value` to choose a `ComponentOutput` when the decision is
+navigation-only, as `MainTabComponentDefault.onPrimaryCtaClick()` does.
+
 ## Error handling
 
 Blinkly does not route every Store label to parent output.
@@ -116,10 +148,10 @@ Choose one of these deliberately:
 
 When a label must leave a feature, collect `store.labels` from the component,
 map the label to a typed `ComponentOutput`, and cancel the collecting scope from
-`lifecycle.doOnDestroy`. `OnboardingStep5ComponentDefault` is the current
-reference: it maps `InitialRemindersStore.Label.ErrorCaught` to
-`ComponentOutput.Common.ErrorCaught`, then `OnboardingComponentDefault` forwards
-common outputs upward after handling onboarding navigation outputs locally.
+`lifecycle.doOnDestroy`. `MainTabComponentDefault` is the current tab reference:
+it maps `MainTabStore.Label.ErrorCaught` to
+`ComponentOutput.Common.ErrorCaught`. `OnboardingStep5ComponentDefault` is the
+nested-flow reference for the same pattern.
 
 Do not leak platform-specific exceptions into Compose.
 
@@ -128,6 +160,7 @@ Do not leak platform-specific exceptions into Compose.
 If the Store has non-trivial behaviour, cover it through component tests in `shared/component/root/src/commonTest`, even when the component itself lives in another module.
 Reference:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/ComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/main/MainTabComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/onboarding/OnboardingComponentTest.kt`
 
 Test these behaviours:
@@ -136,6 +169,8 @@ Test these behaviours:
 - flow collection and mapped state
 - permission or manager side effects
 - label-triggering paths when applicable
+- output decisions based on Store-derived model state, such as MainTab CTA
+  mapping to exercise blocks
 
 ## Avoid these mistakes
 

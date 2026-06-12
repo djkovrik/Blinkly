@@ -352,6 +352,21 @@
     <string name="highlight_fact49">Только 2% людей на планете имеют зеленый цвет глаз. Это самый редкий цвет.</string>
     <string name="highlight_fact50">Проводя много времени на улице в детстве, вы снижаете риск развития близорукости. Солнечный свет стимулирует выработку дофамина в сетчатке, который сдерживает рост глаза.</string>
 
+    <!-- Preferences -->
+    <string name="preferences_title">Настройки</string>
+    <string name="preferences_theme_title">Тема приложения</string>
+    <string name="preferences_theme_system">Системная</string>
+    <string name="preferences_theme_light">Светлая</string>
+    <string name="preferences_theme_dark">Темная</string>
+    <string name="preferences_exercises_title">Настройки упражнений</string>
+    <string name="preferences_count_label">Количество</string>
+    <string name="preferences_duration_label">Длительность</string>
+    <string name="preferences_unit_repetitions">раз</string>
+    <string name="preferences_unit_seconds">сек</string>
+
     <!-- Content descriptions -->
     <string name="content_description_settings">Настройки</string>
+    <string name="content_description_back">Назад</string>
+    <string name="content_description_decrease">Уменьшить</string>
+    <string name="content_description_increase">Увеличить</string>
 </resources>

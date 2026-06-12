@@ -8,9 +8,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import com.sedsoftware.blinkly.domain.model.ThemeState
 
 private val LightColorScheme = lightColorScheme(
     primary = primaryLight,
@@ -88,19 +86,24 @@ private val DarkColorScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
-internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
+internal val LocalThemeIsDark = compositionLocalOf { true }
 
 @Composable
 internal fun BlinklyAppTheme(
     onThemeChanged: @Composable (isDark: Boolean) -> Unit,
-    isDakTheme: Boolean = isSystemInDarkTheme(),
+    themeState: ThemeState = ThemeState.SYSTEM,
+    isSystemDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    val isDarkState = remember(isDakTheme) { mutableStateOf(isDakTheme) }
+    val isDark = when (themeState) {
+        ThemeState.SYSTEM -> isSystemDarkTheme
+        ThemeState.LIGHT -> false
+        ThemeState.DARK -> true
+    }
+
     CompositionLocalProvider(
-        LocalThemeIsDark provides isDarkState
+        LocalThemeIsDark provides isDark
     ) {
-        val isDark by isDarkState
         onThemeChanged(!isDark)
         MaterialTheme(
             colorScheme = if (isDark) DarkColorScheme else LightColorScheme,
@@ -118,7 +121,7 @@ internal fun BlinklyWidgetPreview(
 ) {
     BlinklyAppTheme(
         onThemeChanged = {},
-        isDakTheme = isDakTheme,
+        themeState = if (isDakTheme) ThemeState.DARK else ThemeState.LIGHT,
         content = content,
     )
 }
