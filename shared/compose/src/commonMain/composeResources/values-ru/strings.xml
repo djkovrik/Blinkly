@@ -28,10 +28,10 @@
     <string name="onboarding_how_title2">Для увлажнения:</string>
     <string name="onboarding_how_title3">Для кровообращения:</string>
     <string name="onboarding_how_title4">Перезагрузка:</string>
-    <string name="onboarding_how_description1">Глазные мышцы, как и любые другие, нуждаются в разминке. Долгое смотрение в одну точку (экран) заставляет цилиарную мышцу «застывать» в напряжении. Гимнастика учит ее расслабляться (снимает спазм аккомодации), что может замедлить развитие ложной близорукости.</string>
+    <string name="onboarding_how_description1">Глазные мышцы, как и любые другие, нуждаются в разминке. Долгое смотрение в одну точку (экран) заставляет цилиарную мышцу "застывать" в напряжении. Гимнастика учит ее расслабляться (снимает спазм аккомодации), что может замедлить развитие ложной близорукости.</string>
     <string name="onboarding_how_description2">При фокусировке на экране мы реже моргаем. Упражнения напоминают нам моргать, равномерно распределяя слезную пленку и предотвращая синдром сухого глаза.</string>
     <string name="onboarding_how_description3">Движения глазами и зажмуривания усиливают приток крови к тканям глаза, улучшая их питание.</string>
-    <string name="onboarding_how_description4">Короткий перерыв, чтобы посмотреть вдаль, дает зрительной системе «перезагрузиться», снижая утомление и головную боль напряжения.</string>
+    <string name="onboarding_how_description4">Короткий перерыв, чтобы посмотреть вдаль, дает зрительной системе "перезагрузиться", снижая утомление и головную боль напряжения.</string>
 
     <!-- Onboarding step 4 -->
     <string name="onboarding_disclaimer1">Важная информация о здоровье</string>
@@ -41,7 +41,7 @@
     <string name="onboarding_disclaimer5">Противопоказания:</string>
     <string name="onboarding_disclaimer6">Если у вас диагностированы какие-либо заболевания глаз (в том числе глаукома, так как некоторые упражнения могут повышать внутриглазное давление) или вы недавно перенесли операцию на глазах - перед началом занятий обязательно проконсультируйтесь с врачом-офтальмологом.</string>
     <string name="onboarding_disclaimer7">При дискомфорте:</string>
-    <string name="onboarding_disclaimer8">В случае возникновения боли, рези, длительного ухудшения зрения или появления «мушек» перед глазами - прекратите занятия и немедленно обратитесь к специалисту.</string>
+    <string name="onboarding_disclaimer8">В случае возникновения боли, рези, длительного ухудшения зрения или появления "мушек" перед глазами - прекратите занятия и немедленно обратитесь к специалисту.</string>
     <string name="onboarding_disclaimer_got_it">Окей, я все понял(а)</string>
 
     <!-- Onboarding step 5 -->
@@ -83,7 +83,7 @@
     <string name="achievement2_blink_starter">Начинающий моргастер</string>
     <string name="achievement2_blink_starter_description">Сделать 100 морганий в упражнениях</string>
     <string name="achievement3_close_up">Близкий взгляд</string>
-    <string name="achievement3_close_up_description">Выполнить упражнение "Фокусировка близко-далеко" 5 раз</string>
+    <string name="achievement3_close_up_description">Выполнить упражнение "Близко-далеко" 5 раз</string>
     <string name="achievement4_clockwise">Стрелки часов</string>
     <string name="achievement4_clockwise_description">Выполнить вращение глазами ("Часы") 5 раз</string>
     <string name="achievement5_evening_newbie">Вечерний новичок</string>
@@ -99,17 +99,17 @@
     <string name="achievement10_express_master">Экспресс-мастер</string>
     <string name="achievement10_express_master_description">Выполнить правило 20-20-20 50 раз</string>
     <string name="achievement11_the_artist">Художник</string>
-    <string name="achievement11_the_artist_description">Нарисовать глазами «восьмёрку» 30 раз</string>
+    <string name="achievement11_the_artist_description">Нарисовать глазами "восьмёрку" 30 раз</string>
     <string name="achievement12_clockmaker">Часовщик</string>
     <string name="achievement12_clockmaker_description">Выполнить вращение глазами 50 раз</string>
     <string name="achievement13_reverse_myope">Близорукий навыворот</string>
-    <string name="achievement13_reverse_myope_description">Сделать упражнение «Фокусировка близко-далеко» 50 раз</string>
+    <string name="achievement13_reverse_myope_description">Выполнить упражнение "Близко-далеко" 50 раз</string>
     <string name="achievement14_relax_enthusiast">Релакс-любитель</string>
     <string name="achievement14_relax_enthusiast_description">Провести в пальминге 60 минут суммарно</string>
     <string name="achievement15_regular_warm_up">Регулярная разминка</string>
-    <string name="achievement15_regular_warm_up_description">Выполнить блок А («Разминка на рабочем месте») 10 раз</string>
+    <string name="achievement15_regular_warm_up_description">Выполнить блок А ("Разминка на рабочем месте") 10 раз</string>
     <string name="achievement16_evening_ritual">Вечерний ритуал</string>
-    <string name="achievement16_evening_ritual_description">Выполнить блок Б («Снятие напряжения») 10 раз</string>
+    <string name="achievement16_evening_ritual_description">Выполнить блок Б ("Снятие напряжения") 10 раз</string>
     <string name="achievement17_far_sighted">Дальнозоркий</string>
     <string name="achievement17_far_sighted_description">Выполнить правило 20-20-20 100 раз</string>
     <string name="achievement18_30_exercises">30 упражнений</string>
@@ -164,6 +164,11 @@
     <string name="achievement_level_pro">Профи</string>
     <string name="achievement_level_expert">Эксперт</string>
     <string name="achievement_level_hidden">Скрытые</string>
+    <string name="achievements_screen_title">Достижения</string>
+    <string name="achievements_locked">Закрыто</string>
+    <string name="achievements_unlocked">Открыто</string>
+    <string name="achievements_unlocked_at">Открыто: %1$s</string>
+    <string name="achievements_hidden_description">Скрытое описание достижения</string>
 
     <!-- Main tab -->
     <string name="tree_fraxinus_excelsior">Ясный взгляд</string>
@@ -223,9 +228,9 @@
     <string name="block_c_desc">Золотое правило цифровой гигиены глаз. Используйте его в любое время и в любом месте.</string>
     <string name="exercise_blink_break">Моргание</string>
     <string name="exercise_blink_break_desc">Моргайте быстро и мягко. Это увлажняет слезную плёнку и снимает сухость. (За экраном вы моргаете реже - это упражнение всё исправляет!)</string>
-    <string name="exercise_near_far_focus">Фокусировка «Близко-далеко»</string>
+    <string name="exercise_near_far_focus">Близко-далеко</string>
     <string name="exercise_near_far_focus_desc">Держите большой палец в 15 см от носа. Сфокусируйтесь на нём. Затем переведите взгляд на что-то далёкое (в окно или на другой конец комнаты). Задерживайтесь на пару секунд.</string>
-    <string name="exercise_diagonal_gazes">Диагональные взгляды</string>
+    <string name="exercise_diagonal_gazes">Диагонали</string>
     <string name="exercise_diagonal_gazes_desc">Голова неподвижна. Посмотрите вверх-влево, затем вниз-вправо. Повторите в другую сторону: вверх-вправо, затем вниз-влево.</string>
     <string name="exercise_figure_eight">Восьмёрка</string>
     <string name="exercise_figure_eight_desc">Представьте перед собой огромную горизонтальную восьмёрку (∞). Медленно обведите её глазами. Пройдите в одну сторону, затем поменяйте направление.</string>
@@ -294,14 +299,14 @@
     <string name="highlight_tip18_title">Проверьте осанку</string>
     <string name="highlight_tip18_description">Сидите прямо. Если вы горбитесь, расстояние до экрана искажается, и глазам приходится сильнее напрягаться.</string>
 
-    <string name="highlight_tip19_title">Фокусировка «Близко-Далеко»</string>
+    <string name="highlight_tip19_title">Фокусировка "Близко-Далеко"</string>
     <string name="highlight_tip19_description">Научите глаза перестраиваться: посмотрите на палец около носа, затем переведите взгляд на дальний объект за окном. Повторите 10 раз.</string>
 
     <string name="highlight_tip20_title">Ешьте рыбу</string>
     <string name="highlight_tip20_description">Омега-3 жирные кислоты (лосось, тунец) помогают бороться с синдромом сухого глаза.</string>
 
     <string name="highlight_tip21_title">Рисуйте глазами</string>
-    <string name="highlight_tip21_description">Закройте глаза и попробуйте «нарисовать» ими в воздухе цифры от 0 до 9. Это отличная гимнастика.</string>
+    <string name="highlight_tip21_description">Закройте глаза и попробуйте "нарисовать" ими в воздухе цифры от 0 до 9. Это отличная гимнастика.</string>
 
     <string name="highlight_tip22_title">Регулярно проверяйте зрение</string>
     <string name="highlight_tip22_description">Даже если вам кажется, что вы видите хорошо, раз в год посещайте офтальмолога для профилактики.</string>
@@ -367,6 +372,7 @@
     <!-- Content descriptions -->
     <string name="content_description_settings">Настройки</string>
     <string name="content_description_back">Назад</string>
+    <string name="content_description_locked_achievement">Закрытое достижение</string>
     <string name="content_description_decrease">Уменьшить</string>
     <string name="content_description_increase">Увеличить</string>
 </resources>

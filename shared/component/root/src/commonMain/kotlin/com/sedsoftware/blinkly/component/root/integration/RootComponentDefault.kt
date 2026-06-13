@@ -116,7 +116,7 @@ class RootComponentDefault private constructor(
             BlockCComponentDefault(childContext, output)
         },
         achievementsComponent = { childContext, output ->
-            AchievementsComponentDefault(childContext, output)
+            AchievementsComponentDefault(childContext, storeFactory, dispatchers, achievementsWatcher, output)
         },
         gardenComponent = { childContext, output ->
             GardenComponentDefault(childContext, output)
