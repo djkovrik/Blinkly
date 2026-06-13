@@ -164,6 +164,11 @@
     <string name="achievement_level_pro">Профи</string>
     <string name="achievement_level_expert">Эксперт</string>
     <string name="achievement_level_hidden">Скрытые</string>
+    <string name="achievements_screen_title">Достижения</string>
+    <string name="achievements_locked">Закрыто</string>
+    <string name="achievements_unlocked">Открыто</string>
+    <string name="achievements_unlocked_at">Открыто: %1$s</string>
+    <string name="achievements_hidden_description">Скрытое описание достижения</string>
 
     <!-- Main tab -->
     <string name="tree_fraxinus_excelsior">Ясный взгляд</string>
@@ -367,6 +372,7 @@
     <!-- Content descriptions -->
     <string name="content_description_settings">Настройки</string>
     <string name="content_description_back">Назад</string>
+    <string name="content_description_locked_achievement">Закрытое достижение</string>
     <string name="content_description_decrease">Уменьшить</string>
     <string name="content_description_increase">Увеличить</string>
 </resources>
