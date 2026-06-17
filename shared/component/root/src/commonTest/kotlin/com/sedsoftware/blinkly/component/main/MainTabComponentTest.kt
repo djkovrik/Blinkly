@@ -24,11 +24,13 @@ import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import com.sedsoftware.blinkly.domain.model.Tree
+import com.sedsoftware.blinkly.domain.model.TreeGarden
 import com.sedsoftware.blinkly.domain.model.TreeStage
 import com.sedsoftware.blinkly.domain.model.TreeType
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -308,6 +310,7 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
             highlightsProvider = highlightsProvider,
             treeProgressWatcher = object : BlinklyTreeProgressWatcher {
                 override val tree: Flow<Tree> = treeFlow
+                override val garden: Flow<TreeGarden> = flowOf(emptyGarden())
             },
             mainTabOutput = { componentOutput.add(it) },
         )
@@ -380,5 +383,14 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
 
     private companion object {
         val DEFAULT_TREE: Tree = Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f)
+
+        fun emptyGarden(): TreeGarden =
+            TreeGarden(
+                currentTree = DEFAULT_TREE,
+                grownTrees = emptyList(),
+                totalTrees = TreeType.entries.size,
+                nextTreeType = TreeType.FRAXINUS_EXCELSIOR,
+                daysToNextTree = 28,
+            )
     }
 }

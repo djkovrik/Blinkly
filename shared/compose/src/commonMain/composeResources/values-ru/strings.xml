@@ -170,6 +170,14 @@
     <string name="achievements_unlocked_at">Открыто: %1$s</string>
     <string name="achievements_hidden_description">Скрытое описание достижения</string>
 
+    <!-- Garden -->
+    <string name="garden_current_tree_title">Ваше текущее дерево</string>
+    <string name="garden_collection_title">Сад</string>
+    <string name="garden_stats_title">Статистика сада</string>
+    <string name="garden_grown_count">Выращено: %1$d из %2$d растений</string>
+    <string name="garden_next_tree">Следующее растение: %1$s через %2$d дн.</string>
+    <string name="garden_all_grown">Все растения выращены</string>
+
     <!-- Main tab -->
     <string name="tree_fraxinus_excelsior">Ясный взгляд</string>
     <string name="tree_ginkgo_biloba">Гинкго-зрение</string>
@@ -373,6 +381,7 @@
     <string name="content_description_settings">Настройки</string>
     <string name="content_description_back">Назад</string>
     <string name="content_description_locked_achievement">Закрытое достижение</string>
+    <string name="content_description_tree_preview">%1$s, стадия %2$s</string>
     <string name="content_description_decrease">Уменьшить</string>
     <string name="content_description_increase">Увеличить</string>
 </resources>

@@ -598,4 +598,57 @@ class BlinklyTreeProgressWatcherTest : BaseDomainTest() {
             Tree(TreeStage.MAGNIFICENT, TreeType.QUERCUS_ROBUR, 100f)
         )
     }
+
+    @Test
+    fun `when no data in database then garden has no grown trees and first next tree`() = runTest(testScheduler) {
+        // given
+        every { database.currentCalendar() } returns flowOf(emptyList())
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+
+        // when
+        val result = watcher.garden.first()
+
+        // then
+        assertThat(result.currentTree).isEqualTo(Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f))
+        assertThat(result.grownTrees).isEqualTo(emptyList())
+        assertThat(result.totalTrees).isEqualTo(TreeType.entries.size)
+        assertThat(result.nextTreeType).isEqualTo(TreeType.FRAXINUS_EXCELSIOR)
+        assertThat(result.daysToNextTree).isEqualTo(28)
+    }
+
+    @Test
+    fun `when first tree completed today then garden contains first grown tree`() = runTest(testScheduler) {
+        // given
+        val calendar = FakeData.getCalendarWithFullDays(now, 28)
+        every { database.currentCalendar() } returns flowOf(calendar)
+        every { timeUtils.now() } returns now
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+
+        // when
+        val result = watcher.garden.first()
+
+        // then
+        assertThat(result.grownTrees).isEqualTo(
+            listOf(Tree(TreeStage.MAGNIFICENT, TreeType.FRAXINUS_EXCELSIOR, 100f))
+        )
+        assertThat(result.nextTreeType).isEqualTo(TreeType.GINKGO_BILOBA)
+        assertThat(result.daysToNextTree).isEqualTo(28)
+    }
+
+    @Test
+    fun `when all trees completed then garden contains all grown trees and no next tree`() = runTest(testScheduler) {
+        // given
+        val calendar = FakeData.getCalendarWithFullDays(now, 280)
+        every { database.currentCalendar() } returns flowOf(calendar)
+        every { timeUtils.now() } returns now
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+
+        // when
+        val result = watcher.garden.first()
+
+        // then
+        assertThat(result.grownTrees.map { it.type }).isEqualTo(TreeType.entries.toList())
+        assertThat(result.nextTreeType).isEqualTo(null)
+        assertThat(result.daysToNextTree).isEqualTo(null)
+    }
 }
