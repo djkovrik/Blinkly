@@ -119,7 +119,7 @@ class RootComponentDefault private constructor(
             AchievementsComponentDefault(childContext, storeFactory, dispatchers, achievementsWatcher, output)
         },
         gardenComponent = { childContext, output ->
-            GardenComponentDefault(childContext, output)
+            GardenComponentDefault(childContext, storeFactory, dispatchers, treeProgressWatcher, output)
         },
         addNewReminderComponent = { childContext, output ->
             AddNewReminderComponentDefault(childContext, output)

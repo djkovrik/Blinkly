@@ -6,6 +6,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Tree
+import com.sedsoftware.blinkly.domain.model.TreeGarden
 import com.sedsoftware.blinkly.domain.model.TreeStage
 import com.sedsoftware.blinkly.domain.model.TreeType
 import com.sedsoftware.blinkly.domain.model.Workout
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.datetime.TimeZone
+import kotlin.math.ceil
 
 class BlinklyTreeProgressWatcherImpl(
     private val timeUtils: BlinklyTimeUtils,
@@ -25,7 +27,14 @@ class BlinklyTreeProgressWatcherImpl(
 
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
 
-    override val tree: Flow<Tree> = database.currentCalendar()
+    private val calendar: Flow<List<Workout>> = database.currentCalendar()
+        .shareIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_STOP_TIMEOUT),
+            replay = 1,
+        )
+
+    override val tree: Flow<Tree> = calendar
         .map(::calculateCurrentTree)
         .shareIn(
             scope = scope,
@@ -33,34 +42,21 @@ class BlinklyTreeProgressWatcherImpl(
             replay = 1,
         )
 
-    private fun calculateCurrentTree(workouts: List<Workout>): Tree {
-        val now = timeUtils.now()
-        val timeZone: TimeZone = timeUtils.timeZone()
+    override val garden: Flow<TreeGarden> = calendar
+        .map(::calculateGarden)
+        .shareIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_STOP_TIMEOUT),
+            replay = 1,
+        )
 
+    private fun calculateCurrentTree(workouts: List<Workout>): Tree {
         if (workouts.isEmpty()) {
             return Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f)
         }
 
-        val today = now.asLocalDate(timeZone)
-        val exercisesByDate = workouts.flatMap { it.exercises }
-            .groupBy { it.completedAt.asLocalDate(timeZone) }
-
-        val dailyProgressByDate = exercisesByDate.mapValues { (_, exercises) ->
-            val uniqueBlocks = exercises.map { it.block }.toSet().size
-            if (uniqueBlocks == 1) STEP_HALF else STEP_FULL
-        }
-
-        var progressBeforeToday = 0f
-        var todayProgress = 0f
-
-        dailyProgressByDate.forEach { (date, progress) ->
-            when {
-                date < today -> progressBeforeToday += progress
-                date == today -> todayProgress = progress
-            }
-        }
-
-        val cappedBefore = progressBeforeToday.coerceAtMost(280f)
+        val progress = calculateProgress(workouts)
+        val cappedBefore = progress.beforeToday.coerceAtMost(MAX_GARDEN_PROGRESS)
 
         val (baseType, baseStage, accumulatedBefore) = getStageAndProgress(cappedBefore)
 
@@ -78,10 +74,58 @@ class BlinklyTreeProgressWatcherImpl(
             startingProgress = 0f
         }
 
-        val finalProgress = (startingProgress + todayProgress).coerceAtMost(currentStage.threshold)
+        val finalProgress = (startingProgress + progress.today).coerceAtMost(currentStage.threshold)
         val percentProgress = (finalProgress / currentStage.threshold * HUNDRED_PERCENTS).coerceIn(0f, HUNDRED_PERCENTS)
 
         return Tree(currentStage, currentType, percentProgress)
+    }
+
+    private fun calculateGarden(workouts: List<Workout>): TreeGarden {
+        val progress = calculateProgress(workouts)
+        val totalProgress = (progress.beforeToday + progress.today).coerceAtMost(MAX_GARDEN_PROGRESS)
+        val grownTreesCount = (totalProgress / TREE_FULL_PROGRESS).toInt().coerceIn(0, TreeType.entries.size)
+        val nextTreeType = TreeType.entries.getOrNull(grownTreesCount)
+        val daysToNextTree = nextTreeType?.let {
+            val nextTreeThreshold = TREE_FULL_PROGRESS * (grownTreesCount + 1)
+            ceil(nextTreeThreshold - totalProgress).toInt().coerceAtLeast(0)
+        }
+
+        return TreeGarden(
+            currentTree = calculateCurrentTree(workouts),
+            grownTrees = TreeType.entries
+                .take(grownTreesCount)
+                .map { type -> Tree(TreeStage.MAGNIFICENT, type, HUNDRED_PERCENTS) },
+            totalTrees = TreeType.entries.size,
+            nextTreeType = nextTreeType,
+            daysToNextTree = daysToNextTree,
+        )
+    }
+
+    private fun calculateProgress(workouts: List<Workout>): Progress {
+        val now = timeUtils.now()
+        val timeZone: TimeZone = timeUtils.timeZone()
+        val today = now.asLocalDate(timeZone)
+        val dailyProgressByDate = workouts.flatMap { it.exercises }
+            .groupBy { it.completedAt.asLocalDate(timeZone) }
+            .mapValues { (_, exercises) ->
+                val uniqueBlocks = exercises.map { it.block }.toSet().size
+                if (uniqueBlocks == 1) STEP_HALF else STEP_FULL
+            }
+
+        var progressBeforeToday = 0f
+        var todayProgress = 0f
+
+        dailyProgressByDate.forEach { (date, progress) ->
+            when {
+                date < today -> progressBeforeToday += progress
+                date == today -> todayProgress = progress
+            }
+        }
+
+        return Progress(
+            beforeToday = progressBeforeToday,
+            today = todayProgress,
+        )
     }
 
     private fun getStageAndProgress(total: Float): Triple<TreeType, TreeStage, Float> {
@@ -115,9 +159,16 @@ class BlinklyTreeProgressWatcherImpl(
         return type to stage
     }
 
+    private data class Progress(
+        val beforeToday: Float,
+        val today: Float,
+    )
+
     private companion object {
         const val SUBSCRIPTION_STOP_TIMEOUT = 5000L
         const val HUNDRED_PERCENTS = 100f
+        const val MAX_GARDEN_PROGRESS = 280f
+        val TREE_FULL_PROGRESS: Float = TreeStage.entries.sumOf { it.threshold.toDouble() }.toFloat()
         const val STEP_HALF = 0.5f
         const val STEP_FULL = 1.0f
     }

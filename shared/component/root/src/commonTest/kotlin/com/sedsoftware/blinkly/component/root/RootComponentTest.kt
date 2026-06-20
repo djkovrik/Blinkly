@@ -56,6 +56,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val reminderManagerMock: BlinklyReminderManager = mock()
     private val treeProgressWatcherMock: BlinklyTreeProgressWatcher = mock {
         every { tree } returns kotlinx.coroutines.flow.emptyFlow()
+        every { garden } returns kotlinx.coroutines.flow.emptyFlow()
     }
 
     @Test

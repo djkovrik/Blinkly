@@ -15,6 +15,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.Tree
+import com.sedsoftware.blinkly.domain.model.TreeGarden
 import com.sedsoftware.blinkly.domain.model.TreeStage
 import com.sedsoftware.blinkly.domain.model.TreeType
 import com.sedsoftware.blinkly.domain.model.Workout
@@ -99,7 +100,17 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
             },
             treeProgressWatcher = object : BlinklyTreeProgressWatcher {
                 override val tree: Flow<Tree> = flowOf(Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f))
+                override val garden: Flow<TreeGarden> = flowOf(emptyGarden())
             },
             homeScreenOutput = { componentOutput.add(it) },
+        )
+
+    private fun emptyGarden(): TreeGarden =
+        TreeGarden(
+            currentTree = Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f),
+            grownTrees = emptyList(),
+            totalTrees = TreeType.entries.size,
+            nextTreeType = TreeType.FRAXINUS_EXCELSIOR,
+            daysToNextTree = 28,
         )
 }

@@ -173,6 +173,14 @@
     <string name="achievements_unlocked_at">Unlocked at %1$s</string>
     <string name="achievements_hidden_description">Hidden achievement description</string>
 
+    <!-- Garden -->
+    <string name="garden_current_tree_title">Your current tree</string>
+    <string name="garden_collection_title">Garden</string>
+    <string name="garden_stats_title">Garden stats</string>
+    <string name="garden_grown_count">Grown: %1$d of %2$d plants</string>
+    <string name="garden_next_tree">Next plant: %1$s in %2$d days</string>
+    <string name="garden_all_grown">All plants are grown</string>
+
     <!-- Main tab -->
     <string name="tree_fraxinus_excelsior">Clear Ash</string>
     <string name="tree_ginkgo_biloba">Ginkgo Vision</string>
@@ -376,6 +384,7 @@
     <string name="content_description_settings">Settings</string>
     <string name="content_description_back">Back</string>
     <string name="content_description_locked_achievement">Locked achievement</string>
+    <string name="content_description_tree_preview">%1$s, %2$s stage</string>
     <string name="content_description_decrease">Decrease</string>
     <string name="content_description_increase">Increase</string>
 </resources>
