@@ -10,10 +10,12 @@ import com.sedsoftware.blinkly.component.home.integration.HomeScreenComponentDef
 import com.sedsoftware.blinkly.component.home.model.HomeScreenTab
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
+import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
+import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeGarden
 import com.sedsoftware.blinkly.domain.model.TreeStage
@@ -23,6 +25,8 @@ import dev.mokkery.mock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlin.test.Test
 import kotlin.time.Clock
@@ -97,6 +101,20 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
                 override suspend fun forceNextHighlight(): HighlightOfTheDay = HighlightOfTheDay.Tip(2)
                 override suspend fun reset() = Unit
                 override suspend fun getShownCount(): Int = 1
+            },
+            reminderManager = object : BlinklyReminderManager {
+                override fun createdReminders(): Flow<List<Reminder>> = flowOf(emptyList())
+                override suspend fun scheduleDaily(time: LocalTime) = Unit
+                override suspend fun scheduleWeeklySingle(time: LocalTime, dayOfWeek: DayOfWeek) = Unit
+                override suspend fun scheduleWeeklyDayPeriod(
+                    from: LocalTime,
+                    until: LocalTime,
+                    intervalMinutes: Int,
+                    days: List<DayOfWeek>,
+                ) = Unit
+                override suspend fun rescheduleAll() = Unit
+                override suspend fun cancel(uuid: String) = Unit
+                override suspend fun cancelAll() = Unit
             },
             treeProgressWatcher = object : BlinklyTreeProgressWatcher {
                 override val tree: Flow<Tree> = flowOf(Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f))

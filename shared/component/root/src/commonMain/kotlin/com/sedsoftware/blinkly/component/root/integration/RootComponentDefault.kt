@@ -99,6 +99,7 @@ class RootComponentDefault private constructor(
                 timeUtils = timeUtils,
                 calendarWatcher = calendarWatcher,
                 highlightsProvider = highlightsProvider,
+                reminderManager = reminderManager,
                 treeProgressWatcher = treeProgressWatcher,
                 homeScreenOutput = output,
             )
@@ -122,7 +123,13 @@ class RootComponentDefault private constructor(
             GardenComponentDefault(childContext, storeFactory, dispatchers, treeProgressWatcher, output)
         },
         addNewReminderComponent = { childContext, output ->
-            AddNewReminderComponentDefault(childContext, output)
+            AddNewReminderComponentDefault(
+                componentContext = childContext,
+                storeFactory = storeFactory,
+                dispatchers = dispatchers,
+                reminderManager = reminderManager,
+                addNewReminderOutput = output,
+            )
         },
     )
 

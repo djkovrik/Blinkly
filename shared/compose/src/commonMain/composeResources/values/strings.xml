@@ -64,6 +64,43 @@
     <string name="onboarding_initial_setup_create">Create</string>
     <string name="onboarding_initial_setup_clear">Clear</string>
     <string name="onboarding_initial_setup_created">Created:</string>
+    <string name="reminders_title">Reminders</string>
+    <string name="reminders_add">Add reminder</string>
+    <string name="reminders_empty_title">No reminders yet</string>
+    <string name="reminders_empty_description">Create a 20-20-20 reminder and Blinkly will help you pause before eye strain builds up.</string>
+    <string name="reminders_empty_cta">Create reminder</string>
+    <string name="reminders_daily">Daily</string>
+    <string name="reminders_weekly">Weekly</string>
+    <string name="reminders_next">Next</string>
+    <string name="reminders_days_every_day">Every day</string>
+    <string name="reminders_overview_title">20-20-20 break schedule</string>
+    <string name="reminders_overview_count">Active reminders: %1$d</string>
+    <string name="reminders_overview_next">Next: %1$s on %2$s</string>
+    <string name="reminders_overview_hint">Blinkly will nudge you to look away before eye strain builds up.</string>
+    <string name="reminders_deleted">Reminder deleted</string>
+    <string name="reminders_undo">Undo</string>
+    <string name="add_reminder_title">New reminder</string>
+    <string name="add_reminder_description">Choose how Blinkly should remind you to take a 20-20-20 break.</string>
+    <string name="add_reminder_type">Schedule</string>
+    <string name="add_reminder_type_daily">Daily</string>
+    <string name="add_reminder_type_daily_description">One reminder every day at the selected time.</string>
+    <string name="add_reminder_type_weekly_single">Weekly</string>
+    <string name="add_reminder_type_weekly_single_description">One reminder every week on the selected day.</string>
+    <string name="add_reminder_type_weekly_period">Workday period</string>
+    <string name="add_reminder_type_weekly_period_description">Several reminders between two times on selected days.</string>
+    <string name="add_reminder_time">Time</string>
+    <string name="add_reminder_day">Day</string>
+    <string name="add_reminder_interval_minutes">%1$d min</string>
+    <string name="add_reminder_interval_custom">Custom</string>
+    <string name="add_reminder_preview_title">Reminder preview</string>
+    <string name="add_reminder_preview_daily">Every day at %1$s</string>
+    <string name="add_reminder_preview_weekly">Every %1$s at %2$s</string>
+    <string name="add_reminder_preview_period">%1$s, %2$s-%3$s, every %4$d min</string>
+    <string name="add_reminder_save">Create reminder</string>
+    <string name="add_reminder_saving">Creating...</string>
+    <string name="add_reminder_error_empty_days">Select at least one day</string>
+    <string name="add_reminder_error_invalid_period">The start time must be before the end time</string>
+    <string name="add_reminder_error_invalid_interval">Interval must be greater than zero</string>
 
     <!-- Reminder creator -->
     <string name="week_monday">MO</string>
@@ -383,6 +420,8 @@
     <!-- Content descriptions -->
     <string name="content_description_settings">Settings</string>
     <string name="content_description_back">Back</string>
+    <string name="content_description_add">Add</string>
+    <string name="content_description_delete">Delete reminder</string>
     <string name="content_description_locked_achievement">Locked achievement</string>
     <string name="content_description_tree_preview">%1$s, %2$s stage</string>
     <string name="content_description_decrease">Decrease</string>
