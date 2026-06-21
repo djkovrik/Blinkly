@@ -53,7 +53,9 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val highlightsProviderMock: BlinklyHighlightsProvider = mock {
         everySuspend { get() } returns com.sedsoftware.blinkly.domain.model.HighlightOfTheDay.Tip(1)
     }
-    private val reminderManagerMock: BlinklyReminderManager = mock()
+    private val reminderManagerMock: BlinklyReminderManager = mock {
+        every { createdReminders() } returns emptyFlow()
+    }
     private val treeProgressWatcherMock: BlinklyTreeProgressWatcher = mock {
         every { tree } returns kotlinx.coroutines.flow.emptyFlow()
         every { garden } returns kotlinx.coroutines.flow.emptyFlow()

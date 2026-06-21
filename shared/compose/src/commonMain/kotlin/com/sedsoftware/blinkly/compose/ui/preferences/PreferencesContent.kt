@@ -44,8 +44,8 @@ import blinkly.shared.compose.generated.resources.exercise_diagonal_gazes
 import blinkly.shared.compose.generated.resources.exercise_figure_eight
 import blinkly.shared.compose.generated.resources.exercise_near_far_focus
 import blinkly.shared.compose.generated.resources.exercise_palming
-import blinkly.shared.compose.generated.resources.ic_minus
-import blinkly.shared.compose.generated.resources.ic_plus
+import blinkly.shared.compose.generated.resources.icon_minus
+import blinkly.shared.compose.generated.resources.icon_plus
 import blinkly.shared.compose.generated.resources.icon_back
 import blinkly.shared.compose.generated.resources.preferences_count_label
 import blinkly.shared.compose.generated.resources.preferences_duration_label
@@ -358,13 +358,13 @@ private fun PreferenceStepper(
             }
 
             StepperButton(
-                iconRes = Res.drawable.ic_minus,
+                iconRes = Res.drawable.icon_minus,
                 contentDescription = stringResource(resource = Res.string.content_description_decrease),
                 onClick = onDecrease,
             )
 
             StepperButton(
-                iconRes = Res.drawable.ic_plus,
+                iconRes = Res.drawable.icon_plus,
                 contentDescription = stringResource(resource = Res.string.content_description_increase),
                 onClick = onIncrease,
             )

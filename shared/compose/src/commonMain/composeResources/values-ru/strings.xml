@@ -61,6 +61,43 @@
     <string name="onboarding_initial_setup_create">Создать</string>
     <string name="onboarding_initial_setup_clear">Очистить</string>
     <string name="onboarding_initial_setup_created">Создано:</string>
+    <string name="reminders_title">Напоминания</string>
+    <string name="reminders_add">Добавить напоминание</string>
+    <string name="reminders_empty_title">Напоминаний пока нет</string>
+    <string name="reminders_empty_description">Создайте напоминание 20-20-20, и Blinkly поможет сделать паузу до того, как глаза устанут.</string>
+    <string name="reminders_empty_cta">Создать напоминание</string>
+    <string name="reminders_daily">Ежедневно</string>
+    <string name="reminders_weekly">Еженедельно</string>
+    <string name="reminders_next">Ближайшее</string>
+    <string name="reminders_days_every_day">Каждый день</string>
+    <string name="reminders_overview_title">Расписание перерывов 20-20-20</string>
+    <string name="reminders_overview_count">Активных напоминаний: %1$d</string>
+    <string name="reminders_overview_next">Ближайшее: %1$s, %2$s</string>
+    <string name="reminders_overview_hint">Blinkly напомнит посмотреть вдаль до того, как глаза начнут уставать.</string>
+    <string name="reminders_deleted">Напоминание удалено</string>
+    <string name="reminders_undo">Отменить</string>
+    <string name="add_reminder_title">Новое напоминание</string>
+    <string name="add_reminder_description">Выберите, как Blinkly будет напоминать вам сделать перерыв 20-20-20.</string>
+    <string name="add_reminder_type">Расписание</string>
+    <string name="add_reminder_type_daily">Ежедневно</string>
+    <string name="add_reminder_type_daily_description">Одно напоминание каждый день в выбранное время.</string>
+    <string name="add_reminder_type_weekly_single">Еженедельно</string>
+    <string name="add_reminder_type_weekly_single_description">Одно напоминание каждую неделю в выбранный день.</string>
+    <string name="add_reminder_type_weekly_period">Рабочий период</string>
+    <string name="add_reminder_type_weekly_period_description">Несколько напоминаний между двумя временами в выбранные дни.</string>
+    <string name="add_reminder_time">Время</string>
+    <string name="add_reminder_day">День</string>
+    <string name="add_reminder_interval_minutes">%1$d мин</string>
+    <string name="add_reminder_interval_custom">Свой</string>
+    <string name="add_reminder_preview_title">Предпросмотр напоминания</string>
+    <string name="add_reminder_preview_daily">Каждый день в %1$s</string>
+    <string name="add_reminder_preview_weekly">Каждый %1$s в %2$s</string>
+    <string name="add_reminder_preview_period">%1$s, %2$s-%3$s, каждые %4$d мин</string>
+    <string name="add_reminder_save">Создать напоминание</string>
+    <string name="add_reminder_saving">Создаем...</string>
+    <string name="add_reminder_error_empty_days">Выберите хотя бы один день</string>
+    <string name="add_reminder_error_invalid_period">Время начала должно быть раньше времени окончания</string>
+    <string name="add_reminder_error_invalid_interval">Интервал должен быть больше нуля</string>
 
     <!-- Reminder creator -->
     <string name="week_monday">ПН</string>
@@ -380,6 +417,8 @@
     <!-- Content descriptions -->
     <string name="content_description_settings">Настройки</string>
     <string name="content_description_back">Назад</string>
+    <string name="content_description_add">Добавить</string>
+    <string name="content_description_delete">Удалить напоминание</string>
     <string name="content_description_locked_achievement">Закрытое достижение</string>
     <string name="content_description_tree_preview">%1$s, стадия %2$s</string>
     <string name="content_description_decrease">Уменьшить</string>
