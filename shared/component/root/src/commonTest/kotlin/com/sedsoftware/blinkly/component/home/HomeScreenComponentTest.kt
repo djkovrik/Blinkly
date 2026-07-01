@@ -8,12 +8,14 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.home.integration.HomeScreenComponentDefault
 import com.sedsoftware.blinkly.component.home.model.HomeScreenTab
+import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.Tree
@@ -93,6 +95,9 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
             dispatchers = testDispatchers,
             settings = fakeSettings,
             timeUtils = timeUtils,
+            achievementsWatcher = object : BlinklyAchievementsWatcher {
+                override val achievements: Flow<List<Achievement>> = flowOf(emptyList())
+            },
             calendarWatcher = object : BlinklyCalendarWatcher {
                 override val calendar: Flow<List<Workout>> = flowOf(emptyList())
             },
