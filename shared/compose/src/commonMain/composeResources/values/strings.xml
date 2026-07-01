@@ -264,6 +264,14 @@
     <string name="info_activities_breaks">⏱ 20-20-20 breaks:</string>
     <string name="info_activities_relax">🌴 Relax:</string>
 
+    <!-- Progress tab -->
+    <string name="progress_title">My progress</string>
+    <string name="progress_calendar_title">Training calendar</string>
+    <string name="progress_tree_title">Growth tree</string>
+    <string name="progress_tree_level">Level %1$d: %2$s</string>
+    <string name="progress_achievements_title">Achievements</string>
+    <string name="progress_achievement_unknown">Mystery achievement</string>
+
     <!-- Exercising -->
     <string name="block_a">Block A</string>
     <string name="block_a_title">Workplace Warm-up</string>

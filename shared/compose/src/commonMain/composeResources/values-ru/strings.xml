@@ -261,6 +261,14 @@
     <string name="info_activities_breaks">⏱ Перерывы 20-20-20:</string>
     <string name="info_activities_relax">🌴 Релакс:</string>
 
+    <!-- Вкладка прогресса -->
+    <string name="progress_title">Мой прогресс</string>
+    <string name="progress_calendar_title">Календарь тренировок</string>
+    <string name="progress_tree_title">Дерево роста</string>
+    <string name="progress_tree_level">Уровень %1$d: %2$s</string>
+    <string name="progress_achievements_title">Достижения</string>
+    <string name="progress_achievement_unknown">Тайное достижение</string>
+
     <!-- Тренировки и упражнения -->
     <string name="block_a">Блок А</string>
     <string name="block_a_title">Разминка на рабочем месте</string>

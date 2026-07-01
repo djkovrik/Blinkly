@@ -97,6 +97,7 @@ class RootComponentDefault private constructor(
                 dispatchers = dispatchers,
                 settings = settings,
                 timeUtils = timeUtils,
+                achievementsWatcher = achievementsWatcher,
                 calendarWatcher = calendarWatcher,
                 highlightsProvider = highlightsProvider,
                 reminderManager = reminderManager,

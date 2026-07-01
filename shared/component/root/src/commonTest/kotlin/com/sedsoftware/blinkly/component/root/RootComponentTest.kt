@@ -45,7 +45,9 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         every { now() } returns Clock.System.now()
         every { timeZone() } returns TimeZone.UTC
     }
-    private val achievementsWatcherMock: BlinklyAchievementsWatcher = mock()
+    private val achievementsWatcherMock: BlinklyAchievementsWatcher = mock {
+        every { achievements } returns emptyFlow()
+    }
     private val calendarWatcherMock: BlinklyCalendarWatcher = mock {
         every { calendar } returns emptyFlow()
     }

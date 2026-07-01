@@ -18,6 +18,7 @@ import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent
 import com.sedsoftware.blinkly.component.reminders.integration.RemindersTabComponentDefault
 import com.sedsoftware.blinkly.component.trainings.TrainingsTabComponent
 import com.sedsoftware.blinkly.component.trainings.integration.TrainingsTabComponentDefault
+import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
@@ -49,6 +50,7 @@ class HomeScreenComponentDefault private constructor(
         dispatchers: BlinklyDispatchers,
         settings: BlinklySettings,
         timeUtils: BlinklyTimeUtils,
+        achievementsWatcher: BlinklyAchievementsWatcher,
         calendarWatcher: BlinklyCalendarWatcher,
         highlightsProvider: BlinklyHighlightsProvider,
         reminderManager: BlinklyReminderManager,
@@ -76,7 +78,16 @@ class HomeScreenComponentDefault private constructor(
             TrainingsTabComponentDefault(childContext, componentOutput)
         },
         progressTabComponent = { childContext, componentOutput ->
-            ProgressTabComponentDefault(childContext, componentOutput)
+            ProgressTabComponentDefault(
+                componentContext = childContext,
+                storeFactory = storeFactory,
+                dispatchers = dispatchers,
+                timeUtils = timeUtils,
+                calendarWatcher = calendarWatcher,
+                achievementsWatcher = achievementsWatcher,
+                treeProgressWatcher = treeProgressWatcher,
+                progressTabOutput = componentOutput,
+            )
         },
         remindersTabComponent = { childContext, componentOutput ->
             RemindersTabComponentDefault(
