@@ -53,9 +53,7 @@ include(
     ":shared:component:reminders",
     ":shared:component:reminders:child:newreminder",
     ":shared:component:trainings",
-    ":shared:component:trainings:child:blocka",
-    ":shared:component:trainings:child:blockb",
-    ":shared:component:trainings:child:blockc",
+    ":shared:component:trainings:child:workout",
 )
 
 includeBuild("gradle/build-logic")

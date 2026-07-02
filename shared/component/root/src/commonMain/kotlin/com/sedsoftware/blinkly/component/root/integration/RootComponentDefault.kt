@@ -15,12 +15,8 @@ import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.sedsoftware.blinkly.component.achievements.AchievementsComponent
 import com.sedsoftware.blinkly.component.achievements.integration.AchievementsComponentDefault
-import com.sedsoftware.blinkly.component.blocka.BlockAComponent
-import com.sedsoftware.blinkly.component.blocka.integration.BlockAComponentDefault
-import com.sedsoftware.blinkly.component.blockb.BlockBComponent
-import com.sedsoftware.blinkly.component.blockb.integration.BlockBComponentDefault
-import com.sedsoftware.blinkly.component.blockc.BlockCComponent
-import com.sedsoftware.blinkly.component.blockc.integration.BlockCComponentDefault
+import com.sedsoftware.blinkly.component.workout.WorkoutComponent
+import com.sedsoftware.blinkly.component.workout.integration.WorkoutComponentDefault
 import com.sedsoftware.blinkly.component.garden.GardenComponent
 import com.sedsoftware.blinkly.component.garden.integration.GardenComponentDefault
 import com.sedsoftware.blinkly.component.home.HomeScreenComponent
@@ -59,9 +55,7 @@ class RootComponentDefault private constructor(
     private val onboardingComponent: (ComponentContext, (ComponentOutput) -> Unit) -> OnboardingComponent,
     private val homeScreenComponent: (ComponentContext, (ComponentOutput) -> Unit) -> HomeScreenComponent,
     private val preferencesComponent: (ComponentContext, (ComponentOutput) -> Unit) -> PreferencesComponent,
-    private val blockAComponent: (ComponentContext, (ComponentOutput) -> Unit) -> BlockAComponent,
-    private val blockBComponent: (ComponentContext, (ComponentOutput) -> Unit) -> BlockBComponent,
-    private val blockCComponent: (ComponentContext, (ComponentOutput) -> Unit) -> BlockCComponent,
+    private val exercisesComponent: (ComponentContext, ExerciseBlock, (ComponentOutput) -> Unit) -> WorkoutComponent,
     private val achievementsComponent: (ComponentContext, (ComponentOutput) -> Unit) -> AchievementsComponent,
     private val gardenComponent: (ComponentContext, (ComponentOutput) -> Unit) -> GardenComponent,
     private val addNewReminderComponent: (ComponentContext, (ComponentOutput) -> Unit) -> AddNewReminderComponent,
@@ -108,14 +102,8 @@ class RootComponentDefault private constructor(
         preferencesComponent = { childContext, output ->
             PreferencesComponentDefault(childContext, storeFactory, dispatchers, settings, output)
         },
-        blockAComponent = { childContext, output ->
-            BlockAComponentDefault(childContext, output)
-        },
-        blockBComponent = { childContext, output ->
-            BlockBComponentDefault(childContext, output)
-        },
-        blockCComponent = { childContext, output ->
-            BlockCComponentDefault(childContext, output)
+        exercisesComponent = { childContext, block, output ->
+            WorkoutComponentDefault(childContext, block, output)
         },
         achievementsComponent = { childContext, output ->
             AchievementsComponentDefault(childContext, storeFactory, dispatchers, achievementsWatcher, output)
@@ -176,14 +164,8 @@ class RootComponentDefault private constructor(
             is Config.Preferences ->
                 RootComponent.Child.Preferences(preferencesComponent(componentContext, ::onChildOutput))
 
-            is Config.BlockA ->
-                RootComponent.Child.BlockA(blockAComponent(componentContext, ::onChildOutput))
-
-            is Config.BlockB ->
-                RootComponent.Child.BlockB(blockBComponent(componentContext, ::onChildOutput))
-
-            is Config.BlockC ->
-                RootComponent.Child.BlockC(blockCComponent(componentContext, ::onChildOutput))
+            is Config.Workout ->
+                RootComponent.Child.Workout(exercisesComponent(componentContext, config.block, ::onChildOutput))
 
             is Config.Achievements ->
                 RootComponent.Child.Achievements(achievementsComponent(componentContext, ::onChildOutput))
@@ -209,11 +191,7 @@ class RootComponentDefault private constructor(
             is ComponentOutput.Main.OpenProgressTab -> Unit
 
             is ComponentOutput.Trainings.OpenExerciseBlock -> {
-                when (output.block) {
-                    ExerciseBlock.A -> navigation.push(Config.BlockA)
-                    ExerciseBlock.B -> navigation.push(Config.BlockB)
-                    ExerciseBlock.C -> navigation.push(Config.BlockC)
-                }
+                navigation.push(Config.Workout(output.block))
             }
 
             is ComponentOutput.Progress.OpenAchievements -> {
@@ -264,13 +242,7 @@ class RootComponentDefault private constructor(
         data object Preferences : Config
 
         @Serializable
-        data object BlockA : Config
-
-        @Serializable
-        data object BlockB : Config
-
-        @Serializable
-        data object BlockC : Config
+        data class Workout(val block: ExerciseBlock) : Config
 
         @Serializable
         data object Achievements : Config

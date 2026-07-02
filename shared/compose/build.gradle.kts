@@ -49,9 +49,7 @@ kotlin {
             implementation(project(":shared:component:reminders"))
             implementation(project(":shared:component:reminders:child:newreminder"))
             implementation(project(":shared:component:trainings"))
-            implementation(project(":shared:component:trainings:child:blocka"))
-            implementation(project(":shared:component:trainings:child:blockb"))
-            implementation(project(":shared:component:trainings:child:blockc"))
+            implementation(project(":shared:component:trainings:child:workout"))
         }
 
         commonTest.dependencies {

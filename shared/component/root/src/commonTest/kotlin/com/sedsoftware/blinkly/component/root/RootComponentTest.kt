@@ -135,9 +135,9 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         // when
         currentTabChild.component.onBlockAClick()
         // then
-        assertThat(component.childStack.active.instance is RootComponent.Child.BlockA).isTrue()
+        assertThat(component.childStack.active.instance is RootComponent.Child.Workout).isTrue()
         // when
-        (component.childStack.active.instance as RootComponent.Child.BlockA).component.onBackClick()
+        (component.childStack.active.instance as RootComponent.Child.Workout).component.onBackClick()
         // then
         assertThat(component.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
     }
@@ -152,9 +152,9 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         // when
         currentTabChild.component.onBlockBClick()
         // then
-        assertThat(component.childStack.active.instance is RootComponent.Child.BlockB).isTrue()
+        assertThat(component.childStack.active.instance is RootComponent.Child.Workout).isTrue()
         // when
-        (component.childStack.active.instance as RootComponent.Child.BlockB).component.onBackClick()
+        (component.childStack.active.instance as RootComponent.Child.Workout).component.onBackClick()
         // then
         assertThat(component.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
     }
@@ -169,9 +169,9 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         // when
         currentTabChild.component.onBlockCClick()
         // then
-        assertThat(component.childStack.active.instance is RootComponent.Child.BlockC).isTrue()
+        assertThat(component.childStack.active.instance is RootComponent.Child.Workout).isTrue()
         // when
-        (component.childStack.active.instance as RootComponent.Child.BlockC).component.onBackClick()
+        (component.childStack.active.instance as RootComponent.Child.Workout).component.onBackClick()
         // then
         assertThat(component.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
     }

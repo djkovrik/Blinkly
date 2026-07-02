@@ -10,11 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sedsoftware.blinkly.component.blocka.BlockAComponent
+import com.sedsoftware.blinkly.component.workout.WorkoutComponent
 
 @Composable
-fun BlockAContent(
-    component: BlockAComponent,
+fun WorkoutContent(
+    component: WorkoutComponent,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -22,7 +22,7 @@ fun BlockAContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
     ) {
-        Text("Block A")
+        Text("Workout")
         Button(onClick = component::onBackClick, modifier = Modifier.padding(all = 8.dp)) {
             Text("Close")
         }
