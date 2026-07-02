@@ -252,6 +252,7 @@
     <string name="cta_perfect_day">Сегодня вы отлично позаботились о своих глазах</string>
     <string name="cta_perfect_day_desc">Ваше дерево стало ещё сильнее 🌳</string>
     <string name="cta_start">Начать</string>
+    <string name="cta_repeat">Повторить</string>
 
     <string name="info_days">д</string>
     <string name="info_current_tree">Дерево роста</string>
@@ -279,6 +280,21 @@
     <string name="block_c">Блок В</string>
     <string name="block_c_title">Экспресс-правило 20-20-20</string>
     <string name="block_c_desc">Золотое правило цифровой гигиены глаз. Используйте его в любое время и в любом месте.</string>
+    <string name="trainings_title">Тренировки</string>
+    <string name="trainings_subtitle">Выберите комплекс, который подходит именно сейчас.</string>
+    <string name="training_workplace_warmup_title">Разминка на рабочем месте</string>
+    <string name="training_workplace_warmup_description">Несколько простых упражнений, которые помогут снять напряжение во время работы за компьютером.</string>
+    <string name="training_workplace_warmup_benefit">Снимает напряжение</string>
+    <string name="training_workplace_warmup_duration">5 минут</string>
+    <string name="training_quick_twenty_title">Быстро 20-20-20</string>
+    <string name="training_quick_twenty_description">Быстрый отдых для глаз по правилу 20-20-20. Отлично подходит между рабочими задачами.</string>
+    <string name="training_quick_twenty_benefit">Быстрый отдых</string>
+    <string name="training_quick_twenty_duration">20 секунд</string>
+    <string name="training_evening_relax_title">Вечерний релакс</string>
+    <string name="training_evening_relax_description">Спокойный комплекс упражнений, который поможет расслабить глаза после долгого дня.</string>
+    <string name="training_evening_relax_benefit">Помогает расслабиться</string>
+    <string name="training_evening_relax_duration">7 минут</string>
+    <string name="training_status_completed_today">Выполнено сегодня</string>
     <string name="exercise_blink_break">Моргание</string>
     <string name="exercise_blink_break_desc">Моргайте быстро и мягко. Это увлажняет слезную плёнку и снимает сухость. (За экраном вы моргаете реже - это упражнение всё исправляет!)</string>
     <string name="exercise_near_far_focus">Близко-далеко</string>
@@ -431,4 +447,5 @@
     <string name="content_description_tree_preview">%1$s, стадия %2$s</string>
     <string name="content_description_decrease">Уменьшить</string>
     <string name="content_description_increase">Увеличить</string>
+    <string name="content_description_training_completed">Тренировка выполнена сегодня</string>
 </resources>

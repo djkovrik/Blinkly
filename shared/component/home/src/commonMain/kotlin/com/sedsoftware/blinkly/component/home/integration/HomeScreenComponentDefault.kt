@@ -75,7 +75,14 @@ class HomeScreenComponentDefault private constructor(
             )
         },
         trainingsTabComponent = { childContext, componentOutput ->
-            TrainingsTabComponentDefault(childContext, componentOutput)
+            TrainingsTabComponentDefault(
+                componentContext = childContext,
+                storeFactory = storeFactory,
+                dispatchers = dispatchers,
+                timeUtils = timeUtils,
+                calendarWatcher = calendarWatcher,
+                trainingsTabOutput = componentOutput,
+            )
         },
         progressTabComponent = { childContext, componentOutput ->
             ProgressTabComponentDefault(
