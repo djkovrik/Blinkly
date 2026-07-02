@@ -255,6 +255,7 @@
     <string name="cta_perfect_day">You took great care of your eyes today</string>
     <string name="cta_perfect_day_desc">Your tree has grown even stronger 🌳</string>
     <string name="cta_start">Start</string>
+    <string name="cta_repeat">Repeat</string>
 
     <string name="info_days">d</string>
     <string name="info_current_tree">Growth Tree</string>
@@ -282,6 +283,21 @@
     <string name="block_c">Block C</string>
     <string name="block_c_title">The 20-20-20 Express</string>
     <string name="block_c_desc">The golden rule of digital eye care. Use this anytime, anywhere.</string>
+    <string name="trainings_title">Trainings</string>
+    <string name="trainings_subtitle">Choose the routine that fits right now.</string>
+    <string name="training_workplace_warmup_title">Workplace Warm-up</string>
+    <string name="training_workplace_warmup_description">A few simple exercises to help release tension while working at a computer.</string>
+    <string name="training_workplace_warmup_benefit">Relieves tension</string>
+    <string name="training_workplace_warmup_duration">5 minutes</string>
+    <string name="training_quick_twenty_title">Quick 20-20-20</string>
+    <string name="training_quick_twenty_description">A quick eye break based on the 20-20-20 rule. Great between work tasks.</string>
+    <string name="training_quick_twenty_benefit">Quick rest</string>
+    <string name="training_quick_twenty_duration">20 seconds</string>
+    <string name="training_evening_relax_title">Evening Relax</string>
+    <string name="training_evening_relax_description">A calm exercise routine to help your eyes unwind after a long day.</string>
+    <string name="training_evening_relax_benefit">Helps you relax</string>
+    <string name="training_evening_relax_duration">7 minutes</string>
+    <string name="training_status_completed_today">Completed today</string>
     <string name="exercise_blink_break">Blink Break</string>
     <string name="exercise_blink_break_desc">Blink rapidly and gently. This refreshes your tear film and relieves dryness. (You blink less when staring at screens — this resets it!)</string>
     <string name="exercise_near_far_focus">Near-Far Focus</string>
@@ -434,4 +450,5 @@
     <string name="content_description_tree_preview">%1$s, %2$s stage</string>
     <string name="content_description_decrease">Decrease</string>
     <string name="content_description_increase">Increase</string>
+    <string name="content_description_training_completed">Training completed today</string>
 </resources>
