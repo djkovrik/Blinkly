@@ -16,6 +16,7 @@ internal fun getAlarmeePlatformConfiguration(): AlarmeePlatformConfiguration {
             AlarmeeNotificationChannel(
                 id = "dailyNewsChannelId",
                 name = "Daily news notifications",
+                soundFilename = "ding",
                 importance = NotificationManager.IMPORTANCE_HIGH,
             ),
         )

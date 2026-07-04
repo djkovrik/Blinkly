@@ -59,7 +59,9 @@ internal class BlinklyAlarmManagerImpl(
                     priority = AndroidNotificationPriority.MAXIMUM,
                     channelId = BLINKLY_CHANNEL_ID,
                 ),
-                iosNotificationConfiguration = IosNotificationConfiguration(),
+                iosNotificationConfiguration = IosNotificationConfiguration(
+                    soundFilename = "ding.wav",
+                ),
             )
         )
     }
