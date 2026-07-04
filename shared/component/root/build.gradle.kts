@@ -13,6 +13,7 @@ kotlin {
                 implementation(project(":shared:notifier"))
                 implementation(project(":shared:settings"))
                 implementation(project(":shared:utils"))
+                implementation(project(":shared:beeper"))
                 implementation(project(":shared:component:onboarding"))
                 implementation(project(":shared:component:onboarding:child:step1"))
                 implementation(project(":shared:component:onboarding:child:step2"))

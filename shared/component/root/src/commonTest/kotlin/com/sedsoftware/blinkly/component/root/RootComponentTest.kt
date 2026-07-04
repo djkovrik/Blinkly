@@ -18,6 +18,7 @@ import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
+import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
@@ -38,6 +39,7 @@ import kotlin.time.Clock
 class RootComponentTest : ComponentTest<RootComponent>() {
 
     private val alarmManagerMock: BlinklyAlarmManager = mock()
+    private val beeperMock: BlinklyBeeper = mock()
     private val databaseMock: BlinklyDatabase = mock()
     private val notifierMock: BlinklyNotifier = mock()
     private val fakeSettings = FakeSettings()
@@ -59,8 +61,8 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         every { createdReminders() } returns emptyFlow()
     }
     private val treeProgressWatcherMock: BlinklyTreeProgressWatcher = mock {
-        every { tree } returns kotlinx.coroutines.flow.emptyFlow()
-        every { garden } returns kotlinx.coroutines.flow.emptyFlow()
+        every { tree } returns emptyFlow()
+        every { garden } returns emptyFlow()
     }
 
     @Test
@@ -249,7 +251,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         // given
         val exception = IllegalStateException("permission check failed")
         prepareStep5Dependencies()
-        dev.mokkery.everySuspend { notifierMock.isNotificationPermissionGranted() } throws exception
+        everySuspend { notifierMock.isNotificationPermissionGranted() } throws exception
 
         // when
         val before = component.childStack.active.instance::class
@@ -287,8 +289,8 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     }
 
     private fun prepareStep5Dependencies() {
-        dev.mokkery.every { notifierMock.permissionEvents() } returns emptyFlow()
-        dev.mokkery.every { reminderManagerMock.createdReminders() } returns emptyFlow()
+        every { notifierMock.permissionEvents() } returns emptyFlow()
+        every { reminderManagerMock.createdReminders() } returns emptyFlow()
     }
 
     private fun switchTab(tab: HomeScreenTab) {
@@ -301,6 +303,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
             componentContext = DefaultComponentContext(lifecycle),
             storeFactory = DefaultStoreFactory(),
             alarmManager = alarmManagerMock,
+            beeper = beeperMock,
             database = databaseMock,
             dispatchers = testDispatchers,
             notifier = notifierMock,

@@ -35,6 +35,7 @@ include(
     ":shared:database",
     ":shared:domain",
     ":shared:notifier",
+    ":shared:beeper",
     ":shared:settings",
     ":shared:utils",
     ":shared:component:root",
