@@ -7,10 +7,10 @@ description: Use in the Blinkly Kotlin Multiplatform repository when adding, cha
 
 Read `AGENTS.md` first for the project-level architecture.
 
-Blinkly is in active development. The current MVIKotlin references are
-`main`, onboarding `step4`, and onboarding `step5`. Use `main` as the primary
-reference for a Store-backed tab with manager-based business logic, real
-Compose UI, preview-only component implementation, and common component tests.
+Blinkly has Store-backed references across onboarding steps, home tabs, and
+nested feature screens. Use `main` as the primary reference for a Store-backed
+tab with manager-based business logic, real Compose UI, preview-only component
+implementation, and common component tests.
 
 ## Use these local references first
 
@@ -26,6 +26,33 @@ Store with bootstrapper, flows, and IO:
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/domain/model/MainTabData.kt`
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentDefault.kt`
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/Mappers.kt`
+- `shared/component/main/child/preferences/src/commonMain/kotlin/com/sedsoftware/blinkly/component/preferences/store/PreferencesStore.kt`
+- `shared/component/main/child/preferences/src/commonMain/kotlin/com/sedsoftware/blinkly/component/preferences/store/PreferencesStoreProvider.kt`
+- `shared/component/main/child/preferences/src/commonMain/kotlin/com/sedsoftware/blinkly/component/preferences/integration/PreferencesComponentDefault.kt`
+- `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/store/ProgressTabStore.kt`
+- `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/store/ProgressTabStoreProvider.kt`
+- `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/domain/ProgressTabManager.kt`
+- `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/integration/ProgressTabComponentDefault.kt`
+- `shared/component/progress/child/achievements/src/commonMain/kotlin/com/sedsoftware/blinkly/component/achievements/store/AchievementsStore.kt`
+- `shared/component/progress/child/achievements/src/commonMain/kotlin/com/sedsoftware/blinkly/component/achievements/store/AchievementsStoreProvider.kt`
+- `shared/component/progress/child/achievements/src/commonMain/kotlin/com/sedsoftware/blinkly/component/achievements/integration/AchievementsComponentDefault.kt`
+- `shared/component/progress/child/garden/src/commonMain/kotlin/com/sedsoftware/blinkly/component/garden/store/GardenStore.kt`
+- `shared/component/progress/child/garden/src/commonMain/kotlin/com/sedsoftware/blinkly/component/garden/store/GardenStoreProvider.kt`
+- `shared/component/progress/child/garden/src/commonMain/kotlin/com/sedsoftware/blinkly/component/garden/integration/GardenComponentDefault.kt`
+- `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/store/RemindersStore.kt`
+- `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/store/RemindersStoreProvider.kt`
+- `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/domain/RemindersManager.kt`
+- `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/integration/RemindersTabComponentDefault.kt`
+- `shared/component/reminders/child/newreminder/src/commonMain/kotlin/com/sedsoftware/blinkly/component/newreminder/store/AddNewReminderStore.kt`
+- `shared/component/reminders/child/newreminder/src/commonMain/kotlin/com/sedsoftware/blinkly/component/newreminder/store/AddNewReminderStoreProvider.kt`
+- `shared/component/reminders/child/newreminder/src/commonMain/kotlin/com/sedsoftware/blinkly/component/newreminder/integration/AddNewReminderComponentDefault.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/store/TrainingsTabStore.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/store/TrainingsTabStoreProvider.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/domain/TrainingsTabManager.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/integration/TrainingsTabComponentDefault.kt`
+- `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/store/WorkoutStore.kt`
+- `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/store/WorkoutStoreProvider.kt`
+- `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/integration/WorkoutComponentDefault.kt`
 - `shared/component/onboarding/child/step5/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step5/store/InitialRemindersStore.kt`
 - `shared/component/onboarding/child/step5/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step5/store/InitialRemindersStoreProvider.kt`
 - `shared/component/onboarding/child/step5/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step5/integration/OnboardingStep5ComponentDefault.kt`
@@ -49,9 +76,9 @@ Use a Store when the feature needs one or more of these:
 - startup actions or subscriptions
 - one-off labels
 
-Many leaf components are currently thin work-in-progress skeletons. Match that
-style only when the feature really has no state yet; do not assume those
-screens are complete. `MainTabComponent` is no longer a skeleton.
+Several components still intentionally stay thin when they only forward
+outputs. Match that style only when the feature has no reducer-owned state,
+async work, startup subscriptions, or one-off labels.
 
 ## Implement the Store in Blinkly style
 
@@ -116,8 +143,9 @@ Use these patterns:
 
 `MainTabStoreProvider` is the reference for bootstrapper actions that subscribe
 to multiple flows, run manager calculations on `ioContext`, and translate
-stream updates into `Msg` values. `step5` remains a valid subscription
-reference, even though its Compose UI is still incomplete.
+stream updates into `Msg` values. `step5`, `progress`, `reminders`,
+`trainings`, and nested feature components are valid references for narrower
+Store-backed flows.
 
 ## Component integration rules
 

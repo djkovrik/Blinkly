@@ -7,12 +7,11 @@ description: Use in the Blinkly Kotlin Multiplatform repository when adding, cha
 
 Read `AGENTS.md` first for the project-level architecture.
 
-Blinkly is in active development. The materialized component areas are
-`onboarding` with child steps `step1` through `step5`, and the `main` tab.
-`MainTabComponent` is the current reference for a Store-backed tab component
-with real Compose UI and preview-only component implementation. `progress`,
-`reminders`, `trainings`, and many leaf routes remain skeletons unless their
-code proves otherwise.
+Blinkly has baseline Decompose components across onboarding, home tabs, nested
+feature routes, Compose bindings, previews, and common component tests.
+`MainTabComponent` remains the primary Store-backed tab reference, while
+`progress`, `reminders`, and `trainings` show Store-backed tabs with nested
+child navigation.
 
 ## Use these local references first
 
@@ -26,22 +25,46 @@ Nested flow navigation:
 - `shared/component/onboarding/src/commonMain/kotlin/com/sedsoftware/blinkly/component/onboarding/OnboardingComponent.kt`
 - `shared/component/onboarding/src/commonMain/kotlin/com/sedsoftware/blinkly/component/onboarding/integration/OnboardingComponentDefault.kt`
 
-Tabbed home shell and implemented main tab:
+Tabbed home shell and home tabs:
 - `shared/component/home/src/commonMain/kotlin/com/sedsoftware/blinkly/component/home/integration/HomeScreenComponentDefault.kt`
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/MainTabComponent.kt`
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentDefault.kt`
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentPreview.kt`
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/Mappers.kt`
-
-Thin work-in-progress leaf component skeletons:
-- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/integration/TrainingsTabComponentDefault.kt`
+- `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/ProgressTabComponent.kt`
 - `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/integration/ProgressTabComponentDefault.kt`
+- `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/integration/ProgressTabComponentPreview.kt`
+- `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/RemindersTabComponent.kt`
 - `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/integration/RemindersTabComponentDefault.kt`
+- `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/integration/RemindersTabComponentPreview.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/TrainingsTabComponent.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/integration/TrainingsTabComponentDefault.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/integration/TrainingsTabComponentPreview.kt`
+
+Nested feature components:
+- `shared/component/main/child/preferences/src/commonMain/kotlin/com/sedsoftware/blinkly/component/preferences/PreferencesComponent.kt`
+- `shared/component/main/child/preferences/src/commonMain/kotlin/com/sedsoftware/blinkly/component/preferences/integration/PreferencesComponentDefault.kt`
+- `shared/component/progress/child/achievements/src/commonMain/kotlin/com/sedsoftware/blinkly/component/achievements/AchievementsComponent.kt`
+- `shared/component/progress/child/achievements/src/commonMain/kotlin/com/sedsoftware/blinkly/component/achievements/integration/AchievementsComponentDefault.kt`
+- `shared/component/progress/child/garden/src/commonMain/kotlin/com/sedsoftware/blinkly/component/garden/GardenComponent.kt`
+- `shared/component/progress/child/garden/src/commonMain/kotlin/com/sedsoftware/blinkly/component/garden/integration/GardenComponentDefault.kt`
+- `shared/component/reminders/child/newreminder/src/commonMain/kotlin/com/sedsoftware/blinkly/component/newreminder/AddNewReminderComponent.kt`
+- `shared/component/reminders/child/newreminder/src/commonMain/kotlin/com/sedsoftware/blinkly/component/newreminder/integration/AddNewReminderComponentDefault.kt`
+- `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/WorkoutComponent.kt`
+- `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/integration/WorkoutComponentDefault.kt`
 
 Compose integration:
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/RootContent.kt`
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/HomeScreenContent.kt`
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/tabs/MainTabContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/tabs/ProgressTabContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/tabs/RemindersTabContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/tabs/TrainingsTabContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/preferences/PreferencesContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/achievements/AchievementsContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/garden/GardenContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/newreminder/AddNewReminderContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/exercises/WorkoutContent.kt`
 
 Official docs:
 - https://arkivanov.github.io/Decompose/component/overview/
@@ -134,7 +157,7 @@ Preferred patterns:
   as `MainTabContent` does with `MainTabComponentPreview`
 
 Do not create root components inside a composable unless there is no alternative.
-Blinkly creates the root component in platform code before `setContent`; treat this as the host wiring pattern, not as evidence that every routed screen is complete.
+Blinkly creates the root component in platform code before `setContent`; treat this as the host wiring pattern.
 
 ## Root dependency composition rules
 
@@ -158,9 +181,8 @@ Keep feature components constructor-injected.
 6. add Compose content in `shared/compose`
 7. add common tests for navigation or behaviour
 
-For currently skeleton modules outside `onboarding` and `main`, first decide
-whether you are filling in the real feature or only extending placeholder
-navigation.
+For existing feature modules, preserve their component/store/Compose/test
+shape and extend the nearest parent navigation only when the route changes.
 
 ## Avoid these mistakes
 
