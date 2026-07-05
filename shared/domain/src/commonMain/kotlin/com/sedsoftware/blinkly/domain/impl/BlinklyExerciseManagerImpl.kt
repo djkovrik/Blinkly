@@ -1,6 +1,7 @@
 package com.sedsoftware.blinkly.domain.impl
 
 import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
+import com.sedsoftware.blinkly.domain.exercise.dsl.BeepNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteBlockNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteExerciseNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.ExerciseNode
@@ -102,6 +103,10 @@ internal class BlinklyExerciseManagerImpl(
 
             is TickNode -> {
                 _events.emit(ExerciseEvent.Tick(block, type, node.second))
+            }
+
+            BeepNode -> {
+                _events.emit(ExerciseEvent.Beep(block, type))
             }
 
             CompleteExerciseNode -> {

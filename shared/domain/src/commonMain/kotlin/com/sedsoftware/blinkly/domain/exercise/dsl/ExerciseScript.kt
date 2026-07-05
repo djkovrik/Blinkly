@@ -21,6 +21,8 @@ internal data class TickNode(
     val delay: DurationMs,
 ) : ExerciseNode
 
+internal data object BeepNode : ExerciseNode
+
 internal data object CompleteExerciseNode : ExerciseNode
 
 internal data object CompleteBlockNode : ExerciseNode

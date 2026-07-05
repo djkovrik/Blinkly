@@ -19,6 +19,8 @@ internal fun diagonalScript(settings: BlinklySettings): ExerciseScript =
             DiagonalBottomRight every 1.seconds
         }
 
+        beep()
+
         repeat(settings.diagonalGazesCount) {
             DiagonalTopRight every 1.seconds
 

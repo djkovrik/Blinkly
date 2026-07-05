@@ -8,7 +8,11 @@ import com.sedsoftware.blinkly.domain.model.ExerciseType
 internal fun twentyScript(): ExerciseScript =
     exercise(ExerciseType.TWENTY_X3) {
 
+        beep()
+
         timer(20.seconds)
+
+        beep()
 
         completeBlock()
     }

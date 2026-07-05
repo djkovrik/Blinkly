@@ -15,6 +15,8 @@ internal fun clockRollScript(settings: BlinklySettings): ExerciseScript =
             CircleClockwise every 2.seconds
         }
 
+        beep()
+
         repeat(settings.clockRollsEachSide) {
             CircleCounterclockwise every 2.seconds
         }
