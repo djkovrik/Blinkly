@@ -51,10 +51,12 @@ internal class BlinklyExerciseManagerImpl(
     }
 
     override fun stop() {
+        paused = false
         scope.coroutineContext.cancelChildren()
     }
 
     override fun startBlock(block: ExerciseBlock) {
+        stop()
         currentBlock = block
         exerciseIndex = 0
     }
@@ -115,6 +117,7 @@ internal class BlinklyExerciseManagerImpl(
             }
 
             CompleteBlockNode -> {
+                database.saveExercise(Exercise(block, type, timeUtils.now()))
                 _events.emit(ExerciseEvent.BlockCompleted(block))
             }
         }

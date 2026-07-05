@@ -445,6 +445,25 @@
     <string name="preferences_unit_repetitions">reps</string>
     <string name="preferences_unit_seconds">sec</string>
 
+    <!-- Workout -->
+    <string name="workout_intro_label">Workout block</string>
+    <string name="workout_exercise_counter">Exercise %1$d of %2$d</string>
+    <string name="workout_ready_label">Ready when you are</string>
+    <string name="workout_running_label">In progress</string>
+    <string name="workout_paused_label">Paused</string>
+    <string name="workout_completed_title">Training complete</string>
+    <string name="workout_completed_desc">Nice work. Your eyes got a focused break.</string>
+    <string name="workout_start_block">Start block</string>
+    <string name="workout_start_exercise">Start exercise</string>
+    <string name="workout_pause">Pause</string>
+    <string name="workout_resume">Resume</string>
+    <string name="workout_finish">Finish</string>
+    <string name="workout_close">Close</string>
+    <string name="workout_progress_label">Progress</string>
+    <string name="workout_progress_value">%1$d%%</string>
+    <string name="workout_timer_label">Time left</string>
+    <string name="workout_timer_value">%1$02d:%2$02d</string>
+
     <!-- Content descriptions -->
     <string name="content_description_settings">Settings</string>
     <string name="content_description_back">Back</string>

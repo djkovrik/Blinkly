@@ -105,7 +105,15 @@ class RootComponentDefault private constructor(
             PreferencesComponentDefault(childContext, storeFactory, dispatchers, settings, output)
         },
         exercisesComponent = { childContext, block, output ->
-            WorkoutComponentDefault(childContext, block, output)
+            WorkoutComponentDefault(
+                componentContext = childContext,
+                storeFactory = storeFactory,
+                dispatchers = dispatchers,
+                block = block,
+                exerciseManager = exerciseManager,
+                beeper = beeper,
+                workoutOutput = output,
+            )
         },
         achievementsComponent = { childContext, output ->
             AchievementsComponentDefault(childContext, storeFactory, dispatchers, achievementsWatcher, output)

@@ -59,6 +59,7 @@ fun BlinklyEyePanel(
     movement: EyeMovement? = null,
     modifier: Modifier = Modifier,
     animationTrigger: Any? = movement,
+    restState: BlinklyEyeRestState = BlinklyEyeRestState.Open,
 ) {
     val offsetX = remember { Animatable(0f) }
     val offsetY = remember { Animatable(0f) }
@@ -67,8 +68,21 @@ fun BlinklyEyePanel(
     var focusState: EyeFocusState by remember { mutableStateOf(EyeFocusState.None) }
     var pathMovement: EyeMovement? by remember { mutableStateOf(null) }
 
-    LaunchedEffect(animationTrigger) {
-        val currentMovement = movement ?: return@LaunchedEffect
+    LaunchedEffect(animationTrigger, restState) {
+        val currentMovement = movement
+        if (currentMovement == null) {
+            pathMovement = null
+            pathProgress.snapTo(0f)
+            focusState = EyeFocusState.None
+            openness.animateTo(
+                targetValue = restState.openness,
+                animationSpec = tween(
+                    durationMillis = EYE_OPEN_DURATION_MS,
+                    easing = FastOutSlowInEasing,
+                ),
+            )
+            return@LaunchedEffect
+        }
 
         pathMovement = null
         pathProgress.snapTo(0f)
@@ -177,6 +191,11 @@ fun BlinklyEyePanel(
         ),
         modifier = modifier,
     )
+}
+
+enum class BlinklyEyeRestState {
+    Open,
+    Closed,
 }
 
 private suspend fun Animatable<Float, *>.animateToOpen() {
@@ -412,6 +431,13 @@ private enum class EyeFocusState {
     Close,
     Far,
 }
+
+private val BlinklyEyeRestState.openness: Float
+    get() =
+        when (this) {
+            BlinklyEyeRestState.Open -> OPEN_EYE
+            BlinklyEyeRestState.Closed -> CLOSED_EYE
+        }
 
 @Preview
 @Composable

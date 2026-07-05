@@ -28,6 +28,7 @@ import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
@@ -39,7 +40,10 @@ import kotlin.time.Clock
 class RootComponentTest : ComponentTest<RootComponent>() {
 
     private val alarmManagerMock: BlinklyAlarmManager = mock()
-    private val beeperMock: BlinklyBeeper = mock()
+    private val beeperMock: BlinklyBeeper = mock {
+        every { beep() } returns Unit
+        every { release() } returns Unit
+    }
     private val databaseMock: BlinklyDatabase = mock()
     private val notifierMock: BlinklyNotifier = mock()
     private val fakeSettings = FakeSettings()
@@ -53,7 +57,14 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val calendarWatcherMock: BlinklyCalendarWatcher = mock {
         every { calendar } returns emptyFlow()
     }
-    private val exerciseManagerMock: BlinklyExerciseManager = mock()
+    private val exerciseManagerMock: BlinklyExerciseManager = mock {
+        every { events } returns emptyFlow()
+        every { startBlock(any()) } returns Unit
+        every { startNextExercise() } returns Unit
+        every { pause() } returns Unit
+        every { resume() } returns Unit
+        every { stop() } returns Unit
+    }
     private val highlightsProviderMock: BlinklyHighlightsProvider = mock {
         everySuspend { get() } returns com.sedsoftware.blinkly.domain.model.HighlightOfTheDay.Tip(1)
     }

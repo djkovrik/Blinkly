@@ -442,6 +442,25 @@
     <string name="preferences_unit_repetitions">раз</string>
     <string name="preferences_unit_seconds">сек</string>
 
+    <!-- Workout -->
+    <string name="workout_intro_label">Блок тренировки</string>
+    <string name="workout_exercise_counter">Упражнение %1$d из %2$d</string>
+    <string name="workout_ready_label">Можно начинать</string>
+    <string name="workout_running_label">Выполняется</string>
+    <string name="workout_paused_label">Пауза</string>
+    <string name="workout_completed_title">Тренировка завершена</string>
+    <string name="workout_completed_desc">Отлично. Глаза получили сфокусированный перерыв.</string>
+    <string name="workout_start_block">Начать блок</string>
+    <string name="workout_start_exercise">Начать упражнение</string>
+    <string name="workout_pause">Пауза</string>
+    <string name="workout_resume">Продолжить</string>
+    <string name="workout_finish">Завершить</string>
+    <string name="workout_close">Закрыть</string>
+    <string name="workout_progress_label">Прогресс</string>
+    <string name="workout_progress_value">%1$d%%</string>
+    <string name="workout_timer_label">Осталось</string>
+    <string name="workout_timer_value">%1$02d:%2$02d</string>
+
     <!-- Content descriptions -->
     <string name="content_description_settings">Настройки</string>
     <string name="content_description_back">Назад</string>
