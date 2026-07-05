@@ -22,6 +22,11 @@ sealed interface ExerciseEvent {
         val progress: ExerciseProgress,
     ) : ExerciseEvent
 
+    data class Beep(
+        override val block: ExerciseBlock,
+        override val exercise: ExerciseType,
+    ) : ExerciseEvent
+
     data class ExerciseCompleted(
         override val block: ExerciseBlock,
         override val exercise: ExerciseType,

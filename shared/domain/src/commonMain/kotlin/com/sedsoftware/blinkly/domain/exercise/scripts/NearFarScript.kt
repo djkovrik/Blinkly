@@ -11,8 +11,14 @@ import com.sedsoftware.blinkly.domain.model.ExerciseType
 internal fun nearFarScript(settings: BlinklySettings): ExerciseScript =
     exercise(ExerciseType.NEAR_FAR_FOCUS) {
 
-        repeat(settings.nearFarFocusCount) {
+        repeat(settings.nearFarFocusCount) { index ->
+            if (index > 1) {
+                beep()
+            }
+
             AccommodationClose every settings.nearFarFocusDuration.seconds
+
+            beep()
 
             AccommodationFar every settings.nearFarFocusDuration.seconds
         }

@@ -12,6 +12,7 @@ local.properties
 captures
 .externalNativeBuild
 .cxx
+.lazyweb
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/

@@ -10,8 +10,12 @@ import com.sedsoftware.blinkly.domain.model.ExerciseType
 internal fun blinkScript(settings: BlinklySettings): ExerciseScript =
     exercise(ExerciseType.BLINK_BREAK) {
 
-        repeat(settings.blinkBreakCount) {
-            Blink(it) every 250.ms
+        repeat(settings.blinkBreakCount) { index ->
+            if (index > 1) {
+                beep()
+            }
+
+            Blink(index) every 250.ms
         }
 
         completeExercise()

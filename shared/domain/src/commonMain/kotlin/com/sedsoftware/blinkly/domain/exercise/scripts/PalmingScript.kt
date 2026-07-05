@@ -9,7 +9,11 @@ import com.sedsoftware.blinkly.domain.model.ExerciseType
 internal fun palmingScript(settings: BlinklySettings): ExerciseScript =
     exercise(ExerciseType.PALMING) {
 
+        beep()
+
         timer(settings.palmingDuration.seconds)
+
+        beep()
 
         completeBlock()
     }

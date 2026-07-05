@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
+import com.sedsoftware.blinkly.domain.exercise.dsl.BeepNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteBlockNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteExerciseNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.MovementNode
@@ -27,9 +28,11 @@ class ScriptsTest : BaseDomainTest() {
         // when
         val script = blinkScript(settings)
         val movementCount = script.nodes.count { it is MovementNode }
+        val beepCount = script.nodes.count { it is BeepNode }
 
         // then
         assertThat(movementCount).isEqualTo(FakeData.BLINK_BREAK_COUNT)
+        assertThat(beepCount).isEqualTo(FakeData.BLINK_BREAK_COUNT - 1)
         assertThat(script.nodes.last() is CompleteExerciseNode).isTrue()
     }
 
@@ -39,9 +42,13 @@ class ScriptsTest : BaseDomainTest() {
         // when
         val script = palmingScript(settings)
         val ticks = script.nodes.filterIsInstance<TickNode>()
+        val beepCount = script.nodes.count { it is BeepNode }
 
         // then
         assertThat(ticks.size).isEqualTo(FakeData.PALMING_DURATION)
+        assertThat(beepCount).isEqualTo(2)
+        assertThat(script.nodes.first() is BeepNode).isTrue()
+        assertThat(script.nodes[script.nodes.lastIndex - 1] is BeepNode).isTrue()
         assertThat(script.nodes.last() is CompleteBlockNode).isTrue()
     }
 
@@ -51,10 +58,12 @@ class ScriptsTest : BaseDomainTest() {
         // when
         val script = clockRollScript(settings)
         val movements = script.nodes.filterIsInstance<MovementNode>()
+        val beepCount = script.nodes.count { it is BeepNode }
         val expectedMovements = FakeData.CLOCK_COUNT * 2
 
         // then
         assertThat(movements.size).isEqualTo(expectedMovements)
+        assertThat(beepCount).isEqualTo(1)
         assertThat(script.nodes.last() is CompleteExerciseNode).isTrue()
     }
 
@@ -64,10 +73,12 @@ class ScriptsTest : BaseDomainTest() {
         // when
         val script = diagonalScript(settings)
         val movements = script.nodes.filterIsInstance<MovementNode>()
+        val beepCount = script.nodes.count { it is BeepNode }
         val expectedMovements = FakeData.DIAGONAL_COUNT * 4
 
         // then
         assertThat(movements.size).isEqualTo(expectedMovements)
+        assertThat(beepCount).isEqualTo(1)
         assertThat(script.nodes.last() is CompleteBlockNode).isTrue()
     }
 
@@ -77,10 +88,12 @@ class ScriptsTest : BaseDomainTest() {
         // when
         val script = figureEightScript(settings)
         val movements = script.nodes.filterIsInstance<MovementNode>()
+        val beepCount = script.nodes.count { it is BeepNode }
         val expectedMovements = FakeData.FIGURE_EIGHT_COUNT * 2
 
         // then
         assertThat(movements.size).isEqualTo(expectedMovements)
+        assertThat(beepCount).isEqualTo(1)
         assertThat(script.nodes.last() is CompleteExerciseNode).isTrue()
     }
 
@@ -90,10 +103,12 @@ class ScriptsTest : BaseDomainTest() {
         // when
         val script = nearFarScript(settings)
         val movements = script.nodes.filterIsInstance<MovementNode>()
+        val beepCount = script.nodes.count { it is BeepNode }
         val expectedMovements = FakeData.NEAR_FAR_COUNT * 2
 
         // then
         assertThat(movements.size).isEqualTo(expectedMovements)
+        assertThat(beepCount).isEqualTo(expectedMovements - 1)
         assertThat(script.nodes.last() is CompleteExerciseNode).isTrue()
     }
 
@@ -103,9 +118,13 @@ class ScriptsTest : BaseDomainTest() {
         // when
         val script = twentyScript()
         val ticks = script.nodes.filterIsInstance<TickNode>()
+        val beepCount = script.nodes.count { it is BeepNode }
 
         // then
         assertThat(ticks.size).isEqualTo(20)
+        assertThat(beepCount).isEqualTo(2)
+        assertThat(script.nodes.first() is BeepNode).isTrue()
+        assertThat(script.nodes[script.nodes.lastIndex - 1] is BeepNode).isTrue()
         assertThat(script.nodes.last() is CompleteBlockNode).isTrue()
     }
 }

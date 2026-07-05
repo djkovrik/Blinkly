@@ -16,6 +16,10 @@ internal class ExerciseBuilder {
         nodes += TickNode(second, duration)
     }
 
+    fun beep() {
+        nodes += BeepNode
+    }
+
     fun completeExercise() {
         nodes += CompleteExerciseNode
     }

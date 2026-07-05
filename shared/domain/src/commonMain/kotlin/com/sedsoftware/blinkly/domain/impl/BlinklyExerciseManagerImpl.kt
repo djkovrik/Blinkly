@@ -1,6 +1,7 @@
 package com.sedsoftware.blinkly.domain.impl
 
 import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
+import com.sedsoftware.blinkly.domain.exercise.dsl.BeepNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteBlockNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteExerciseNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.ExerciseNode
@@ -50,10 +51,12 @@ internal class BlinklyExerciseManagerImpl(
     }
 
     override fun stop() {
+        paused = false
         scope.coroutineContext.cancelChildren()
     }
 
     override fun startBlock(block: ExerciseBlock) {
+        stop()
         currentBlock = block
         exerciseIndex = 0
     }
@@ -104,12 +107,17 @@ internal class BlinklyExerciseManagerImpl(
                 _events.emit(ExerciseEvent.Tick(block, type, node.second))
             }
 
+            BeepNode -> {
+                _events.emit(ExerciseEvent.Beep(block, type))
+            }
+
             CompleteExerciseNode -> {
                 database.saveExercise(Exercise(block, type, timeUtils.now()))
                 _events.emit(ExerciseEvent.ExerciseCompleted(block, type))
             }
 
             CompleteBlockNode -> {
+                database.saveExercise(Exercise(block, type, timeUtils.now()))
                 _events.emit(ExerciseEvent.BlockCompleted(block))
             }
         }

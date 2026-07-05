@@ -22,6 +22,10 @@ internal class ExerciseScope(
         builder.completeBlock()
     }
 
+    fun beep() {
+        builder.beep()
+    }
+
     fun repeat(times: Int, block: ExerciseScope.(Int) -> Unit) {
         for (i in 1..times) {
             block(i)

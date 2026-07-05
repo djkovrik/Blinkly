@@ -6,6 +6,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
+import com.sedsoftware.blinkly.domain.exercise.dsl.BeepNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.Blink
 import com.sedsoftware.blinkly.domain.exercise.dsl.CompleteExerciseNode
 import com.sedsoftware.blinkly.domain.exercise.dsl.ExerciseNode
@@ -28,6 +29,7 @@ class ExerciseEngineTest : BaseDomainTest() {
         // given
         val script = exercise(ExerciseType.BLINK_BREAK) {
             Blink(1) every 10.ms
+            beep()
             Blink(2) every 10.ms
             completeExercise()
         }
@@ -44,10 +46,11 @@ class ExerciseEngineTest : BaseDomainTest() {
         )
 
         // then
-        assertThat(emitted.size).isEqualTo(3)
+        assertThat(emitted.size).isEqualTo(4)
         assertThat(emitted[0] is MovementNode).isTrue()
-        assertThat(emitted[1] is MovementNode).isTrue()
-        assertThat(emitted[2] is CompleteExerciseNode).isTrue()
+        assertThat(emitted[1] is BeepNode).isTrue()
+        assertThat(emitted[2] is MovementNode).isTrue()
+        assertThat(emitted[3] is CompleteExerciseNode).isTrue()
     }
 
     @Test

@@ -295,6 +295,7 @@ import blinkly.shared.compose.generated.resources.tree_salix_babylonica
 import blinkly.shared.compose.generated.resources.tree_sequoia_sempervirens
 import blinkly.shared.compose.generated.resources.tip_of_the_day
 import blinkly.shared.compose.generated.resources.week_monday
+import blinkly.shared.compose.generated.resources.week_friday
 import blinkly.shared.compose.generated.resources.week_saturday
 import blinkly.shared.compose.generated.resources.week_sunday
 import blinkly.shared.compose.generated.resources.week_thursday
@@ -317,14 +318,17 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DayOfWeek.asLabel(): String =
+    stringResource(asLabelResource())
+
+fun DayOfWeek.asLabelResource(): StringResource =
     when (this) {
-        DayOfWeek.MONDAY -> stringResource(Res.string.week_monday)
-        DayOfWeek.TUESDAY -> stringResource(Res.string.week_tuesday)
-        DayOfWeek.WEDNESDAY -> stringResource(Res.string.week_wednesday)
-        DayOfWeek.THURSDAY -> stringResource(Res.string.week_thursday)
-        DayOfWeek.FRIDAY -> stringResource(Res.string.week_monday)
-        DayOfWeek.SATURDAY -> stringResource(Res.string.week_saturday)
-        DayOfWeek.SUNDAY -> stringResource(Res.string.week_sunday)
+        DayOfWeek.MONDAY -> Res.string.week_monday
+        DayOfWeek.TUESDAY -> Res.string.week_tuesday
+        DayOfWeek.WEDNESDAY -> Res.string.week_wednesday
+        DayOfWeek.THURSDAY -> Res.string.week_thursday
+        DayOfWeek.FRIDAY -> Res.string.week_friday
+        DayOfWeek.SATURDAY -> Res.string.week_saturday
+        DayOfWeek.SUNDAY -> Res.string.week_sunday
     }
 
 @Composable

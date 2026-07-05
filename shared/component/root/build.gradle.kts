@@ -13,6 +13,7 @@ kotlin {
                 implementation(project(":shared:notifier"))
                 implementation(project(":shared:settings"))
                 implementation(project(":shared:utils"))
+                implementation(project(":shared:beeper"))
                 implementation(project(":shared:component:onboarding"))
                 implementation(project(":shared:component:onboarding:child:step1"))
                 implementation(project(":shared:component:onboarding:child:step2"))
@@ -28,9 +29,7 @@ kotlin {
                 implementation(project(":shared:component:reminders"))
                 implementation(project(":shared:component:reminders:child:newreminder"))
                 implementation(project(":shared:component:trainings"))
-                implementation(project(":shared:component:trainings:child:blocka"))
-                implementation(project(":shared:component:trainings:child:blockb"))
-                implementation(project(":shared:component:trainings:child:blockc"))
+                implementation(project(":shared:component:trainings:child:workout"))
 
                 implementation(libs.ark.decompose.core)
                 implementation(libs.ark.decompose.extensions)

@@ -9,7 +9,7 @@ Targets:
 - iOS app in `iosApp`
 - Shared business logic, navigation, and UI in `shared`
 
-Planned product areas:
+Product areas:
 - 20-20-20 break reminders
 - exercise blocks A, B, and C
 - onboarding flow
@@ -77,36 +77,33 @@ repository copy first and remove or refresh the global copy immediately after.
 
 ## Module Map
 
-Blinkly is in active development. Treat this map as the planned module
-structure plus currently available skeleton modules, not as a list of completed
-features.
+Use this map as the current shared component structure. The core component
+modules have baseline contracts, default implementations, Compose bindings,
+preview implementations where useful, and common component tests.
 
 Top-level component modules:
 - `root` - app root, dependency composition, top-level navigation
-- `onboarding` - one-time onboarding flow with five child steps; currently the main implemented flow
+- `onboarding` - one-time onboarding flow with five child steps
 - `home` - shell with four tabs; routes tab outputs and owns tab stack navigation
 - `main` - implemented main dashboard tab with MVIKotlin Store, feature-local manager, Compose UI, preview component, and common tests
-- `progress` - planned progress tab; currently a thin/skeleton component
-- `reminders` - planned reminders tab; currently a thin/skeleton component
-- `trainings` - planned trainings tab; currently a thin/skeleton component
+- `progress` - progress tab with MVIKotlin Store, progress manager, achievements and garden child routes, Compose UI, preview component, and common tests
+- `reminders` - reminders tab with MVIKotlin Store, reminders manager, add-new-reminder child route, Compose UI, preview component, and common tests
+- `trainings` - trainings tab with MVIKotlin Store, trainings manager, workout child route, Compose UI, preview component, and common tests
 
 Nested component modules:
-- `main/child/preferences` - planned/preferences skeleton
-- `onboarding/child/step1` through `step5` - current onboarding implementation area
-- `progress/child/achievements` - planned/skeleton
-- `progress/child/garden` - planned/skeleton
-- `reminders/child/newreminder` - planned/skeleton
-- `trainings/child/blocka` - planned/skeleton
-- `trainings/child/blockb` - planned/skeleton
-- `trainings/child/blockc` - planned/skeleton
+- `main/child/preferences` - preferences screen with MVIKotlin Store, manager, Compose UI, preview component, and common tests
+- `onboarding/child/step1` through `step5` - onboarding steps; `step4` and `step5` are Store-backed
+- `progress/child/achievements` - achievements screen with MVIKotlin Store, Compose UI, preview component, and common tests
+- `progress/child/garden` - garden screen with MVIKotlin Store, Compose UI, preview component, and common tests
+- `reminders/child/newreminder` - add-new-reminder screen with MVIKotlin Store, manager, Compose UI, preview component, and common tests
+- `trainings/child/workout` - workout execution screen with MVIKotlin Store, Compose UI, preview component, and common tests
 
 Current implementation notes:
-- Component work is materially implemented for `onboarding` and its child steps `step1` through `step5`, plus the `main` tab.
+- Component work is materially implemented across root navigation, onboarding, home tabs, nested feature screens, Compose bindings, previews, and common component tests.
 - `main` is the current reference for a Store-backed tab component with domain-derived dashboard state, one-off error labels, a Compose screen, preview-only component implementation, and common component tests.
-- `step5` has component/store logic, but its Compose UI is not finished yet.
-- Root and home navigation contain both completed routes and future routes; check the target module before treating it as complete.
-- `step4`, `step5`, and `main` are the current reference implementations for MVIKotlin stores.
-- `progress`, `reminders`, `trainings`, and their current leaf routes are still mostly temporary thin Decompose wrappers that emit `ComponentOutput` without a Store.
+- `progress`, `reminders`, and `trainings` are the current references for Store-backed tabs with nested child routes.
+- `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are the current references for Store-backed nested feature components.
+- `step4`, `step5`, `main`, `preferences`, `progress`, `achievements`, `garden`, `reminders`, `newreminder`, `trainings`, and `workout` are the current reference implementations for MVIKotlin stores.
 
 ## Architecture Rules
 
@@ -115,7 +112,7 @@ Current implementation notes:
 Use this dependency direction:
 - platform app -> root factory -> shared component modules
 - components -> domain abstractions and external interfaces
-- domain -> external interfaces from `shared/domain/external`
+- domain -> external interfaces from `shared/domain/src/commonMain/kotlin/com/sedsoftware/blinkly/domain/external`
 - database, notifier, alarm, settings, utils -> implementations of those external interfaces
 - compose -> components only, no business logic
 
@@ -137,7 +134,7 @@ Apply these rules by default when changing Blinkly code:
 - Cover Decompose behaviour in `shared/component/root/src/commonTest`, extending `ComponentTest<T>` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
 - Keep `*Default` component implementations as the real runtime wiring for Stores, dependencies, labels, lifecycle, and output routing. Use separate `*Preview` implementations only for Compose previews; they should implement the same public component interface with static `MutableValue` model data and no production dependencies.
 
-When unsure whether to follow a generic library pattern or the project pattern, follow the project pattern demonstrated in `main`, `step4`, `step5`, `onboarding`, and `home`. Treat `progress`, `reminders`, `trainings`, and unfinished leaf routes as skeleton references unless the code clearly shows completed behaviour.
+When unsure whether to follow a generic library pattern or the project pattern, follow the project pattern demonstrated in `main`, `step4`, `step5`, `onboarding`, `home`, `progress`, `reminders`, `trainings`, and their nested feature components.
 
 ### Manual dependency injection
 
@@ -176,8 +173,26 @@ Reference files:
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentDefault.kt`
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentPreview.kt`
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/Mappers.kt`
+- `shared/component/main/child/preferences/src/commonMain/kotlin/com/sedsoftware/blinkly/component/preferences/PreferencesComponent.kt`
+- `shared/component/main/child/preferences/src/commonMain/kotlin/com/sedsoftware/blinkly/component/preferences/integration/PreferencesComponentDefault.kt`
+- `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/ProgressTabComponent.kt`
+- `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/integration/ProgressTabComponentDefault.kt`
+- `shared/component/progress/child/achievements/src/commonMain/kotlin/com/sedsoftware/blinkly/component/achievements/AchievementsComponent.kt`
+- `shared/component/progress/child/achievements/src/commonMain/kotlin/com/sedsoftware/blinkly/component/achievements/integration/AchievementsComponentDefault.kt`
+- `shared/component/progress/child/garden/src/commonMain/kotlin/com/sedsoftware/blinkly/component/garden/GardenComponent.kt`
+- `shared/component/progress/child/garden/src/commonMain/kotlin/com/sedsoftware/blinkly/component/garden/integration/GardenComponentDefault.kt`
+- `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/RemindersTabComponent.kt`
+- `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/integration/RemindersTabComponentDefault.kt`
+- `shared/component/reminders/child/newreminder/src/commonMain/kotlin/com/sedsoftware/blinkly/component/newreminder/AddNewReminderComponent.kt`
+- `shared/component/reminders/child/newreminder/src/commonMain/kotlin/com/sedsoftware/blinkly/component/newreminder/integration/AddNewReminderComponentDefault.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/TrainingsTabComponent.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/integration/TrainingsTabComponentDefault.kt`
+- `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/WorkoutComponent.kt`
+- `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/integration/WorkoutComponentDefault.kt`
 - `shared/component/onboarding/child/step4/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step4/OnboardingStep4Component.kt`
 - `shared/component/onboarding/child/step4/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step4/integration/OnboardingStep4ComponentDefault.kt`
+- `shared/component/onboarding/child/step5/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step5/OnboardingStep5Component.kt`
+- `shared/component/onboarding/child/step5/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step5/integration/OnboardingStep5ComponentDefault.kt`
 - `shared/component/onboarding/src/commonMain/kotlin/com/sedsoftware/blinkly/component/onboarding/integration/OnboardingComponentDefault.kt`
 - `shared/component/home/src/commonMain/kotlin/com/sedsoftware/blinkly/component/home/integration/HomeScreenComponentDefault.kt`
 - `shared/component/root/src/commonMain/kotlin/com/sedsoftware/blinkly/component/root/integration/RootComponentDefault.kt`
@@ -195,15 +210,16 @@ Parent components use:
 - a child output handler that maps `ComponentOutput` to navigation operations
 
 Local reference patterns:
-- `OnboardingComponentDefault` for the currently implemented nested flow navigation
+- `OnboardingComponentDefault` for nested flow navigation
 - `RootComponentDefault` for app-level stack-navigation shape and root-level interpretation of child outputs
-- `HomeScreenComponentDefault` for tab-switching shape with `bringToFront`, creation of the real `MainTabComponentDefault`, and local handling of `ComponentOutput.Main.OpenProgressTab`
+- `HomeScreenComponentDefault` for tab-switching shape with `bringToFront`, creation of real tab components, and local handling of tab-switch outputs
+- `ProgressTabComponentDefault`, `RemindersTabComponentDefault`, and `TrainingsTabComponentDefault` for nested tab child navigation
 
 Keep navigation on the main thread. This matches Decompose guidance.
 
 ### Outputs
 
-Cross-component communication uses `ComponentOutput` from `shared/domain/model/ComponentOutput.kt`.
+Cross-component communication uses `ComponentOutput` from `shared/domain/src/commonMain/kotlin/com/sedsoftware/blinkly/domain/model/ComponentOutput.kt`.
 
 Rules:
 - child components do not mutate parent navigation directly
@@ -224,7 +240,6 @@ Only create a scope when the component actually runs background work.
 ### When to use a Store
 
 Use MVIKotlin only when the component has meaningful state transitions or asynchronous business logic.
-The project is Work In Progress and has only a small number of Stores and fully shaped components implemented.
 
 Current store references:
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/store/MainTabStore.kt`
@@ -232,13 +247,29 @@ Current store references:
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/domain/MainTabManager.kt`
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/MainTabComponentDefault.kt`
 - `shared/component/main/src/commonMain/kotlin/com/sedsoftware/blinkly/component/main/integration/Mappers.kt`
+- `shared/component/main/child/preferences/src/commonMain/kotlin/com/sedsoftware/blinkly/component/preferences/store/PreferencesStore.kt`
+- `shared/component/main/child/preferences/src/commonMain/kotlin/com/sedsoftware/blinkly/component/preferences/store/PreferencesStoreProvider.kt`
+- `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/store/ProgressTabStore.kt`
+- `shared/component/progress/src/commonMain/kotlin/com/sedsoftware/blinkly/component/progress/store/ProgressTabStoreProvider.kt`
+- `shared/component/progress/child/achievements/src/commonMain/kotlin/com/sedsoftware/blinkly/component/achievements/store/AchievementsStore.kt`
+- `shared/component/progress/child/achievements/src/commonMain/kotlin/com/sedsoftware/blinkly/component/achievements/store/AchievementsStoreProvider.kt`
+- `shared/component/progress/child/garden/src/commonMain/kotlin/com/sedsoftware/blinkly/component/garden/store/GardenStore.kt`
+- `shared/component/progress/child/garden/src/commonMain/kotlin/com/sedsoftware/blinkly/component/garden/store/GardenStoreProvider.kt`
+- `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/store/RemindersStore.kt`
+- `shared/component/reminders/src/commonMain/kotlin/com/sedsoftware/blinkly/component/reminders/store/RemindersStoreProvider.kt`
+- `shared/component/reminders/child/newreminder/src/commonMain/kotlin/com/sedsoftware/blinkly/component/newreminder/store/AddNewReminderStore.kt`
+- `shared/component/reminders/child/newreminder/src/commonMain/kotlin/com/sedsoftware/blinkly/component/newreminder/store/AddNewReminderStoreProvider.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/store/TrainingsTabStore.kt`
+- `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/store/TrainingsTabStoreProvider.kt`
+- `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/store/WorkoutStore.kt`
+- `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/store/WorkoutStoreProvider.kt`
 - `shared/component/onboarding/child/step4/.../store/DisclaimerStore.kt`
 - `shared/component/onboarding/child/step4/.../store/DisclaimerStoreProvider.kt`
 - `shared/component/onboarding/child/step5/.../store/InitialRemindersStore.kt`
 - `shared/component/onboarding/child/step5/.../store/InitialRemindersStoreProvider.kt`
 
 `main` is the reference for a tab Store with bootstrapper subscriptions, manager-based business logic, domain-derived model data, and labels mapped to parent output.
-`step5` is a valid Store/component reference, but its user interface is not complete yet.
+`progress`, `reminders`, and `trainings` are references for Store-backed tabs with child navigation. `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are references for Store-backed nested screens.
 
 ### Store structure
 
@@ -301,6 +332,14 @@ References:
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/RootContent.kt`
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/HomeScreenContent.kt`
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/tabs/MainTabContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/tabs/ProgressTabContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/tabs/RemindersTabContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/home/tabs/TrainingsTabContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/preferences/PreferencesContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/achievements/AchievementsContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/garden/GardenContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/newreminder/AddNewReminderContent.kt`
+- `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/exercises/WorkoutContent.kt`
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/onboarding/*`
 
 `MainTabContent` is the reference for connecting a component to Compose:
@@ -312,6 +351,29 @@ References:
 Platform note:
 - Android creates the root `ComponentContext` once in `AppActivity.onCreate()` via `defaultComponentContext()`.
 - This follows Decompose guidance to create the root component outside Compose.
+
+### Paparazzi snapshots
+
+`shared/compose` uses Paparazzi golden screenshots generated from Compose
+`@Preview` functions.
+
+Rules for UI changes:
+- Any change to shared Compose UI, theme, typography, spacing, preview data, or
+  visual assets must include the corresponding Paparazzi golden updates.
+- Keep previews deterministic: use stable preview components/data, fixed preview
+  dimensions, and avoid runtime-only dependencies in preview code.
+- For screens represented by a large variant board, also keep at least one
+  realistic single-state phone preview when that helps catch real viewport
+  layout issues.
+- After intentional visual changes, run
+  `.\gradlew.bat :shared:compose:cleanRecordPaparazziDebug` to regenerate
+  goldens, then run `.\gradlew.bat :shared:compose:verifyPaparazziDebug`.
+- Inspect new or materially changed PNGs in
+  `shared/compose/src/test/snapshots/images` before finishing the change.
+- Commit the updated snapshot PNGs together with the UI code that caused them.
+- Do not bless unrelated Paparazzi diffs. If `verifyPaparazziDebug` reports
+  unexpected changes, inspect the diff and either fix the UI or update only the
+  goldens that match the intended visual change.
 
 ## Testing Conventions
 
@@ -332,6 +394,14 @@ Current references:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/home/HomeScreenComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/onboarding/OnboardingComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/main/MainTabComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/preferences/PreferencesComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/progress/ProgressTabComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/achievements/AchievementsComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/garden/GardenComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/reminders/RemindersTabComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/newreminder/AddNewReminderComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/trainings/TrainingsTabComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/workout/WorkoutComponentTest.kt`
 
 Preferred assertions:
 - inspect `childStack.active.instance` for navigation state

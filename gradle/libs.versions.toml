@@ -39,6 +39,9 @@ detekt-decompose = "0.2.0"
 assertk = "0.28.1"
 kover = "0.8.1"
 mokkery = "2.10.2"
+paparazzi = "2.0.0-alpha02"
+composable-preview-scanner = "0.9.0"
+junit4 = "4.13.2"
 
 [libraries]
 
@@ -94,8 +97,10 @@ lib-sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", v
 
 test-kotlin = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+test-junit4 = { module = "junit:junit", version.ref = "junit4" }
 test-assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertk" }
 mokkery-coroutines = { module = "dev.mokkery:mokkery-coroutines", version.ref = "mokkery" }
+test-composable-preview-scanner-android = { module = "io.github.sergio-sastre.ComposablePreviewScanner:android", version.ref = "composable-preview-scanner" }
 
 [plugins]
 
@@ -112,3 +117,4 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 coverage = { id = "blinkly.config.printcoverage" }
+paparazzi = { id = "app.cash.paparazzi", version.ref = "paparazzi" }

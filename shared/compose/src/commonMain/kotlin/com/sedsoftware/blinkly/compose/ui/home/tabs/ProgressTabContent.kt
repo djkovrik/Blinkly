@@ -14,10 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -63,6 +60,9 @@ import com.sedsoftware.blinkly.compose.ui.extension.asLabel
 import com.sedsoftware.blinkly.compose.ui.extension.asTitle
 import com.sedsoftware.blinkly.compose.ui.extension.clickableOnce
 import com.sedsoftware.blinkly.compose.ui.extension.shimmering
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyAppCard
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySectionTitle
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.Tree
 import org.jetbrains.compose.resources.painterResource
@@ -76,17 +76,17 @@ fun ProgressTabContent(
     val model: ProgressTabComponent.Model by component.model.subscribeAsState()
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(space = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.SectionGap),
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(state = rememberScrollState())
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = BlinklySpacing.ScreenHorizontal)
             .padding(top = 28.dp, bottom = 20.dp),
     ) {
         Text(
             text = stringResource(resource = Res.string.progress_title),
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -117,36 +117,26 @@ private fun CalendarSection(
     weeks: List<List<CalendarDay?>>,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        shape = MaterialTheme.shapes.medium,
-        tonalElevation = 1.dp,
+    BlinklyAppCard(
+        contentPadding = BlinklySpacing.CompactCardPadding,
         modifier = modifier,
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(space = 10.dp),
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 16.dp),
-        ) {
-            Text(
-                text = stringResource(resource = Res.string.progress_calendar_title),
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
+        BlinklySectionTitle(
+            text = stringResource(resource = Res.string.progress_calendar_title),
+        )
 
-            WeekHeader()
+        WeekHeader()
 
-            weeks.forEach { week ->
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    week.forEach { day ->
-                        CalendarDayCell(
-                            day = day,
-                            modifier = Modifier.size(size = 36.dp),
-                        )
-                    }
+        weeks.forEach { week ->
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                week.forEach { day ->
+                    CalendarDayCell(
+                        day = day,
+                        modifier = Modifier.size(size = 34.dp),
+                    )
                 }
             }
         }
@@ -227,14 +217,7 @@ private fun TreeSection(
 ) {
     val treeName = tree?.type?.asLabel().orEmpty()
 
-    ElevatedCard(
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
-        elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 3.dp,
-            pressedElevation = 1.dp,
-        ),
+    BlinklyAppCard(
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
             .clickableOnce(onClick = onClick)
@@ -245,13 +228,12 @@ private fun TreeSection(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(space = 10.dp),
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 18.dp),
+            verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.ItemGap),
         ) {
             Text(
                 text = stringResource(resource = Res.string.progress_tree_title),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -264,8 +246,8 @@ private fun TreeSection(
             tree?.let {
                 Text(
                     text = stringResource(resource = Res.string.progress_tree_level, it.stage.index, it.type.asLabel()),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.labelLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -313,17 +295,12 @@ private fun AchievementsSection(
         verticalArrangement = Arrangement.spacedBy(space = 10.dp),
         modifier = modifier,
     ) {
-        Text(
+        BlinklySectionTitle(
             text = stringResource(resource = Res.string.progress_achievements_title),
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
         )
 
-        Surface(
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            shape = MaterialTheme.shapes.medium,
-            tonalElevation = 1.dp,
+        BlinklyAppCard(
+            contentPadding = BlinklySpacing.CompactCardPadding,
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(MaterialTheme.shapes.medium)
@@ -334,8 +311,7 @@ private fun AchievementsSection(
                 },
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(space = 12.dp),
-                modifier = Modifier.padding(all = 14.dp),
+                horizontalArrangement = Arrangement.spacedBy(space = 10.dp),
             ) {
                 achievements.take(RECENT_ACHIEVEMENTS_COUNT).forEach { achievement ->
                     AchievementPreviewItem(
@@ -364,7 +340,7 @@ private fun AchievementPreviewItem(
         Image(
             painter = painterResource(resource = achievement?.type?.asImage() ?: Res.drawable.achievement_unknown),
             contentDescription = title,
-            modifier = Modifier.size(size = 72.dp),
+            modifier = Modifier.size(size = 60.dp),
         )
 
         Text(
@@ -405,6 +381,6 @@ private fun ProgressTabContentPreviewDark() {
 }
 
 private const val WORKOUT_DAY_ALPHA = 0.22f
-private const val TREE_IMAGE_BOX_HEIGHT = 184
-private const val TREE_IMAGE_SIZE = 176
+private const val TREE_IMAGE_BOX_HEIGHT = 148
+private const val TREE_IMAGE_SIZE = 140
 private const val RECENT_ACHIEVEMENTS_COUNT = 3

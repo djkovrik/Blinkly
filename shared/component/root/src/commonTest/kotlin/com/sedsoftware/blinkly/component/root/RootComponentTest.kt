@@ -18,6 +18,7 @@ import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
+import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
@@ -27,6 +28,7 @@ import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
@@ -38,6 +40,10 @@ import kotlin.time.Clock
 class RootComponentTest : ComponentTest<RootComponent>() {
 
     private val alarmManagerMock: BlinklyAlarmManager = mock()
+    private val beeperMock: BlinklyBeeper = mock {
+        every { beep() } returns Unit
+        every { release() } returns Unit
+    }
     private val databaseMock: BlinklyDatabase = mock()
     private val notifierMock: BlinklyNotifier = mock()
     private val fakeSettings = FakeSettings()
@@ -51,7 +57,14 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val calendarWatcherMock: BlinklyCalendarWatcher = mock {
         every { calendar } returns emptyFlow()
     }
-    private val exerciseManagerMock: BlinklyExerciseManager = mock()
+    private val exerciseManagerMock: BlinklyExerciseManager = mock {
+        every { events } returns emptyFlow()
+        every { startBlock(any()) } returns Unit
+        every { startNextExercise() } returns Unit
+        every { pause() } returns Unit
+        every { resume() } returns Unit
+        every { stop() } returns Unit
+    }
     private val highlightsProviderMock: BlinklyHighlightsProvider = mock {
         everySuspend { get() } returns com.sedsoftware.blinkly.domain.model.HighlightOfTheDay.Tip(1)
     }
@@ -59,8 +72,8 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         every { createdReminders() } returns emptyFlow()
     }
     private val treeProgressWatcherMock: BlinklyTreeProgressWatcher = mock {
-        every { tree } returns kotlinx.coroutines.flow.emptyFlow()
-        every { garden } returns kotlinx.coroutines.flow.emptyFlow()
+        every { tree } returns emptyFlow()
+        every { garden } returns emptyFlow()
     }
 
     @Test
@@ -135,9 +148,9 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         // when
         currentTabChild.component.onBlockAClick()
         // then
-        assertThat(component.childStack.active.instance is RootComponent.Child.BlockA).isTrue()
+        assertThat(component.childStack.active.instance is RootComponent.Child.Workout).isTrue()
         // when
-        (component.childStack.active.instance as RootComponent.Child.BlockA).component.onBackClick()
+        (component.childStack.active.instance as RootComponent.Child.Workout).component.onBackClick()
         // then
         assertThat(component.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
     }
@@ -152,9 +165,9 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         // when
         currentTabChild.component.onBlockBClick()
         // then
-        assertThat(component.childStack.active.instance is RootComponent.Child.BlockB).isTrue()
+        assertThat(component.childStack.active.instance is RootComponent.Child.Workout).isTrue()
         // when
-        (component.childStack.active.instance as RootComponent.Child.BlockB).component.onBackClick()
+        (component.childStack.active.instance as RootComponent.Child.Workout).component.onBackClick()
         // then
         assertThat(component.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
     }
@@ -169,9 +182,9 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         // when
         currentTabChild.component.onBlockCClick()
         // then
-        assertThat(component.childStack.active.instance is RootComponent.Child.BlockC).isTrue()
+        assertThat(component.childStack.active.instance is RootComponent.Child.Workout).isTrue()
         // when
-        (component.childStack.active.instance as RootComponent.Child.BlockC).component.onBackClick()
+        (component.childStack.active.instance as RootComponent.Child.Workout).component.onBackClick()
         // then
         assertThat(component.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
     }
@@ -249,7 +262,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         // given
         val exception = IllegalStateException("permission check failed")
         prepareStep5Dependencies()
-        dev.mokkery.everySuspend { notifierMock.isNotificationPermissionGranted() } throws exception
+        everySuspend { notifierMock.isNotificationPermissionGranted() } throws exception
 
         // when
         val before = component.childStack.active.instance::class
@@ -287,8 +300,8 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     }
 
     private fun prepareStep5Dependencies() {
-        dev.mokkery.every { notifierMock.permissionEvents() } returns emptyFlow()
-        dev.mokkery.every { reminderManagerMock.createdReminders() } returns emptyFlow()
+        every { notifierMock.permissionEvents() } returns emptyFlow()
+        every { reminderManagerMock.createdReminders() } returns emptyFlow()
     }
 
     private fun switchTab(tab: HomeScreenTab) {
@@ -301,6 +314,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
             componentContext = DefaultComponentContext(lifecycle),
             storeFactory = DefaultStoreFactory(),
             alarmManager = alarmManagerMock,
+            beeper = beeperMock,
             database = databaseMock,
             dispatchers = testDispatchers,
             notifier = notifierMock,

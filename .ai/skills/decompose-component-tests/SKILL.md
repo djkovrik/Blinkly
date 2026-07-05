@@ -7,12 +7,11 @@ description: Use in the Blinkly Kotlin Multiplatform repository when writing, up
 
 Read `AGENTS.md` first for architecture and test conventions.
 
-Blinkly is in active development. Component tests currently use onboarding,
-home navigation, and the implemented `main` tab as references. `MainTabComponentTest`
-is the reference for a Store-backed tab with manager-derived state, watcher
-flows, fake time/settings, error labels, and CTA output mapping. `progress`,
-`reminders`, `trainings`, and many leaf routes remain skeletons unless their
-code proves otherwise.
+Blinkly component tests cover onboarding, home navigation, Store-backed tabs,
+nested feature components, coroutine side effects, manager-derived state, fake
+time/settings, output mapping, and Mokkery collaborator verification.
+`MainTabComponentTest` remains the reference for a Store-backed tab with
+manager-derived state, watcher flows, error labels, and CTA output mapping.
 
 ## Use these local references first
 
@@ -23,11 +22,21 @@ Navigation-heavy tests:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/root/RootComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/onboarding/OnboardingComponentTest.kt`
 
-Simple shell/skeleton component test:
+Home shell and tab navigation test:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/home/HomeScreenComponentTest.kt`
 
-Store-backed tab component test:
+Store-backed tab component tests:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/main/MainTabComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/progress/ProgressTabComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/reminders/RemindersTabComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/trainings/TrainingsTabComponentTest.kt`
+
+Store-backed nested feature tests:
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/preferences/PreferencesComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/achievements/AchievementsComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/garden/GardenComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/newreminder/AddNewReminderComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/workout/WorkoutComponentTest.kt`
 
 ## Test location
 
@@ -128,8 +137,8 @@ Do not assume immediate completion for work scheduled on `StandardTestDispatcher
 2. call `onNextClick()` on each step component
 3. assert step transitions or final output
 
-`step5` has component/store logic, but its Compose UI is not finished. Test the
-component contract and Store-backed model, not final UI behaviour.
+Test onboarding through the component contract and Store-backed model, not by
+recreating Compose behaviour in component tests.
 
 ### Store-backed state change
 

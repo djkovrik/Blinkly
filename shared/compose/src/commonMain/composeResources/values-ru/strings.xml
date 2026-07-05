@@ -57,7 +57,7 @@
     <string name="onboarding_initial_setup_20">Каждые 20 минут</string>
     <string name="onboarding_initial_setup_40">Каждые 40 минут</string>
     <string name="onboarding_initial_setup_custom">Свой интервал, минут</string>
-    <string name="onboarding_initial_setup_weekdays">В следующие дли недели:</string>
+    <string name="onboarding_initial_setup_weekdays">В следующие дни недели:</string>
     <string name="onboarding_initial_setup_create">Создать</string>
     <string name="onboarding_initial_setup_clear">Очистить</string>
     <string name="onboarding_initial_setup_created">Создано:</string>
@@ -309,6 +309,10 @@
     <string name="exercise_palming_desc">Потрите ладони друг о друга, чтобы их согреть. Мягко положите ладони на закрытые глаза (пальцы скрещены на лбу). Убедитесь, что свет не проникает. Дышите глубоко и представьте полную черноту или спокойное место.</string>
     <string name="exercise_twenty_x3">Правило 20-20-20</string>
     <string name="exercise_twenty_x3_desc">Каждые 20 минут смотрите на объект, находящийся не менее чем в 6 метрах от вас, в течение хотя бы 20 секунд.</string>
+    <string name="blinkly_eye_focus_close_label">Фокус вблизи</string>
+    <string name="blinkly_eye_focus_far_label">Фокус вдали</string>
+    <string name="blinkly_eye_focus_close_content_description">Глаз Blinkly сфокусирован вблизи</string>
+    <string name="blinkly_eye_focus_far_content_description">Глаз Blinkly сфокусирован вдали</string>
 
     <!-- Highlights -->
     <string name="fact_of_the_day">Факт дня</string>
@@ -437,6 +441,25 @@
     <string name="preferences_duration_label">Длительность</string>
     <string name="preferences_unit_repetitions">раз</string>
     <string name="preferences_unit_seconds">сек</string>
+
+    <!-- Workout -->
+    <string name="workout_intro_label">Блок тренировки</string>
+    <string name="workout_exercise_counter">Упражнение %1$d из %2$d</string>
+    <string name="workout_ready_label">Можно начинать</string>
+    <string name="workout_running_label">Выполняется</string>
+    <string name="workout_paused_label">Пауза</string>
+    <string name="workout_completed_title">Тренировка завершена</string>
+    <string name="workout_completed_desc">Отлично. Глаза получили сфокусированный перерыв.</string>
+    <string name="workout_start_block">Начать блок</string>
+    <string name="workout_start_exercise">Начать упражнение</string>
+    <string name="workout_pause">Пауза</string>
+    <string name="workout_resume">Продолжить</string>
+    <string name="workout_finish">Завершить</string>
+    <string name="workout_close">Закрыть</string>
+    <string name="workout_progress_label">Прогресс</string>
+    <string name="workout_progress_value">%1$d%%</string>
+    <string name="workout_timer_label">Осталось</string>
+    <string name="workout_timer_value">%1$02d:%2$02d</string>
 
     <!-- Content descriptions -->
     <string name="content_description_settings">Настройки</string>

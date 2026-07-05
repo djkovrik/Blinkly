@@ -6,6 +6,10 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.russhwolf.settings.Settings
 import com.sedsoftware.blinkly.alarm.di.AlarmModule
 import com.sedsoftware.blinkly.alarm.di.AlarmModuleDependencies
+import com.sedsoftware.blinkly.beeper.BeeperWrapper
+import com.sedsoftware.blinkly.beeper.BeeperWrapperFactory
+import com.sedsoftware.blinkly.beeper.di.BeeperModule
+import com.sedsoftware.blinkly.beeper.di.BeeperModuleDependencies
 import com.sedsoftware.blinkly.component.root.integration.RootComponentDefault
 import com.sedsoftware.blinkly.database.BlinklyDatabaseDriverFactory
 import com.sedsoftware.blinkly.database.di.DatabaseModule
@@ -13,6 +17,7 @@ import com.sedsoftware.blinkly.database.di.DatabaseModuleDependencies
 import com.sedsoftware.blinkly.domain.di.DomainModule
 import com.sedsoftware.blinkly.domain.di.DomainModuleDependencies
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
+import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
@@ -105,10 +110,21 @@ fun RootComponentFactory(
         )
     }
 
+    val beeper: BlinklyBeeper by lazy {
+        val beeperModule = BeeperModule(
+            dependencies = object : BeeperModuleDependencies {
+                override val wrapper: BeeperWrapper = BeeperWrapperFactory()
+            }
+        )
+
+        beeperModule.beeper
+    }
+
     return RootComponentDefault(
         componentContext = componentContext,
         storeFactory = DefaultStoreFactory(),
         alarmManager = alarmManager,
+        beeper = beeper,
         database = database,
         dispatchers = dispatchers,
         notifier = notifier,

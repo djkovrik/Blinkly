@@ -1,23 +1,21 @@
 package com.sedsoftware.blinkly.compose.ui.home.tabs
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import blinkly.shared.compose.generated.resources.Res
@@ -55,7 +53,9 @@ import com.sedsoftware.blinkly.component.trainings.TrainingsTabComponent
 import com.sedsoftware.blinkly.component.trainings.TrainingsTabComponent.TrainingCard
 import com.sedsoftware.blinkly.component.trainings.integration.TrainingsTabComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyAppCard
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyButton
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -68,18 +68,19 @@ fun TrainingsTabContent(
     val model: TrainingsTabComponent.Model by component.model.subscribeAsState()
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(space = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.SectionGap),
         modifier = modifier
             .systemBarsPadding()
             .fillMaxSize()
             .verticalScroll(state = rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 24.dp)
+            .padding(horizontal = BlinklySpacing.ScreenHorizontal, vertical = 24.dp)
     ) {
         TrainingsHeader()
 
-        model.cards.forEach { card ->
+        model.cards.forEachIndexed { index, card ->
             TrainingCatalogCard(
                 card = card,
+                isPrimaryAction = index == 0 && !card.completedToday,
                 onClick = {
                     when (card.block) {
                         ExerciseBlock.A -> component.onBlockAClick()
@@ -104,7 +105,7 @@ private fun TrainingsHeader(
         Text(
             text = stringResource(resource = Res.string.trainings_title),
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
         )
 
@@ -119,82 +120,84 @@ private fun TrainingsHeader(
 @Composable
 private fun TrainingCatalogCard(
     card: TrainingCard,
+    isPrimaryAction: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val copy = card.block.trainingCopy()
     val colors = card.block.trainingColors()
 
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = MaterialTheme.shapes.large,
-        modifier = modifier.border(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant,
-            shape = MaterialTheme.shapes.large,
-        )
+    BlinklyAppCard(
+        contentPadding = BlinklySpacing.CardPadding,
+        verticalArrangement = Arrangement.spacedBy(space = 12.dp),
+        modifier = modifier,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(space = 14.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 22.dp)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(space = 12.dp),
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier.fillMaxWidth(),
         ) {
             TrainingIcon(
                 containerColor = colors.containerColor,
                 contentColor = colors.contentColor,
             )
 
-            Text(
-                text = copy.title,
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.SemiBold,
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(space = 8.dp),
+                modifier = Modifier.weight(weight = 1f),
+            ) {
+                Text(
+                    text = copy.title,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
 
-            Text(
-                text = copy.description,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-            )
-
-            BenefitBadge(
-                text = copy.benefit,
-                containerColor = colors.containerColor,
-                contentColor = colors.contentColor,
-            )
-
-            Text(
-                text = copy.duration,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-
-            BlinklyButton(
-                text = stringResource(
-                    resource = if (card.completedToday) {
-                        Res.string.cta_repeat
-                    } else {
-                        Res.string.cta_start
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(space = 6.dp),
+                    verticalArrangement = Arrangement.spacedBy(space = 6.dp),
+                ) {
+                    MetadataBadge(text = copy.duration)
+                    MetadataBadge(
+                        text = copy.benefit,
+                        containerColor = colors.containerColor,
+                        contentColor = colors.contentColor,
+                    )
+                    if (card.completedToday) {
+                        CompletedTodayStatus()
                     }
-                ),
-                textColor = MaterialTheme.colorScheme.onPrimary,
-                buttonColor = MaterialTheme.colorScheme.primary,
-                buttonHeight = 50.dp,
-                onClick = onClick,
-                modifier = Modifier.fillMaxWidth(),
-            )
+                }
 
-            if (card.completedToday) {
-                CompletedTodayStatus()
+                Text(
+                    text = copy.description,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
             }
         }
+
+        BlinklyButton(
+            text = stringResource(
+                resource = if (card.completedToday) {
+                    Res.string.cta_repeat
+                } else {
+                    Res.string.cta_start
+                }
+            ),
+            textColor = if (isPrimaryAction) {
+                MaterialTheme.colorScheme.onPrimary
+            } else {
+                MaterialTheme.colorScheme.onSecondaryContainer
+            },
+            buttonColor = if (isPrimaryAction) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.secondaryContainer
+            },
+            buttonHeight = 44.dp,
+            onClick = onClick,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -208,8 +211,8 @@ private fun TrainingIcon(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(size = 58.dp)
-            .clip(shape = MaterialTheme.shapes.extraLarge)
-            .background(color = containerColor, shape = MaterialTheme.shapes.extraLarge),
+            .clip(shape = MaterialTheme.shapes.medium)
+            .background(color = containerColor, shape = MaterialTheme.shapes.medium),
     ) {
         Icon(
             painter = painterResource(resource = Res.drawable.tab_trainings),
@@ -221,24 +224,25 @@ private fun TrainingIcon(
 }
 
 @Composable
-private fun BenefitBadge(
+private fun MetadataBadge(
     text: String,
-    containerColor: Color,
-    contentColor: Color,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
+    contentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .clip(shape = MaterialTheme.shapes.extraLarge)
-            .background(color = containerColor, shape = MaterialTheme.shapes.extraLarge)
-            .padding(horizontal = 18.dp, vertical = 9.dp),
+    Surface(
+        color = containerColor,
+        contentColor = contentColor,
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = modifier,
     ) {
         Text(
             text = text,
-            color = contentColor,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
         )
     }
 }
@@ -247,23 +251,31 @@ private fun BenefitBadge(
 private fun CompletedTodayStatus(
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(space = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.height(height = 24.dp),
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = modifier,
     ) {
-        Icon(
-            painter = painterResource(resource = Res.drawable.icon_done),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.72f),
-            contentDescription = stringResource(resource = Res.string.content_description_training_completed),
-            modifier = Modifier.size(size = 16.dp),
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(space = 5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+        ) {
+            Icon(
+                painter = painterResource(resource = Res.drawable.icon_done),
+                tint = MaterialTheme.colorScheme.primary,
+                contentDescription = stringResource(resource = Res.string.content_description_training_completed),
+                modifier = Modifier.size(size = 14.dp),
+            )
 
-        Text(
-            text = stringResource(resource = Res.string.training_status_completed_today),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-        )
+            Text(
+                text = stringResource(resource = Res.string.training_status_completed_today),
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
@@ -324,7 +336,7 @@ private data class TrainingColors(
 )
 
 @Composable
-@Preview(widthDp = 600, heightDp = 1200)
+@Preview(widthDp = 420, heightDp = 920)
 private fun TrainingsTabContentPreviewLight() {
     BlinklyWidgetPreview {
         TrainingsTabContent(
@@ -334,7 +346,7 @@ private fun TrainingsTabContentPreviewLight() {
 }
 
 @Composable
-@Preview(widthDp = 600, heightDp = 1200)
+@Preview(widthDp = 420, heightDp = 920)
 private fun TrainingsTabContentPreviewDark() {
     BlinklyWidgetPreview(isDakTheme = true) {
         TrainingsTabContent(

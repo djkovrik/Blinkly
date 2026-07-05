@@ -1,6 +1,7 @@
 package com.sedsoftware.blinkly.compose.ui.onboarding
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import blinkly.shared.compose.generated.resources.onboarding_how_title4
 import com.sedsoftware.blinkly.component.step3.OnboardingStep3Component
 import com.sedsoftware.blinkly.component.step3.integration.OnboardingStep3ComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -40,70 +42,43 @@ fun OnboardingContentStep3(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .padding(all = 16.dp)
+            .padding(all = BlinklySpacing.ScreenHorizontal)
     ) {
         Text(
             text = stringResource(resource = Res.string.onboarding_how),
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(vertical = 32.dp)
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(vertical = 24.dp)
         )
 
         Column(
+            verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.ItemGap),
             modifier = Modifier
                 .weight(weight = 1f, fill = true)
                 .verticalScroll(state = scrollState)
         ) {
-            Text(
-                text = stringResource(resource = Res.string.onboarding_how_title1),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = stringResource(resource = Res.string.onboarding_how_description1),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+            OnboardingInfoCard(
+                marker = "1",
+                title = stringResource(resource = Res.string.onboarding_how_title1),
+                body = stringResource(resource = Res.string.onboarding_how_description1),
             )
 
-            Text(
-                text = stringResource(resource = Res.string.onboarding_how_title2),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = stringResource(resource = Res.string.onboarding_how_description2),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+            OnboardingInfoCard(
+                marker = "2",
+                title = stringResource(resource = Res.string.onboarding_how_title2),
+                body = stringResource(resource = Res.string.onboarding_how_description2),
             )
 
-            Text(
-                text = stringResource(resource = Res.string.onboarding_how_title3),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = stringResource(resource = Res.string.onboarding_how_description3),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+            OnboardingInfoCard(
+                marker = "3",
+                title = stringResource(resource = Res.string.onboarding_how_title3),
+                body = stringResource(resource = Res.string.onboarding_how_description3),
             )
 
-            Text(
-                text = stringResource(resource = Res.string.onboarding_how_title4),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = stringResource(resource = Res.string.onboarding_how_description4),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+            OnboardingInfoCard(
+                marker = "4",
+                title = stringResource(resource = Res.string.onboarding_how_title4),
+                body = stringResource(resource = Res.string.onboarding_how_description4),
             )
         }
 

@@ -15,6 +15,8 @@ internal fun figureEightScript(settings: BlinklySettings): ExerciseScript =
             EightClockwise every 4.seconds
         }
 
+        beep()
+
         repeat(settings.figureEightCount) {
             EightCounterclockwise every 4.seconds
         }

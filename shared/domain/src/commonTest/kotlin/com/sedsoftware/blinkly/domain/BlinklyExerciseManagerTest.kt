@@ -14,6 +14,7 @@ import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -52,6 +53,7 @@ class BlinklyExerciseManagerTest : BaseDomainTest() {
 
         // then
         assertThat(events.any { it is ExerciseEvent.Movement }).isTrue()
+        assertThat(events.any { it is ExerciseEvent.Beep }).isTrue()
         job.cancel()
     }
 
@@ -112,6 +114,19 @@ class BlinklyExerciseManagerTest : BaseDomainTest() {
 
         // then
         verifySuspend { database.saveExercise(any()) }
+    }
+
+    @Test
+    fun `when block completed then final exercise saved to database`() = runTest(testScheduler) {
+        // given
+        manager.startBlock(ExerciseBlock.C)
+
+        // when
+        manager.startNextExercise()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        verifySuspend(exactly(1)) { database.saveExercise(any()) }
     }
 
     @Test

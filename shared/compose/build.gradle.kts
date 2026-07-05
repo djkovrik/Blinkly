@@ -1,14 +1,134 @@
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
+abstract class GenerateComposablePreviewPaparazziTestsTask : DefaultTask() {
+    @get:Input
+    abstract val previewPackages: ListProperty<String>
+
+    @get:Input
+    abstract val testPackageName: Property<String>
+
+    @get:Input
+    abstract val testClassName: Property<String>
+
+    @get:Input
+    abstract val compileSdkVersion: Property<Int>
+
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    @TaskAction
+    fun generate() {
+        val packageName = testPackageName.get()
+        val className = testClassName.get()
+        val packagePath = packageName.replace('.', '/')
+        val outputFile = outputDirectory.file("$packagePath/$className.kt").get().asFile
+        val previewPackageLiterals = previewPackages.get().joinToString(separator = ", ") { "\"$it\"" }
+        val previewPackagePrefix = previewPackages.get().first()
+
+        outputFile.parentFile.mkdirs()
+        outputFile.writeText(
+            """
+            @file:Suppress("LongMethod")
+
+            package $packageName
+
+            import app.cash.paparazzi.Paparazzi
+            import com.sedsoftware.blinkly.compose.ui.paparazzi.BlinklyPaparazziPreviewRule
+            import com.sedsoftware.blinkly.compose.ui.paparazzi.BlinklyPreviewContent
+            import com.sedsoftware.blinkly.compose.ui.paparazzi.configureComposeResources
+            import org.junit.Rule
+            import org.junit.Test
+            import org.junit.runner.RunWith
+            import org.junit.runners.Parameterized
+            import sergio.sastre.composable.preview.scanner.android.AndroidComposablePreviewScanner
+            import sergio.sastre.composable.preview.scanner.android.AndroidPreviewInfo
+            import sergio.sastre.composable.preview.scanner.android.screenshotid.AndroidPreviewScreenshotIdBuilder
+            import sergio.sastre.composable.preview.scanner.core.preview.ComposablePreview
+
+            @RunWith(Parameterized::class)
+            class $className(
+                private val preview: ComposablePreview<AndroidPreviewInfo>,
+            ) {
+                companion object {
+                    @JvmStatic
+                    @Parameterized.Parameters(name = "{0}")
+                    fun previews(): List<ComposablePreview<AndroidPreviewInfo>> =
+                        AndroidComposablePreviewScanner()
+                            .scanPackageTrees(
+                                include = listOf($previewPackageLiterals),
+                                exclude = emptyList(),
+                            )
+                            .includePrivatePreviews()
+                            .getPreviews()
+                }
+
+                @get:Rule
+                val paparazzi: Paparazzi = BlinklyPaparazziPreviewRule.createFor(
+                    preview = preview,
+                    compileSdkVersion = ${compileSdkVersion.get()},
+                )
+
+                @Test
+                fun snapshot() {
+                    paparazzi.configureComposeResources()
+
+                    val screenshotId = AndroidPreviewScreenshotIdBuilder(preview)
+                        .doNotIgnoreMethodParametersType()
+                        .encodeUnsafeCharacters()
+                        .build()
+                        .replace("$previewPackagePrefix.", "")
+
+                    paparazzi.snapshot(name = screenshotId) {
+                        BlinklyPreviewContent(preview.previewInfo) {
+                            preview()
+                        }
+                    }
+                }
+            }
+            """.trimIndent()
+        )
+    }
+}
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.android.kmp.library)
+    alias(libs.plugins.paparazzi)
+}
+
+val paparazziPreviewPackage = "com.sedsoftware.blinkly.compose.ui"
+val paparazziGeneratedTestPackage = "com.sedsoftware.blinkly.compose.ui.paparazzi.generated"
+val paparazziGeneratedTestClass = "GeneratedComposablePreviewPaparazziTest"
+val paparazziGeneratedTestDir = layout.buildDirectory.dir("generated/source/paparazziPreviews/androidUnitTest/kotlin")
+val paparazziRenderCompileSdk = 35
+
+val generateComposablePreviewPaparazziTests by tasks.registering(GenerateComposablePreviewPaparazziTestsTask::class) {
+    group = "verification"
+    description = "Generates Paparazzi screenshot tests for Compose @Preview functions."
+
+    previewPackages.set(listOf(paparazziPreviewPackage))
+    testPackageName.set(paparazziGeneratedTestPackage)
+    testClassName.set(paparazziGeneratedTestClass)
+    compileSdkVersion.set(paparazziRenderCompileSdk)
+    outputDirectory.set(paparazziGeneratedTestDir)
 }
 
 kotlin {
-    androidTarget()
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+    }
 
     iosX64()
     iosArm64()
@@ -49,9 +169,7 @@ kotlin {
             implementation(project(":shared:component:reminders"))
             implementation(project(":shared:component:reminders:child:newreminder"))
             implementation(project(":shared:component:trainings"))
-            implementation(project(":shared:component:trainings:child:blocka"))
-            implementation(project(":shared:component:trainings:child:blockb"))
-            implementation(project(":shared:component:trainings:child:blockc"))
+            implementation(project(":shared:component:trainings:child:workout"))
         }
 
         commonTest.dependencies {
@@ -62,6 +180,15 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.kotlinx.coroutines.android)
+        }
+
+        androidUnitTest {
+            kotlin.srcDir(paparazziGeneratedTestDir)
+
+            dependencies {
+                implementation(libs.test.junit4)
+                implementation(libs.test.composable.preview.scanner.android)
+            }
         }
     }
 
@@ -97,4 +224,21 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all {
+                it.jvmArgs("-Xmx4g")
+            }
+        }
+    }
+}
+
+tasks.matching {
+    it.name == "compileDebugUnitTestKotlinAndroid" ||
+        it.name == "compileReleaseUnitTestKotlinAndroid" ||
+        it.name.startsWith("recordPaparazzi") ||
+        it.name.startsWith("verifyPaparazzi")
+}.configureEach {
+    dependsOn(generateComposablePreviewPaparazziTests)
 }

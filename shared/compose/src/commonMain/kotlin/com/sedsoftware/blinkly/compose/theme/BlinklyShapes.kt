@@ -8,9 +8,9 @@ internal object BlinklyShapes {
 
     fun shapes(): Shapes = Shapes(
         extraSmall = RoundedCornerShape(size = 8.dp),
-        small = RoundedCornerShape(size = 14.dp),
-        medium = RoundedCornerShape(size = 20.dp),
-        large = RoundedCornerShape(size = 26.dp),
-        extraLarge = RoundedCornerShape(size = 32.dp),
+        small = RoundedCornerShape(size = 10.dp),
+        medium = RoundedCornerShape(size = 16.dp),
+        large = RoundedCornerShape(size = 22.dp),
+        extraLarge = RoundedCornerShape(size = 28.dp),
     )
 }

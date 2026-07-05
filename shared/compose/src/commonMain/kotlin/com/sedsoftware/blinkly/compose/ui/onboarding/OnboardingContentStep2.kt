@@ -2,6 +2,7 @@ package com.sedsoftware.blinkly.compose.ui.onboarding
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import blinkly.shared.compose.generated.resources.onboarding_why_description2
 import com.sedsoftware.blinkly.component.step2.OnboardingStep2Component
 import com.sedsoftware.blinkly.component.step2.integration.OnboardingStep2ComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -28,28 +30,22 @@ fun OnboardingContentStep2(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.SectionGap),
         modifier = modifier
             .fillMaxSize()
-            .padding(all = 16.dp)
+            .padding(all = BlinklySpacing.ScreenHorizontal)
     ) {
         Text(
             text = stringResource(resource = Res.string.onboarding_why),
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(vertical = 32.dp)
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(top = 24.dp)
         )
 
-        Text(
-            text = stringResource(resource = Res.string.onboarding_why_description1),
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-
-        Text(
-            text = stringResource(resource = Res.string.onboarding_why_description2),
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.bodyLarge,
+        OnboardingInfoCard(
+            marker = "1",
+            title = stringResource(resource = Res.string.onboarding_why_description1),
+            body = stringResource(resource = Res.string.onboarding_why_description2),
         )
 
         Spacer(modifier = Modifier.weight(weight = 1f, fill = true))
