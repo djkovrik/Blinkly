@@ -65,6 +65,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
+private const val PHONE_PREVIEW_FACT_ID = 48
+private const val PHONE_PREVIEW_TREE_PROGRESS = 60f
+
 @Composable
 fun MainTabContent(
     component: MainTabComponent,
@@ -423,6 +426,33 @@ private fun MainTabContentPreviewDark() {
     BlinklyWidgetPreview(isDakTheme = true) {
         MainTabPreviewContent()
     }
+}
+
+@Composable
+@Preview(widthDp = 420, heightDp = 920)
+private fun MainTabContentPhonePreviewLight() {
+    BlinklyWidgetPreview {
+        MainTabPhonePreviewContent()
+    }
+}
+
+@Composable
+@Preview(widthDp = 420, heightDp = 920)
+private fun MainTabContentPhonePreviewDark() {
+    BlinklyWidgetPreview(isDakTheme = true) {
+        MainTabPhonePreviewContent()
+    }
+}
+
+@Composable
+private fun MainTabPhonePreviewContent() {
+    MainTabPreviewDefault(
+        greetingPeriod = GreetingPeriod.DAY,
+        ctaState = MainCtaState.WorkBreakDue,
+        highlight = HighlightOfTheDay.Fact(PHONE_PREVIEW_FACT_ID),
+        tree = Tree(TreeStage.GROWING, TreeType.QUERCUS_ROBUR, PHONE_PREVIEW_TREE_PROGRESS),
+        modifier = Modifier.fillMaxSize(),
+    )
 }
 
 @Composable

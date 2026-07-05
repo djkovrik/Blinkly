@@ -6,18 +6,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -68,13 +66,18 @@ import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.Reminde
 import com.sedsoftware.blinkly.component.reminders.integration.RemindersTabComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import com.sedsoftware.blinkly.compose.ui.extension.asLabel
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyAppCard
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyButton
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyMetricRow
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.extension.toHumanReadableString
 import com.sedsoftware.blinkly.utils.PreviewContent
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+
+private const val MAX_INLINE_REMINDERS_WITH_ADD_BUTTON = 4
 
 @Composable
 fun RemindersTabContent(
@@ -109,7 +112,7 @@ fun RemindersTabContent(
                 title = {
                     Text(
                         text = stringResource(resource = Res.string.reminders_title),
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.titleLarge,
                     )
                 }
             )
@@ -118,7 +121,7 @@ fun RemindersTabContent(
             SnackbarHost(hostState = snackbarHostState)
         },
         floatingActionButton = {
-            if (model.reminders.isNotEmpty()) {
+            if (model.reminders.size > 4) {
                 ExtendedFloatingActionButton(
                     text = {
                         Text(text = stringResource(resource = Res.string.reminders_add))
@@ -149,15 +152,19 @@ fun RemindersTabContent(
                 )
             } else {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(space = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.ItemGap),
+                    contentPadding = PaddingValues(
+                        start = BlinklySpacing.ScreenHorizontal,
+                        top = BlinklySpacing.ScreenVertical,
+                        end = BlinklySpacing.ScreenHorizontal,
+                        bottom = 24.dp,
+                    ),
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     item {
                         RemindersOverview(
                             reminders = model.reminders,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
 
@@ -168,14 +175,20 @@ fun RemindersTabContent(
                         ReminderCard(
                             item = item,
                             onDeleteClick = { component.onDeleteReminder(item.uuid) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
 
-                    item {
-                        Spacer(modifier = Modifier.padding(bottom = 80.dp))
+                    if (model.reminders.size <= MAX_INLINE_REMINDERS_WITH_ADD_BUTTON) {
+                        item {
+                            BlinklyButton(
+                                text = stringResource(resource = Res.string.reminders_add),
+                                onClick = component::onAddNewClick,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 2.dp),
+                            )
+                        }
                     }
                 }
             }
@@ -236,55 +249,41 @@ private fun RemindersOverview(
             .thenBy { item -> item.time }
     )
 
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
-        ),
+    BlinklyAppCard(
+        highlighted = true,
+        contentPadding = BlinklySpacing.CompactCardPadding,
         modifier = modifier,
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(space = 10.dp),
-            modifier = Modifier.padding(all = 16.dp),
-        ) {
+        Text(
+            text = stringResource(resource = Res.string.reminders_overview_title),
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+        )
+
+        BlinklyMetricRow(
+            label = stringResource(resource = Res.string.reminders_overview_count, reminders.size),
+            value = nextReminder?.time?.toHumanReadableString().orEmpty(),
+            valueColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        )
+
+        if (nextReminder != null) {
             Text(
-                text = stringResource(resource = Res.string.reminders_overview_title),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(space = 8.dp),
-            ) {
-                ReminderPill(
-                    text = stringResource(
-                        resource = Res.string.reminders_overview_count,
-                        reminders.size,
-                    ),
-                )
-
-                if (nextReminder != null) {
-                    ReminderPill(
-                        text = stringResource(
-                            resource = Res.string.reminders_overview_next,
-                            nextReminder.time.toHumanReadableString(),
-                            nextReminder.nextDate.asShortDate(),
-                        ),
-                    )
-                }
-            }
-
-            Text(
-                text = stringResource(resource = Res.string.reminders_overview_hint),
+                text = stringResource(
+                    resource = Res.string.reminders_overview_next,
+                    nextReminder.time.toHumanReadableString(),
+                    nextReminder.nextDate.asShortDate(),
+                ),
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f),
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
+
+        Text(
+            text = stringResource(resource = Res.string.reminders_overview_hint),
+            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f),
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 
@@ -294,45 +293,40 @@ private fun ReminderCard(
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        ),
+    BlinklyAppCard(
+        contentPadding = BlinklySpacing.CompactCardPadding,
         modifier = modifier,
     ) {
         Row(
             verticalAlignment = Alignment.Top,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(all = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(space = 12.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .width(width = 100.dp)
-                    .padding(end = 16.dp),
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.widthIn(min = 72.dp, max = 88.dp),
             ) {
                 Box(
                     modifier = Modifier
-                        .size(width = 38.dp, height = 4.dp)
+                        .size(width = 28.dp, height = 4.dp)
                         .clip(shape = CircleShape)
                         .background(color = MaterialTheme.colorScheme.primary),
                 )
 
                 Text(
                     text = item.time.toHumanReadableString(),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Clip,
                     softWrap = false,
-                    modifier = Modifier.padding(top = 10.dp),
+                    modifier = Modifier.padding(top = 8.dp),
                 )
 
                 Text(
                     text = item.interval.intervalLabel(),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.72f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelMedium,
                 )
             }
@@ -343,13 +337,13 @@ private fun ReminderCard(
             ) {
                 Text(
                     text = stringResource(resource = Res.string.exercise_twenty_x3),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.labelLarge,
                 )
 
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(space = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(space = 6.dp),
+                    verticalArrangement = Arrangement.spacedBy(space = 6.dp),
                 ) {
                     ReminderPill(text = item.daysLabel())
                     ReminderPill(text = "${stringResource(resource = Res.string.reminders_next)} ${item.nextDate.asShortDate()}")
@@ -384,6 +378,10 @@ private fun ReminderPill(
     Surface(
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
         shape = MaterialTheme.shapes.small,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.72f),
+        ),
         modifier = modifier,
     ) {
         Text(

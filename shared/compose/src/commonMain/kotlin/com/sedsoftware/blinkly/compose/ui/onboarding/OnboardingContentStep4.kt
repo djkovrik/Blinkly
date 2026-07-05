@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.sedsoftware.blinkly.component.step4.OnboardingStep4Component
 import com.sedsoftware.blinkly.component.step4.integration.OnboardingStep4ComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -46,84 +48,70 @@ fun OnboardingContentStep4(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .padding(all = 16.dp)
+            .padding(all = BlinklySpacing.ScreenHorizontal)
     ) {
         Text(
             text = stringResource(resource = Res.string.onboarding_disclaimer1),
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(vertical = 32.dp)
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(vertical = 24.dp)
         )
 
         Column(
+            verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.ItemGap),
             modifier = Modifier
                 .weight(weight = 1f, fill = true)
                 .verticalScroll(state = scrollState)
         ) {
             Text(
                 text = stringResource(resource = Res.string.onboarding_disclaimer2),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.76f),
+                style = MaterialTheme.typography.bodyMedium,
             )
 
-            Text(
-                text = stringResource(resource = Res.string.onboarding_disclaimer3),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = stringResource(resource = Res.string.onboarding_disclaimer4),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+            OnboardingInfoCard(
+                marker = "1",
+                title = stringResource(resource = Res.string.onboarding_disclaimer3),
+                body = stringResource(resource = Res.string.onboarding_disclaimer4),
             )
 
-            Text(
-                text = stringResource(resource = Res.string.onboarding_disclaimer5),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = stringResource(resource = Res.string.onboarding_disclaimer6),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+            OnboardingInfoCard(
+                marker = "2",
+                title = stringResource(resource = Res.string.onboarding_disclaimer5),
+                body = stringResource(resource = Res.string.onboarding_disclaimer6),
             )
 
-            Text(
-                text = stringResource(resource = Res.string.onboarding_disclaimer7),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = stringResource(resource = Res.string.onboarding_disclaimer8),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+            OnboardingInfoCard(
+                marker = "3",
+                title = stringResource(resource = Res.string.onboarding_disclaimer7),
+                body = stringResource(resource = Res.string.onboarding_disclaimer8),
             )
         }
 
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            shape = MaterialTheme.shapes.medium,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
+                .padding(top = 12.dp)
         ) {
-            Checkbox(
-                checked = model.checkboxSelected,
-                onCheckedChange = component::onCheckboxSelect,
-            )
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+            ) {
+                Checkbox(
+                    checked = model.checkboxSelected,
+                    onCheckedChange = component::onCheckboxSelect,
+                )
 
-            Text(
-                text = stringResource(resource = Res.string.onboarding_disclaimer_got_it),
-                color = MaterialTheme.colorScheme.secondary,
-                style = MaterialTheme.typography.bodyMedium,
-            )
+                Text(
+                    text = stringResource(resource = Res.string.onboarding_disclaimer_got_it),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
         }
 
         BottomNavigationButtons(

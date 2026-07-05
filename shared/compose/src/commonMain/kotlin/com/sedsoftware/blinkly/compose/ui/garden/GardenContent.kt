@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +44,6 @@ import blinkly.shared.compose.generated.resources.content_description_tree_previ
 import blinkly.shared.compose.generated.resources.garden_all_grown
 import blinkly.shared.compose.generated.resources.garden_collection_title
 import blinkly.shared.compose.generated.resources.garden_current_tree_title
-import blinkly.shared.compose.generated.resources.garden_grown_count
 import blinkly.shared.compose.generated.resources.garden_next_tree
 import blinkly.shared.compose.generated.resources.garden_stats_title
 import blinkly.shared.compose.generated.resources.icon_back
@@ -57,6 +54,10 @@ import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import com.sedsoftware.blinkly.compose.ui.extension.asImage
 import com.sedsoftware.blinkly.compose.ui.extension.asLabel
 import com.sedsoftware.blinkly.compose.ui.extension.clickableOnce
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyAppCard
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyMetricRow
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySectionTitle
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeStage
 import com.sedsoftware.blinkly.domain.model.TreeType
@@ -79,7 +80,7 @@ fun GardenContent(
                     Text(
                         text = stringResource(resource = Res.string.garden_current_tree_title),
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleLarge,
                     )
                 },
                 navigationIcon = {
@@ -100,7 +101,7 @@ fun GardenContent(
         modifier = modifier,
     ) { paddingValues ->
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(space = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.SectionGap),
             modifier = Modifier
                 .padding(paddingValues = paddingValues)
                 .fillMaxSize(),
@@ -111,7 +112,7 @@ fun GardenContent(
             ) {
                 CurrentTreeSection(
                     tree = model.currentTree,
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = Modifier.padding(horizontal = BlinklySpacing.ScreenHorizontal),
                 )
             }
 
@@ -123,7 +124,7 @@ fun GardenContent(
                     model = model,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = BlinklySpacing.ScreenHorizontal)
                         .padding(bottom = 24.dp),
                 )
             }
@@ -135,7 +136,7 @@ fun GardenContent(
                 ) {
                     SectionTitle(
                         text = stringResource(resource = Res.string.garden_collection_title),
-                        modifier = Modifier.padding(horizontal = 16.dp),
+                        modifier = Modifier.padding(horizontal = BlinklySpacing.ScreenHorizontal),
                     )
                 }
 
@@ -147,7 +148,7 @@ fun GardenContent(
                     GardenTreeRow(
                         trees = row,
                         onTreeClick = component::onTreeClick,
-                        modifier = Modifier.padding(horizontal = 16.dp),
+                        modifier = Modifier.padding(horizontal = BlinklySpacing.ScreenHorizontal),
                     )
                 }
             }
@@ -174,28 +175,23 @@ private fun CurrentTreeSection(
     tree: Tree,
     modifier: Modifier = Modifier,
 ) {
-    ElevatedCard(
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+    BlinklyAppCard(
         modifier = modifier.fillMaxWidth(),
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(space = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.ItemGap),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(all = 20.dp),
         ) {
             TreeImage(
                 tree = tree,
-                size = 224,
+                size = 184,
                 modifier = Modifier.fillMaxWidth(),
             )
 
             Text(
                 text = tree.type.asLabel(),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -224,15 +220,15 @@ private fun TreeProgress(
         ) {
             Text(
                 text = tree.stage.asLabel(),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.SemiBold,
             )
 
             Text(
                 text = "$progressPercent%",
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.SemiBold,
             )
         }
@@ -254,11 +250,8 @@ private fun SectionTitle(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    Text(
+    BlinklySectionTitle(
         text = text,
-        color = MaterialTheme.colorScheme.onBackground,
-        style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold,
         modifier = modifier.fillMaxWidth(),
     )
 }
@@ -296,12 +289,12 @@ private fun GardenTreeCard(
     val treeName = tree.type.asLabel()
 
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = MaterialTheme.shapes.medium,
         tonalElevation = 1.dp,
         modifier = modifier
-            .sizeIn(minHeight = 168.dp)
-            .clip(MaterialTheme.shapes.large)
+            .sizeIn(minHeight = 148.dp)
+            .clip(MaterialTheme.shapes.medium)
             .clickableOnce(onClick = onClick)
             .semantics {
                 role = Role.Button
@@ -315,7 +308,7 @@ private fun GardenTreeCard(
         ) {
             TreeImage(
                 tree = tree,
-                size = 104,
+                size = 88,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -336,42 +329,31 @@ private fun GardenStatsSection(
     model: GardenComponent.Model,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        shape = MaterialTheme.shapes.large,
+    BlinklyAppCard(
+        contentPadding = BlinklySpacing.CompactCardPadding,
         modifier = modifier,
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(space = 8.dp),
-            modifier = Modifier.padding(all = 16.dp),
-        ) {
-            Text(
-                text = stringResource(resource = Res.string.garden_stats_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
+        BlinklySectionTitle(
+            text = stringResource(resource = Res.string.garden_stats_title),
+        )
 
-            Text(
-                text = stringResource(
-                    resource = Res.string.garden_grown_count,
-                    model.grownTreesCount,
-                    model.totalTrees,
-                ),
-                style = MaterialTheme.typography.bodyLarge,
-            )
+        BlinklyMetricRow(
+            label = stringResource(resource = Res.string.garden_collection_title),
+            value = "${model.grownTreesCount}/${model.totalTrees}",
+            valueColor = MaterialTheme.colorScheme.primary,
+        )
 
-            Text(
-                text = model.nextTreeType?.let { nextType ->
-                    stringResource(
-                        resource = Res.string.garden_next_tree,
-                        nextType.asLabel(),
-                        model.daysToNextTree ?: 0,
-                    )
-                } ?: stringResource(resource = Res.string.garden_all_grown),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-        }
+        Text(
+            text = model.nextTreeType?.let { nextType ->
+                stringResource(
+                    resource = Res.string.garden_next_tree,
+                    nextType.asLabel(),
+                    model.daysToNextTree ?: 0,
+                )
+            } ?: stringResource(resource = Res.string.garden_all_grown),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 

@@ -62,6 +62,8 @@ import com.sedsoftware.blinkly.compose.ui.extension.asImage
 import com.sedsoftware.blinkly.compose.ui.extension.asLabel
 import com.sedsoftware.blinkly.compose.ui.extension.asTitle
 import com.sedsoftware.blinkly.compose.ui.extension.clickableOnce
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySectionTitle
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
 import kotlinx.datetime.TimeZone
@@ -85,7 +87,7 @@ fun AchievementsContent(
                     Text(
                         text = stringResource(resource = Res.string.achievements_screen_title),
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleLarge,
                     )
                 },
                 navigationIcon = {
@@ -106,7 +108,7 @@ fun AchievementsContent(
         modifier = modifier,
     ) { paddingValues ->
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(space = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.ItemGap),
             modifier = Modifier
                 .padding(paddingValues = paddingValues)
                 .fillMaxSize(),
@@ -118,7 +120,11 @@ fun AchievementsContent(
                 ) {
                     AchievementSectionHeader(
                         title = section.level.asLabel(),
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(
+                            top = 8.dp,
+                            start = BlinklySpacing.ScreenHorizontal,
+                            end = BlinklySpacing.ScreenHorizontal,
+                        ),
                     )
                 }
 
@@ -130,6 +136,7 @@ fun AchievementsContent(
                     AchievementRow(
                         achievement = achievement,
                         onClick = { component.onAchievementClick(achievement.type) },
+                        modifier = Modifier.padding(horizontal = BlinklySpacing.ScreenHorizontal),
                     )
                 }
             }
@@ -156,14 +163,9 @@ private fun AchievementSectionHeader(
     title: String,
     modifier: Modifier = Modifier,
 ) {
-    Text(
+    BlinklySectionTitle(
         text = title,
-        color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.SemiBold,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 4.dp),
+        modifier = modifier.fillMaxWidth(),
     )
 }
 
@@ -180,17 +182,17 @@ private fun AchievementRow(
     val lockedDescription = stringResource(resource = Res.string.content_description_locked_achievement)
 
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = MaterialTheme.shapes.medium,
         tonalElevation = 1.dp,
         modifier = modifier
             .fillMaxWidth()
-            .sizeIn(minHeight = 96.dp)
+            .sizeIn(minHeight = 88.dp)
             .alpha(if (achievement.isUnlocked) 1f else LOCKED_ACHIEVEMENT_ALPHA)
             .alsoIf(
                 achievement.isDetailsAvailable,
                 Modifier
-                    .clip(MaterialTheme.shapes.large)
+                    .clip(MaterialTheme.shapes.medium)
                     .clickableOnce(onClick = onClick)
                     .semantics {
                         role = Role.Button
@@ -200,17 +202,17 @@ private fun AchievementRow(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
         ) {
             Image(
                 painter = painterResource(
                     resource = if (achievement.isUnlocked) achievement.type.asImage() else Res.drawable.achievement_unknown
                 ),
                 contentDescription = if (achievement.isUnlocked) title else lockedDescription,
-                modifier = Modifier.size(size = 64.dp),
+                modifier = Modifier.size(size = 56.dp),
             )
 
-            Spacer(modifier = Modifier.width(width = 14.dp))
+            Spacer(modifier = Modifier.width(width = 12.dp))
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(space = 6.dp),
@@ -258,27 +260,27 @@ private fun AchievementStatusChip(
         color = if (isUnlocked) {
             MaterialTheme.colorScheme.primaryContainer
         } else {
-            MaterialTheme.colorScheme.surfaceContainerHighest
+            MaterialTheme.colorScheme.surfaceContainer
         },
         contentColor = if (isUnlocked) {
             MaterialTheme.colorScheme.onPrimaryContainer
         } else {
             MaterialTheme.colorScheme.onSurfaceVariant
         },
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.extraLarge,
         modifier = modifier,
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .height(height = 30.dp)
+                .height(height = 28.dp)
                 .padding(horizontal = 10.dp),
         ) {
             Text(
                 text = stringResource(
                     resource = if (isUnlocked) Res.string.achievements_unlocked else Res.string.achievements_locked
                 ),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -349,9 +351,9 @@ private fun AchievementDetailsSheet(
 
         achievement.unlockedAt?.let { unlockedAt ->
             Surface(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text(
                     text = stringResource(

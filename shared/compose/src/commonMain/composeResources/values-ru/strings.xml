@@ -57,7 +57,7 @@
     <string name="onboarding_initial_setup_20">Каждые 20 минут</string>
     <string name="onboarding_initial_setup_40">Каждые 40 минут</string>
     <string name="onboarding_initial_setup_custom">Свой интервал, минут</string>
-    <string name="onboarding_initial_setup_weekdays">В следующие дли недели:</string>
+    <string name="onboarding_initial_setup_weekdays">В следующие дни недели:</string>
     <string name="onboarding_initial_setup_create">Создать</string>
     <string name="onboarding_initial_setup_clear">Очистить</string>
     <string name="onboarding_initial_setup_created">Создано:</string>

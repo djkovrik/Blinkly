@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -260,7 +259,7 @@ private fun BlinklyEyeContent(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .aspectRatio(1f)
-            .clip(RoundedCornerShape(28.dp))
+            .clip(MaterialTheme.shapes.extraLarge)
             .background(color = colorScheme.surfaceContainer)
             .semantics { this.contentDescription = contentDescription },
     ) {

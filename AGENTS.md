@@ -352,6 +352,29 @@ Platform note:
 - Android creates the root `ComponentContext` once in `AppActivity.onCreate()` via `defaultComponentContext()`.
 - This follows Decompose guidance to create the root component outside Compose.
 
+### Paparazzi snapshots
+
+`shared/compose` uses Paparazzi golden screenshots generated from Compose
+`@Preview` functions.
+
+Rules for UI changes:
+- Any change to shared Compose UI, theme, typography, spacing, preview data, or
+  visual assets must include the corresponding Paparazzi golden updates.
+- Keep previews deterministic: use stable preview components/data, fixed preview
+  dimensions, and avoid runtime-only dependencies in preview code.
+- For screens represented by a large variant board, also keep at least one
+  realistic single-state phone preview when that helps catch real viewport
+  layout issues.
+- After intentional visual changes, run
+  `.\gradlew.bat :shared:compose:cleanRecordPaparazziDebug` to regenerate
+  goldens, then run `.\gradlew.bat :shared:compose:verifyPaparazziDebug`.
+- Inspect new or materially changed PNGs in
+  `shared/compose/src/test/snapshots/images` before finishing the change.
+- Commit the updated snapshot PNGs together with the UI code that caused them.
+- Do not bless unrelated Paparazzi diffs. If `verifyPaparazziDebug` reports
+  unexpected changes, inspect the diff and either fix the UI or update only the
+  goldens that match the intended visual change.
+
 ## Testing Conventions
 
 Component tests are common tests, not instrumentation tests.

@@ -14,8 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -79,8 +77,11 @@ import com.sedsoftware.blinkly.component.newreminder.AddNewReminderComponent.Val
 import com.sedsoftware.blinkly.component.newreminder.integration.AddNewReminderComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import com.sedsoftware.blinkly.compose.ui.extension.asLabel
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyAppCard
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyButton
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyOutlineButton
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySectionTitle
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyTimePickerDialog
 import com.sedsoftware.blinkly.compose.ui.widget.WeekDayToggle
 import com.sedsoftware.blinkly.domain.extension.toHumanReadableString
@@ -127,7 +128,7 @@ fun AddNewReminderContent(
                 title = {
                     Text(
                         text = stringResource(resource = Res.string.add_reminder_title),
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.titleLarge,
                     )
                 },
             )
@@ -138,12 +139,15 @@ fun AddNewReminderContent(
         modifier = modifier.fillMaxSize(),
     ) { paddingValues ->
         Column(
-            verticalArrangement = Arrangement.spacedBy(space = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(space = 14.dp),
             modifier = Modifier
                 .padding(paddingValues = paddingValues)
                 .fillMaxSize()
                 .verticalScroll(state = rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(
+                    horizontal = BlinklySpacing.ScreenHorizontal,
+                    vertical = BlinklySpacing.ScreenVertical,
+                ),
         ) {
             Text(
                 text = stringResource(resource = Res.string.add_reminder_description),
@@ -204,33 +208,22 @@ fun AddNewReminderContent(
 private fun ReminderTypeHeader(
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-        ),
+    BlinklyAppCard(
+        highlighted = true,
         modifier = modifier.fillMaxWidth(),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(space = 6.dp),
-            modifier = Modifier.padding(all = 16.dp),
-        ) {
-            Text(
-                text = stringResource(resource = Res.string.exercise_twenty_x3),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
+        Text(
+            text = stringResource(resource = Res.string.exercise_twenty_x3),
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+        )
 
-            Text(
-                text = stringResource(resource = Res.string.exercise_twenty_x3_desc),
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.74f),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
+        Text(
+            text = stringResource(resource = Res.string.exercise_twenty_x3_desc),
+            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.74f),
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 
@@ -244,10 +237,8 @@ private fun ScheduleTypeSection(
         verticalArrangement = Arrangement.spacedBy(space = 10.dp),
         modifier = modifier.selectableGroup(),
     ) {
-        Text(
+        BlinklySectionTitle(
             text = stringResource(resource = Res.string.add_reminder_type),
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleMedium,
         )
 
         FlowRow(
@@ -297,7 +288,7 @@ private fun ScheduleTypeChip(
                 MaterialTheme.colorScheme.outlineVariant
             },
         ),
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.extraLarge,
         modifier = modifier
             .selectable(
                 selected = selected,
@@ -320,27 +311,17 @@ private fun DailyReminderSection(
     onTimeSelect: (LocalTime) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+    BlinklyAppCard(
         modifier = modifier.fillMaxWidth(),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(space = 12.dp),
-            modifier = Modifier.padding(all = 16.dp),
-        ) {
-            Text(
-                text = stringResource(resource = Res.string.add_reminder_time),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.titleMedium,
-            )
+        BlinklySectionTitle(
+            text = stringResource(resource = Res.string.add_reminder_time),
+        )
 
-            TimeSelector(
-                time = time,
-                onTimeSelect = onTimeSelect,
-            )
-        }
+        TimeSelector(
+            time = time,
+            onTimeSelect = onTimeSelect,
+        )
     }
 }
 
@@ -352,44 +333,32 @@ private fun WeeklySingleReminderSection(
     onDaySelect: (DayOfWeek) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+    BlinklyAppCard(
         modifier = modifier.fillMaxWidth(),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(space = 12.dp),
-            modifier = Modifier.padding(all = 16.dp),
+        BlinklySectionTitle(
+            text = stringResource(resource = Res.string.add_reminder_time),
+        )
+
+        TimeSelector(
+            time = time,
+            onTimeSelect = onTimeSelect,
+        )
+
+        BlinklySectionTitle(
+            text = stringResource(resource = Res.string.add_reminder_day),
+        )
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(space = 8.dp),
         ) {
-            Text(
-                text = stringResource(resource = Res.string.add_reminder_time),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.titleMedium,
-            )
-
-            TimeSelector(
-                time = time,
-                onTimeSelect = onTimeSelect,
-            )
-
-            Text(
-                text = stringResource(resource = Res.string.add_reminder_day),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.titleMedium,
-            )
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(space = 8.dp),
-            ) {
-                DayOfWeek.entries.forEach { dayOfWeek ->
-                    WeekDayToggle(
-                        dayOfWeek = dayOfWeek,
-                        toggled = day == dayOfWeek,
-                        onToggle = { onDaySelect(dayOfWeek) },
-                    )
-                }
+            DayOfWeek.entries.forEach { dayOfWeek ->
+                WeekDayToggle(
+                    dayOfWeek = dayOfWeek,
+                    toggled = day == dayOfWeek,
+                    onToggle = { onDaySelect(dayOfWeek) },
+                )
             }
         }
     }
@@ -407,68 +376,52 @@ private fun WeeklyPeriodReminderSection(
     onDayClick: (DayOfWeek) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant,
-        ),
+    BlinklyAppCard(
         modifier = modifier.fillMaxWidth(),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(space = 12.dp),
-            modifier = Modifier.padding(all = 16.dp),
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                TimeSelector(
-                    time = timeFrom,
-                    prefix = stringResource(resource = Res.string.onboarding_initial_setup_from),
-                    onTimeSelect = onTimeFromSelect,
-                    modifier = Modifier.weight(weight = 1f),
+            TimeSelector(
+                time = timeFrom,
+                prefix = stringResource(resource = Res.string.onboarding_initial_setup_from),
+                onTimeSelect = onTimeFromSelect,
+                modifier = Modifier.weight(weight = 1f),
+            )
+
+            TimeSelector(
+                time = timeUntil,
+                prefix = stringResource(resource = Res.string.onboarding_initial_setup_until),
+                onTimeSelect = onTimeUntilSelect,
+                modifier = Modifier.weight(weight = 1f),
+            )
+        }
+
+        BlinklySectionTitle(
+            text = stringResource(resource = Res.string.onboarding_initial_setup_interval),
+        )
+
+        IntervalSelector(
+            interval = interval,
+            onIntervalSelect = onIntervalSelect,
+        )
+
+        BlinklySectionTitle(
+            text = stringResource(resource = Res.string.onboarding_initial_setup_weekdays),
+        )
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(space = 8.dp),
+        ) {
+            DayOfWeek.entries.forEach { dayOfWeek ->
+                WeekDayToggle(
+                    dayOfWeek = dayOfWeek,
+                    toggled = selectedDays.contains(dayOfWeek),
+                    onToggle = { onDayClick(dayOfWeek) },
                 )
-
-                TimeSelector(
-                    time = timeUntil,
-                    prefix = stringResource(resource = Res.string.onboarding_initial_setup_until),
-                    onTimeSelect = onTimeUntilSelect,
-                    modifier = Modifier.weight(weight = 1f),
-                )
-            }
-
-            Text(
-                text = stringResource(resource = Res.string.onboarding_initial_setup_interval),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.titleMedium,
-            )
-
-            IntervalSelector(
-                interval = interval,
-                onIntervalSelect = onIntervalSelect,
-            )
-
-            Text(
-                text = stringResource(resource = Res.string.onboarding_initial_setup_weekdays),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.titleMedium,
-            )
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(space = 8.dp),
-            ) {
-                DayOfWeek.entries.forEach { dayOfWeek ->
-                    WeekDayToggle(
-                        dayOfWeek = dayOfWeek,
-                        toggled = selectedDays.contains(dayOfWeek),
-                        onToggle = { onDayClick(dayOfWeek) },
-                    )
-                }
             }
         }
     }
@@ -503,9 +456,9 @@ private fun TimeSelector(
 
     BlinklyOutlineButton(
         text = listOfNotNull(prefix, time.toHumanReadableString()).joinToString(separator = " "),
-        buttonShape = MaterialTheme.shapes.small,
+        buttonShape = MaterialTheme.shapes.extraLarge,
         borderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.72f),
-        textColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        textColor = MaterialTheme.colorScheme.onSurface,
         onClick = { pickerVisible = true },
         modifier = modifier,
     )
@@ -602,7 +555,7 @@ private fun IntervalOption(
                 MaterialTheme.colorScheme.outlineVariant
             },
         ),
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.extraLarge,
         modifier = modifier.selectable(
             selected = selected,
             onClick = onClick,
@@ -625,29 +578,23 @@ private fun ReminderPreview(
     model: AddNewReminderComponent.Model,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        ),
+    BlinklyAppCard(
+        highlighted = true,
+        contentPadding = BlinklySpacing.CompactCardPadding,
         modifier = modifier.fillMaxWidth(),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(space = 8.dp),
-            modifier = Modifier.padding(all = 16.dp),
-        ) {
-            Text(
-                text = stringResource(resource = Res.string.add_reminder_preview_title),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
+        Text(
+            text = stringResource(resource = Res.string.add_reminder_preview_title),
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+        )
 
-            Text(
-                text = model.previewText(),
-                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.76f),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
+        Text(
+            text = model.previewText(),
+            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.76f),
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 

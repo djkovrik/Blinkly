@@ -3,7 +3,6 @@
 package com.sedsoftware.blinkly.compose.ui.exercises
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -75,9 +73,11 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.sedsoftware.blinkly.component.workout.WorkoutComponent
 import com.sedsoftware.blinkly.component.workout.integration.WorkoutComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyAppCard
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyButton
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyEyePanel
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyEyeRestState
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.EyeMovement
@@ -113,12 +113,12 @@ private fun WorkoutScreen(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(space = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.SectionGap),
         modifier = modifier
             .fillMaxSize()
             .systemBarsPadding()
             .verticalScroll(state = rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 18.dp),
+            .padding(horizontal = BlinklySpacing.ScreenHorizontal, vertical = 16.dp),
     ) {
         WorkoutTopBar(onBackClick = onBackClick)
 
@@ -186,7 +186,7 @@ private fun WorkoutIntro(
         Text(
             text = copy.title,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
         )
@@ -226,7 +226,7 @@ private fun WorkoutExercise(
     val copy = exercise.exerciseCopy()
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(space = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.SectionGap),
         modifier = modifier.fillMaxWidth(),
     ) {
         ExerciseHeader(model = model)
@@ -296,7 +296,7 @@ private fun ExerciseCopyBlock(
         Text(
             text = title,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
         )
 
@@ -313,58 +313,46 @@ private fun WorkoutMetrics(
     model: WorkoutComponent.Model,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-        shape = MaterialTheme.shapes.large,
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outlineVariant,
-                shape = MaterialTheme.shapes.large,
-            ),
+    BlinklyAppCard(
+        contentPadding = BlinklySpacing.CompactCardPadding,
+        modifier = modifier.fillMaxWidth(),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(space = 14.dp),
-            modifier = Modifier.padding(all = 16.dp),
-        ) {
-            model.timerRemainingSeconds?.let { seconds ->
-                MetricValue(
-                    label = stringResource(resource = Res.string.workout_timer_label),
-                    value = formatTimer(seconds),
+        model.timerRemainingSeconds?.let { seconds ->
+            MetricValue(
+                label = stringResource(resource = Res.string.workout_timer_label),
+                value = formatTimer(seconds),
+            )
+        }
+
+        model.progress?.let { progress ->
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(resource = Res.string.workout_progress_label),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
-            }
 
-            model.progress?.let { progress ->
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        text = stringResource(resource = Res.string.workout_progress_label),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-
-                    Text(
-                        text = formatPercent(progress.percent),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-
-                LinearProgressIndicator(
-                    progress = { progress.percent.coerceIn(0, 100) / 100f },
+                Text(
+                    text = formatPercent(progress.percent),
                     color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(height = 8.dp)
-                        .clip(MaterialTheme.shapes.small),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
+
+            LinearProgressIndicator(
+                progress = { progress.percent.coerceIn(0, 100) / 100f },
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height = 8.dp)
+                    .clip(MaterialTheme.shapes.small),
+            )
         }
     }
 }
@@ -383,13 +371,13 @@ private fun MetricValue(
         Text(
             text = label,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.bodyMedium,
         )
 
         Text(
             text = value,
             color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
         )
     }
@@ -444,7 +432,7 @@ private fun WorkoutCompleted(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(space = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.SectionGap),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxWidth(),
     ) {
@@ -471,7 +459,7 @@ private fun WorkoutCompleted(
         Text(
             text = stringResource(resource = Res.string.workout_completed_title),
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
         )
@@ -516,9 +504,9 @@ private fun ExerciseQueue(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(shape = MaterialTheme.shapes.large)
-                    .background(color = containerColor, shape = MaterialTheme.shapes.large)
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                    .clip(shape = MaterialTheme.shapes.medium)
+                    .background(color = containerColor, shape = MaterialTheme.shapes.medium)
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
             ) {
                 Text(
                     text = "${index + 1}",
