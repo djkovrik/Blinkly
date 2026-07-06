@@ -8,7 +8,9 @@ import com.sedsoftware.blinkly.component.reminders.domain.RemindersManager
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.Intent
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.Label
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.State
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.Reminder
+import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
 import kotlinx.coroutines.flow.catch
@@ -35,7 +37,7 @@ internal class RemindersStoreProvider(
                 onAction<Action.ObserveReminders> {
                     launch {
                         manager.observeReminders()
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(BlinklyError::RemindersLoading))) }
                             .collect { dispatch(Msg.RemindersUpdated(it)) }
                     }
                 }
@@ -56,7 +58,7 @@ internal class RemindersStoreProvider(
                             },
                             onError = { throwable ->
                                 dispatch(Msg.DeleteFinished)
-                                publish(Label.ErrorCaught(throwable))
+                                publish(Label.ErrorCaught(BlinklyError.ReminderDeleting(throwable)))
                             },
                         )
                     }
@@ -74,7 +76,7 @@ internal class RemindersStoreProvider(
                             onSuccess = { dispatch(Msg.DeletedMessageShown) },
                             onError = { throwable ->
                                 dispatch(Msg.RestoreFinished)
-                                publish(Label.ErrorCaught(throwable))
+                                publish(Label.ErrorCaught(BlinklyError.ReminderRestoring(throwable)))
                             },
                         )
                     }

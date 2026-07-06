@@ -18,6 +18,7 @@ import com.sedsoftware.blinkly.component.onboarding.integration.OnboardingCompon
 import com.sedsoftware.blinkly.component.step5.OnboardingStep5Component
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
@@ -226,7 +227,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.NotificationPermissionChecking>(exception)).isTrue()
     }
 
     @Test
@@ -279,7 +280,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.NotificationPermissionRequesting>(exception)).isTrue()
     }
 
     @Test
@@ -296,7 +297,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.NotificationPermissionChecking>(exception)).isTrue()
     }
 
     @Test
@@ -313,7 +314,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.InitialRemindersLoading>(exception)).isTrue()
     }
 
     @Test
@@ -388,7 +389,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.InitialRemindersCreating>(exception)).isTrue()
     }
 
     @Test
@@ -404,7 +405,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.InitialRemindersClearing>(exception)).isTrue()
     }
 
     @Test

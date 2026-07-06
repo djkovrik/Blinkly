@@ -9,8 +9,10 @@ import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.Inten
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.Label
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.State
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.ValidationError
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
+import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
 import kotlinx.coroutines.flow.catch
@@ -47,7 +49,7 @@ internal class InitialRemindersStoreProvider(
                                 dispatch(Msg.NotificationPermissionChanged(granted))
                             },
                             onError = { throwable ->
-                                publish(Label.ErrorCaught(throwable))
+                                publish(Label.ErrorCaught(BlinklyError.NotificationPermissionChecking(throwable)))
                             }
                         )
                     }
@@ -56,7 +58,7 @@ internal class InitialRemindersStoreProvider(
                 onAction<Action.ObserveGrantedPermission> {
                     launch {
                         manager.observePermissionEvents()
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(BlinklyError::NotificationPermissionChecking))) }
                             .collect { result ->
                                 val granted = result == PermissionResult.Granted
                                 dispatch(Msg.NotificationPermissionChanged(granted))
@@ -68,7 +70,7 @@ internal class InitialRemindersStoreProvider(
                 onAction<Action.ObserveCreatedReminders> {
                     launch {
                         manager.observeReminders()
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(BlinklyError::InitialRemindersLoading))) }
                             .collect { dispatch(Msg.RemindersUpdated(it)) }
                     }
                 }
@@ -82,7 +84,7 @@ internal class InitialRemindersStoreProvider(
                                 result = manager.requestNotificationsPermission(),
                                 onSuccess = {},
                                 onError = { throwable ->
-                                    publish(Label.ErrorCaught(throwable))
+                                    publish(Label.ErrorCaught(BlinklyError.NotificationPermissionRequesting(throwable)))
                                 }
                             )
                         }
@@ -136,7 +138,7 @@ internal class InitialRemindersStoreProvider(
                             },
                             onError = { throwable ->
                                 dispatch(Msg.SavingChanged(false))
-                                publish(Label.ErrorCaught(throwable))
+                                publish(Label.ErrorCaught(BlinklyError.InitialRemindersCreating(throwable)))
                             }
                         )
                     }
@@ -152,7 +154,7 @@ internal class InitialRemindersStoreProvider(
                                 dispatch(Msg.RemindersDeleted)
                             },
                             onError = { throwable ->
-                                publish(Label.ErrorCaught(throwable))
+                                publish(Label.ErrorCaught(BlinklyError.InitialRemindersClearing(throwable)))
                             }
                         )
                     }

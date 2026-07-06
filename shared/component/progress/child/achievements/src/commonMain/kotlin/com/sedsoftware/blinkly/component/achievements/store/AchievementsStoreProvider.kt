@@ -12,6 +12,8 @@ import com.sedsoftware.blinkly.component.achievements.store.AchievementsStore.St
 import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementType
+import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -35,7 +37,7 @@ internal class AchievementsStoreProvider(
                 onAction<Action.ObserveAchievements> {
                     launch {
                         achievementsWatcher.achievements
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(BlinklyError::AchievementsLoading))) }
                             .collect { achievements ->
                                 dispatch(Msg.AchievementsUpdated(achievements))
                             }

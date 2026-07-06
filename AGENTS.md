@@ -301,8 +301,8 @@ These match both local code and official MVIKotlin guidance:
 - switch to `dispatchers.io` inside executor coroutines for IO or long-running operations
 - publish one-off failures through `Label` when they should not live in state
 - feature-local managers in component `domain` packages should wrap suspend/business operations in `Result<T>` via `runCatching`; Store executors handle those results with `unwrap(...)`
-- managers may expose watcher flows directly when the Store only needs to subscribe and map stream values; protect those subscriptions with `.catch { publish(Label.ErrorCaught(it)) }`
-- flow subscriptions may remain as `Flow<T>` from managers and should be protected with `.catch { publish(Label.ErrorCaught(it)) }` in the executor
+- managers may expose watcher flows directly when the Store only needs to subscribe and map stream values; protect those subscriptions with `.catch { publish(Label.ErrorCaught(it.asBlinklyError(...))) }`, using the matching `BlinklyError` subclass for that feature or operation
+- flow subscriptions may remain as `Flow<T>` from managers and should be protected with `.catch { publish(Label.ErrorCaught(it.asBlinklyError(...))) }` in the executor, using the matching `BlinklyError` subclass rather than publishing raw exceptions
 
 `main` is the reference for bootstrapper plus subscriptions that also derive aggregate dashboard state through a manager.
 `step5` is the reference for bootstrapper plus subscription-driven setup logic.
@@ -326,7 +326,13 @@ The project models one-off errors as `ComponentOutput.Common.ErrorCaught`.
 When a Store label must be visible outside the feature, collect `store.labels` in the component layer, map the label to a typed `ComponentOutput`, and let the parent decide whether to handle it locally or forward it upward.
 `OnboardingStep5ComponentDefault` is the current reference: it maps `InitialRemindersStore.Label.ErrorCaught` to `ComponentOutput.Common.ErrorCaught`; `OnboardingComponentDefault` handles onboarding navigation outputs locally and forwards common outputs to the root.
 
-Only route labels upward when a parent actually needs the event. Otherwise keep the event as a Store `Label` for local handling. Do not leak domain or platform exceptions into Compose.
+Only route labels upward when a parent actually needs the event. Otherwise keep the event as a Store `Label` for local handling.
+
+App-wide user-visible errors use `BlinklyError` from `shared/domain/src/commonMain/kotlin/com/sedsoftware/blinkly/domain/model/BlinklyError.kt`.
+Wrap low-level failures at the point where the user-facing operation is known, such as loading progress data, saving preferences, creating a reminder, or saving a workout. Keep the original throwable as `cause` for logging.
+`RootComponentDefault` maps incoming `ComponentOutput.Common.ErrorCaught` values to `BlinklyError`, logs the original cause, and emits them through `RootComponent.errors`.
+`RootContent` collects `RootComponent.errors`, maps `BlinklyError` to localized strings, and shows the app-wide top error snackbar.
+When adding a new user-visible error context, add the `BlinklyError` type and matching English/Russian strings in `shared/compose/src/commonMain/composeResources`; unknown or too-narrow failures should fall back to `BlinklyError.Unknown`.
 
 ## Compose Conventions
 

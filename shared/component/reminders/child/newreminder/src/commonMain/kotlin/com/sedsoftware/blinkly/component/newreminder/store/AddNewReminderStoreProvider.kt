@@ -9,6 +9,7 @@ import com.sedsoftware.blinkly.component.newreminder.store.AddNewReminderStore.I
 import com.sedsoftware.blinkly.component.newreminder.store.AddNewReminderStore.Label
 import com.sedsoftware.blinkly.component.newreminder.store.AddNewReminderStore.State
 import com.sedsoftware.blinkly.component.newreminder.store.AddNewReminderStore.ValidationError
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
 import kotlinx.coroutines.launch
@@ -97,7 +98,7 @@ internal class AddNewReminderStoreProvider(
                                 },
                                 onError = { throwable ->
                                     dispatch(Msg.SavingChanged(false))
-                                    publish(Label.ErrorCaught(throwable))
+                                    publish(Label.ErrorCaught(BlinklyError.ReminderCreating(throwable)))
                                 },
                             )
                         }

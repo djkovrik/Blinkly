@@ -11,6 +11,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.garden.integration.GardenComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeGarden
@@ -137,10 +138,7 @@ class GardenComponentTest : ComponentTest<GardenComponent>() {
 
         // then
         assertThat(testComponent).isInstanceOf(GardenComponent::class)
-        assertThat(
-            componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
-                .any { it.throwable.message == exception.message }
-        ).isTrue()
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.GardenLoading>(exception)).isTrue()
     }
 
     override fun createComponent(): GardenComponent =

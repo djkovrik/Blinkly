@@ -8,8 +8,10 @@ import com.sedsoftware.blinkly.component.garden.store.GardenStore.Intent
 import com.sedsoftware.blinkly.component.garden.store.GardenStore.Label
 import com.sedsoftware.blinkly.component.garden.store.GardenStore.State
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.TreeGarden
 import com.sedsoftware.blinkly.domain.model.TreeType
+import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -33,7 +35,7 @@ internal class GardenStoreProvider(
                 onAction<Action.ObserveGarden> {
                     launch {
                         treeProgressWatcher.garden
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(BlinklyError::GardenLoading))) }
                             .collect { garden ->
                                 dispatch(Msg.GardenUpdated(garden))
                             }

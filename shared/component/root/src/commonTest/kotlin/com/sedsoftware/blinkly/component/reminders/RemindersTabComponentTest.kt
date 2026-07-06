@@ -10,6 +10,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.reminders.integration.RemindersTabComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
@@ -137,10 +138,7 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
         // then
         assertThat(component.model.value.reminders.map { it.uuid }).isEqualTo(listOf("daily"))
         assertThat(component.model.value.deletedReminder).isNull()
-        assertThat(
-            componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
-                .any { it.throwable.message == exception.message }
-        ).isTrue()
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.ReminderDeleting>(exception)).isTrue()
     }
 
     @Test

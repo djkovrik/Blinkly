@@ -8,7 +8,9 @@ import com.sedsoftware.blinkly.component.trainings.domain.TrainingsTabManager
 import com.sedsoftware.blinkly.component.trainings.store.TrainingsTabStore.Intent
 import com.sedsoftware.blinkly.component.trainings.store.TrainingsTabStore.Label
 import com.sedsoftware.blinkly.component.trainings.store.TrainingsTabStore.State
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
 import kotlinx.coroutines.flow.catch
@@ -35,12 +37,12 @@ internal class TrainingsTabStoreProvider(
                 onAction<Action.ObserveCalendar> {
                     launch {
                         manager.calendar
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(BlinklyError::TrainingsDataLoading))) }
                             .collect { calendar ->
                                 unwrap(
                                     result = withContext(ioContext) { manager.completedToday(calendar) },
                                     onSuccess = { completed -> dispatch(Msg.CompletedTodayUpdated(completed)) },
-                                    onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                                    onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.TrainingsDataLoading(throwable))) },
                                 )
                             }
                     }

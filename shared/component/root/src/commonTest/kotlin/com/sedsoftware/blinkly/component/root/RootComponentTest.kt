@@ -23,6 +23,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
@@ -31,6 +32,7 @@ import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -261,6 +263,8 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     fun `when child emits error then root keeps current child`() = runTest(testScheduler) {
         // given
         val exception = IllegalStateException("permission check failed")
+        val errors = mutableListOf<BlinklyError>()
+        val collectJob = launch { component.errors.collect { errors.add(it) } }
         prepareStep5Dependencies()
         everySuspend { notifierMock.isNotificationPermissionGranted() } throws exception
 
@@ -271,6 +275,8 @@ class RootComponentTest : ComponentTest<RootComponent>() {
 
         // then
         assertThat(component.childStack.active.instance::class).isEqualTo(before)
+        assertThat(errors.any { it is BlinklyError.NotificationPermissionChecking && it.cause === exception }).isTrue()
+        collectJob.cancel()
     }
 
     private fun completeOnboardingFlow(currentComponent: RootComponent) {

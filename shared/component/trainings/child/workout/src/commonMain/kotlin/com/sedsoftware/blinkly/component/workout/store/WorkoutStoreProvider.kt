@@ -10,11 +10,13 @@ import com.sedsoftware.blinkly.component.workout.store.WorkoutStore.Phase
 import com.sedsoftware.blinkly.component.workout.store.WorkoutStore.State
 import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ExerciseEvent
 import com.sedsoftware.blinkly.domain.model.ExerciseProgress
 import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.EyeMovement
+import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
@@ -48,7 +50,9 @@ internal class WorkoutStoreProvider(
                     launch {
                         exerciseManager.events
                             .filter { event -> event.block == block }
-                            .catch { throwable -> publish(Label.ErrorCaught(throwable)) }
+                            .catch { throwable ->
+                                publish(Label.ErrorCaught(throwable.asBlinklyError(BlinklyError::WorkoutDataLoading)))
+                            }
                             .collect { event ->
                                 when (event) {
                                     is ExerciseEvent.Movement -> dispatch(Msg.MovementUpdated(event.movement))
@@ -57,6 +61,9 @@ internal class WorkoutStoreProvider(
                                     is ExerciseEvent.Beep -> beeper.beep()
                                     is ExerciseEvent.ExerciseCompleted -> dispatch(Msg.ExerciseCompleted(event.exercise))
                                     is ExerciseEvent.BlockCompleted -> dispatch(Msg.BlockCompleted)
+                                    is ExerciseEvent.Error -> publish(
+                                        Label.ErrorCaught(event.throwable.asBlinklyError(BlinklyError::WorkoutDataLoading))
+                                    )
                                 }
                             }
                     }

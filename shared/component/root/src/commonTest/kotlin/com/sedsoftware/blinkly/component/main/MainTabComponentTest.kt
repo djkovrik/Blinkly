@@ -17,6 +17,7 @@ import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
@@ -291,10 +292,7 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
 
         // then
         assertThat(testComponent).isInstanceOf(MainTabComponent::class)
-        assertThat(
-            componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
-                .any { it.throwable.message == exception.message }
-        ).isTrue()
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.MainDataLoading>(exception)).isTrue()
     }
 
     override fun createComponent(): MainTabComponent =

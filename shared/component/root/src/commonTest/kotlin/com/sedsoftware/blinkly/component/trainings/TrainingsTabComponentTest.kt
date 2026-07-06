@@ -13,6 +13,7 @@ import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.trainings.integration.TrainingsTabComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
@@ -166,10 +167,7 @@ class TrainingsTabComponentTest : ComponentTest<TrainingsTabComponent>() {
 
         // then
         assertThat(testComponent.model.value.cards.any { it.completedToday }).isFalse()
-        assertThat(
-            componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
-                .any { it.throwable.message == exception.message }
-        ).isTrue()
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.TrainingsDataLoading>(exception)).isTrue()
     }
 
     override fun createComponent(): TrainingsTabComponent =

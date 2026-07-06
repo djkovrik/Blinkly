@@ -9,6 +9,7 @@ import com.sedsoftware.blinkly.component.preferences.domain.model.PreferencesDat
 import com.sedsoftware.blinkly.component.preferences.store.PreferencesStore.Intent
 import com.sedsoftware.blinkly.component.preferences.store.PreferencesStore.Label
 import com.sedsoftware.blinkly.component.preferences.store.PreferencesStore.State
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
@@ -41,7 +42,7 @@ internal class PreferencesStoreProvider(
                         unwrap(
                             result = withContext(ioContext) { manager.load() },
                             onSuccess = { data -> dispatch(Msg.PreferencesChanged(data, dirtyFlags)) },
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesLoading(throwable))) },
                         )
                     }
                 }
@@ -56,7 +57,7 @@ internal class PreferencesStoreProvider(
                         unwrap(
                             result = withContext(ioContext) { manager.saveBlinkBreakCount(value) },
                             onSuccess = {},
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesSaving(throwable))) },
                         )
                     }
                 }
@@ -71,7 +72,7 @@ internal class PreferencesStoreProvider(
                         unwrap(
                             result = withContext(ioContext) { manager.saveNearFarFocusCount(value) },
                             onSuccess = {},
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesSaving(throwable))) },
                         )
                     }
                 }
@@ -86,7 +87,7 @@ internal class PreferencesStoreProvider(
                         unwrap(
                             result = withContext(ioContext) { manager.saveNearFarFocusDuration(value) },
                             onSuccess = {},
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesSaving(throwable))) },
                         )
                     }
                 }
@@ -101,7 +102,7 @@ internal class PreferencesStoreProvider(
                         unwrap(
                             result = withContext(ioContext) { manager.saveDiagonalGazesCount(value) },
                             onSuccess = {},
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesSaving(throwable))) },
                         )
                     }
                 }
@@ -116,7 +117,7 @@ internal class PreferencesStoreProvider(
                         unwrap(
                             result = withContext(ioContext) { manager.saveDiagonalGazesDuration(value) },
                             onSuccess = {},
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesSaving(throwable))) },
                         )
                     }
                 }
@@ -131,7 +132,7 @@ internal class PreferencesStoreProvider(
                         unwrap(
                             result = withContext(ioContext) { manager.saveFigureEightCount(value) },
                             onSuccess = {},
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesSaving(throwable))) },
                         )
                     }
                 }
@@ -146,7 +147,7 @@ internal class PreferencesStoreProvider(
                         unwrap(
                             result = withContext(ioContext) { manager.saveClockRollsEachSide(value) },
                             onSuccess = {},
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesSaving(throwable))) },
                         )
                     }
                 }
@@ -161,7 +162,7 @@ internal class PreferencesStoreProvider(
                         unwrap(
                             result = withContext(ioContext) { manager.savePalmingDuration(value) },
                             onSuccess = {},
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesSaving(throwable))) },
                         )
                     }
                 }
@@ -180,7 +181,7 @@ internal class PreferencesStoreProvider(
                                     publish(Label.ThemeStateChanged(value))
                                 }
                             },
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesSaving(throwable))) },
                         )
                     }
                 }

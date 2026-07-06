@@ -40,9 +40,13 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ThemeState
+import com.sedsoftware.blinkly.domain.model.asBlinklyError
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.serialization.Serializable
 
 @Suppress("LongParameterList")
@@ -131,6 +135,7 @@ class RootComponentDefault private constructor(
 
     private val navigation: StackNavigation<Config> = StackNavigation()
     private val themeStateValue: MutableValue<ThemeState> = MutableValue(settings.themeState)
+    private val errorEvents: MutableSharedFlow<BlinklyError> = MutableSharedFlow(extraBufferCapacity = ERROR_BUFFER_CAPACITY)
 
     init {
         lifecycle.doOnDestroy {
@@ -149,6 +154,7 @@ class RootComponentDefault private constructor(
 
     override val childStack: Value<ChildStack<*, RootComponent.Child>> = stack
     override val themeState: Value<ThemeState> = themeStateValue
+    override val errors = errorEvents.asSharedFlow()
 
     override fun onBack() {
         navigation.pop()
@@ -216,7 +222,11 @@ class RootComponentDefault private constructor(
             }
 
             is ComponentOutput.Common.ErrorCaught -> {
-                Logger.e { "Blinkly error caught: ${output.throwable.message}" }
+                val error = output.throwable.asBlinklyError(BlinklyError::Unknown)
+                val cause = error.cause ?: error
+
+                Logger.e(cause) { "Blinkly error caught: ${error.message}" }
+                errorEvents.tryEmit(error)
             }
 
             else -> Unit
@@ -253,5 +263,9 @@ class RootComponentDefault private constructor(
 
         @Serializable
         data object AddNewReminder : Config
+    }
+
+    private companion object {
+        const val ERROR_BUFFER_CAPACITY = 16
     }
 }

@@ -8,6 +8,7 @@ import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.mvikotlin.core.utils.isAssertOnMainThreadEnabled
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -53,6 +54,11 @@ abstract class ComponentTest<Component : Any> {
         lifecycle.pause()
         lifecycle.destroy()
     }
+
+    protected inline fun <reified T : BlinklyError> componentOutputContainsErrorCausedBy(cause: Throwable): Boolean =
+        componentOutput
+            .filterIsInstance<ComponentOutput.Common.ErrorCaught>()
+            .any { output -> output.throwable is T && output.throwable.cause === cause }
 
     abstract fun createComponent(): Component
 }

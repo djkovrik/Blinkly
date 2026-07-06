@@ -7,6 +7,25 @@
     <!-- Common -->
     <string name="common_ok">ОК</string>
     <string name="common_cancel">Отмена</string>
+    <string name="error_unknown">Что-то пошло не так</string>
+    <string name="error_main_data_loading">Не удалось обновить главный экран</string>
+    <string name="error_progress_data_loading">Не удалось загрузить прогресс</string>
+    <string name="error_trainings_data_loading">Не удалось загрузить тренировки</string>
+    <string name="error_preferences_loading">Не удалось загрузить настройки</string>
+    <string name="error_preferences_saving">Не удалось сохранить настройки</string>
+    <string name="error_achievements_loading">Не удалось загрузить достижения</string>
+    <string name="error_garden_loading">Не удалось загрузить сад</string>
+    <string name="error_reminders_loading">Не удалось загрузить напоминания</string>
+    <string name="error_reminder_deleting">Не удалось удалить напоминание</string>
+    <string name="error_reminder_restoring">Не удалось восстановить напоминание</string>
+    <string name="error_reminder_creating">Не удалось создать напоминание</string>
+    <string name="error_initial_reminders_loading">Не удалось загрузить первые напоминания</string>
+    <string name="error_initial_reminders_creating">Не удалось создать первые напоминания</string>
+    <string name="error_initial_reminders_clearing">Не удалось очистить первые напоминания</string>
+    <string name="error_notification_permission_checking">Не удалось проверить разрешение на уведомления</string>
+    <string name="error_notification_permission_requesting">Не удалось запросить разрешение на уведомления</string>
+    <string name="error_workout_data_loading">Не удалось обновить прогресс тренировки</string>
+    <string name="error_workout_saving">Не удалось сохранить тренировку</string>
 
     <!-- Onboarding navigation -->
     <string name="onboarding_back">Назад</string>

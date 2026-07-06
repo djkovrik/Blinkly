@@ -36,4 +36,10 @@ sealed interface ExerciseEvent {
         override val block: ExerciseBlock,
         override val exercise: ExerciseType? = null,
     ) : ExerciseEvent
+
+    data class Error(
+        override val block: ExerciseBlock,
+        override val exercise: ExerciseType?,
+        val throwable: Throwable,
+    ) : ExerciseEvent
 }

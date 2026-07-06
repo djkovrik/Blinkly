@@ -138,8 +138,8 @@ Use these patterns:
 - `withContext(ioContext)` for IO or heavier domain calls
 - feature-local managers in component `domain` packages return `Result<T>` from suspend/business operations using `runCatching`
 - handle manager results with `unwrap(result = ..., onSuccess = ..., onError = ...)` in the executor
-- keep manager flow subscriptions as `Flow<T>` and protect them with `.catch { publish(Label.ErrorCaught(it)) }`
-- `publish(Label.ErrorCaught(...))` for one-off failures that should not live in state
+- keep manager flow subscriptions as `Flow<T>` and protect them with `.catch { publish(Label.ErrorCaught(it.asBlinklyError(...))) }`, using the matching `BlinklyError` subclass for that feature or operation
+- `publish(Label.ErrorCaught(...))` for one-off failures that should not live in state; do not publish raw platform/domain exceptions when the error will be visible app-wide
 
 `MainTabStoreProvider` is the reference for bootstrapper actions that subscribe
 to multiple flows, run manager calculations on `ioContext`, and translate
@@ -190,6 +190,9 @@ it maps `MainTabStore.Label.ErrorCaught` to
 `ComponentOutput.Common.ErrorCaught`. `OnboardingStep5ComponentDefault` is the
 nested-flow reference for the same pattern.
 
+App-wide user-visible errors use `BlinklyError` from `shared/domain/src/commonMain/kotlin/com/sedsoftware/blinkly/domain/model/BlinklyError.kt`.
+Wrap low-level failures at the point where the user-facing operation is known, keep the original throwable as `cause`, and route the wrapped error through `ComponentOutput.Common.ErrorCaught`.
+`RootComponentDefault` exposes the resulting errors through `RootComponent.errors`; `RootContent` maps them to localized Compose resources and shows the top error snackbar.
 Do not leak platform-specific exceptions into Compose.
 
 ## Testing expectations
