@@ -8,8 +8,8 @@ description: Use in the Blinkly Kotlin Multiplatform repository when writing, up
 Read `AGENTS.md` first for architecture and test conventions.
 
 Blinkly component tests cover onboarding, home navigation, Store-backed tabs,
-nested feature components, coroutine side effects, manager-derived state, fake
-time/settings, output mapping, and Mokkery collaborator verification.
+root-pushed feature components, coroutine side effects, manager-derived state,
+fake time/settings, output mapping, and Mokkery collaborator verification.
 `MainTabComponentTest` remains the reference for a Store-backed tab with
 manager-derived state, watcher flows, error labels, and CTA output mapping.
 
@@ -31,7 +31,7 @@ Store-backed tab component tests:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/reminders/RemindersTabComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/trainings/TrainingsTabComponentTest.kt`
 
-Store-backed nested feature tests:
+Store-backed root-pushed feature tests:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/preferences/PreferencesComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/achievements/AchievementsComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/garden/GardenComponentTest.kt`
@@ -68,6 +68,15 @@ For parent navigation components, verify:
 - stack depth when navigation pushes screens
 - back navigation by child callback and by parent `onBack()`
 - output translation from child to parent navigation
+
+Current Blinkly navigation ownership:
+- `RootComponentDefault` owns root-pushed feature screens: `Preferences`,
+  `Workout`, `Achievements`, `Garden`, and `AddNewReminder`.
+- `HomeScreenComponentDefault` owns only the tab stack and handles
+  `Main.OpenProgressTab` locally.
+- `ProgressTabComponentDefault`, `RemindersTabComponentDefault`, and
+  `TrainingsTabComponentDefault` should be tested as Store-backed tabs that
+  emit outputs, not as parents with nested child stacks.
 
 For Store-backed child components, verify:
 - model state before actions

@@ -67,6 +67,7 @@ repository copy first and remove or refresh the global copy immediately after.
 - `androidApp` - Android entry point and Android resources
 - `iosApp` - iOS host app and Xcode project
 - `shared/alarm` - alarm scheduling through Alarmee
+- `shared/beeper` - platform beep/audio feedback abstraction used by workout execution
 - `shared/component` - Decompose component modules, usually one module per screen or nested flow
 - `shared/compose` - shared Compose UI only
 - `shared/database` - SQLDelight database implementation and mappers
@@ -82,27 +83,34 @@ modules have baseline contracts, default implementations, Compose bindings,
 preview implementations where useful, and common component tests.
 
 Top-level component modules:
-- `root` - app root, dependency composition, top-level navigation
+- `root` - app root, dependency composition, top-level stack navigation, and root-level feature screen routing
 - `onboarding` - one-time onboarding flow with five child steps
-- `home` - shell with four tabs; routes tab outputs and owns tab stack navigation
+- `home` - shell with four tabs; owns tab stack navigation and forwards root-level tab outputs upward
 - `main` - implemented main dashboard tab with MVIKotlin Store, feature-local manager, Compose UI, preview component, and common tests
-- `progress` - progress tab with MVIKotlin Store, progress manager, achievements and garden child routes, Compose UI, preview component, and common tests
-- `reminders` - reminders tab with MVIKotlin Store, reminders manager, add-new-reminder child route, Compose UI, preview component, and common tests
-- `trainings` - trainings tab with MVIKotlin Store, trainings manager, workout child route, Compose UI, preview component, and common tests
+- `progress` - progress tab with MVIKotlin Store, progress manager, calendar/garden/achievement summary state, outputs for achievements and garden screens, Compose UI, preview component, and common tests
+- `reminders` - reminders tab with MVIKotlin Store, reminders manager, reminder list/delete/undo state, output for add-new-reminder, Compose UI, preview component, and common tests
+- `trainings` - trainings tab with MVIKotlin Store, trainings manager, exercise block cards, outputs for workout execution, Compose UI, preview component, and common tests
 
 Nested component modules:
-- `main/child/preferences` - preferences screen with MVIKotlin Store, manager, Compose UI, preview component, and common tests
+- `main/child/preferences` - preferences screen opened on the root stack from the main tab; has MVIKotlin Store, manager, Compose UI, preview component, and common tests
 - `onboarding/child/step1` through `step5` - onboarding steps; `step4` and `step5` are Store-backed
-- `progress/child/achievements` - achievements screen with MVIKotlin Store, Compose UI, preview component, and common tests
-- `progress/child/garden` - garden screen with MVIKotlin Store, Compose UI, preview component, and common tests
-- `reminders/child/newreminder` - add-new-reminder screen with MVIKotlin Store, manager, Compose UI, preview component, and common tests
-- `trainings/child/workout` - workout execution screen with MVIKotlin Store, Compose UI, preview component, and common tests
+- `progress/child/achievements` - achievements screen opened on the root stack from the progress tab; has MVIKotlin Store, Compose UI, preview component, and common tests
+- `progress/child/garden` - garden screen opened on the root stack from the progress tab; has MVIKotlin Store, Compose UI, preview component, and common tests
+- `reminders/child/newreminder` - add-new-reminder screen opened on the root stack from the reminders tab; has MVIKotlin Store, manager, Compose UI, preview component, and common tests
+- `trainings/child/workout` - workout execution screen opened on the root stack from the trainings tab or main CTA; has MVIKotlin Store, beeper feedback, Compose UI, preview component, and common tests
+
+Current screen hierarchy:
+- `RootComponentDefault` starts with `Onboarding` when onboarding has not been completed, otherwise `HomeScreen`.
+- `RootComponentDefault` owns the app-level stack and pushes `Preferences`, `Workout`, `Achievements`, `Garden`, and `AddNewReminder` from `ComponentOutput` values emitted by child components.
+- `HomeScreenComponentDefault` owns only the four-tab stack: main, trainings, progress, and reminders. It handles `Main.OpenProgressTab` locally with `bringToFront`; other tab outputs go up to root.
+- `OnboardingComponentDefault` owns the onboarding step stack from step 1 through step 5. Steps 1, 2, and 3 are thin output-forwarding components; step 4 and step 5 are Store-backed.
+- Root-level feature screens use `ComponentOutput.Common.BackPressed` to return to the previous root stack entry.
 
 Current implementation notes:
-- Component work is materially implemented across root navigation, onboarding, home tabs, nested feature screens, Compose bindings, previews, and common component tests.
+- Component work is materially implemented across root navigation, onboarding, home tabs, root-pushed feature screens, Compose bindings, previews, and common component tests.
 - `main` is the current reference for a Store-backed tab component with domain-derived dashboard state, one-off error labels, a Compose screen, preview-only component implementation, and common component tests.
-- `progress`, `reminders`, and `trainings` are the current references for Store-backed tabs with nested child routes.
-- `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are the current references for Store-backed nested feature components.
+- `progress`, `reminders`, and `trainings` are the current references for Store-backed tabs that emit root-handled navigation outputs.
+- `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are the current references for Store-backed feature screens that are physically grouped under their owning product area but opened on the root stack.
 - `step4`, `step5`, `main`, `preferences`, `progress`, `achievements`, `garden`, `reminders`, `newreminder`, `trainings`, and `workout` are the current reference implementations for MVIKotlin stores.
 
 ## Architecture Rules
@@ -113,7 +121,7 @@ Use this dependency direction:
 - platform app -> root factory -> shared component modules
 - components -> domain abstractions and external interfaces
 - domain -> external interfaces from `shared/domain/src/commonMain/kotlin/com/sedsoftware/blinkly/domain/external`
-- database, notifier, alarm, settings, utils -> implementations of those external interfaces
+- database, notifier, alarm, settings, beeper, utils -> implementations of those external interfaces
 - compose -> components only, no business logic
 
 Keep UI-specific code out of component and store layers. Compose should render state and call component methods. Components should translate UI actions into navigation, Store intents, or domain calls.
@@ -130,11 +138,12 @@ Apply these rules by default when changing Blinkly code:
 - Keep Store reducers pure. Put side effects, subscriptions, manager calls, and IO switching in the executor.
 - Route cross-component events upward through `ComponentOutput`; do not let child components manipulate parent navigation directly.
 - Keep dependencies in constructors and root or parent factories; never place dependencies into Decompose navigation configs.
+- When adding or materially changing a shared module, component module, feature screen, or dependency wiring, update this guide in the same change. Keep `Repository Layout`, `Module Map`, `Shared layering`, and `Manual dependency injection` accurate, including new DI modules, external interfaces, root factory wiring, and navigation ownership.
 - Keep Compose as a rendering layer only. Do not move business logic, navigation decisions, or mutable feature state into composables.
 - Cover Decompose behaviour in `shared/component/root/src/commonTest`, extending `ComponentTest<T>` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
 - Keep `*Default` component implementations as the real runtime wiring for Stores, dependencies, labels, lifecycle, and output routing. Use separate `*Preview` implementations only for Compose previews; they should implement the same public component interface with static `MutableValue` model data and no production dependencies.
 
-When unsure whether to follow a generic library pattern or the project pattern, follow the project pattern demonstrated in `main`, `step4`, `step5`, `onboarding`, `home`, `progress`, `reminders`, `trainings`, and their nested feature components.
+When unsure whether to follow a generic library pattern or the project pattern, follow the project pattern demonstrated in `main`, `step4`, `step5`, `onboarding`, `home`, `progress`, `reminders`, `trainings`, and their feature components.
 
 ### Manual dependency injection
 
@@ -152,9 +161,10 @@ Reference modules:
 - `shared/settings/src/commonMain/kotlin/com/sedsoftware/blinkly/settings/di/SettingsModule.kt`
 - `shared/notifier/src/commonMain/kotlin/com/sedsoftware/blinkly/notifier/di/NotifierModule.kt`
 - `shared/alarm/src/commonMain/kotlin/com/sedsoftware/blinkly/alarm/di/AlarmModule.kt`
+- `shared/beeper/src/commonMain/kotlin/com/sedsoftware/blinkly/beeper/di/BeeperModule.kt`
 - `shared/utils/src/commonMain/kotlin/com/sedsoftware/blinkly/utils/di/UtilsModule.kt`
 
-`RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules, then `DomainModule`, then `RootComponentDefault`.
+`RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `DomainModule`, then `RootComponentDefault`.
 
 Important local rule: configuration objects in Decompose navigation carry only persistent arguments, never dependencies. Dependencies are supplied in child factories.
 
@@ -211,9 +221,9 @@ Parent components use:
 
 Local reference patterns:
 - `OnboardingComponentDefault` for nested flow navigation
-- `RootComponentDefault` for app-level stack-navigation shape and root-level interpretation of child outputs
+- `RootComponentDefault` for app-level stack-navigation shape, root-level feature screens, and root-level interpretation of child outputs
 - `HomeScreenComponentDefault` for tab-switching shape with `bringToFront`, creation of real tab components, and local handling of tab-switch outputs
-- `ProgressTabComponentDefault`, `RemindersTabComponentDefault`, and `TrainingsTabComponentDefault` for nested tab child navigation
+- `ProgressTabComponentDefault`, `RemindersTabComponentDefault`, and `TrainingsTabComponentDefault` for Store-backed tab state and root-handled navigation outputs
 
 Keep navigation on the main thread. This matches Decompose guidance.
 
@@ -269,7 +279,7 @@ Current store references:
 - `shared/component/onboarding/child/step5/.../store/InitialRemindersStoreProvider.kt`
 
 `main` is the reference for a tab Store with bootstrapper subscriptions, manager-based business logic, domain-derived model data, and labels mapped to parent output.
-`progress`, `reminders`, and `trainings` are references for Store-backed tabs with child navigation. `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are references for Store-backed nested screens.
+`progress`, `reminders`, and `trainings` are references for Store-backed tabs that emit navigation outputs. `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are references for Store-backed feature screens opened by the root stack.
 
 ### Store structure
 
@@ -425,6 +435,7 @@ When adding a new Blinkly feature:
 3. keep domain logic in `shared/domain` or a feature-local domain helper, not in Compose
 4. inject dependencies from the root or parent factory, never through navigation configs
 5. add common tests for component behavior and state transitions
+6. update `AGENTS.md` in the same change when the feature adds or changes a module, component hierarchy, dependency direction, external interface, DI module, or root factory wiring
 
 When modifying existing code:
 - preserve current package naming even when file path and package names differ in nesting depth
