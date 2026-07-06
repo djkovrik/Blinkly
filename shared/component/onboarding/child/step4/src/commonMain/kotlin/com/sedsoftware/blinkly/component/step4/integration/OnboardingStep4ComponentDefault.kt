@@ -35,7 +35,9 @@ class OnboardingStep4ComponentDefault(
     }
 
     override fun onNextClick() {
-        onboardingOutput(ComponentOutput.Onboarding.GoToStep5)
+        if (model.value.checkboxSelected) {
+            onboardingOutput(ComponentOutput.Onboarding.GoToStep5)
+        }
     }
 
     override fun onBackClick() {

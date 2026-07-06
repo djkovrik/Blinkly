@@ -24,5 +24,14 @@ interface OnboardingStep5Component {
         val selectedInterval: Int,
         val selectedDays: List<DayOfWeek>,
         val createdRemindersCount: Int,
+        val initialSetupApplied: Boolean = false,
+        val isSaving: Boolean = false,
+        val validationError: ValidationError? = null,
     )
+
+    enum class ValidationError {
+        EMPTY_DAYS,
+        INVALID_PERIOD,
+        INVALID_INTERVAL,
+    }
 }

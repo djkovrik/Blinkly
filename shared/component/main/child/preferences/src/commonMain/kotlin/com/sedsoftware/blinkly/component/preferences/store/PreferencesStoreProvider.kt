@@ -12,6 +12,7 @@ import com.sedsoftware.blinkly.component.preferences.store.PreferencesStore.Stat
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
@@ -32,11 +33,14 @@ internal class PreferencesStoreProvider(
                 dispatch(Action.LoadPreferences)
             },
             executorFactory = coroutineExecutorFactory(mainContext) {
+                var dirtyFlags = DirtyFlags()
+                var saveJob: Job? = null
+
                 onAction<Action.LoadPreferences> {
                     launch {
                         unwrap(
                             result = withContext(ioContext) { manager.load() },
-                            onSuccess = { data -> dispatch(Msg.PreferencesChanged(data)) },
+                            onSuccess = { data -> dispatch(Msg.PreferencesChanged(data, dirtyFlags)) },
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
                     }
@@ -44,10 +48,14 @@ internal class PreferencesStoreProvider(
 
                 onIntent<Intent.BlinkBreakCountChanged> {
                     val value = it.value.atLeastOne()
-                    launch {
+                    dirtyFlags = dirtyFlags.copy(blinkBreakCount = true)
+                    dispatch(Msg.BlinkBreakCountChanged(value))
+                    val previousJob = saveJob
+                    saveJob = launch {
+                        previousJob?.join()
                         unwrap(
                             result = withContext(ioContext) { manager.saveBlinkBreakCount(value) },
-                            onSuccess = { dispatch(Msg.BlinkBreakCountChanged(value)) },
+                            onSuccess = {},
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
                     }
@@ -55,10 +63,14 @@ internal class PreferencesStoreProvider(
 
                 onIntent<Intent.NearFarFocusCountChanged> {
                     val value = it.value.atLeastOne()
-                    launch {
+                    dirtyFlags = dirtyFlags.copy(nearFarFocusCount = true)
+                    dispatch(Msg.NearFarFocusCountChanged(value))
+                    val previousJob = saveJob
+                    saveJob = launch {
+                        previousJob?.join()
                         unwrap(
                             result = withContext(ioContext) { manager.saveNearFarFocusCount(value) },
-                            onSuccess = { dispatch(Msg.NearFarFocusCountChanged(value)) },
+                            onSuccess = {},
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
                     }
@@ -66,10 +78,14 @@ internal class PreferencesStoreProvider(
 
                 onIntent<Intent.NearFarFocusDurationChanged> {
                     val value = it.value.atLeastHalf()
-                    launch {
+                    dirtyFlags = dirtyFlags.copy(nearFarFocusDuration = true)
+                    dispatch(Msg.NearFarFocusDurationChanged(value))
+                    val previousJob = saveJob
+                    saveJob = launch {
+                        previousJob?.join()
                         unwrap(
                             result = withContext(ioContext) { manager.saveNearFarFocusDuration(value) },
-                            onSuccess = { dispatch(Msg.NearFarFocusDurationChanged(value)) },
+                            onSuccess = {},
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
                     }
@@ -77,10 +93,14 @@ internal class PreferencesStoreProvider(
 
                 onIntent<Intent.DiagonalGazesCountChanged> {
                     val value = it.value.atLeastOne()
-                    launch {
+                    dirtyFlags = dirtyFlags.copy(diagonalGazesCount = true)
+                    dispatch(Msg.DiagonalGazesCountChanged(value))
+                    val previousJob = saveJob
+                    saveJob = launch {
+                        previousJob?.join()
                         unwrap(
                             result = withContext(ioContext) { manager.saveDiagonalGazesCount(value) },
-                            onSuccess = { dispatch(Msg.DiagonalGazesCountChanged(value)) },
+                            onSuccess = {},
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
                     }
@@ -88,10 +108,14 @@ internal class PreferencesStoreProvider(
 
                 onIntent<Intent.DiagonalGazesDurationChanged> {
                     val value = it.value.atLeastHalf()
-                    launch {
+                    dirtyFlags = dirtyFlags.copy(diagonalGazesDuration = true)
+                    dispatch(Msg.DiagonalGazesDurationChanged(value))
+                    val previousJob = saveJob
+                    saveJob = launch {
+                        previousJob?.join()
                         unwrap(
                             result = withContext(ioContext) { manager.saveDiagonalGazesDuration(value) },
-                            onSuccess = { dispatch(Msg.DiagonalGazesDurationChanged(value)) },
+                            onSuccess = {},
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
                     }
@@ -99,10 +123,14 @@ internal class PreferencesStoreProvider(
 
                 onIntent<Intent.FigureEightCountChanged> {
                     val value = it.value.atLeastOne()
-                    launch {
+                    dirtyFlags = dirtyFlags.copy(figureEightCount = true)
+                    dispatch(Msg.FigureEightCountChanged(value))
+                    val previousJob = saveJob
+                    saveJob = launch {
+                        previousJob?.join()
                         unwrap(
                             result = withContext(ioContext) { manager.saveFigureEightCount(value) },
-                            onSuccess = { dispatch(Msg.FigureEightCountChanged(value)) },
+                            onSuccess = {},
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
                     }
@@ -110,10 +138,14 @@ internal class PreferencesStoreProvider(
 
                 onIntent<Intent.ClockRollsEachSideChanged> {
                     val value = it.value.atLeastOne()
-                    launch {
+                    dirtyFlags = dirtyFlags.copy(clockRollsEachSide = true)
+                    dispatch(Msg.ClockRollsEachSideChanged(value))
+                    val previousJob = saveJob
+                    saveJob = launch {
+                        previousJob?.join()
                         unwrap(
                             result = withContext(ioContext) { manager.saveClockRollsEachSide(value) },
-                            onSuccess = { dispatch(Msg.ClockRollsEachSideChanged(value)) },
+                            onSuccess = {},
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
                     }
@@ -121,10 +153,14 @@ internal class PreferencesStoreProvider(
 
                 onIntent<Intent.PalmingDurationChanged> {
                     val value = it.value.atLeastOne()
-                    launch {
+                    dirtyFlags = dirtyFlags.copy(palmingDuration = true)
+                    dispatch(Msg.PalmingDurationChanged(value))
+                    val previousJob = saveJob
+                    saveJob = launch {
+                        previousJob?.join()
                         unwrap(
                             result = withContext(ioContext) { manager.savePalmingDuration(value) },
-                            onSuccess = { dispatch(Msg.PalmingDurationChanged(value)) },
+                            onSuccess = {},
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
                     }
@@ -132,12 +168,17 @@ internal class PreferencesStoreProvider(
 
                 onIntent<Intent.ThemeStateChanged> {
                     val value = it.value
-                    launch {
+                    dirtyFlags = dirtyFlags.copy(themeState = true)
+                    dispatch(Msg.ThemeStateChanged(value))
+                    val previousJob = saveJob
+                    saveJob = launch {
+                        previousJob?.join()
                         unwrap(
                             result = withContext(ioContext) { manager.saveThemeState(value) },
                             onSuccess = {
-                                dispatch(Msg.ThemeStateChanged(value))
-                                publish(Label.ThemeStateChanged(value))
+                                if (state().themeState == value) {
+                                    publish(Label.ThemeStateChanged(value))
+                                }
                             },
                             onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
                         )
@@ -147,15 +188,35 @@ internal class PreferencesStoreProvider(
             reducer = { msg ->
                 when (msg) {
                     is Msg.PreferencesChanged -> copy(
-                        blinkBreakCount = msg.data.blinkBreakCount,
-                        nearFarFocusCount = msg.data.nearFarFocusCount,
-                        nearFarFocusDuration = msg.data.nearFarFocusDuration,
-                        diagonalGazesCount = msg.data.diagonalGazesCount,
-                        diagonalGazesDuration = msg.data.diagonalGazesDuration,
-                        figureEightCount = msg.data.figureEightCount,
-                        clockRollsEachSide = msg.data.clockRollsEachSide,
-                        palmingDuration = msg.data.palmingDuration,
-                        themeState = msg.data.themeState,
+                        blinkBreakCount = if (msg.dirtyFlags.blinkBreakCount) blinkBreakCount else msg.data.blinkBreakCount,
+                        nearFarFocusCount = if (msg.dirtyFlags.nearFarFocusCount) nearFarFocusCount else msg.data.nearFarFocusCount,
+                        nearFarFocusDuration = if (msg.dirtyFlags.nearFarFocusDuration) {
+                            nearFarFocusDuration
+                        } else {
+                            msg.data.nearFarFocusDuration
+                        },
+                        diagonalGazesCount = if (msg.dirtyFlags.diagonalGazesCount) {
+                            diagonalGazesCount
+                        } else {
+                            msg.data.diagonalGazesCount
+                        },
+                        diagonalGazesDuration = if (msg.dirtyFlags.diagonalGazesDuration) {
+                            diagonalGazesDuration
+                        } else {
+                            msg.data.diagonalGazesDuration
+                        },
+                        figureEightCount = if (msg.dirtyFlags.figureEightCount) {
+                            figureEightCount
+                        } else {
+                            msg.data.figureEightCount
+                        },
+                        clockRollsEachSide = if (msg.dirtyFlags.clockRollsEachSide) {
+                            clockRollsEachSide
+                        } else {
+                            msg.data.clockRollsEachSide
+                        },
+                        palmingDuration = if (msg.dirtyFlags.palmingDuration) palmingDuration else msg.data.palmingDuration,
+                        themeState = if (msg.dirtyFlags.themeState) themeState else msg.data.themeState,
                     )
 
                     is Msg.BlinkBreakCountChanged -> copy(blinkBreakCount = msg.value)
@@ -175,8 +236,20 @@ internal class PreferencesStoreProvider(
         data object LoadPreferences : Action
     }
 
+    data class DirtyFlags(
+        val blinkBreakCount: Boolean = false,
+        val nearFarFocusCount: Boolean = false,
+        val nearFarFocusDuration: Boolean = false,
+        val diagonalGazesCount: Boolean = false,
+        val diagonalGazesDuration: Boolean = false,
+        val figureEightCount: Boolean = false,
+        val clockRollsEachSide: Boolean = false,
+        val palmingDuration: Boolean = false,
+        val themeState: Boolean = false,
+    )
+
     sealed interface Msg {
-        data class PreferencesChanged(val data: PreferencesData) : Msg
+        data class PreferencesChanged(val data: PreferencesData, val dirtyFlags: DirtyFlags) : Msg
         data class BlinkBreakCountChanged(val value: Int) : Msg
         data class NearFarFocusCountChanged(val value: Int) : Msg
         data class NearFarFocusDurationChanged(val value: Float) : Msg

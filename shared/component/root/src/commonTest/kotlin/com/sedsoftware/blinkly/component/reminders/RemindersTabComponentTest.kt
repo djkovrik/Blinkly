@@ -14,6 +14,7 @@ import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
 import com.sedsoftware.blinkly.domain.model.ReminderType
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -142,6 +143,38 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
         ).isTrue()
     }
 
+    @Test
+    fun `when delete already pending then next delete is ignored`() = runTest(testScheduler) {
+        // given
+        val firstReminder = reminder(
+            uuid = "first",
+            date = LocalDateTime(year = 2026, month = 6, day = 20, hour = 10, minute = 0),
+            interval = ReminderInterval.DAILY,
+        )
+        val secondReminder = reminder(
+            uuid = "second",
+            date = LocalDateTime(year = 2026, month = 6, day = 20, hour = 11, minute = 0),
+            interval = ReminderInterval.DAILY,
+        )
+        val cancelGate = CompletableDeferred<Unit>()
+        reminderManager.cancelGate = cancelGate
+        reminderManager.reminders.value = listOf(firstReminder, secondReminder)
+        testScheduler.advanceUntilIdle()
+
+        // when
+        component.onDeleteReminder("first")
+        testScheduler.advanceUntilIdle()
+        component.onDeleteReminder("second")
+        testScheduler.advanceUntilIdle()
+        cancelGate.complete(Unit)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(reminderManager.cancelled).isEqualTo(listOf("first"))
+        assertThat(component.model.value.deletedReminder?.uuid).isEqualTo("first")
+        assertThat(component.model.value.reminders.map { it.uuid }).isEqualTo(listOf("second"))
+    }
+
     override fun createComponent(): RemindersTabComponent =
         RemindersTabComponentDefault(
             componentContext = DefaultComponentContext(lifecycle),
@@ -171,6 +204,7 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
         val scheduledDaily: MutableList<LocalTime> = mutableListOf()
         val scheduledWeeklySingle: MutableList<Pair<LocalTime, DayOfWeek>> = mutableListOf()
         var cancelException: Throwable? = null
+        var cancelGate: CompletableDeferred<Unit>? = null
 
         override fun createdReminders(): Flow<List<Reminder>> = reminders
 
@@ -192,6 +226,7 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
         override suspend fun rescheduleAll() = Unit
 
         override suspend fun cancel(uuid: String) {
+            cancelGate?.await()
             cancelException?.let { throw it }
             cancelled.add(uuid)
             reminders.value = reminders.value.filterNot { it.uuid == uuid }

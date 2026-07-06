@@ -29,7 +29,16 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
         val remindIntervalMinutes: Int = 20,
         val selectedDays: List<DayOfWeek> = DayOfWeek.entries.toList(),
         val createdReminders: List<Reminder> = emptyList(),
+        val initialSetupApplied: Boolean = false,
+        val isSaving: Boolean = false,
+        val validationError: ValidationError? = null,
     )
+
+    enum class ValidationError {
+        EMPTY_DAYS,
+        INVALID_PERIOD,
+        INVALID_INTERVAL,
+    }
 
     sealed class Label {
         data class ErrorCaught(val exception: Throwable) : Label()

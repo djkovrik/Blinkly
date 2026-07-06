@@ -245,7 +245,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     }
 
     @Test
-    fun `when lifecycle destroyed then manager stops and beeper releases`() = runTest(testScheduler) {
+    fun `when lifecycle destroyed then manager stops and beeper stays owned by root`() = runTest(testScheduler) {
         // given
         val localLifecycle = LifecycleRegistry()
         val localManager = FakeExerciseManager()
@@ -265,7 +265,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
 
         // then
         assertThat(localManager.stopCount).isEqualTo(1)
-        assertThat(localBeeper.releaseCount).isEqualTo(1)
+        assertThat(localBeeper.releaseCount).isEqualTo(0)
     }
 
     override fun createComponent(): WorkoutComponent =

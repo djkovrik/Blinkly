@@ -41,25 +41,41 @@ internal class RemindersStoreProvider(
                 }
 
                 onIntent<Intent.DeleteReminder> { intent ->
+                    if (state().pendingDeleteUuid != null) return@onIntent
+
                     val reminder = state().reminders.firstOrNull { it.uuid == intent.uuid } ?: return@onIntent
+                    dispatch(Msg.DeleteStarted(intent.uuid))
 
                     launch {
                         unwrap(
                             result = withContext(ioContext) { manager.deleteReminder(intent.uuid) },
-                            onSuccess = { dispatch(Msg.ReminderDeleted(reminder)) },
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onSuccess = {
+                                if (state().pendingDeleteUuid == intent.uuid) {
+                                    dispatch(Msg.ReminderDeleted(reminder))
+                                }
+                            },
+                            onError = { throwable ->
+                                dispatch(Msg.DeleteFinished)
+                                publish(Label.ErrorCaught(throwable))
+                            },
                         )
                     }
                 }
 
                 onIntent<Intent.UndoDelete> {
+                    if (state().isRestoringDeleted) return@onIntent
+
                     val reminder = state().deletedReminder ?: return@onIntent
+                    dispatch(Msg.RestoreStarted)
 
                     launch {
                         unwrap(
                             result = withContext(ioContext) { manager.restoreReminder(reminder) },
                             onSuccess = { dispatch(Msg.DeletedMessageShown) },
-                            onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                            onError = { throwable ->
+                                dispatch(Msg.RestoreFinished)
+                                publish(Label.ErrorCaught(throwable))
+                            },
                         )
                     }
                 }
@@ -77,10 +93,28 @@ internal class RemindersStoreProvider(
                     is Msg.ReminderDeleted -> copy(
                         reminders = reminders.filterNot { it.uuid == msg.item.uuid },
                         deletedReminder = msg.item,
+                        pendingDeleteUuid = null,
                     )
 
                     is Msg.DeletedMessageShown -> copy(
                         deletedReminder = null,
+                        isRestoringDeleted = false,
+                    )
+
+                    is Msg.DeleteStarted -> copy(
+                        pendingDeleteUuid = msg.uuid,
+                    )
+
+                    is Msg.DeleteFinished -> copy(
+                        pendingDeleteUuid = null,
+                    )
+
+                    is Msg.RestoreStarted -> copy(
+                        isRestoringDeleted = true,
+                    )
+
+                    is Msg.RestoreFinished -> copy(
+                        isRestoringDeleted = false,
                     )
                 }
             },
@@ -94,5 +128,9 @@ internal class RemindersStoreProvider(
         data class RemindersUpdated(val items: List<Reminder>) : Msg
         data class ReminderDeleted(val item: Reminder) : Msg
         data object DeletedMessageShown : Msg
+        data class DeleteStarted(val uuid: String) : Msg
+        data object DeleteFinished : Msg
+        data object RestoreStarted : Msg
+        data object RestoreFinished : Msg
     }
 }

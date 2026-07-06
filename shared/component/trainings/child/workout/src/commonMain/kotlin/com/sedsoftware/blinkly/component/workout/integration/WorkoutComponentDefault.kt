@@ -61,7 +61,6 @@ class WorkoutComponentDefault(
 
         lifecycle.doOnDestroy {
             exerciseManager.stop()
-            beeper.release()
             scope.cancel()
         }
     }

@@ -1,6 +1,7 @@
 package com.sedsoftware.blinkly.component.home
 
 import assertk.assertThat
+import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.router.stack.active
@@ -45,11 +46,11 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
         }
 
     @Test
-    fun `when component created then onboarding displayed flag is true`() = runTest(testScheduler) {
+    fun `when component created then onboarding displayed flag is not changed by home`() = runTest(testScheduler) {
         // given
         // when
         // then
-        assertThat(fakeSettings.onboardingDisplayed).isTrue()
+        assertThat(fakeSettings.onboardingDisplayed).isFalse()
     }
 
     @Test
