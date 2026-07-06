@@ -284,53 +284,89 @@ fun AddWeeklyPeriodContent(
     }
 }
 
-@Preview(heightDp = 1600)
+@Preview(heightDp = 520)
 @Composable
-private fun AddWeeklyPeriodContentPreviewLight() {
+private fun AddWeeklyPeriodContentDefaultPreviewLight() {
     BlinklyWidgetPreview {
-        AddWeeklyPeriodContentPreviewContent()
+        AddWeeklyPeriodContentDefaultPreviewContent()
     }
 }
 
-@Preview(heightDp = 1600)
+@Preview(heightDp = 520)
 @Composable
-private fun AddWeeklyPeriodContentPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
-        AddWeeklyPeriodContentPreviewContent()
+private fun AddWeeklyPeriodContentDefaultPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
+        AddWeeklyPeriodContentDefaultPreviewContent()
+    }
+}
+
+@Preview(heightDp = 520)
+@Composable
+private fun AddWeeklyPeriodContentCreatedPreviewLight() {
+    BlinklyWidgetPreview {
+        AddWeeklyPeriodContentCreatedPreviewContent()
+    }
+}
+
+@Preview(heightDp = 520)
+@Composable
+private fun AddWeeklyPeriodContentCreatedPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
+        AddWeeklyPeriodContentCreatedPreviewContent()
+    }
+}
+
+@Preview(heightDp = 560)
+@Composable
+private fun AddWeeklyPeriodContentCustomPreviewLight() {
+    BlinklyWidgetPreview {
+        AddWeeklyPeriodContentCustomPreviewContent()
+    }
+}
+
+@Preview(heightDp = 560)
+@Composable
+private fun AddWeeklyPeriodContentCustomPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
+        AddWeeklyPeriodContentCustomPreviewContent()
     }
 }
 
 @Composable
 @PreviewContent
-private fun AddWeeklyPeriodContentPreviewContent() {
-    Column {
-        AddWeeklyPeriodContent(
-            selectedTimeFrom = LocalTime(10, 0),
-            selectedTimeUntil = LocalTime(18, 0),
-            selectedDays = DayOfWeek.entries.toList(),
-            selectedInterval = SLIDER_STEP_VALUE,
-            createdRemindersCount = 0,
-            modifier = Modifier.padding(bottom = 64.dp)
-        )
+private fun AddWeeklyPeriodContentDefaultPreviewContent() {
+    AddWeeklyPeriodContent(
+        selectedTimeFrom = LocalTime(10, 0),
+        selectedTimeUntil = LocalTime(18, 0),
+        selectedDays = DayOfWeek.entries.toList(),
+        selectedInterval = SLIDER_STEP_VALUE,
+        createdRemindersCount = 0,
+    )
+}
 
-        AddWeeklyPeriodContent(
-            selectedTimeFrom = LocalTime(14, 0),
-            selectedTimeUntil = LocalTime(16, 0),
-            selectedDays = listOf(
-                DayOfWeek.MONDAY,
-                DayOfWeek.WEDNESDAY,
-            ),
-            selectedInterval = SLIDER_STEP_VALUE * 2,
-            createdRemindersCount = 2,
-            modifier = Modifier.padding(bottom = 64.dp)
-        )
+@Composable
+@PreviewContent
+private fun AddWeeklyPeriodContentCreatedPreviewContent() {
+    AddWeeklyPeriodContent(
+        selectedTimeFrom = LocalTime(14, 0),
+        selectedTimeUntil = LocalTime(16, 0),
+        selectedDays = listOf(
+            DayOfWeek.MONDAY,
+            DayOfWeek.WEDNESDAY,
+        ),
+        selectedInterval = SLIDER_STEP_VALUE * 2,
+        createdRemindersCount = 2,
+    )
+}
 
-        AddWeeklyPeriodContent(
-            selectedTimeFrom = LocalTime(11, 0),
-            selectedTimeUntil = LocalTime(13, 0),
-            selectedDays = listOf(DayOfWeek.SUNDAY),
-            selectedInterval = SLIDER_STEP_VALUE * 3,
-            createdRemindersCount = 99,
-        )
-    }
+@Composable
+@PreviewContent
+private fun AddWeeklyPeriodContentCustomPreviewContent() {
+    AddWeeklyPeriodContent(
+        selectedTimeFrom = LocalTime(11, 0),
+        selectedTimeUntil = LocalTime(13, 0),
+        selectedDays = listOf(DayOfWeek.SUNDAY),
+        selectedInterval = SLIDER_STEP_VALUE * 3,
+        createdRemindersCount = 99,
+    )
 }

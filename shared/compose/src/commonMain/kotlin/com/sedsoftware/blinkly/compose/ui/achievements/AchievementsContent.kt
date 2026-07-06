@@ -378,7 +378,7 @@ private fun Instant.asUserTimeZoneDateTime(): String {
 
 private fun Int.twoDigits(): String = toString().padStart(length = 2, padChar = '0')
 
-@Preview(widthDp = 420, heightDp = 1200)
+@Preview(widthDp = 420, heightDp = 1060)
 @Composable
 private fun AchievementsContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -386,15 +386,15 @@ private fun AchievementsContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 1200)
+@Preview(widthDp = 420, heightDp = 1060)
 @Composable
 private fun AchievementsContentPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         AchievementsContent(component = AchievementsComponentPreview())
     }
 }
 
-@Preview(widthDp = 420, heightDp = 520)
+@Preview(widthDp = 420, heightDp = 500)
 @Composable
 private fun AchievementDetailsSheetPreviewLight() {
     BlinklyWidgetPreview {
@@ -407,10 +407,10 @@ private fun AchievementDetailsSheetPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 520)
+@Preview(widthDp = 420, heightDp = 500)
 @Composable
 private fun AchievementDetailsSheetPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         AchievementDetailsSheet(
             achievement = previewDetailsAchievement(),
             modifier = Modifier

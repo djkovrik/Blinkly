@@ -656,7 +656,7 @@ private fun ValidationError.asMessage(): String =
         ValidationError.INVALID_INTERVAL -> stringResource(resource = Res.string.add_reminder_error_invalid_interval)
     }
 
-@Preview(widthDp = 440, heightDp = 880)
+@Preview(widthDp = 440, heightDp = 840)
 @Composable
 private fun AddNewReminderContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -664,18 +664,28 @@ private fun AddNewReminderContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 440, heightDp = 880)
+@Preview(widthDp = 440, heightDp = 840)
 @Composable
 private fun AddNewReminderContentPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         AddNewReminderPreviewContent()
     }
 }
 
-@Preview(widthDp = 440, heightDp = 880)
+@Preview(widthDp = 440, heightDp = 660)
 @Composable
 private fun AddNewReminderContentDailyPreviewLight() {
     BlinklyWidgetPreview {
+        AddNewReminderContent(
+            component = AddNewReminderComponentPreview(scheduleType = ScheduleType.DAILY)
+        )
+    }
+}
+
+@Preview(widthDp = 440, heightDp = 660)
+@Composable
+private fun AddNewReminderContentDailyPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         AddNewReminderContent(
             component = AddNewReminderComponentPreview(scheduleType = ScheduleType.DAILY)
         )

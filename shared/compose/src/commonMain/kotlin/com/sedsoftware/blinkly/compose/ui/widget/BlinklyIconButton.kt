@@ -136,7 +136,7 @@ private fun BlinklyIconButtonPreviewLight() {
 @Preview
 @Composable
 private fun BlinklyIconButtonPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyIconButtonPreviewContent()
     }
 }

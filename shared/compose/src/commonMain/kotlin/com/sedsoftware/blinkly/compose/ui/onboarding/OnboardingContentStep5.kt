@@ -178,7 +178,7 @@ private fun OnboardingContentStep5PreviewLight() {
 @Preview(widthDp = 440, heightDp = 880)
 @Composable
 private fun OnboardingContentStep5PreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         OnboardingContentStep5PreviewContent()
     }
 }

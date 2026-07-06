@@ -364,7 +364,7 @@ private fun AchievementPreviewItem(
     }
 }
 
-@Preview(widthDp = 420, heightDp = 1060)
+@Preview(widthDp = 420, heightDp = 920)
 @Composable
 private fun ProgressTabContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -372,10 +372,10 @@ private fun ProgressTabContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 1060)
+@Preview(widthDp = 420, heightDp = 920)
 @Composable
 private fun ProgressTabContentPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         ProgressTabContent(component = ProgressTabComponentPreview())
     }
 }

@@ -336,7 +336,7 @@ private data class TrainingColors(
 )
 
 @Composable
-@Preview(widthDp = 420, heightDp = 920)
+@Preview(widthDp = 420, heightDp = 800)
 private fun TrainingsTabContentPreviewLight() {
     BlinklyWidgetPreview {
         TrainingsTabContent(
@@ -346,9 +346,9 @@ private fun TrainingsTabContentPreviewLight() {
 }
 
 @Composable
-@Preview(widthDp = 420, heightDp = 920)
+@Preview(widthDp = 420, heightDp = 800)
 private fun TrainingsTabContentPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         TrainingsTabContent(
             component = TrainingsTabComponentPreview(
                 completedBlocks = setOf(

@@ -500,7 +500,7 @@ private fun BlinklyEyeFarFocusPreviewLight() {
 @Preview
 @Composable
 private fun BlinklyEyeOpenPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyEyePreviewContent(
             focusState = EyeFocusState.None,
             openness = OPEN_EYE,
@@ -512,7 +512,7 @@ private fun BlinklyEyeOpenPreviewDark() {
 @Preview
 @Composable
 private fun BlinklyEyeClosedPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyEyePreviewContent(
             focusState = EyeFocusState.None,
             openness = CLOSED_EYE,
@@ -524,7 +524,7 @@ private fun BlinklyEyeClosedPreviewDark() {
 @Preview
 @Composable
 private fun BlinklyEyeFocusPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyEyePreviewContent(
             focusState = EyeFocusState.Close,
             openness = OPEN_EYE,
@@ -537,7 +537,7 @@ private fun BlinklyEyeFocusPreviewDark() {
 @Preview
 @Composable
 private fun BlinklyEyeFarFocusPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyEyePreviewContent(
             focusState = EyeFocusState.Far,
             openness = OPEN_EYE,

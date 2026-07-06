@@ -106,7 +106,7 @@ private fun OnboardingContentStep3PreviewLight() {
 @Preview
 @Composable
 private fun OnboardingContentStep3PreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         OnboardingContentStep3(OnboardingStep3ComponentPreview())
     }
 }

@@ -93,7 +93,7 @@ private fun BlinklyOutlineButtonPreviewLight() {
 @Preview
 @Composable
 private fun BlinklyOutlineButtonPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyOutlineButtonPreviewContent()
     }
 }

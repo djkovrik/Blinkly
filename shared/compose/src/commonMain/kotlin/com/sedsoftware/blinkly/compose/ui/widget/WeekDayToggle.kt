@@ -112,7 +112,7 @@ private fun WeekDayTogglePreviewLight() {
 @Preview
 @Composable
 private fun WeekDayTogglePreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         WeekDayTogglePreviewContent()
     }
 }

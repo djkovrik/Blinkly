@@ -96,7 +96,7 @@ private fun BlinklyTimePickerDialogPreviewLight() {
 @Preview
 @Composable
 private fun BlinklyTimePickerDialogPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyTimePickerDialogPreviewContent()
     }
 }

@@ -116,12 +116,12 @@ internal fun BlinklyAppTheme(
 
 @Composable
 internal fun BlinklyWidgetPreview(
-    isDakTheme: Boolean = false,
+    isDarkTheme: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     BlinklyAppTheme(
         onSystemBarsAppearanceChanged = {},
-        themeState = if (isDakTheme) ThemeState.DARK else ThemeState.LIGHT,
+        themeState = if (isDarkTheme) ThemeState.DARK else ThemeState.LIGHT,
         content = content,
     )
 }
