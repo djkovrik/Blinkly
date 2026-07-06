@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        with:
+          lfs: true
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -28,3 +30,6 @@ jobs:
 
       - name: Testing
         run: ./gradlew testDebugUnitTest
+
+      - name: Screenshot testing
+        run: ./gradlew :shared:compose:verifyPaparazziDebug
