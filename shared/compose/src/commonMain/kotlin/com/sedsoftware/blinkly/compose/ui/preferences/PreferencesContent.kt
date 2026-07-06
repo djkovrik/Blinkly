@@ -381,7 +381,7 @@ private fun StepperButton(
 ) {
     FilledTonalIconButton(
         onClick = onClick,
-        modifier = modifier.size(size = 40.dp),
+        modifier = modifier.size(size = 48.dp),
     ) {
         Icon(
             painter = painterResource(resource = iconRes),
@@ -401,7 +401,7 @@ private fun Float.asDisplayValue(): String {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 1100)
+@Preview(widthDp = 420, heightDp = 1020)
 @Composable
 private fun PreferencesContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -409,10 +409,10 @@ private fun PreferencesContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 1100)
+@Preview(widthDp = 420, heightDp = 1020)
 @Composable
 private fun PreferencesContentPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         PreferencesContent(component = PreferencesComponentPreview(themeState = ThemeState.DARK))
     }
 }

@@ -236,14 +236,14 @@ private fun BottomNavigationBarPreviewLight() {
 @Preview
 @Composable
 private fun BottomNavigationBarPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BottomNavigationBarPreviewContent()
     }
 }
 
 @Composable
 private fun BottomNavigationBarPreviewContent() {
-    var activeTab: HomeScreenTab by remember { mutableStateOf(HomeScreenTab.TRAINING) }
+    var activeTab: HomeScreenTab by remember { mutableStateOf(HomeScreenTab.MAIN) }
 
     Column(
         modifier = Modifier

@@ -655,7 +655,7 @@ private data class WorkoutCopy(
     val description: String,
 )
 
-@Preview(widthDp = 390, heightDp = 900)
+@Preview(widthDp = 390, heightDp = 520)
 @Composable
 private fun WorkoutIntroPreview() {
     BlinklyWidgetPreview {
@@ -663,7 +663,15 @@ private fun WorkoutIntroPreview() {
     }
 }
 
-@Preview(widthDp = 390, heightDp = 900)
+@Preview(widthDp = 390, heightDp = 520)
+@Composable
+private fun WorkoutIntroPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
+        WorkoutContent(component = WorkoutComponentPreview())
+    }
+}
+
+@Preview(widthDp = 390, heightDp = 780)
 @Composable
 private fun WorkoutBlinkBreakPreview() {
     WorkoutExercisePreview(
@@ -673,7 +681,18 @@ private fun WorkoutBlinkBreakPreview() {
     )
 }
 
-@Preview(widthDp = 390, heightDp = 900)
+@Preview(widthDp = 390, heightDp = 780)
+@Composable
+private fun WorkoutBlinkBreakPreviewDark() {
+    WorkoutExercisePreview(
+        block = ExerciseBlock.A,
+        exercise = ExerciseType.BLINK_BREAK,
+        movement = EyeMovement.Blink(count = 3),
+        isDarkTheme = true,
+    )
+}
+
+@Preview(widthDp = 390, heightDp = 780)
 @Composable
 private fun WorkoutNearFarPreview() {
     WorkoutExercisePreview(
@@ -683,7 +702,18 @@ private fun WorkoutNearFarPreview() {
     )
 }
 
-@Preview(widthDp = 390, heightDp = 900)
+@Preview(widthDp = 390, heightDp = 780)
+@Composable
+private fun WorkoutNearFarPreviewDark() {
+    WorkoutExercisePreview(
+        block = ExerciseBlock.A,
+        exercise = ExerciseType.NEAR_FAR_FOCUS,
+        movement = EyeMovement.AccommodationFar,
+        isDarkTheme = true,
+    )
+}
+
+@Preview(widthDp = 390, heightDp = 780)
 @Composable
 private fun WorkoutDiagonalPreview() {
     WorkoutExercisePreview(
@@ -693,7 +723,18 @@ private fun WorkoutDiagonalPreview() {
     )
 }
 
-@Preview(widthDp = 390, heightDp = 900)
+@Preview(widthDp = 390, heightDp = 780)
+@Composable
+private fun WorkoutDiagonalPreviewDark() {
+    WorkoutExercisePreview(
+        block = ExerciseBlock.A,
+        exercise = ExerciseType.DIAGONAL_GAZES,
+        movement = EyeMovement.DiagonalBottomRight,
+        isDarkTheme = true,
+    )
+}
+
+@Preview(widthDp = 390, heightDp = 780)
 @Composable
 private fun WorkoutFigureEightPreview() {
     WorkoutExercisePreview(
@@ -703,7 +744,18 @@ private fun WorkoutFigureEightPreview() {
     )
 }
 
-@Preview(widthDp = 390, heightDp = 900)
+@Preview(widthDp = 390, heightDp = 780)
+@Composable
+private fun WorkoutFigureEightPreviewDark() {
+    WorkoutExercisePreview(
+        block = ExerciseBlock.B,
+        exercise = ExerciseType.FIGURE_EIGHT,
+        movement = EyeMovement.EightClockwise,
+        isDarkTheme = true,
+    )
+}
+
+@Preview(widthDp = 390, heightDp = 780)
 @Composable
 private fun WorkoutClockRollsPreview() {
     WorkoutExercisePreview(
@@ -713,7 +765,18 @@ private fun WorkoutClockRollsPreview() {
     )
 }
 
-@Preview(widthDp = 390, heightDp = 900)
+@Preview(widthDp = 390, heightDp = 780)
+@Composable
+private fun WorkoutClockRollsPreviewDark() {
+    WorkoutExercisePreview(
+        block = ExerciseBlock.B,
+        exercise = ExerciseType.CLOCK_ROLLS,
+        movement = EyeMovement.CircleClockwise,
+        isDarkTheme = true,
+    )
+}
+
+@Preview(widthDp = 390, heightDp = 860)
 @Composable
 private fun WorkoutPalmingPreview() {
     WorkoutExercisePreview(
@@ -723,7 +786,18 @@ private fun WorkoutPalmingPreview() {
     )
 }
 
-@Preview(widthDp = 390, heightDp = 900)
+@Preview(widthDp = 390, heightDp = 860)
+@Composable
+private fun WorkoutPalmingPreviewDark() {
+    WorkoutExercisePreview(
+        block = ExerciseBlock.B,
+        exercise = ExerciseType.PALMING,
+        timerRemainingSeconds = 42,
+        isDarkTheme = true,
+    )
+}
+
+@Preview(widthDp = 390, heightDp = 800)
 @Composable
 private fun WorkoutTwentyPreview() {
     WorkoutExercisePreview(
@@ -733,10 +807,36 @@ private fun WorkoutTwentyPreview() {
     )
 }
 
-@Preview(widthDp = 390, heightDp = 900)
+@Preview(widthDp = 390, heightDp = 800)
+@Composable
+private fun WorkoutTwentyPreviewDark() {
+    WorkoutExercisePreview(
+        block = ExerciseBlock.C,
+        exercise = ExerciseType.TWENTY_X3,
+        timerRemainingSeconds = 16,
+        isDarkTheme = true,
+    )
+}
+
+@Preview(widthDp = 390, heightDp = 520)
 @Composable
 private fun WorkoutCompletedPreview() {
     BlinklyWidgetPreview {
+        WorkoutContent(
+            component = WorkoutComponentPreview(
+                block = ExerciseBlock.C,
+                currentExercise = ExerciseType.TWENTY_X3,
+                phase = WorkoutComponent.Phase.COMPLETED,
+                progress = WorkoutComponent.Progress(percent = 100, remainingMs = 0L, totalMs = 20_000L),
+            )
+        )
+    }
+}
+
+@Preview(widthDp = 390, heightDp = 520)
+@Composable
+private fun WorkoutCompletedPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         WorkoutContent(
             component = WorkoutComponentPreview(
                 block = ExerciseBlock.C,
@@ -754,8 +854,9 @@ private fun WorkoutExercisePreview(
     exercise: ExerciseType,
     movement: EyeMovement? = null,
     timerRemainingSeconds: Int? = null,
+    isDarkTheme: Boolean = false
 ) {
-    BlinklyWidgetPreview {
+    BlinklyWidgetPreview(isDarkTheme = isDarkTheme) {
         WorkoutContent(
             component = WorkoutComponentPreview(
                 block = block,

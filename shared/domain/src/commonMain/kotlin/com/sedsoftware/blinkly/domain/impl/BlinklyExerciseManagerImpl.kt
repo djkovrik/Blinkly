@@ -13,6 +13,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ExerciseEvent
@@ -112,14 +113,27 @@ internal class BlinklyExerciseManagerImpl(
             }
 
             CompleteExerciseNode -> {
-                database.saveExercise(Exercise(block, type, timeUtils.now()))
+                saveExercise(block, type)
                 _events.emit(ExerciseEvent.ExerciseCompleted(block, type))
             }
 
             CompleteBlockNode -> {
-                database.saveExercise(Exercise(block, type, timeUtils.now()))
+                saveExercise(block, type)
                 _events.emit(ExerciseEvent.BlockCompleted(block))
             }
+        }
+    }
+
+    @Suppress("TooGenericExceptionCaught")
+    private suspend fun saveExercise(
+        block: ExerciseBlock,
+        type: ExerciseType,
+    ) {
+        try {
+            database.saveExercise(Exercise(block, type, timeUtils.now()))
+        } catch (throwable: Throwable) {
+            _events.emit(ExerciseEvent.Error(block, type, BlinklyError.WorkoutSaving(throwable)))
+            throw throwable
         }
     }
 

@@ -10,7 +10,9 @@ import com.sedsoftware.blinkly.component.progress.store.ProgressTabStore.Intent
 import com.sedsoftware.blinkly.component.progress.store.ProgressTabStore.Label
 import com.sedsoftware.blinkly.component.progress.store.ProgressTabStore.State
 import com.sedsoftware.blinkly.domain.model.Achievement
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.Tree
+import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
 import kotlinx.coroutines.flow.catch
@@ -39,12 +41,12 @@ internal class ProgressTabStoreProvider(
                 onAction<Action.ObserveCalendar> {
                     launch {
                         manager.calendar
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(::progressDataLoadingError))) }
                             .collect { calendar ->
                                 unwrap(
                                     result = withContext(ioContext) { manager.calculateCalendarWeeks(calendar) },
                                     onSuccess = { weeks -> dispatch(Msg.CalendarUpdated(weeks)) },
-                                    onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                                    onError = { throwable -> publish(Label.ErrorCaught(progressDataLoadingError(throwable))) },
                                 )
                             }
                     }
@@ -53,7 +55,7 @@ internal class ProgressTabStoreProvider(
                 onAction<Action.ObserveTree> {
                     launch {
                         manager.tree
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(::progressDataLoadingError))) }
                             .collect { tree ->
                                 dispatch(Msg.TreeUpdated(tree))
                             }
@@ -63,12 +65,12 @@ internal class ProgressTabStoreProvider(
                 onAction<Action.ObserveAchievements> {
                     launch {
                         manager.achievements
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(::progressDataLoadingError))) }
                             .collect { achievements ->
                                 unwrap(
                                     result = withContext(ioContext) { manager.calculateRecentAchievements(achievements) },
                                     onSuccess = { recent -> dispatch(Msg.AchievementsUpdated(recent)) },
-                                    onError = { throwable -> publish(Label.ErrorCaught(throwable)) },
+                                    onError = { throwable -> publish(Label.ErrorCaught(progressDataLoadingError(throwable))) },
                                 )
                             }
                     }
@@ -95,3 +97,6 @@ internal class ProgressTabStoreProvider(
         data class AchievementsUpdated(val achievements: List<Achievement?>) : Msg
     }
 }
+
+private fun progressDataLoadingError(throwable: Throwable): BlinklyError =
+    BlinklyError.ProgressDataLoading(throwable)

@@ -357,7 +357,7 @@ private fun ReminderCard(
             ) {
                 IconButton(
                     onClick = onDeleteClick,
-                    modifier = Modifier.size(size = 40.dp),
+                    modifier = Modifier.size(size = 48.dp),
                 ) {
                     Icon(
                         painter = painterResource(resource = Res.drawable.icon_delete),
@@ -417,7 +417,7 @@ private fun ReminderItem.daysLabel(): String {
 private fun LocalDate.asShortDate(): String =
     "${day.toString().padStart(2, '0')}.${(month.ordinal + 1).toString().padStart(2, '0')}"
 
-@Preview(widthDp = 440, heightDp = 880)
+@Preview(widthDp = 440, heightDp = 560)
 @Composable
 private fun RemindersTabContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -425,15 +425,15 @@ private fun RemindersTabContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 440, heightDp = 880)
+@Preview(widthDp = 440, heightDp = 560)
 @Composable
 private fun RemindersTabContentPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         RemindersPreviewContent()
     }
 }
 
-@Preview(widthDp = 440, heightDp = 880)
+@Preview(widthDp = 440, heightDp = 560)
 @Composable
 private fun RemindersTabContentEmptyPreviewLight() {
     BlinklyWidgetPreview {

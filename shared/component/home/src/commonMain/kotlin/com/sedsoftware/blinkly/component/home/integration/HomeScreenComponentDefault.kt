@@ -6,7 +6,6 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.sedsoftware.blinkly.component.home.HomeScreenComponent
 import com.sedsoftware.blinkly.component.home.model.HomeScreenTab
@@ -27,16 +26,11 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Suppress("LongParameterList")
 class HomeScreenComponentDefault private constructor(
     private val componentContext: ComponentContext,
-    private val dispatchers: BlinklyDispatchers,
-    private val settings: BlinklySettings,
     private val homeScreenOutput: (ComponentOutput) -> Unit,
     private val mainTabComponent: (ComponentContext, (ComponentOutput) -> Unit) -> MainTabComponent,
     private val trainingsTabComponent: (ComponentContext, (ComponentOutput) -> Unit) -> TrainingsTabComponent,
@@ -58,8 +52,6 @@ class HomeScreenComponentDefault private constructor(
         homeScreenOutput: (ComponentOutput) -> Unit,
     ) : this(
         componentContext = componentContext,
-        dispatchers = dispatchers,
-        settings = settings,
         homeScreenOutput = homeScreenOutput,
         mainTabComponent = { childContext, componentOutput ->
             MainTabComponentDefault(
@@ -107,16 +99,6 @@ class HomeScreenComponentDefault private constructor(
         }
     )
 
-    private val scope: CoroutineScope = CoroutineScope(dispatchers.io)
-
-    init {
-        lifecycle.doOnDestroy {
-            scope.cancel()
-        }
-
-        markOnboardingCompleted()
-    }
-
     private val navigation: StackNavigation<Config> = StackNavigation()
 
     private val stack: Value<ChildStack<Config, HomeScreenComponent.Child>> =
@@ -160,14 +142,6 @@ class HomeScreenComponentDefault private constructor(
             is Config.RemindersTab ->
                 HomeScreenComponent.Child.RemindersTab(remindersTabComponent(componentContext, ::onChildOutput))
         }
-
-    private fun markOnboardingCompleted() {
-        scope.launch {
-            if (!settings.onboardingDisplayed) {
-                settings.onboardingDisplayed = true
-            }
-        }
-    }
 
     @Serializable
     private sealed interface Config {

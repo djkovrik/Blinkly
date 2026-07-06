@@ -8,9 +8,9 @@ description: Use in the Blinkly Kotlin Multiplatform repository when adding, cha
 Read `AGENTS.md` first for the project-level architecture.
 
 Blinkly has Store-backed references across onboarding steps, home tabs, and
-nested feature screens. Use `main` as the primary reference for a Store-backed
-tab with manager-based business logic, real Compose UI, preview-only component
-implementation, and common component tests.
+root-pushed feature screens. Use `main` as the primary reference for a
+Store-backed tab with manager-based business logic, real Compose UI,
+preview-only component implementation, and common component tests.
 
 ## Use these local references first
 
@@ -138,13 +138,13 @@ Use these patterns:
 - `withContext(ioContext)` for IO or heavier domain calls
 - feature-local managers in component `domain` packages return `Result<T>` from suspend/business operations using `runCatching`
 - handle manager results with `unwrap(result = ..., onSuccess = ..., onError = ...)` in the executor
-- keep manager flow subscriptions as `Flow<T>` and protect them with `.catch { publish(Label.ErrorCaught(it)) }`
-- `publish(Label.ErrorCaught(...))` for one-off failures that should not live in state
+- keep manager flow subscriptions as `Flow<T>` and protect them with `.catch { publish(Label.ErrorCaught(it.asBlinklyError(...))) }`, using the matching `BlinklyError` subclass for that feature or operation
+- `publish(Label.ErrorCaught(...))` for one-off failures that should not live in state; do not publish raw platform/domain exceptions when the error will be visible app-wide
 
 `MainTabStoreProvider` is the reference for bootstrapper actions that subscribe
 to multiple flows, run manager calculations on `ioContext`, and translate
 stream updates into `Msg` values. `step5`, `progress`, `reminders`,
-`trainings`, and nested feature components are valid references for narrower
+`trainings`, and root-pushed feature screens are valid references for narrower
 Store-backed flows.
 
 ## Component integration rules
@@ -167,6 +167,15 @@ Store `Intent` sealed interface empty as in `MainTabStore`. Component callbacks
 can use current `model.value` to choose a `ComponentOutput` when the decision is
 navigation-only, as `MainTabComponentDefault.onPrimaryCtaClick()` does.
 
+Navigation ownership note:
+- `ProgressTabComponentDefault`, `RemindersTabComponentDefault`, and
+  `TrainingsTabComponentDefault` expose Store-backed tab state and emit outputs.
+  They do not own nested child stacks.
+- `Preferences`, `Achievements`, `Garden`, `AddNewReminder`, and `Workout` are
+  Store-backed feature screens opened by `RootComponentDefault`.
+- `WorkoutStoreProvider` receives `BlinklyBeeper` for exercise audio feedback;
+  `WorkoutComponentDefault` releases it in lifecycle cleanup.
+
 ## Error handling
 
 Blinkly does not route every Store label to parent output.
@@ -181,6 +190,9 @@ it maps `MainTabStore.Label.ErrorCaught` to
 `ComponentOutput.Common.ErrorCaught`. `OnboardingStep5ComponentDefault` is the
 nested-flow reference for the same pattern.
 
+App-wide user-visible errors use `BlinklyError` from `shared/domain/src/commonMain/kotlin/com/sedsoftware/blinkly/domain/model/BlinklyError.kt`.
+Wrap low-level failures at the point where the user-facing operation is known, keep the original throwable as `cause`, and route the wrapped error through `ComponentOutput.Common.ErrorCaught`.
+`RootComponentDefault` exposes the resulting errors through `RootComponent.errors`; `RootContent` maps them to localized Compose resources and shows the top error snackbar.
 Do not leak platform-specific exceptions into Compose.
 
 ## Testing expectations

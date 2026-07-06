@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        with:
+          lfs: true
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -28,3 +30,16 @@ jobs:
 
       - name: Testing
         run: ./gradlew testDebugUnitTest
+
+      - name: Screenshot testing
+        run: ./gradlew :shared:compose:verifyPaparazziDebug
+
+      - name: Upload Paparazzi report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: paparazzi-report
+          path: |
+            shared/compose/build/reports/paparazzi
+            shared/compose/build/paparazzi/failures
+          if-no-files-found: ignore

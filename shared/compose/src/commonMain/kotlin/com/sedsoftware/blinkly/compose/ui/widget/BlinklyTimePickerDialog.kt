@@ -1,12 +1,12 @@
 package com.sedsoftware.blinkly.compose.ui.widget
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
@@ -65,23 +65,21 @@ private fun BlinklyTimePickerDialogDialogContent(
             Row(
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Text(
-                    text = stringResource(resource = Res.string.common_ok),
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .clickable(onClick = onConfirm)
-                )
+                TextButton(onClick = onConfirm) {
+                    Text(
+                        text = stringResource(resource = Res.string.common_ok),
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
 
-                Text(
-                    text = stringResource(resource = Res.string.common_cancel),
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .clickable(onClick = onDismiss)
-                )
+                TextButton(onClick = onDismiss) {
+                    Text(
+                        text = stringResource(resource = Res.string.common_cancel),
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
             }
         }
     }
@@ -98,7 +96,7 @@ private fun BlinklyTimePickerDialogPreviewLight() {
 @Preview
 @Composable
 private fun BlinklyTimePickerDialogPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyTimePickerDialogPreviewContent()
     }
 }

@@ -10,6 +10,25 @@
     <!-- Common -->
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
+    <string name="error_unknown">Something went wrong</string>
+    <string name="error_main_data_loading">Could not update the main screen</string>
+    <string name="error_progress_data_loading">Could not load your progress</string>
+    <string name="error_trainings_data_loading">Could not load trainings</string>
+    <string name="error_preferences_loading">Could not load preferences</string>
+    <string name="error_preferences_saving">Could not save preferences</string>
+    <string name="error_achievements_loading">Could not load achievements</string>
+    <string name="error_garden_loading">Could not load the garden</string>
+    <string name="error_reminders_loading">Could not load reminders</string>
+    <string name="error_reminder_deleting">Could not delete reminder</string>
+    <string name="error_reminder_restoring">Could not restore reminder</string>
+    <string name="error_reminder_creating">Could not create reminder</string>
+    <string name="error_initial_reminders_loading">Could not load initial reminders</string>
+    <string name="error_initial_reminders_creating">Could not create initial reminders</string>
+    <string name="error_initial_reminders_clearing">Could not clear initial reminders</string>
+    <string name="error_notification_permission_checking">Could not check notification permission</string>
+    <string name="error_notification_permission_requesting">Could not request notification permission</string>
+    <string name="error_workout_data_loading">Could not update workout progress</string>
+    <string name="error_workout_saving">Could not save workout</string>
 
     <!-- Onboarding navigation -->
     <string name="onboarding_back">Back</string>

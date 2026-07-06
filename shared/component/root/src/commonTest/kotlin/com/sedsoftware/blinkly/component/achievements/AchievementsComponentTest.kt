@@ -17,6 +17,7 @@ import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -179,10 +180,7 @@ class AchievementsComponentTest : ComponentTest<AchievementsComponent>() {
 
         // then
         assertThat(testComponent).isInstanceOf(AchievementsComponent::class)
-        assertThat(
-            componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
-                .any { it.throwable.message == exception.message }
-        ).isTrue()
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.AchievementsLoading>(exception)).isTrue()
     }
 
     override fun createComponent(): AchievementsComponent =

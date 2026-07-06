@@ -18,6 +18,7 @@ import com.sedsoftware.blinkly.component.onboarding.integration.OnboardingCompon
 import com.sedsoftware.blinkly.component.step5.OnboardingStep5Component
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
@@ -102,6 +103,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         assertThat(childStep4).isNotNull()
         assertThat(component.childStack.items.size).isEqualTo(4)
         // when
+        childStep4?.component?.onCheckboxSelect(true)
         childStep4?.component?.onNextClick()
         // then
         val childStep5 = component.childStack.active.instance as? OnboardingComponent.Child.Step5
@@ -123,6 +125,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         var childStep3 = component.childStack.active.instance as? OnboardingComponent.Child.Step3
         childStep3?.component?.onNextClick()
         var childStep4 = component.childStack.active.instance as? OnboardingComponent.Child.Step4
+        childStep4?.component?.onCheckboxSelect(true)
         childStep4?.component?.onNextClick()
         val childStep5 = component.childStack.active.instance as? OnboardingComponent.Child.Step5
         assertThat(childStep5).isNotNull()
@@ -183,6 +186,25 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
     }
 
     @Test
+    fun `when disclaimer checkbox not selected then next step is not opened`() = runTest(testScheduler) {
+        // given
+        val childStep1 = component.childStack.active.instance as? OnboardingComponent.Child.Step1
+        childStep1?.component?.onNextClick()
+        val childStep2 = component.childStack.active.instance as? OnboardingComponent.Child.Step2
+        childStep2?.component?.onNextClick()
+        val childStep3 = component.childStack.active.instance as? OnboardingComponent.Child.Step3
+        childStep3?.component?.onNextClick()
+        val childStep4 = component.childStack.active.instance as? OnboardingComponent.Child.Step4
+
+        // when
+        childStep4?.component?.onNextClick()
+
+        // then
+        assertThat(component.childStack.active.instance is OnboardingComponent.Child.Step4).isTrue()
+        assertThat(component.childStack.items.size).isEqualTo(4)
+    }
+
+    @Test
     fun `when last step activated then subscribe store for events`() = runTest(testScheduler) {
         // given
         getStep5Component()
@@ -205,7 +227,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.NotificationPermissionChecking>(exception)).isTrue()
     }
 
     @Test
@@ -258,7 +280,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.NotificationPermissionRequesting>(exception)).isTrue()
     }
 
     @Test
@@ -275,7 +297,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.NotificationPermissionChecking>(exception)).isTrue()
     }
 
     @Test
@@ -292,7 +314,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.InitialRemindersLoading>(exception)).isTrue()
     }
 
     @Test
@@ -355,8 +377,11 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
     fun `when creating reminders failed then error output emitted`() = runTest(testScheduler) {
         // given
         val exception = IllegalStateException("create reminders failed")
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns true
         val step5 = getStep5Component()
         everySuspend { reminderManagerMock.scheduleWeeklyDayPeriod(any(), any(), any(), any()) } throws exception
+        testScheduler.advanceUntilIdle()
+        step5.onInitialSetupChoice(true)
         testScheduler.advanceUntilIdle()
 
         // when
@@ -364,7 +389,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.InitialRemindersCreating>(exception)).isTrue()
     }
 
     @Test
@@ -380,7 +405,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(componentOutput).contains(ComponentOutput.Common.ErrorCaught(exception))
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.InitialRemindersClearing>(exception)).isTrue()
     }
 
     @Test
@@ -410,11 +435,37 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         }
     }
 
+    @Test
+    fun `when initial setup is selected then next waits for reminders creation`() = runTest(testScheduler) {
+        // given
+        val step5 = getStep5Component()
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns true
+        testScheduler.advanceUntilIdle()
+        step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+
+        // when
+        step5.onNextClick()
+
+        // then
+        assertThat(componentOutput).doesNotContain(ComponentOutput.Onboarding.GoToHomeScreen)
+
+        // when
+        step5.onCreateReminders()
+        testScheduler.advanceUntilIdle()
+        step5.onNextClick()
+
+        // then
+        assertThat(componentOutput).contains(ComponentOutput.Onboarding.GoToHomeScreen)
+    }
+
     private fun getStep5Component(): OnboardingStep5Component {
         (component.childStack.active.instance as? OnboardingComponent.Child.Step1)?.component?.onNextClick()
         (component.childStack.active.instance as? OnboardingComponent.Child.Step2)?.component?.onNextClick()
         (component.childStack.active.instance as? OnboardingComponent.Child.Step3)?.component?.onNextClick()
-        (component.childStack.active.instance as? OnboardingComponent.Child.Step4)?.component?.onNextClick()
+        val step4 = component.childStack.active.instance as? OnboardingComponent.Child.Step4
+        step4?.component?.onCheckboxSelect(true)
+        step4?.component?.onNextClick()
         return (component.childStack.active.instance as? OnboardingComponent.Child.Step5)?.component!!
     }
 

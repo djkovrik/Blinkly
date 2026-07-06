@@ -16,6 +16,7 @@ import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.workout.integration.WorkoutComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ExerciseEvent
@@ -229,10 +230,28 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
 
         // then
         assertThat(testComponent.model.value.phase).isEqualTo(WorkoutComponent.Phase.INTRO)
-        assertThat(
-            componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
-                .any { it.throwable.message == exception.message }
-        ).isTrue()
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.WorkoutDataLoading>(exception)).isTrue()
+    }
+
+    @Test
+    fun `when saving workout fails then component publishes saving error output`() = runTest(testScheduler) {
+        // given
+        val exception = IllegalStateException("save failed")
+        component.onStartClick()
+        testScheduler.advanceUntilIdle()
+
+        // when
+        exerciseManager.emit(
+            ExerciseEvent.Error(
+                block = ExerciseBlock.A,
+                exercise = ExerciseType.BLINK_BREAK,
+                throwable = BlinklyError.WorkoutSaving(exception),
+            )
+        )
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.WorkoutSaving>(exception)).isTrue()
     }
 
     @Test
@@ -245,7 +264,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     }
 
     @Test
-    fun `when lifecycle destroyed then manager stops and beeper releases`() = runTest(testScheduler) {
+    fun `when lifecycle destroyed then manager stops and beeper stays owned by root`() = runTest(testScheduler) {
         // given
         val localLifecycle = LifecycleRegistry()
         val localManager = FakeExerciseManager()
@@ -265,7 +284,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
 
         // then
         assertThat(localManager.stopCount).isEqualTo(1)
-        assertThat(localBeeper.releaseCount).isEqualTo(1)
+        assertThat(localBeeper.releaseCount).isEqualTo(0)
     }
 
     override fun createComponent(): WorkoutComponent =

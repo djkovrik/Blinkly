@@ -142,7 +142,7 @@ fun GardenContent(
 
                 items(
                     items = model.grownTrees.chunked(size = 2),
-                    key = { row -> "garden_row_${row.first().type.name}" },
+                    key = { row -> row.joinToString(prefix = "garden_row_", separator = "_") { it.type.name } },
                     contentType = { "garden_row" },
                 ) { row ->
                     GardenTreeRow(
@@ -410,7 +410,7 @@ private fun TreeImage(
     }
 }
 
-@Preview(widthDp = 420, heightDp = 1100)
+@Preview(widthDp = 420, heightDp = 900)
 @Composable
 private fun GardenContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -418,15 +418,15 @@ private fun GardenContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 1100)
+@Preview(widthDp = 420, heightDp = 900)
 @Composable
 private fun GardenContentPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         GardenContent(component = GardenComponentPreview())
     }
 }
 
-@Preview(widthDp = 420, heightDp = 520)
+@Preview(widthDp = 420, heightDp = 500)
 @Composable
 private fun GardenTreeDetailsSheetPreviewLight() {
     BlinklyWidgetPreview {
@@ -439,10 +439,10 @@ private fun GardenTreeDetailsSheetPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 520)
+@Preview(widthDp = 420, heightDp = 500)
 @Composable
 private fun GardenTreeDetailsSheetPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         GardenTreeDetailsSheet(
             tree = Tree(TreeStage.MAGNIFICENT, TreeType.GINKGO_BILOBA, 100f),
             modifier = Modifier

@@ -71,7 +71,7 @@ private fun BottomNavigationButtonsPreviewLight() {
 @Preview
 @Composable
 private fun BottomNavigationButtonsPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BottomNavigationButtonsPreviewContent()
     }
 }

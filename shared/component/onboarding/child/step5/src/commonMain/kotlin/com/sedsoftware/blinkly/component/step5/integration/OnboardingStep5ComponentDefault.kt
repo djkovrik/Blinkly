@@ -61,7 +61,11 @@ class OnboardingStep5ComponentDefault(
     override val model: Value<Model> = store.asValue().map(stateToModel)
 
     override fun onNextClick() {
-        onboardingOutput(ComponentOutput.Onboarding.GoToHomeScreen)
+        val currentModel = model.value
+
+        if (!currentModel.showInitialSetup || currentModel.initialSetupApplied || currentModel.createdRemindersCount > 0) {
+            onboardingOutput(ComponentOutput.Onboarding.GoToHomeScreen)
+        }
     }
 
     override fun onBackClick() {

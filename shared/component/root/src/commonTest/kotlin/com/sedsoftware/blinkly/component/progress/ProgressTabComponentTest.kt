@@ -17,6 +17,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
@@ -128,10 +129,7 @@ class ProgressTabComponentTest : ComponentTest<ProgressTabComponent>() {
 
         // then
         assertThat(testComponent).isInstanceOf(ProgressTabComponent::class)
-        assertThat(
-            componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
-                .any { it.throwable.message == exception.message }
-        ).isTrue()
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.ProgressDataLoading>(exception)).isTrue()
     }
 
     override fun createComponent(): ProgressTabComponent =

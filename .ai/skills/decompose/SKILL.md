@@ -7,11 +7,11 @@ description: Use in the Blinkly Kotlin Multiplatform repository when adding, cha
 
 Read `AGENTS.md` first for the project-level architecture.
 
-Blinkly has baseline Decompose components across onboarding, home tabs, nested
-feature routes, Compose bindings, previews, and common component tests.
+Blinkly has baseline Decompose components across onboarding, home tabs,
+root-pushed feature routes, Compose bindings, previews, and common component tests.
 `MainTabComponent` remains the primary Store-backed tab reference, while
-`progress`, `reminders`, and `trainings` show Store-backed tabs with nested
-child navigation.
+`progress`, `reminders`, and `trainings` show Store-backed tabs that emit
+root-handled navigation outputs.
 
 ## Use these local references first
 
@@ -112,6 +112,16 @@ Config rules:
 
 Keep navigation calls on the main thread.
 
+Current Blinkly hierarchy:
+- `RootComponentDefault` owns the app-level stack and pushes `Preferences`,
+  `Workout`, `Achievements`, `Garden`, and `AddNewReminder`.
+- `HomeScreenComponentDefault` owns only the four-tab stack and forwards most
+  tab outputs upward to root.
+- `OnboardingComponentDefault` owns the onboarding step stack.
+- `ProgressTabComponentDefault`, `RemindersTabComponentDefault`, and
+  `TrainingsTabComponentDefault` do not own nested child stacks; they emit
+  `ComponentOutput` values that root interprets.
+
 ## Output rules
 
 Use `ComponentOutput` to communicate upward.
@@ -166,6 +176,7 @@ Use them to:
 - create platform dispatchers
 - build module factories from `shared/*/di`
 - assemble `DomainModule`
+- create `BeeperModule` and pass `BlinklyBeeper` to workout execution
 - instantiate `RootComponentDefault`
 
 Do not push DI container logic into feature components.
@@ -180,6 +191,9 @@ Keep feature components constructor-injected.
 5. add navigation config and child mapping in the parent
 6. add Compose content in `shared/compose`
 7. add common tests for navigation or behaviour
+8. update `AGENTS.md` in the same change when the new screen or flow changes
+   module layout, component hierarchy, navigation ownership, dependency
+   direction, DI modules, external interfaces, or root factory wiring
 
 For existing feature modules, preserve their component/store/Compose/test
 shape and extend the nearest parent navigation only when the route changes.

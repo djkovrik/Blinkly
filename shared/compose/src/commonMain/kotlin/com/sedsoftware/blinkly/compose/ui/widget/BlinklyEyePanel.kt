@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +34,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -72,6 +75,8 @@ fun BlinklyEyePanel(
         if (currentMovement == null) {
             pathMovement = null
             pathProgress.snapTo(0f)
+            offsetX.snapTo(0f)
+            offsetY.snapTo(0f)
             focusState = EyeFocusState.None
             openness.animateTo(
                 targetValue = restState.openness,
@@ -89,6 +94,8 @@ fun BlinklyEyePanel(
         when (currentMovement) {
             is EyeMovement.Blink -> {
                 openness.snapTo(OPEN_EYE)
+                offsetX.snapTo(0f)
+                offsetY.snapTo(0f)
                 openness.animateTo(
                     targetValue = CLOSED_EYE,
                     animationSpec = tween(
@@ -107,11 +114,15 @@ fun BlinklyEyePanel(
 
             EyeMovement.AccommodationClose -> {
                 focusState = EyeFocusState.Close
+                offsetX.snapTo(0f)
+                offsetY.snapTo(0f)
                 openness.animateToOpen()
             }
 
             EyeMovement.AccommodationFar -> {
                 focusState = EyeFocusState.Far
+                offsetX.snapTo(0f)
+                offsetY.snapTo(0f)
                 openness.animateToOpen()
             }
 
@@ -166,6 +177,8 @@ fun BlinklyEyePanel(
                 -> {
                 focusState = EyeFocusState.None
                 openness.animateToOpen()
+                offsetX.snapTo(0f)
+                offsetY.snapTo(0f)
                 pathMovement = currentMovement
                 pathProgress.snapTo(0f)
                 pathProgress.animateTo(
@@ -269,8 +282,8 @@ private fun BlinklyEyeContent(
                 movementOffset = movementOffset,
                 focusState = focusState,
                 surfaceColor = colorScheme.surface,
-                outlineColor = colorScheme.primary,
-                irisColor = colorScheme.tertiary,
+                outlineColor = colorScheme.eyeOutline,
+                irisColor = colorScheme.eyeIris,
                 pupilColor = colorScheme.onSurface,
                 highlightColor = colorScheme.surfaceContainerHighest,
             )
@@ -289,6 +302,22 @@ private fun BlinklyEyeContent(
         }
     }
 }
+
+private val ColorScheme.eyeOutline: Color
+    get() =
+        if (surfaceContainer.luminance() < DARK_SURFACE_LUMINANCE_THRESHOLD) {
+            primary.copy(alpha = DARK_OUTLINE_ALPHA)
+        } else {
+            primary
+        }
+
+private val ColorScheme.eyeIris: Color
+    get() =
+        if (surfaceContainer.luminance() < DARK_SURFACE_LUMINANCE_THRESHOLD) {
+            lerp(surface, tertiary, DARK_IRIS_BLEND_FRACTION)
+        } else {
+            tertiary
+        }
 
 private fun DrawScope.drawBlinklyEye(
     openness: Float,
@@ -490,7 +519,7 @@ private fun BlinklyEyeFarFocusPreviewLight() {
 @Preview
 @Composable
 private fun BlinklyEyeOpenPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyEyePreviewContent(
             focusState = EyeFocusState.None,
             openness = OPEN_EYE,
@@ -502,7 +531,7 @@ private fun BlinklyEyeOpenPreviewDark() {
 @Preview
 @Composable
 private fun BlinklyEyeClosedPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyEyePreviewContent(
             focusState = EyeFocusState.None,
             openness = CLOSED_EYE,
@@ -514,7 +543,7 @@ private fun BlinklyEyeClosedPreviewDark() {
 @Preview
 @Composable
 private fun BlinklyEyeFocusPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyEyePreviewContent(
             focusState = EyeFocusState.Close,
             openness = OPEN_EYE,
@@ -527,7 +556,7 @@ private fun BlinklyEyeFocusPreviewDark() {
 @Preview
 @Composable
 private fun BlinklyEyeFarFocusPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         BlinklyEyePreviewContent(
             focusState = EyeFocusState.Far,
             openness = OPEN_EYE,
@@ -585,3 +614,6 @@ private const val EYE_OPEN_DURATION_MS = 180
 private const val DIAGONAL_DURATION_MS = 1_000
 private const val CIRCLE_DURATION_MS = 2_000
 private const val EIGHT_DURATION_MS = 4_000
+private const val DARK_SURFACE_LUMINANCE_THRESHOLD = 0.2f
+private const val DARK_OUTLINE_ALPHA = 0.72f
+private const val DARK_IRIS_BLEND_FRACTION = 0.82f

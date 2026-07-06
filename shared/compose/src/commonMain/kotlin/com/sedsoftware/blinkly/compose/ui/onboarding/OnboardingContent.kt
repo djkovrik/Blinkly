@@ -122,7 +122,7 @@ private fun OnboardingContentPreviewStep5Light() {
 @Preview
 @Composable
 private fun OnboardingContentPreviewStep1Dark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         OnboardingContent(OnboardingComponentPreview(step = 1))
     }
 }
@@ -130,7 +130,7 @@ private fun OnboardingContentPreviewStep1Dark() {
 @Preview
 @Composable
 private fun OnboardingContentPreviewStep2Dark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         OnboardingContent(OnboardingComponentPreview(step = 2))
     }
 }
@@ -138,7 +138,7 @@ private fun OnboardingContentPreviewStep2Dark() {
 @Preview
 @Composable
 private fun OnboardingContentPreviewStep3Dark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         OnboardingContent(OnboardingComponentPreview(step = 3))
     }
 }
@@ -146,7 +146,7 @@ private fun OnboardingContentPreviewStep3Dark() {
 @Preview
 @Composable
 private fun OnboardingContentPreviewStep4Dark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         OnboardingContent(OnboardingComponentPreview(step = 4))
     }
 }
@@ -154,7 +154,7 @@ private fun OnboardingContentPreviewStep4Dark() {
 @Preview
 @Composable
 private fun OnboardingContentPreviewStep5Dark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         OnboardingContent(OnboardingComponentPreview(step = 5))
     }
 }

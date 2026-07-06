@@ -9,9 +9,11 @@ import com.sedsoftware.blinkly.component.main.domain.model.MainTabData
 import com.sedsoftware.blinkly.component.main.store.MainTabStore.Intent
 import com.sedsoftware.blinkly.component.main.store.MainTabStore.Label
 import com.sedsoftware.blinkly.component.main.store.MainTabStore.State
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.Workout
+import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
 import kotlinx.coroutines.flow.catch
@@ -40,7 +42,7 @@ internal class MainTabStoreProvider(
                 onAction<Action.ObserveCalendar> {
                     launch {
                         manager.calendar
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(::mainDataLoadingError))) }
                             .collect { calendar ->
                                 dispatch(Msg.CalendarUpdated(calendar))
                                 unwrap(
@@ -49,7 +51,7 @@ internal class MainTabStoreProvider(
                                         dispatch(Msg.DataUpdated(data))
                                     },
                                     onError = { throwable ->
-                                        publish(Label.ErrorCaught(throwable))
+                                        publish(Label.ErrorCaught(mainDataLoadingError(throwable)))
                                     }
                                 )
                             }
@@ -59,7 +61,7 @@ internal class MainTabStoreProvider(
                 onAction<Action.ObserveTree> {
                     launch {
                         manager.tree
-                            .catch { publish(Label.ErrorCaught(it)) }
+                            .catch { publish(Label.ErrorCaught(it.asBlinklyError(::mainDataLoadingError))) }
                             .collect { tree ->
                                 dispatch(Msg.TreeUpdated(tree))
                             }
@@ -74,7 +76,7 @@ internal class MainTabStoreProvider(
                                 dispatch(Msg.HighlightUpdated(highlight))
                             },
                             onError = { throwable ->
-                                publish(Label.ErrorCaught(throwable))
+                                publish(Label.ErrorCaught(mainDataLoadingError(throwable)))
                             }
                         )
                     }
@@ -121,3 +123,6 @@ internal class MainTabStoreProvider(
         data class TreeUpdated(val tree: Tree) : Msg
     }
 }
+
+private fun mainDataLoadingError(throwable: Throwable): BlinklyError =
+    BlinklyError.MainDataLoading(throwable)

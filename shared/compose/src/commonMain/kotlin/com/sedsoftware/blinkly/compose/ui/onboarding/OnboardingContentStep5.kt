@@ -95,7 +95,7 @@ fun OnboardingContentStep5(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(height = 32.dp)
+                            .height(height = 48.dp)
                             .selectable(
                                 selected = when (index) {
                                     0 -> !model.showInitialSetup
@@ -178,7 +178,7 @@ private fun OnboardingContentStep5PreviewLight() {
 @Preview(widthDp = 440, heightDp = 880)
 @Composable
 private fun OnboardingContentStep5PreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         OnboardingContentStep5PreviewContent()
     }
 }

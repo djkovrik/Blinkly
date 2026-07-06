@@ -413,7 +413,7 @@ private fun FourthCardHighlights(
 }
 
 @Composable
-@Preview(widthDp = 1200, heightDp = 1800)
+@Preview(widthDp = 1200, heightDp = 1700)
 private fun MainTabContentPreviewLight() {
     BlinklyWidgetPreview {
         MainTabPreviewContent()
@@ -421,15 +421,15 @@ private fun MainTabContentPreviewLight() {
 }
 
 @Composable
-@Preview(widthDp = 1200, heightDp = 1800)
+@Preview(widthDp = 1200, heightDp = 1700)
 private fun MainTabContentPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         MainTabPreviewContent()
     }
 }
 
 @Composable
-@Preview(widthDp = 420, heightDp = 920)
+@Preview(widthDp = 420, heightDp = 740)
 private fun MainTabContentPhonePreviewLight() {
     BlinklyWidgetPreview {
         MainTabPhonePreviewContent()
@@ -437,9 +437,9 @@ private fun MainTabContentPhonePreviewLight() {
 }
 
 @Composable
-@Preview(widthDp = 420, heightDp = 920)
+@Preview(widthDp = 420, heightDp = 740)
 private fun MainTabContentPhonePreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
+    BlinklyWidgetPreview(isDarkTheme = true) {
         MainTabPhonePreviewContent()
     }
 }

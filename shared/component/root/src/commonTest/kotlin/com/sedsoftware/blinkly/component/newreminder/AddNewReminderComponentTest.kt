@@ -10,6 +10,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.newreminder.integration.AddNewReminderComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.Reminder
 import kotlinx.coroutines.flow.Flow
@@ -138,10 +139,7 @@ class AddNewReminderComponentTest : ComponentTest<AddNewReminderComponent>() {
         testScheduler.advanceUntilIdle()
 
         // then
-        assertThat(
-            componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
-                .any { it.throwable.message == exception.message }
-        ).isTrue()
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.ReminderCreating>(exception)).isTrue()
     }
 
     override fun createComponent(): AddNewReminderComponent =

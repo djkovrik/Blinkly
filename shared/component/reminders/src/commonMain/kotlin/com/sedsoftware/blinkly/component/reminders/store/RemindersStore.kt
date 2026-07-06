@@ -17,6 +17,8 @@ internal interface RemindersStore : Store<Intent, State, Label> {
     data class State(
         val reminders: List<Reminder> = emptyList(),
         val deletedReminder: Reminder? = null,
+        val pendingDeleteUuid: String? = null,
+        val isRestoringDeleted: Boolean = false,
     )
 
     sealed class Label {

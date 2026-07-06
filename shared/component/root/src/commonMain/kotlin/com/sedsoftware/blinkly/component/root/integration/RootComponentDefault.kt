@@ -10,7 +10,6 @@ import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.backhandler.BackCallback
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.sedsoftware.blinkly.component.achievements.AchievementsComponent
@@ -41,17 +40,18 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ThemeState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
+import com.sedsoftware.blinkly.domain.model.asBlinklyError
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.serialization.Serializable
 
 @Suppress("LongParameterList")
 class RootComponentDefault private constructor(
     private val settings: BlinklySettings,
-    private val dispatchers: BlinklyDispatchers,
     private val componentContext: ComponentContext,
     private val onboardingComponent: (ComponentContext, (ComponentOutput) -> Unit) -> OnboardingComponent,
     private val homeScreenComponent: (ComponentContext, (ComponentOutput) -> Unit) -> HomeScreenComponent,
@@ -60,6 +60,7 @@ class RootComponentDefault private constructor(
     private val achievementsComponent: (ComponentContext, (ComponentOutput) -> Unit) -> AchievementsComponent,
     private val gardenComponent: (ComponentContext, (ComponentOutput) -> Unit) -> GardenComponent,
     private val addNewReminderComponent: (ComponentContext, (ComponentOutput) -> Unit) -> AddNewReminderComponent,
+    private val releaseBeeper: () -> Unit,
 ) : RootComponent, ComponentContext by componentContext {
 
     @Suppress("UnusedPrivateProperty")
@@ -81,7 +82,6 @@ class RootComponentDefault private constructor(
         treeProgressWatcher: BlinklyTreeProgressWatcher,
     ) : this(
         componentContext = componentContext,
-        dispatchers = dispatchers,
         settings = settings,
         onboardingComponent = { childContext, output ->
             OnboardingComponentDefault(childContext, storeFactory, reminderManager, notifier, dispatchers, output)
@@ -130,21 +130,17 @@ class RootComponentDefault private constructor(
                 addNewReminderOutput = output,
             )
         },
+        releaseBeeper = beeper::release,
     )
 
     private val navigation: StackNavigation<Config> = StackNavigation()
-    private val scope: CoroutineScope = CoroutineScope(dispatchers.io)
     private val themeStateValue: MutableValue<ThemeState> = MutableValue(settings.themeState)
-
-    private val backCallback: BackCallback = BackCallback { onBack() }
+    private val errorEvents: MutableSharedFlow<BlinklyError> = MutableSharedFlow(extraBufferCapacity = ERROR_BUFFER_CAPACITY)
 
     init {
         lifecycle.doOnDestroy {
-            scope.cancel()
+            releaseBeeper()
         }
-
-        backCallback.isEnabled = false
-        backHandler.register(backCallback)
     }
 
     private val stack: Value<ChildStack<Config, RootComponent.Child>> =
@@ -158,6 +154,7 @@ class RootComponentDefault private constructor(
 
     override val childStack: Value<ChildStack<*, RootComponent.Child>> = stack
     override val themeState: Value<ThemeState> = themeStateValue
+    override val errors = errorEvents.asSharedFlow()
 
     override fun onBack() {
         navigation.pop()
@@ -190,8 +187,8 @@ class RootComponentDefault private constructor(
     private fun onChildOutput(output: ComponentOutput) {
         when (output) {
             is ComponentOutput.Onboarding.GoToHomeScreen -> {
+                settings.onboardingDisplayed = true
                 navigation.replaceCurrent(Config.HomeScreen)
-                backCallback.isEnabled = true
             }
 
             is ComponentOutput.Main.OpenPreferences -> {
@@ -225,7 +222,11 @@ class RootComponentDefault private constructor(
             }
 
             is ComponentOutput.Common.ErrorCaught -> {
-                Logger.e { "Blinkly error caught: ${output.throwable.message}" }
+                val error = output.throwable.asBlinklyError(BlinklyError::Unknown)
+                val cause = error.cause ?: error
+
+                Logger.e(cause) { "Blinkly error caught: ${error.message}" }
+                errorEvents.tryEmit(error)
             }
 
             else -> Unit
@@ -262,5 +263,9 @@ class RootComponentDefault private constructor(
 
         @Serializable
         data object AddNewReminder : Config
+    }
+
+    private companion object {
+        const val ERROR_BUFFER_CAPACITY = 16
     }
 }

@@ -14,7 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,6 +49,7 @@ import org.jetbrains.compose.resources.stringResource
 
 private const val SLIDER_STEP_VALUE = 20
 private const val SLIDER_TOTAL_STEPS = 4
+private const val CUSTOM_INTERVAL_DEFAULT = SLIDER_STEP_VALUE * 3
 
 @Composable
 fun AddWeeklyPeriodContent(
@@ -66,28 +66,14 @@ fun AddWeeklyPeriodContent(
     onCreateClick: () -> Unit = {},
     onClearClick: () -> Unit = {},
 ) {
-    val timePickerStateFrom: TimePickerState = rememberTimePickerState(
-        initialHour = selectedTimeFrom.hour,
-        initialMinute = selectedTimeFrom.minute,
-        is24Hour = true, // TODO 24hr format hardcoded, fix later?
-    )
-
     val defaultIntervals: Set<Int> = setOf(
         SLIDER_STEP_VALUE,
         SLIDER_STEP_VALUE * 2,
     )
+    val showSlider: Boolean = !defaultIntervals.contains(selectedInterval)
 
     var timePickerFromVisible: Boolean by remember { mutableStateOf(false) }
-
-    val timePickerStateUntil: TimePickerState = rememberTimePickerState(
-        initialHour = selectedTimeUntil.hour,
-        initialMinute = selectedTimeUntil.minute,
-        is24Hour = true,
-    )
-
     var timePickerUntilVisible: Boolean by remember { mutableStateOf(false) }
-
-    var showSlider: Boolean by remember { mutableStateOf(!defaultIntervals.contains(selectedInterval)) }
 
     val periodOptions: List<String> = listOf(
         stringResource(Res.string.onboarding_initial_setup_20),
@@ -96,6 +82,12 @@ fun AddWeeklyPeriodContent(
     )
 
     if (timePickerFromVisible) {
+        val timePickerStateFrom = rememberTimePickerState(
+            initialHour = selectedTimeFrom.hour,
+            initialMinute = selectedTimeFrom.minute,
+            is24Hour = true, // TODO 24hr format hardcoded, fix later?
+        )
+
         BlinklyTimePickerDialog(
             timePickerState = timePickerStateFrom,
             onConfirm = {
@@ -110,6 +102,12 @@ fun AddWeeklyPeriodContent(
     }
 
     if (timePickerUntilVisible) {
+        val timePickerStateUntil = rememberTimePickerState(
+            initialHour = selectedTimeUntil.hour,
+            initialMinute = selectedTimeUntil.minute,
+            is24Hour = true,
+        )
+
         BlinklyTimePickerDialog(
             timePickerState = timePickerStateUntil,
             onConfirm = {
@@ -176,7 +174,7 @@ fun AddWeeklyPeriodContent(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(height = 32.dp)
+                        .height(height = 48.dp)
                         .selectable(
                             selected = when (index) {
                                 0 -> selectedInterval == SLIDER_STEP_VALUE
@@ -184,12 +182,13 @@ fun AddWeeklyPeriodContent(
                                 else -> !defaultIntervals.contains(selectedInterval)
                             },
                             onClick = {
-                                when(index) {
+                                when (index) {
                                     0 -> onIntervalSelect.invoke(SLIDER_STEP_VALUE)
                                     1 -> onIntervalSelect.invoke(SLIDER_STEP_VALUE * 2)
+                                    else -> onIntervalSelect.invoke(
+                                        selectedInterval.takeIf { it !in defaultIntervals } ?: CUSTOM_INTERVAL_DEFAULT
+                                    )
                                 }
-
-                                showSlider = index != 0 && index != 1
                             },
                             role = Role.RadioButton,
                         )
@@ -285,53 +284,89 @@ fun AddWeeklyPeriodContent(
     }
 }
 
-@Preview(heightDp = 1600)
+@Preview(heightDp = 520)
 @Composable
-private fun AddWeeklyPeriodContentPreviewLight() {
+private fun AddWeeklyPeriodContentDefaultPreviewLight() {
     BlinklyWidgetPreview {
-        AddWeeklyPeriodContentPreviewContent()
+        AddWeeklyPeriodContentDefaultPreviewContent()
     }
 }
 
-@Preview(heightDp = 1600)
+@Preview(heightDp = 520)
 @Composable
-private fun AddWeeklyPeriodContentPreviewDark() {
-    BlinklyWidgetPreview(isDakTheme = true) {
-        AddWeeklyPeriodContentPreviewContent()
+private fun AddWeeklyPeriodContentDefaultPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
+        AddWeeklyPeriodContentDefaultPreviewContent()
+    }
+}
+
+@Preview(heightDp = 520)
+@Composable
+private fun AddWeeklyPeriodContentCreatedPreviewLight() {
+    BlinklyWidgetPreview {
+        AddWeeklyPeriodContentCreatedPreviewContent()
+    }
+}
+
+@Preview(heightDp = 520)
+@Composable
+private fun AddWeeklyPeriodContentCreatedPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
+        AddWeeklyPeriodContentCreatedPreviewContent()
+    }
+}
+
+@Preview(heightDp = 560)
+@Composable
+private fun AddWeeklyPeriodContentCustomPreviewLight() {
+    BlinklyWidgetPreview {
+        AddWeeklyPeriodContentCustomPreviewContent()
+    }
+}
+
+@Preview(heightDp = 560)
+@Composable
+private fun AddWeeklyPeriodContentCustomPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
+        AddWeeklyPeriodContentCustomPreviewContent()
     }
 }
 
 @Composable
 @PreviewContent
-private fun AddWeeklyPeriodContentPreviewContent() {
-    Column {
-        AddWeeklyPeriodContent(
-            selectedTimeFrom = LocalTime(10, 0),
-            selectedTimeUntil = LocalTime(18, 0),
-            selectedDays = DayOfWeek.entries.toList(),
-            selectedInterval = SLIDER_STEP_VALUE,
-            createdRemindersCount = 0,
-            modifier = Modifier.padding(bottom = 64.dp)
-        )
+private fun AddWeeklyPeriodContentDefaultPreviewContent() {
+    AddWeeklyPeriodContent(
+        selectedTimeFrom = LocalTime(10, 0),
+        selectedTimeUntil = LocalTime(18, 0),
+        selectedDays = DayOfWeek.entries.toList(),
+        selectedInterval = SLIDER_STEP_VALUE,
+        createdRemindersCount = 0,
+    )
+}
 
-        AddWeeklyPeriodContent(
-            selectedTimeFrom = LocalTime(14, 0),
-            selectedTimeUntil = LocalTime(16, 0),
-            selectedDays = listOf(
-                DayOfWeek.MONDAY,
-                DayOfWeek.WEDNESDAY,
-            ),
-            selectedInterval = SLIDER_STEP_VALUE * 2,
-            createdRemindersCount = 2,
-            modifier = Modifier.padding(bottom = 64.dp)
-        )
+@Composable
+@PreviewContent
+private fun AddWeeklyPeriodContentCreatedPreviewContent() {
+    AddWeeklyPeriodContent(
+        selectedTimeFrom = LocalTime(14, 0),
+        selectedTimeUntil = LocalTime(16, 0),
+        selectedDays = listOf(
+            DayOfWeek.MONDAY,
+            DayOfWeek.WEDNESDAY,
+        ),
+        selectedInterval = SLIDER_STEP_VALUE * 2,
+        createdRemindersCount = 2,
+    )
+}
 
-        AddWeeklyPeriodContent(
-            selectedTimeFrom = LocalTime(11, 0),
-            selectedTimeUntil = LocalTime(13, 0),
-            selectedDays = listOf(DayOfWeek.SUNDAY),
-            selectedInterval = SLIDER_STEP_VALUE * 3,
-            createdRemindersCount = 99,
-        )
-    }
+@Composable
+@PreviewContent
+private fun AddWeeklyPeriodContentCustomPreviewContent() {
+    AddWeeklyPeriodContent(
+        selectedTimeFrom = LocalTime(11, 0),
+        selectedTimeUntil = LocalTime(13, 0),
+        selectedDays = listOf(DayOfWeek.SUNDAY),
+        selectedInterval = SLIDER_STEP_VALUE * 3,
+        createdRemindersCount = 99,
+    )
 }
