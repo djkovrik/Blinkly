@@ -124,6 +124,7 @@ internal class BlinklyExerciseManagerImpl(
         }
     }
 
+    @Suppress("TooGenericExceptionCaught")
     private suspend fun saveExercise(
         block: ExerciseBlock,
         type: ExerciseType,
