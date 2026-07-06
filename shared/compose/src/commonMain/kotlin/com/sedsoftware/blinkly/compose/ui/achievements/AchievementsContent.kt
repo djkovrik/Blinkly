@@ -322,6 +322,7 @@ private fun HiddenDescriptionPlaceholder(
 private fun AchievementDetailsSheet(
     achievement: AchievementItem,
     modifier: Modifier = Modifier,
+    unlockedAtTimeZone: TimeZone = TimeZone.currentSystemDefault(),
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -358,7 +359,7 @@ private fun AchievementDetailsSheet(
                 Text(
                     text = stringResource(
                         resource = Res.string.achievements_unlocked_at,
-                        unlockedAt.asUserTimeZoneDateTime(),
+                        unlockedAt.asUserTimeZoneDateTime(timeZone = unlockedAtTimeZone),
                     ),
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
@@ -368,8 +369,8 @@ private fun AchievementDetailsSheet(
     }
 }
 
-private fun Instant.asUserTimeZoneDateTime(): String {
-    val localDateTime = toLocalDateTime(TimeZone.currentSystemDefault())
+private fun Instant.asUserTimeZoneDateTime(timeZone: TimeZone): String {
+    val localDateTime = toLocalDateTime(timeZone)
     val date = localDateTime.date
     val time = localDateTime.time
     return "${date.year}-${(date.month.ordinal + 1).twoDigits()}-${date.day.twoDigits()} " +
@@ -403,6 +404,7 @@ private fun AchievementDetailsSheetPreviewLight() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp, vertical = 32.dp),
+            unlockedAtTimeZone = TimeZone.UTC,
         )
     }
 }
@@ -416,6 +418,7 @@ private fun AchievementDetailsSheetPreviewDark() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp, vertical = 32.dp),
+            unlockedAtTimeZone = TimeZone.UTC,
         )
     }
 }
