@@ -31,12 +31,12 @@ import com.sedsoftware.blinkly.compose.ui.preferences.PreferencesContent
 fun RootContent(
     component: RootComponent,
     modifier: Modifier = Modifier,
-    onThemeChanged: @Composable (isDark: Boolean) -> Unit = {},
+    onSystemBarsAppearanceChanged: @Composable (useDarkIcons: Boolean) -> Unit = {},
 ) {
     val themeState by component.themeState.subscribeAsState()
 
     BlinklyAppTheme(
-        onThemeChanged = onThemeChanged,
+        onSystemBarsAppearanceChanged = onSystemBarsAppearanceChanged,
         themeState = themeState,
     ) {
         ChildStack(

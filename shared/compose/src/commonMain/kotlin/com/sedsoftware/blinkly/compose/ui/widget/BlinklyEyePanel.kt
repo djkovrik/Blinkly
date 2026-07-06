@@ -72,6 +72,8 @@ fun BlinklyEyePanel(
         if (currentMovement == null) {
             pathMovement = null
             pathProgress.snapTo(0f)
+            offsetX.snapTo(0f)
+            offsetY.snapTo(0f)
             focusState = EyeFocusState.None
             openness.animateTo(
                 targetValue = restState.openness,
@@ -89,6 +91,8 @@ fun BlinklyEyePanel(
         when (currentMovement) {
             is EyeMovement.Blink -> {
                 openness.snapTo(OPEN_EYE)
+                offsetX.snapTo(0f)
+                offsetY.snapTo(0f)
                 openness.animateTo(
                     targetValue = CLOSED_EYE,
                     animationSpec = tween(
@@ -107,11 +111,15 @@ fun BlinklyEyePanel(
 
             EyeMovement.AccommodationClose -> {
                 focusState = EyeFocusState.Close
+                offsetX.snapTo(0f)
+                offsetY.snapTo(0f)
                 openness.animateToOpen()
             }
 
             EyeMovement.AccommodationFar -> {
                 focusState = EyeFocusState.Far
+                offsetX.snapTo(0f)
+                offsetY.snapTo(0f)
                 openness.animateToOpen()
             }
 
@@ -166,6 +174,8 @@ fun BlinklyEyePanel(
                 -> {
                 focusState = EyeFocusState.None
                 openness.animateToOpen()
+                offsetX.snapTo(0f)
+                offsetY.snapTo(0f)
                 pathMovement = currentMovement
                 pathProgress.snapTo(0f)
                 pathProgress.animateTo(

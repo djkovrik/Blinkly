@@ -142,7 +142,7 @@ fun GardenContent(
 
                 items(
                     items = model.grownTrees.chunked(size = 2),
-                    key = { row -> "garden_row_${row.first().type.name}" },
+                    key = { row -> row.joinToString(prefix = "garden_row_", separator = "_") { it.type.name } },
                     contentType = { "garden_row" },
                 ) { row ->
                     GardenTreeRow(

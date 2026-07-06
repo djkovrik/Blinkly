@@ -95,7 +95,7 @@ fun OnboardingContentStep5(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(height = 32.dp)
+                            .height(height = 48.dp)
                             .selectable(
                                 selected = when (index) {
                                     0 -> !model.showInitialSetup

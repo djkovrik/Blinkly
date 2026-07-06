@@ -90,7 +90,7 @@ internal val LocalThemeIsDark = compositionLocalOf { true }
 
 @Composable
 internal fun BlinklyAppTheme(
-    onThemeChanged: @Composable (isDark: Boolean) -> Unit,
+    onSystemBarsAppearanceChanged: @Composable (useDarkIcons: Boolean) -> Unit,
     themeState: ThemeState = ThemeState.SYSTEM,
     isSystemDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
@@ -104,7 +104,7 @@ internal fun BlinklyAppTheme(
     CompositionLocalProvider(
         LocalThemeIsDark provides isDark
     ) {
-        onThemeChanged(!isDark)
+        onSystemBarsAppearanceChanged(!isDark)
         MaterialTheme(
             colorScheme = if (isDark) DarkColorScheme else LightColorScheme,
             typography = BlinklyFonts.interTypography(),
@@ -120,7 +120,7 @@ internal fun BlinklyWidgetPreview(
     content: @Composable () -> Unit,
 ) {
     BlinklyAppTheme(
-        onThemeChanged = {},
+        onSystemBarsAppearanceChanged = {},
         themeState = if (isDakTheme) ThemeState.DARK else ThemeState.LIGHT,
         content = content,
     )

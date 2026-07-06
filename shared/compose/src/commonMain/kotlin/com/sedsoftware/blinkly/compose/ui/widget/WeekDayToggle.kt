@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -38,7 +39,7 @@ fun WeekDayToggle(
     toggledTextColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     toggledBackgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    size: Dp = 44.dp,
+    size: Dp = 48.dp,
     borderWidth: Dp = 1.dp,
     animationDurationMs: Int = 250,
     onToggle: () -> Unit = {},
@@ -87,6 +88,7 @@ fun WeekDayToggle(
             .clickableOnce(
                 onClick = onToggle,
                 debounceMs = 150L,
+                role = Role.Checkbox,
             ),
         contentAlignment = Alignment.Center,
     ) {

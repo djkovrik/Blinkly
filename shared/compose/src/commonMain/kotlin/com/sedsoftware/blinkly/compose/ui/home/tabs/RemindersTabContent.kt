@@ -357,7 +357,7 @@ private fun ReminderCard(
             ) {
                 IconButton(
                     onClick = onDeleteClick,
-                    modifier = Modifier.size(size = 40.dp),
+                    modifier = Modifier.size(size = 48.dp),
                 ) {
                     Icon(
                         painter = painterResource(resource = Res.drawable.icon_delete),

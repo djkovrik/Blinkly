@@ -23,7 +23,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -93,6 +92,7 @@ import org.jetbrains.compose.resources.stringResource
 
 private const val INTERVAL_MIN = 20
 private const val INTERVAL_STEP_COUNT = 4
+private const val CUSTOM_INTERVAL_DEFAULT = INTERVAL_MIN * 3
 
 @Composable
 fun AddNewReminderContent(
@@ -434,14 +434,15 @@ private fun TimeSelector(
     prefix: String? = null,
     onTimeSelect: (LocalTime) -> Unit,
 ) {
-    val timePickerState: TimePickerState = rememberTimePickerState(
-        initialHour = time.hour,
-        initialMinute = time.minute,
-        is24Hour = true,
-    )
     var pickerVisible: Boolean by remember { mutableStateOf(false) }
 
     if (pickerVisible) {
+        val timePickerState = rememberTimePickerState(
+            initialHour = time.hour,
+            initialMinute = time.minute,
+            is24Hour = true,
+        )
+
         BlinklyTimePickerDialog(
             timePickerState = timePickerState,
             onConfirm = {
@@ -470,7 +471,7 @@ private fun IntervalSelector(
     onIntervalSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var customIntervalVisible: Boolean by remember { mutableStateOf(interval != INTERVAL_MIN && interval != INTERVAL_MIN * 2) }
+    val customIntervalVisible: Boolean = interval != INTERVAL_MIN && interval != INTERVAL_MIN * 2
 
     Column(modifier = modifier) {
         Row(
@@ -480,27 +481,23 @@ private fun IntervalSelector(
             IntervalOption(
                 text = stringResource(resource = Res.string.add_reminder_interval_minutes, INTERVAL_MIN),
                 selected = interval == INTERVAL_MIN && !customIntervalVisible,
-                onClick = {
-                    customIntervalVisible = false
-                    onIntervalSelect(INTERVAL_MIN)
-                },
+                onClick = { onIntervalSelect(INTERVAL_MIN) },
                 modifier = Modifier.weight(weight = 1f),
             )
 
             IntervalOption(
                 text = stringResource(resource = Res.string.add_reminder_interval_minutes, INTERVAL_MIN * 2),
                 selected = interval == INTERVAL_MIN * 2 && !customIntervalVisible,
-                onClick = {
-                    customIntervalVisible = false
-                    onIntervalSelect(INTERVAL_MIN * 2)
-                },
+                onClick = { onIntervalSelect(INTERVAL_MIN * 2) },
                 modifier = Modifier.weight(weight = 1f),
             )
 
             IntervalOption(
                 text = stringResource(resource = Res.string.add_reminder_interval_custom),
                 selected = customIntervalVisible,
-                onClick = { customIntervalVisible = true },
+                onClick = {
+                    onIntervalSelect(interval.takeIf { customIntervalVisible } ?: CUSTOM_INTERVAL_DEFAULT)
+                },
                 modifier = Modifier.weight(weight = 1f),
             )
         }

@@ -39,7 +39,7 @@ internal fun BlinklyOutlineButton(
     buttonShape: Shape = MaterialTheme.shapes.extraLarge,
     borderColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     borderWidth: Dp = 2.dp,
-    buttonHeight: Dp = 44.dp,
+    buttonHeight: Dp = 48.dp,
     alphaEnabled: Float = 1f,
     alphaDisabled: Float = 0.4f,
     animationDuration: Int = 150,

@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.semantics.Role
 import kotlinx.coroutines.delay
 
 private const val DEFAULT_SHIMMER_DURATION_MS: Int = 1_200
@@ -97,6 +98,7 @@ fun Modifier.shimmering(
 fun Modifier.clickableOnce(
     onClick: () -> Unit,
     debounceMs: Long = 500L,
+    role: Role? = Role.Button,
 ): Modifier = composed {
     val interactionSource = remember { MutableInteractionSource() }
     var isEnabled by remember { mutableStateOf(true) }
@@ -112,6 +114,7 @@ fun Modifier.clickableOnce(
         enabled = isEnabled,
         interactionSource = interactionSource,
         indication = ripple(),
+        role = role,
         onClick = {
             if (isEnabled) {
                 isEnabled = false

@@ -48,7 +48,7 @@ internal fun BlinklyIconButton(
     textColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     buttonColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     buttonShape: Shape = MaterialTheme.shapes.extraLarge,
-    buttonHeight: Dp = 44.dp,
+    buttonHeight: Dp = 48.dp,
     iconSize: Dp = 22.dp,
     alphaEnabled: Float = 1f,
     alphaDisabled: Float = 0.4f,

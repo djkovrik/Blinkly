@@ -14,7 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,6 +49,7 @@ import org.jetbrains.compose.resources.stringResource
 
 private const val SLIDER_STEP_VALUE = 20
 private const val SLIDER_TOTAL_STEPS = 4
+private const val CUSTOM_INTERVAL_DEFAULT = SLIDER_STEP_VALUE * 3
 
 @Composable
 fun AddWeeklyPeriodContent(
@@ -66,28 +66,14 @@ fun AddWeeklyPeriodContent(
     onCreateClick: () -> Unit = {},
     onClearClick: () -> Unit = {},
 ) {
-    val timePickerStateFrom: TimePickerState = rememberTimePickerState(
-        initialHour = selectedTimeFrom.hour,
-        initialMinute = selectedTimeFrom.minute,
-        is24Hour = true, // TODO 24hr format hardcoded, fix later?
-    )
-
     val defaultIntervals: Set<Int> = setOf(
         SLIDER_STEP_VALUE,
         SLIDER_STEP_VALUE * 2,
     )
+    val showSlider: Boolean = !defaultIntervals.contains(selectedInterval)
 
     var timePickerFromVisible: Boolean by remember { mutableStateOf(false) }
-
-    val timePickerStateUntil: TimePickerState = rememberTimePickerState(
-        initialHour = selectedTimeUntil.hour,
-        initialMinute = selectedTimeUntil.minute,
-        is24Hour = true,
-    )
-
     var timePickerUntilVisible: Boolean by remember { mutableStateOf(false) }
-
-    var showSlider: Boolean by remember { mutableStateOf(!defaultIntervals.contains(selectedInterval)) }
 
     val periodOptions: List<String> = listOf(
         stringResource(Res.string.onboarding_initial_setup_20),
@@ -96,6 +82,12 @@ fun AddWeeklyPeriodContent(
     )
 
     if (timePickerFromVisible) {
+        val timePickerStateFrom = rememberTimePickerState(
+            initialHour = selectedTimeFrom.hour,
+            initialMinute = selectedTimeFrom.minute,
+            is24Hour = true, // TODO 24hr format hardcoded, fix later?
+        )
+
         BlinklyTimePickerDialog(
             timePickerState = timePickerStateFrom,
             onConfirm = {
@@ -110,6 +102,12 @@ fun AddWeeklyPeriodContent(
     }
 
     if (timePickerUntilVisible) {
+        val timePickerStateUntil = rememberTimePickerState(
+            initialHour = selectedTimeUntil.hour,
+            initialMinute = selectedTimeUntil.minute,
+            is24Hour = true,
+        )
+
         BlinklyTimePickerDialog(
             timePickerState = timePickerStateUntil,
             onConfirm = {
@@ -176,7 +174,7 @@ fun AddWeeklyPeriodContent(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(height = 32.dp)
+                        .height(height = 48.dp)
                         .selectable(
                             selected = when (index) {
                                 0 -> selectedInterval == SLIDER_STEP_VALUE
@@ -184,12 +182,13 @@ fun AddWeeklyPeriodContent(
                                 else -> !defaultIntervals.contains(selectedInterval)
                             },
                             onClick = {
-                                when(index) {
+                                when (index) {
                                     0 -> onIntervalSelect.invoke(SLIDER_STEP_VALUE)
                                     1 -> onIntervalSelect.invoke(SLIDER_STEP_VALUE * 2)
+                                    else -> onIntervalSelect.invoke(
+                                        selectedInterval.takeIf { it !in defaultIntervals } ?: CUSTOM_INTERVAL_DEFAULT
+                                    )
                                 }
-
-                                showSlider = index != 0 && index != 1
                             },
                             role = Role.RadioButton,
                         )

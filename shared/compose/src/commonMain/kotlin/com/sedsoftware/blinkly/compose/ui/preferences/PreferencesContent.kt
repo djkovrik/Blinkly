@@ -381,7 +381,7 @@ private fun StepperButton(
 ) {
     FilledTonalIconButton(
         onClick = onClick,
-        modifier = modifier.size(size = 40.dp),
+        modifier = modifier.size(size = 48.dp),
     ) {
         Icon(
             painter = painterResource(resource = iconRes),

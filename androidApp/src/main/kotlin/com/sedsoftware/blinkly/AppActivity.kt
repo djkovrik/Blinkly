@@ -49,7 +49,7 @@ class AppActivity : ComponentActivity() {
         setContent {
             RootContent(
                 component = rootComponent,
-                onThemeChanged = { ThemeChanged(it) },
+                onSystemBarsAppearanceChanged = { SystemBarsAppearanceChanged(it) },
             )
         }
     }
@@ -87,13 +87,13 @@ class AppActivity : ComponentActivity() {
 }
 
 @Composable
-private fun ThemeChanged(isDark: Boolean) {
+private fun SystemBarsAppearanceChanged(useDarkIcons: Boolean) {
     val view = LocalView.current
-    LaunchedEffect(isDark) {
+    LaunchedEffect(useDarkIcons) {
         val window = (view.context as Activity).window
         WindowInsetsControllerCompat(window, window.decorView).apply {
-            isAppearanceLightStatusBars = isDark
-            isAppearanceLightNavigationBars = isDark
+            isAppearanceLightStatusBars = useDarkIcons
+            isAppearanceLightNavigationBars = useDarkIcons
         }
     }
 }

@@ -31,7 +31,7 @@ internal fun BlinklyButton(
     textColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     buttonColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     buttonShape: Shape = MaterialTheme.shapes.extraLarge,
-    buttonHeight: Dp = 44.dp,
+    buttonHeight: Dp = 48.dp,
     onClick: () -> Unit = {},
 ) {
     Row(
