@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "38221976818",
+    "project_id": "blinkly-45355",
+    "storage_bucket": "blinkly-45355.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:38221976818:android:e27d086a64b60b17de6c6b",
+        "android_client_info": {
+          "package_name": "com.sedsoftware.blinkly"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "38221976818-7b2q1brbjuek827berdc2bvcf1mt2nms.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sedsoftware.blinkly",
+            "certificate_hash": "0e9242e991632515a54938cbfc491f8275b17544"
+          }
+        },
+        {
+          "client_id": "38221976818-8l1vpr8cee88mfi524122j8apjs3866i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCb12WUBZT8PsBkIcaZ80izt8zJ2PHTTn4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "38221976818-8l1vpr8cee88mfi524122j8apjs3866i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "38221976818-2ajd25hrjgvmkb7uvlkitdehnehcht4a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.sedsoftware.blinkly.iosApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

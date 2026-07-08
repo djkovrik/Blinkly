@@ -37,6 +37,7 @@ include(
     ":shared:notifier",
     ":shared:beeper",
     ":shared:settings",
+    ":shared:sync",
     ":shared:utils",
     ":shared:component:root",
     ":shared:component:onboarding",
