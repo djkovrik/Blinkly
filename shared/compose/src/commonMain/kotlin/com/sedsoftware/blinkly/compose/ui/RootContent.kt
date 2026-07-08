@@ -36,6 +36,11 @@ import blinkly.shared.compose.generated.resources.error_reminder_creating
 import blinkly.shared.compose.generated.resources.error_reminder_deleting
 import blinkly.shared.compose.generated.resources.error_reminder_restoring
 import blinkly.shared.compose.generated.resources.error_reminders_loading
+import blinkly.shared.compose.generated.resources.error_sync_auth_failed
+import blinkly.shared.compose.generated.resources.error_sync_conflict_failed
+import blinkly.shared.compose.generated.resources.error_sync_read_failed
+import blinkly.shared.compose.generated.resources.error_sync_unknown
+import blinkly.shared.compose.generated.resources.error_sync_write_failed
 import blinkly.shared.compose.generated.resources.error_trainings_data_loading
 import blinkly.shared.compose.generated.resources.error_unknown
 import blinkly.shared.compose.generated.resources.error_workout_data_loading
@@ -58,6 +63,7 @@ import com.sedsoftware.blinkly.compose.ui.newreminder.AddNewReminderContent
 import com.sedsoftware.blinkly.compose.ui.onboarding.OnboardingContent
 import com.sedsoftware.blinkly.compose.ui.preferences.PreferencesContent
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -148,7 +154,7 @@ fun RootContent(
 @Composable
 private fun BlinklyError.asMessage(): String =
     stringResource(
-        resource = when (this) {
+        resource = syncMessageResource() ?: when (this) {
             is BlinklyError.MainDataLoading -> Res.string.error_main_data_loading
             is BlinklyError.ProgressDataLoading -> Res.string.error_progress_data_loading
             is BlinklyError.TrainingsDataLoading -> Res.string.error_trainings_data_loading
@@ -168,5 +174,16 @@ private fun BlinklyError.asMessage(): String =
             is BlinklyError.WorkoutDataLoading -> Res.string.error_workout_data_loading
             is BlinklyError.WorkoutSaving -> Res.string.error_workout_saving
             is BlinklyError.Unknown -> Res.string.error_unknown
+            else -> Res.string.error_unknown
         }
     )
+
+private fun BlinklyError.syncMessageResource(): StringResource? =
+    when (this) {
+        is BlinklyError.SyncAuthFailed -> Res.string.error_sync_auth_failed
+        is BlinklyError.SyncReadFailed -> Res.string.error_sync_read_failed
+        is BlinklyError.SyncWriteFailed -> Res.string.error_sync_write_failed
+        is BlinklyError.SyncConflictFailed -> Res.string.error_sync_conflict_failed
+        is BlinklyError.SyncUnknown -> Res.string.error_sync_unknown
+        else -> null
+    }

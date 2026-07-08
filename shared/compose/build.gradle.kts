@@ -170,6 +170,10 @@ kotlin {
             implementation(project(":shared:component:reminders:child:newreminder"))
             implementation(project(":shared:component:trainings"))
             implementation(project(":shared:component:trainings:child:workout"))
+            implementation(project(":shared:component:sync"))
+            implementation(libs.lib.kmpauth.google)
+            implementation(libs.lib.kmpauth.firebase)
+            implementation(libs.lib.kmpauth.uihelper)
         }
 
         commonTest.dependencies {

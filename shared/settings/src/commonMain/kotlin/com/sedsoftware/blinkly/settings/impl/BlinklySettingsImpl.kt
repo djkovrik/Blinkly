@@ -6,7 +6,10 @@ import com.sedsoftware.blinkly.domain.model.ThemeState
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 internal class BlinklySettingsImpl(
     private val settings: Settings,
 ) : BlinklySettings {
@@ -135,6 +138,37 @@ internal class BlinklySettingsImpl(
             settings.setValue(PREF_ONBOARDING_DISPLAYED, value)
         }
 
+    override var lastLocalChangeAt: Instant?
+        get() = settings.getInstant(PREF_LAST_LOCAL_CHANGE_AT)
+        set(value) {
+            settings.setInstant(PREF_LAST_LOCAL_CHANGE_AT, value)
+        }
+
+    override var lastSyncedAt: Instant?
+        get() = settings.getInstant(PREF_LAST_SYNCED_AT)
+        set(value) {
+            settings.setInstant(PREF_LAST_SYNCED_AT, value)
+        }
+
+    override var lastRemoteUpdatedAt: Instant?
+        get() = settings.getInstant(PREF_LAST_REMOTE_UPDATED_AT)
+        set(value) {
+            settings.setInstant(PREF_LAST_REMOTE_UPDATED_AT, value)
+        }
+
+    private fun Settings.getInstant(key: String): Instant? {
+        val epochMillis: Long = getValue(key, SYNC_TIME_EMPTY)
+        return if (epochMillis >= 0L) {
+            Instant.fromEpochMilliseconds(epochMillis)
+        } else {
+            null
+        }
+    }
+
+    private fun Settings.setInstant(key: String, value: Instant?) {
+        setValue(key, value?.toEpochMilliseconds() ?: SYNC_TIME_EMPTY)
+    }
+
     private fun Settings.setValue(key: String, value: Any) {
         when (value) {
             is String -> putString(key, value)
@@ -181,5 +215,9 @@ internal class BlinklySettingsImpl(
         const val PREF_DISPLAYED_HIGHLIGHTS = "dh"
         const val PREF_CURRENT_HIGHLIGHT_DATE = "chd"
         const val PREF_ONBOARDING_DISPLAYED = "od"
+        const val PREF_LAST_LOCAL_CHANGE_AT = "sync_llca"
+        const val PREF_LAST_SYNCED_AT = "sync_lsa"
+        const val PREF_LAST_REMOTE_UPDATED_AT = "sync_lrua"
+        const val SYNC_TIME_EMPTY = -1L
     }
 }

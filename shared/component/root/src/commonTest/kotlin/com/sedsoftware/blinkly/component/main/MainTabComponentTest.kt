@@ -377,6 +377,9 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
         override var displayedHighlights: List<Int> = emptyList()
         override var currentHighlightDate: LocalDate? = null
         override var onboardingDisplayed: Boolean = false
+        override var lastLocalChangeAt: Instant? = null
+        override var lastSyncedAt: Instant? = null
+        override var lastRemoteUpdatedAt: Instant? = null
     }
 
     private companion object {

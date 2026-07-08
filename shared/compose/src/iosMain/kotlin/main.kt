@@ -5,6 +5,7 @@ import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.sedsoftware.blinkly.component.root.RootComponent
 import com.sedsoftware.blinkly.component.root.RootComponentFactory
+import com.sedsoftware.blinkly.compose.auth.initializeBlinklyGoogleAuth
 import com.sedsoftware.blinkly.compose.ui.RootContent
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
@@ -35,12 +36,19 @@ private val rootComponent: RootComponent by lazy {
 
 @Suppress("FunctionNaming")
 fun MainViewController(): UIViewController {
+    initializeGoogleAuth()
+
     return ComposeUIViewController {
         RootContent(
             component = rootComponent,
             onSystemBarsAppearanceChanged = { SystemBarsAppearanceChanged(it) },
         )
     }
+}
+
+private fun initializeGoogleAuth() {
+    val serverId = NSBundle.mainBundle.objectForInfoDictionaryKey("GIDServerClientID") as? String
+    initializeBlinklyGoogleAuth(serverId = serverId.orEmpty())
 }
 
 @Composable

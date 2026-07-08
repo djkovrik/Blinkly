@@ -3,6 +3,7 @@ package com.sedsoftware.blinkly.domain.fakes
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import kotlinx.datetime.LocalDate
+import kotlin.time.Instant
 
 class FakeSettings : BlinklySettings {
     override var blinkBreakCount: Int = FakeData.BLINK_BREAK_COUNT
@@ -20,4 +21,7 @@ class FakeSettings : BlinklySettings {
     override var displayedHighlights: List<Int> = emptyList()
     override var currentHighlightDate: LocalDate? = null
     override var onboardingDisplayed: Boolean = false
+    override var lastLocalChangeAt: Instant? = null
+    override var lastSyncedAt: Instant? = null
+    override var lastRemoteUpdatedAt: Instant? = null
 }

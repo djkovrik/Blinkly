@@ -26,6 +26,11 @@
     <string name="error_notification_permission_requesting">Не удалось запросить разрешение на уведомления</string>
     <string name="error_workout_data_loading">Не удалось обновить прогресс тренировки</string>
     <string name="error_workout_saving">Не удалось сохранить тренировку</string>
+    <string name="error_sync_auth_failed">Не удалось войти для синхронизации</string>
+    <string name="error_sync_read_failed">Не удалось прочитать данные из облака</string>
+    <string name="error_sync_write_failed">Не удалось сохранить данные в облако</string>
+    <string name="error_sync_conflict_failed">Не удалось разрешить конфликт синхронизации</string>
+    <string name="error_sync_unknown">Не удалось синхронизировать данные</string>
 
     <!-- Onboarding navigation -->
     <string name="onboarding_back">Назад</string>
@@ -460,6 +465,14 @@
     <string name="preferences_duration_label">Длительность</string>
     <string name="preferences_unit_repetitions">раз</string>
     <string name="preferences_unit_seconds">сек</string>
+    <string name="sync_title">Синхронизация</string>
+    <string name="sync_sign_in_google">Войти через Google</string>
+    <string name="sync_button_sync_now">Синхронизировать</string>
+    <string name="sync_button_syncing">Синхронизация...</string>
+    <string name="sync_status_not_synced">Не синхронизировано</string>
+    <string name="sync_status_syncing">Синхронизация...</string>
+    <string name="sync_status_last_synced">Последняя синхронизация: %1$s</string>
+    <string name="sync_status_failed">Не удалось синхронизировать</string>
 
     <!-- Workout -->
     <string name="workout_intro_label">Блок тренировки</string>
@@ -490,4 +503,6 @@
     <string name="content_description_decrease">Уменьшить</string>
     <string name="content_description_increase">Увеличить</string>
     <string name="content_description_training_completed">Тренировка выполнена сегодня</string>
+    <string name="content_description_google_sign_in">Вход через Google</string>
+    <string name="content_description_sync">Синхронизация</string>
 </resources>

@@ -39,6 +39,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
+import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
@@ -73,6 +74,7 @@ class RootComponentDefault private constructor(
         dispatchers: BlinklyDispatchers,
         notifier: BlinklyNotifier,
         settings: BlinklySettings,
+        syncManager: BlinklySyncManager,
         timeUtils: BlinklyTimeUtils,
         achievementsWatcher: BlinklyAchievementsWatcher,
         calendarWatcher: BlinklyCalendarWatcher,
@@ -102,7 +104,7 @@ class RootComponentDefault private constructor(
             )
         },
         preferencesComponent = { childContext, output ->
-            PreferencesComponentDefault(childContext, storeFactory, dispatchers, settings, output)
+            PreferencesComponentDefault(childContext, storeFactory, dispatchers, settings, syncManager, output)
         },
         exercisesComponent = { childContext, block, output ->
             WorkoutComponentDefault(

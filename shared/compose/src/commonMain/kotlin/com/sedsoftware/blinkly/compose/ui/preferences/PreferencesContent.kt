@@ -61,6 +61,7 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.sedsoftware.blinkly.component.preferences.PreferencesComponent
 import com.sedsoftware.blinkly.component.preferences.integration.PreferencesComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
+import com.sedsoftware.blinkly.compose.ui.sync.BlinklySyncContent
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -75,6 +76,7 @@ private const val MIN_FLOAT_VALUE = 10f
 fun PreferencesContent(
     component: PreferencesComponent,
     modifier: Modifier = Modifier,
+    enableGoogleSignInContainer: Boolean = true,
 ) {
     val model: PreferencesComponent.Model by component.model.subscribeAsState()
 
@@ -116,6 +118,12 @@ fun PreferencesContent(
             ThemeSelector(
                 selectedTheme = model.themeState,
                 onThemeSelected = component::onThemeStateChanged,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            BlinklySyncContent(
+                component = component.syncComponent,
+                enableGoogleSignInContainer = enableGoogleSignInContainer,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -405,7 +413,10 @@ private fun Float.asDisplayValue(): String {
 @Composable
 private fun PreferencesContentPreviewLight() {
     BlinklyWidgetPreview {
-        PreferencesContent(component = PreferencesComponentPreview())
+        PreferencesContent(
+            component = PreferencesComponentPreview(),
+            enableGoogleSignInContainer = false,
+        )
     }
 }
 
@@ -413,6 +424,9 @@ private fun PreferencesContentPreviewLight() {
 @Composable
 private fun PreferencesContentPreviewDark() {
     BlinklyWidgetPreview(isDarkTheme = true) {
-        PreferencesContent(component = PreferencesComponentPreview(themeState = ThemeState.DARK))
+        PreferencesContent(
+            component = PreferencesComponentPreview(themeState = ThemeState.DARK),
+            enableGoogleSignInContainer = false,
+        )
     }
 }

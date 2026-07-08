@@ -1,11 +1,13 @@
 package com.sedsoftware.blinkly.component.preferences
 
 import com.arkivanov.decompose.value.Value
+import com.sedsoftware.blinkly.component.sync.BlinklySyncComponent
 import com.sedsoftware.blinkly.domain.model.ThemeState
 
 interface PreferencesComponent {
 
     val model: Value<Model>
+    val syncComponent: BlinklySyncComponent
 
     fun onBackClick()
     fun onBlinkBreakCountChanged(value: Int)

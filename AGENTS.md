@@ -74,6 +74,7 @@ repository copy first and remove or refresh the global copy immediately after.
 - `shared/domain` - business interfaces, models, and core logic
 - `shared/notifier` - notification permissions and notification API implementation
 - `shared/settings` - settings storage through Multiplatform Settings
+- `shared/component/sync` - Google/Firebase-backed account sync, remote snapshot DTOs, conflict handling, and sync metadata tracking wrappers
 - `shared/utils` - utility code, preview helpers, and Store helpers
 
 ## Module Map
@@ -89,10 +90,11 @@ Top-level component modules:
 - `main` - implemented main dashboard tab with MVIKotlin Store, feature-local manager, Compose UI, preview component, and common tests
 - `progress` - progress tab with MVIKotlin Store, progress manager, calendar/garden/achievement summary state, outputs for achievements and garden screens, Compose UI, preview component, and common tests
 - `reminders` - reminders tab with MVIKotlin Store, reminders manager, reminder list/delete/undo state, output for add-new-reminder, Compose UI, preview component, and common tests
+- `sync` - settings-embedded sync component with MVIKotlin Store, Google sign-in bridge, Firestore snapshot data source, sync manager, DTO mappers, preview component, and common tests
 - `trainings` - trainings tab with MVIKotlin Store, trainings manager, exercise block cards, outputs for workout execution, Compose UI, preview component, and common tests
 
 Nested component modules:
-- `main/child/preferences` - preferences screen opened on the root stack from the main tab; has MVIKotlin Store, manager, Compose UI, preview component, and common tests
+- `main/child/preferences` - preferences screen opened on the root stack from the main tab; has MVIKotlin Store, manager, nested `sync` component, Compose UI, preview component, and common tests
 - `onboarding/child/step1` through `step5` - onboarding steps; `step4` and `step5` are Store-backed
 - `progress/child/achievements` - achievements screen opened on the root stack from the progress tab; has MVIKotlin Store, Compose UI, preview component, and common tests
 - `progress/child/garden` - garden screen opened on the root stack from the progress tab; has MVIKotlin Store, Compose UI, preview component, and common tests
@@ -103,6 +105,7 @@ Current screen hierarchy:
 - `RootComponentDefault` starts with `Onboarding` when onboarding has not been completed, otherwise `HomeScreen`.
 - `RootComponentDefault` owns the app-level stack and pushes `Preferences`, `Workout`, `Achievements`, `Garden`, and `AddNewReminder` from `ComponentOutput` values emitted by child components.
 - `HomeScreenComponentDefault` owns only the four-tab stack: main, trainings, progress, and reminders. It handles `Main.OpenProgressTab` locally with `bringToFront`; other tab outputs go up to root.
+- `PreferencesComponentDefault` owns the nested `BlinklySyncComponent`; Google sign-in UI remains in Compose, and the sync Store only receives domain-level `BlinklyUser` results.
 - `OnboardingComponentDefault` owns the onboarding step stack from step 1 through step 5. Steps 1, 2, and 3 are thin output-forwarding components; step 4 and step 5 are Store-backed.
 - Root-level feature screens use `ComponentOutput.Common.BackPressed` to return to the previous root stack entry.
 
@@ -111,7 +114,8 @@ Current implementation notes:
 - `main` is the current reference for a Store-backed tab component with domain-derived dashboard state, one-off error labels, a Compose screen, preview-only component implementation, and common component tests.
 - `progress`, `reminders`, and `trainings` are the current references for Store-backed tabs that emit root-handled navigation outputs.
 - `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are the current references for Store-backed feature screens that are physically grouped under their owning product area but opened on the root stack.
-- `step4`, `step5`, `main`, `preferences`, `progress`, `achievements`, `garden`, `reminders`, `newreminder`, `trainings`, and `workout` are the current reference implementations for MVIKotlin stores.
+- `sync` is the current reference for a reusable Store-backed settings child component that observes an external manager and bridges a Compose-owned Google sign-in result back into component state.
+- `step4`, `step5`, `main`, `preferences`, `progress`, `achievements`, `garden`, `reminders`, `newreminder`, `trainings`, `workout`, and `sync` are the current reference implementations for MVIKotlin stores.
 
 ## Architecture Rules
 
@@ -162,9 +166,11 @@ Reference modules:
 - `shared/notifier/src/commonMain/kotlin/com/sedsoftware/blinkly/notifier/di/NotifierModule.kt`
 - `shared/alarm/src/commonMain/kotlin/com/sedsoftware/blinkly/alarm/di/AlarmModule.kt`
 - `shared/beeper/src/commonMain/kotlin/com/sedsoftware/blinkly/beeper/di/BeeperModule.kt`
+- `shared/component/sync/src/commonMain/kotlin/com/sedsoftware/blinkly/component/sync/di/SyncModule.kt`
 - `shared/utils/src/commonMain/kotlin/com/sedsoftware/blinkly/utils/di/UtilsModule.kt`
 
-`RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `DomainModule`, then `RootComponentDefault`.
+`RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `SyncModule`, then `DomainModule`, then `RootComponentDefault`.
+`SyncModule` receives the raw database/settings implementations, exposes tracking decorators for app use, and passes `BlinklySyncManager` into `RootComponentDefault` so Preferences can create the nested sync component.
 
 Important local rule: configuration objects in Decompose navigation carry only persistent arguments, never dependencies. Dependencies are supplied in child factories.
 
@@ -199,6 +205,8 @@ Reference files:
 - `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/integration/TrainingsTabComponentDefault.kt`
 - `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/WorkoutComponent.kt`
 - `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/integration/WorkoutComponentDefault.kt`
+- `shared/component/sync/src/commonMain/kotlin/com/sedsoftware/blinkly/component/sync/BlinklySyncComponent.kt`
+- `shared/component/sync/src/commonMain/kotlin/com/sedsoftware/blinkly/component/sync/integration/BlinklySyncComponentDefault.kt`
 - `shared/component/onboarding/child/step4/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step4/OnboardingStep4Component.kt`
 - `shared/component/onboarding/child/step4/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step4/integration/OnboardingStep4ComponentDefault.kt`
 - `shared/component/onboarding/child/step5/src/commonMain/kotlin/com/sedsoftware/blinkly/component/step5/OnboardingStep5Component.kt`
@@ -273,6 +281,8 @@ Current store references:
 - `shared/component/trainings/src/commonMain/kotlin/com/sedsoftware/blinkly/component/trainings/store/TrainingsTabStoreProvider.kt`
 - `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/store/WorkoutStore.kt`
 - `shared/component/trainings/child/workout/src/commonMain/kotlin/com/sedsoftware/blinkly/component/workout/store/WorkoutStoreProvider.kt`
+- `shared/component/sync/src/commonMain/kotlin/com/sedsoftware/blinkly/component/sync/store/BlinklySyncStore.kt`
+- `shared/component/sync/src/commonMain/kotlin/com/sedsoftware/blinkly/component/sync/store/BlinklySyncStoreProvider.kt`
 - `shared/component/onboarding/child/step4/.../store/DisclaimerStore.kt`
 - `shared/component/onboarding/child/step4/.../store/DisclaimerStoreProvider.kt`
 - `shared/component/onboarding/child/step5/.../store/InitialRemindersStore.kt`
@@ -280,6 +290,7 @@ Current store references:
 
 `main` is the reference for a tab Store with bootstrapper subscriptions, manager-based business logic, domain-derived model data, and labels mapped to parent output.
 `progress`, `reminders`, and `trainings` are references for Store-backed tabs that emit navigation outputs. `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are references for Store-backed feature screens opened by the root stack.
+`sync` is the reference for a Store that observes a domain manager state flow, emits a UI-owned sign-in request label, and performs post-auth synchronization from a domain `BlinklyUser`.
 
 ### Store structure
 
@@ -418,6 +429,7 @@ Current references:
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/newreminder/AddNewReminderComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/trainings/TrainingsTabComponentTest.kt`
 - `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/workout/WorkoutComponentTest.kt`
+- `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component/sync/BlinklySyncComponentTest.kt`
 
 Preferred assertions:
 - inspect `childStack.active.instance` for navigation state

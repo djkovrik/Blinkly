@@ -4,8 +4,12 @@ import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.sedsoftware.blinkly.component.preferences.PreferencesComponent
 import com.sedsoftware.blinkly.component.preferences.PreferencesComponent.Model
+import com.sedsoftware.blinkly.component.sync.BlinklySyncComponent
+import com.sedsoftware.blinkly.component.sync.integration.BlinklySyncComponentPreview
 import com.sedsoftware.blinkly.domain.model.ThemeState
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class PreferencesComponentPreview(
     private val blinkBreakCount: Int = 60,
     private val nearFarFocusCount: Int = 10,
@@ -17,6 +21,8 @@ class PreferencesComponentPreview(
     private val palmingDuration: Int = 120,
     private val themeState: ThemeState = ThemeState.SYSTEM,
 ) : PreferencesComponent {
+
+    override val syncComponent: BlinklySyncComponent = BlinklySyncComponentPreview()
 
     override val model: Value<Model> = MutableValue(
         Model(

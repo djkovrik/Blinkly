@@ -12,6 +12,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowInsetsControllerCompat
 import com.arkivanov.decompose.defaultComponentContext
 import com.sedsoftware.blinkly.component.root.RootComponentFactory
+import com.sedsoftware.blinkly.compose.auth.initializeBlinklyGoogleAuth
 import com.sedsoftware.blinkly.compose.ui.RootContent
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
@@ -38,6 +39,7 @@ class AppActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         permissionsController.bind(this)
+        initializeBlinklyGoogleAuth(serverId = getString(R.string.default_web_client_id))
 
         val rootComponent = RootComponentFactory(
             componentContext = defaultComponentContext(),
