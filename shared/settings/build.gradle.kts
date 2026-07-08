@@ -8,7 +8,14 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:domain"))
-                implementation(libs.kotlinx.serialization.json)
+
+                implementation(libs.lib.multiplatform.settings.core)
+                implementation(libs.lib.multiplatform.settings.test)
+            }
+        }
+        androidMain {
+            dependencies {
+                implementation(libs.androidx.preferences)
             }
         }
     }

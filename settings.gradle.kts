@@ -37,7 +37,6 @@ include(
     ":shared:notifier",
     ":shared:beeper",
     ":shared:settings",
-    ":shared:sync",
     ":shared:utils",
     ":shared:component:root",
     ":shared:component:onboarding",
@@ -56,6 +55,7 @@ include(
     ":shared:component:reminders:child:newreminder",
     ":shared:component:trainings",
     ":shared:component:trainings:child:workout",
+    ":shared:component:sync",
 )
 
 includeBuild("gradle/build-logic")
