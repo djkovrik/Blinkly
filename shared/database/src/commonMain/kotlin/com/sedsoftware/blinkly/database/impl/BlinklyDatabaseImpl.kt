@@ -20,6 +20,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Achievement
+import com.sedsoftware.blinkly.domain.model.BlinklyDatabaseSnapshot
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.Workout
@@ -81,50 +82,79 @@ internal class BlinklyDatabaseImpl(
             .mapToList(dispatchers.io)
             .map(reminderMapper::toDomain)
 
+    override suspend fun currentSnapshot(): BlinklyDatabaseSnapshot =
+        withContext(dispatchers.io) {
+            BlinklyDatabaseSnapshot(
+                exercises = exerciseMapper.toDomain(queries.getExercises().executeAsList()),
+                achievements = achievementMapper.toDomain(queries.getAchievements().executeAsList()),
+                reminders = reminderMapper.toDomain(queries.getReminders().executeAsList()),
+            )
+        }
+
+    override suspend fun replaceSnapshot(snapshot: BlinklyDatabaseSnapshot) {
+        withContext(dispatchers.io) {
+            queries.transaction {
+                queries.deleteExercises()
+                queries.deleteAchievements()
+                queries.deleteReminders()
+
+                snapshot.exercises.forEach(::insertExercise)
+                snapshot.achievements.forEach(::insertAchievement)
+                snapshot.reminders.forEach(::insertReminder)
+            }
+        }
+    }
+
     override suspend fun saveExercise(exercise: Exercise) {
         withContext(dispatchers.io) {
-            queries.insertExercise(
-                type = exercise.type,
-                block = exercise.block,
-                completedAt = exercise.completedAt,
-            )
+            insertExercise(exercise)
+        }
+    }
+
+    override suspend fun saveExercises(exercises: List<Exercise>) {
+        withContext(dispatchers.io) {
+            queries.transaction {
+                exercises.forEach(::insertExercise)
+            }
         }
     }
 
     override suspend fun unlockAchievement(achievement: Achievement) {
         withContext(dispatchers.io) {
-            queries.insertAchievement(
-                type = achievement.type,
-                level = achievement.level,
-                unlockedAt = achievement.unlockedAt,
-            )
+            insertAchievement(achievement)
+        }
+    }
+
+    override suspend fun saveAchievements(achievements: List<Achievement>) {
+        withContext(dispatchers.io) {
+            queries.transaction {
+                achievements.forEach(::insertAchievement)
+            }
+        }
+    }
+
+    override suspend fun deleteAchievements() {
+        withContext(dispatchers.io) {
+            queries.deleteAchievements()
+        }
+    }
+
+    override suspend fun deleteExercises() {
+        withContext(dispatchers.io) {
+            queries.deleteExercises()
         }
     }
 
     override suspend fun saveReminder(reminder: Reminder) {
         withContext(dispatchers.io) {
-            queries.insertReminder(
-                uuid = reminder.uuid,
-                date = reminder.date,
-                type = reminder.type,
-                interval = reminder.interval,
-                weekDays = reminder.weekDays,
-            )
+            insertReminder(reminder)
         }
     }
 
     override suspend fun saveReminders(reminders: List<Reminder>) {
         withContext(dispatchers.io) {
             queries.transaction {
-                reminders.forEach { reminder ->
-                    queries.insertReminder(
-                        uuid = reminder.uuid,
-                        date = reminder.date,
-                        type = reminder.type,
-                        interval = reminder.interval,
-                        weekDays = reminder.weekDays,
-                    )
-                }
+                reminders.forEach(::insertReminder)
             }
         }
     }
@@ -139,5 +169,31 @@ internal class BlinklyDatabaseImpl(
         withContext(dispatchers.io) {
             queries.deleteReminders()
         }
+    }
+
+    private fun insertExercise(exercise: Exercise) {
+        queries.insertExercise(
+            type = exercise.type,
+            block = exercise.block,
+            completedAt = exercise.completedAt,
+        )
+    }
+
+    private fun insertAchievement(achievement: Achievement) {
+        queries.insertAchievement(
+            type = achievement.type,
+            level = achievement.level,
+            unlockedAt = achievement.unlockedAt,
+        )
+    }
+
+    private fun insertReminder(reminder: Reminder) {
+        queries.insertReminder(
+            uuid = reminder.uuid,
+            date = reminder.date,
+            type = reminder.type,
+            interval = reminder.interval,
+            weekDays = reminder.weekDays,
+        )
     }
 }

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A516EB4C2F6DB13A0040FD0E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A516EB4A2F6DB13A0040FD0E /* Localizable.strings */; };
 		A55F5A572F76F8F6005C275E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A55F5A562F76F8F6005C275E /* LaunchScreen.storyboard */; };
+		A5A7FEEF2FFE61D400563B1B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A5A7FEEE2FFE61D400563B1B /* GoogleService-Info.plist */; };
 		A5E68B512FFA71000000BF2A /* beep.wav in Resources */ = {isa = PBXBuildFile; fileRef = A5E68B4F2FFA71000000BF2A /* beep.wav */; };
 		A5E68B522FFA71000000BF2A /* ding.wav in Resources */ = {isa = PBXBuildFile; fileRef = A5E68B502FFA71000000BF2A /* ding.wav */; };
 		A93A953B29CC810C00F8E227 /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93A953A29CC810C00F8E227 /* iosApp.swift */; };
@@ -20,6 +21,7 @@
 		A516EB4B2F6DB13A0040FD0E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A516EB4D2F6DB13F0040FD0E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A55F5A562F76F8F6005C275E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A5A7FEEE2FFE61D400563B1B /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A5E68B4F2FFA71000000BF2A /* beep.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = beep.wav; sourceTree = "<group>"; };
 		A5E68B502FFA71000000BF2A /* ding.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ding.wav; sourceTree = "<group>"; };
 		A93A953729CC810C00F8E227 /* Blinkly.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Blinkly.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -60,6 +62,7 @@
 		A93A953929CC810C00F8E227 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				A5A7FEEE2FFE61D400563B1B /* GoogleService-Info.plist */,
 				A93A953A29CC810C00F8E227 /* iosApp.swift */,
 				A93A953E29CC810D00F8E227 /* Assets.xcassets */,
 				A55F5A562F76F8F6005C275E /* LaunchScreen.storyboard */,
@@ -150,6 +153,7 @@
 				A5E68B512FFA71000000BF2A /* beep.wav in Resources */,
 				A5E68B522FFA71000000BF2A /* ding.wav in Resources */,
 				A93A953F29CC810D00F8E227 /* Assets.xcassets in Resources */,
+				A5A7FEEF2FFE61D400563B1B /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2,6 +2,7 @@ package com.sedsoftware.blinkly.domain.external
 
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import kotlinx.datetime.LocalDate
+import kotlin.time.Instant
 
 interface BlinklySettings {
     var blinkBreakCount: Int
@@ -19,4 +20,7 @@ interface BlinklySettings {
     var displayedHighlights: List<Int>
     var currentHighlightDate: LocalDate?
     var onboardingDisplayed: Boolean
+    var lastLocalChangeAt: Instant?
+    var lastSyncedAt: Instant?
+    var lastRemoteUpdatedAt: Instant?
 }

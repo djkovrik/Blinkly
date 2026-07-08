@@ -30,6 +30,7 @@ kotlin {
                 implementation(project(":shared:component:reminders:child:newreminder"))
                 implementation(project(":shared:component:trainings"))
                 implementation(project(":shared:component:trainings:child:workout"))
+                implementation(project(":shared:component:sync"))
 
                 implementation(libs.ark.decompose.core)
                 implementation(libs.ark.decompose.extensions)

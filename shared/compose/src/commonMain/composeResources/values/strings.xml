@@ -29,6 +29,11 @@
     <string name="error_notification_permission_requesting">Could not request notification permission</string>
     <string name="error_workout_data_loading">Could not update workout progress</string>
     <string name="error_workout_saving">Could not save workout</string>
+    <string name="error_sync_auth_failed">Could not sign in for sync</string>
+    <string name="error_sync_read_failed">Could not read cloud sync data</string>
+    <string name="error_sync_write_failed">Could not save cloud sync data</string>
+    <string name="error_sync_conflict_failed">Could not resolve sync conflict</string>
+    <string name="error_sync_unknown">Could not sync data</string>
 
     <!-- Onboarding navigation -->
     <string name="onboarding_back">Back</string>
@@ -463,6 +468,14 @@
     <string name="preferences_duration_label">Duration</string>
     <string name="preferences_unit_repetitions">reps</string>
     <string name="preferences_unit_seconds">sec</string>
+    <string name="sync_title">Sync</string>
+    <string name="sync_sign_in_google">Sign in with Google</string>
+    <string name="sync_button_sync_now">Sync now</string>
+    <string name="sync_button_syncing">Syncing...</string>
+    <string name="sync_status_not_synced">Not synced yet</string>
+    <string name="sync_status_syncing">Syncing...</string>
+    <string name="sync_status_last_synced">Last synced: %1$s</string>
+    <string name="sync_status_failed">Could not sync</string>
 
     <!-- Workout -->
     <string name="workout_intro_label">Workout block</string>
@@ -493,4 +506,6 @@
     <string name="content_description_decrease">Decrease</string>
     <string name="content_description_increase">Increase</string>
     <string name="content_description_training_completed">Training completed today</string>
+    <string name="content_description_google_sign_in">Google sign in</string>
+    <string name="content_description_sync">Sync</string>
 </resources>

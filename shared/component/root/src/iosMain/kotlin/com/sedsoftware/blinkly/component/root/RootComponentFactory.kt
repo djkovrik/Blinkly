@@ -11,6 +11,8 @@ import com.sedsoftware.blinkly.beeper.BeeperWrapperFactory
 import com.sedsoftware.blinkly.beeper.di.BeeperModule
 import com.sedsoftware.blinkly.beeper.di.BeeperModuleDependencies
 import com.sedsoftware.blinkly.component.root.integration.RootComponentDefault
+import com.sedsoftware.blinkly.component.sync.di.SyncModule
+import com.sedsoftware.blinkly.component.sync.di.SyncModuleDependencies
 import com.sedsoftware.blinkly.database.BlinklyDatabaseDriverFactory
 import com.sedsoftware.blinkly.database.di.DatabaseModule
 import com.sedsoftware.blinkly.database.di.DatabaseModuleDependencies
@@ -35,7 +37,7 @@ import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-@Suppress("FunctionName")
+@Suppress("FunctionName", "LongMethod")
 fun RootComponentFactory(
     componentContext: ComponentContext,
     contentConfigurations: Map<ReminderType, ReminderConfig>,
@@ -65,7 +67,7 @@ fun RootComponentFactory(
         alarmModule.alarmManager
     }
 
-    val database: BlinklyDatabase by lazy {
+    val rawDatabase: BlinklyDatabase by lazy {
         val databaseModule = DatabaseModule(
             dependencies = object : DatabaseModuleDependencies {
                 override val driver: SqlDriver = BlinklyDatabaseDriverFactory()
@@ -87,7 +89,7 @@ fun RootComponentFactory(
         notifierModule.notifier
     }
 
-    val settings: BlinklySettings by lazy {
+    val rawSettings: BlinklySettings by lazy {
         val settingsModule = SettingsModule(
             dependencies = object : SettingsModuleDependencies {
                 override val settings: Settings = SharedSettingsFactory()
@@ -95,6 +97,25 @@ fun RootComponentFactory(
         )
 
         settingsModule.settings
+    }
+
+    val syncModule: SyncModule by lazy {
+        SyncModule(
+            dependencies = object : SyncModuleDependencies {
+                override val database: BlinklyDatabase = rawDatabase
+                override val settings: BlinklySettings = rawSettings
+                override val dispatchers: BlinklyDispatchers = dispatchers
+                override val timeUtils: BlinklyTimeUtils = timeUtils
+            }
+        )
+    }
+
+    val database: BlinklyDatabase by lazy {
+        syncModule.trackedDatabase
+    }
+
+    val settings: BlinklySettings by lazy {
+        syncModule.trackedSettings
     }
 
     val domainModule: DomainModule by lazy {
@@ -129,6 +150,7 @@ fun RootComponentFactory(
         dispatchers = dispatchers,
         notifier = notifier,
         settings = settings,
+        syncManager = syncModule.syncManager,
         timeUtils = timeUtils,
         achievementsWatcher = domainModule.achievementsWatcher,
         calendarWatcher = domainModule.calendarWatcher,

@@ -8,15 +8,22 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.preferences.integration.PreferencesComponentDefault
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
+import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
+import com.sedsoftware.blinkly.domain.model.BlinklySyncState
+import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ThemeState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
+import kotlin.time.Instant
 
 class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
 
     private val settings: FakeSettings = FakeSettings()
+    private val syncManager: FakeBlinklySyncManager = FakeBlinklySyncManager()
 
     @Test
     fun `when component created then model contains settings values`() = runTest(testScheduler) {
@@ -103,6 +110,7 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
             storeFactory = DefaultStoreFactory(),
             dispatchers = testDispatchers,
             settings = settings,
+            syncManager = syncManager,
             preferencesOutput = { componentOutput.add(it) },
         )
 
@@ -122,5 +130,23 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
         override var displayedHighlights: List<Int> = emptyList()
         override var currentHighlightDate: LocalDate? = null
         override var onboardingDisplayed: Boolean = false
+        override var lastLocalChangeAt: Instant? = null
+        override var lastSyncedAt: Instant? = null
+        override var lastRemoteUpdatedAt: Instant? = null
+    }
+
+    private class FakeBlinklySyncManager : BlinklySyncManager {
+        override val state: StateFlow<BlinklySyncState> = MutableStateFlow(
+            BlinklySyncState(
+                isAuthorized = false,
+                isSyncing = false,
+                lastSyncedAt = null,
+                error = null,
+            )
+        )
+
+        override suspend fun signInOrSync() = Unit
+        override suspend fun completeGoogleSignIn(user: BlinklyUser) = Unit
+        override suspend fun syncNow() = Unit
     }
 }

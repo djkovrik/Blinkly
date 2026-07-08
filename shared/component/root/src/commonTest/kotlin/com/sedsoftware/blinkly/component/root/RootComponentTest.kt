@@ -22,8 +22,11 @@ import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
+import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.BlinklySyncState
+import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
@@ -31,6 +34,8 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -38,6 +43,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlin.test.Test
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 class RootComponentTest : ComponentTest<RootComponent>() {
 
@@ -49,6 +55,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val databaseMock: BlinklyDatabase = mock()
     private val notifierMock: BlinklyNotifier = mock()
     private val fakeSettings = FakeSettings()
+    private val syncManager: FakeBlinklySyncManager = FakeBlinklySyncManager()
     private val timeUtilsMock: BlinklyTimeUtils = mock {
         every { now() } returns Clock.System.now()
         every { timeZone() } returns TimeZone.UTC
@@ -327,6 +334,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
             dispatchers = testDispatchers,
             notifier = notifierMock,
             settings = fakeSettings,
+            syncManager = syncManager,
             timeUtils = timeUtilsMock,
             achievementsWatcher = achievementsWatcherMock,
             calendarWatcher = calendarWatcherMock,
@@ -352,5 +360,23 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         override var displayedHighlights: List<Int> = emptyList()
         override var currentHighlightDate: LocalDate? = null
         override var onboardingDisplayed: Boolean = false
+        override var lastLocalChangeAt: Instant? = null
+        override var lastSyncedAt: Instant? = null
+        override var lastRemoteUpdatedAt: Instant? = null
+    }
+
+    private class FakeBlinklySyncManager : BlinklySyncManager {
+        override val state: StateFlow<BlinklySyncState> = MutableStateFlow(
+            BlinklySyncState(
+                isAuthorized = false,
+                isSyncing = false,
+                lastSyncedAt = null,
+                error = null,
+            )
+        )
+
+        override suspend fun signInOrSync() = Unit
+        override suspend fun completeGoogleSignIn(user: BlinklyUser) = Unit
+        override suspend fun syncNow() = Unit
     }
 }

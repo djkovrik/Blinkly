@@ -12,8 +12,11 @@ import com.sedsoftware.blinkly.component.preferences.PreferencesComponent.Model
 import com.sedsoftware.blinkly.component.preferences.domain.PreferencesManager
 import com.sedsoftware.blinkly.component.preferences.store.PreferencesStore
 import com.sedsoftware.blinkly.component.preferences.store.PreferencesStoreProvider
+import com.sedsoftware.blinkly.component.sync.BlinklySyncComponent
+import com.sedsoftware.blinkly.component.sync.integration.BlinklySyncComponentDefault
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
+import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import com.sedsoftware.blinkly.utils.asValue
@@ -26,6 +29,7 @@ class PreferencesComponentDefault(
     private val storeFactory: StoreFactory,
     private val dispatchers: BlinklyDispatchers,
     private val settings: BlinklySettings,
+    syncManager: BlinklySyncManager,
     private val preferencesOutput: (ComponentOutput) -> Unit,
 ) : PreferencesComponent, ComponentContext by componentContext {
 
@@ -38,6 +42,15 @@ class PreferencesComponentDefault(
                 ioContext = dispatchers.io,
             ).create(autoInit = false)
         }
+
+    override val syncComponent: BlinklySyncComponent =
+        BlinklySyncComponentDefault(
+            componentContext = componentContext,
+            storeFactory = storeFactory,
+            dispatchers = dispatchers,
+            syncManager = syncManager,
+            syncOutput = preferencesOutput,
+        )
 
     init {
         val scope = CoroutineScope(dispatchers.main)

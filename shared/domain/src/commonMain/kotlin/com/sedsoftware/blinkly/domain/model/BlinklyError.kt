@@ -20,6 +20,11 @@ sealed class BlinklyError(message: String, cause: Throwable? = null) : Exception
     class NotificationPermissionRequesting(cause: Throwable) : BlinklyError("Unable to request notification permission", cause)
     class WorkoutDataLoading(cause: Throwable) : BlinklyError("Unable to update workout data", cause)
     class WorkoutSaving(cause: Throwable) : BlinklyError("Unable to save workout", cause)
+    class SyncAuthFailed(cause: Throwable) : BlinklyError("Unable to authorize sync", cause)
+    class SyncReadFailed(cause: Throwable) : BlinklyError("Unable to read sync snapshot", cause)
+    class SyncWriteFailed(cause: Throwable) : BlinklyError("Unable to write sync snapshot", cause)
+    class SyncConflictFailed(cause: Throwable) : BlinklyError("Unable to resolve sync conflict", cause)
+    class SyncUnknown(cause: Throwable) : BlinklyError("Unable to sync", cause)
     class Unknown(cause: Throwable) : BlinklyError("Unknown error", cause)
 }
 

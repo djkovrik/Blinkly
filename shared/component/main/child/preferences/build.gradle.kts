@@ -9,6 +9,7 @@ kotlin {
             dependencies {
                 implementation(project(":shared:domain"))
                 implementation(project(":shared:utils"))
+                implementation(project(":shared:component:sync"))
 
                 implementation(libs.ark.decompose.core)
                 implementation(libs.ark.decompose.extensions)
