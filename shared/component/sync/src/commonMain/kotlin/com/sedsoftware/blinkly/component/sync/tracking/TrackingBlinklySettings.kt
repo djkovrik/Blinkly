@@ -71,10 +71,16 @@ internal class TrackingBlinklySettings(
         get() = delegate.onboardingDisplayed
         set(value) = setTracked { delegate.onboardingDisplayed = value }
 
-    override var lastLocalChangeAt: Instant?
-        get() = delegate.lastLocalChangeAt
+    override var lastLocalDatabaseChangeAt: Instant?
+        get() = delegate.lastLocalDatabaseChangeAt
         set(value) {
-            delegate.lastLocalChangeAt = value
+            delegate.lastLocalDatabaseChangeAt = value
+        }
+
+    override var lastLocalSettingsChangeAt: Instant?
+        get() = delegate.lastLocalSettingsChangeAt
+        set(value) {
+            delegate.lastLocalSettingsChangeAt = value
         }
 
     override var lastSyncedAt: Instant?
@@ -91,6 +97,6 @@ internal class TrackingBlinklySettings(
 
     private inline fun setTracked(block: () -> Unit) {
         block()
-        delegate.lastLocalChangeAt = timeUtils.now()
+        delegate.lastLocalSettingsChangeAt = timeUtils.now()
     }
 }

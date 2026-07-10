@@ -130,7 +130,8 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
         override var displayedHighlights: List<Int> = emptyList()
         override var currentHighlightDate: LocalDate? = null
         override var onboardingDisplayed: Boolean = false
-        override var lastLocalChangeAt: Instant? = null
+        override var lastLocalDatabaseChangeAt: Instant? = null
+        override var lastLocalSettingsChangeAt: Instant? = null
         override var lastSyncedAt: Instant? = null
         override var lastRemoteUpdatedAt: Instant? = null
     }
@@ -145,7 +146,6 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
             )
         )
 
-        override suspend fun signInOrSync() = Unit
         override suspend fun completeGoogleSignIn(user: BlinklyUser) = Unit
         override suspend fun syncNow() = Unit
     }

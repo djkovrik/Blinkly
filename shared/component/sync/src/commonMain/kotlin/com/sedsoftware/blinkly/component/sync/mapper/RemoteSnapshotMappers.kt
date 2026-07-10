@@ -23,13 +23,15 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlin.time.Instant
 
-internal const val SYNC_SCHEMA_VERSION = 1
+internal const val SYNC_SCHEMA_VERSION = 2
 
 internal fun RemoteBlinklySnapshot.toDto(): BlinklyRemoteSnapshotDto =
     BlinklyRemoteSnapshotDto(
         schemaVersion = SYNC_SCHEMA_VERSION,
         updatedAtEpochMillis = updatedAt.toEpochMilliseconds(),
         lastSyncedAtEpochMillis = lastSyncedAt?.toEpochMilliseconds(),
+        databaseUpdatedAtEpochMillis = databaseUpdatedAt.toEpochMilliseconds(),
+        settingsUpdatedAtEpochMillis = settingsUpdatedAt.toEpochMilliseconds(),
         settings = settings.toDto(),
         exercises = database.exercises.map(Exercise::toDto),
         achievements = database.achievements.map(Achievement::toDto),
@@ -37,7 +39,7 @@ internal fun RemoteBlinklySnapshot.toDto(): BlinklyRemoteSnapshotDto =
     )
 
 internal fun BlinklyRemoteSnapshotDto.toDomain(): RemoteBlinklySnapshot {
-    if (schemaVersion != SYNC_SCHEMA_VERSION) {
+    if (schemaVersion !in 1..SYNC_SCHEMA_VERSION) {
         throw BlinklyError.SyncConflictFailed(
             IllegalArgumentException("Unsupported sync schema version: $schemaVersion")
         )
@@ -52,6 +54,8 @@ internal fun BlinklyRemoteSnapshotDto.toDomain(): RemoteBlinklySnapshot {
             achievements = achievements.map(AchievementDto::toDomain),
             reminders = reminders.map(ReminderDto::toDomain),
         ),
+        databaseUpdatedAt = Instant.fromEpochMilliseconds(databaseUpdatedAtEpochMillis ?: updatedAtEpochMillis),
+        settingsUpdatedAt = Instant.fromEpochMilliseconds(settingsUpdatedAtEpochMillis ?: updatedAtEpochMillis),
     )
 }
 

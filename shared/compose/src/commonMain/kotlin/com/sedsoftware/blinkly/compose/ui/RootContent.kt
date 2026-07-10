@@ -7,16 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -45,6 +42,7 @@ import blinkly.shared.compose.generated.resources.error_trainings_data_loading
 import blinkly.shared.compose.generated.resources.error_unknown
 import blinkly.shared.compose.generated.resources.error_workout_data_loading
 import blinkly.shared.compose.generated.resources.error_workout_saving
+import blinkly.shared.compose.generated.resources.notification_achievement_unlocked
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.PredictiveBackParams
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.fade
@@ -62,7 +60,14 @@ import com.sedsoftware.blinkly.compose.ui.home.HomeScreenContent
 import com.sedsoftware.blinkly.compose.ui.newreminder.AddNewReminderContent
 import com.sedsoftware.blinkly.compose.ui.onboarding.OnboardingContent
 import com.sedsoftware.blinkly.compose.ui.preferences.PreferencesContent
+import com.sedsoftware.blinkly.compose.ui.extension.asTitle
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySnackbar
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySnackbarType
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySnackbarVisuals
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.BlinklyNotification
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -74,29 +79,34 @@ fun RootContent(
 ) {
     val themeState by component.themeState.subscribeAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    var currentError: BlinklyError? by remember { mutableStateOf(null) }
+    val snackbarEvents = remember(component) { mutableStateListOf<SnackbarEvent>() }
 
     BlinklyAppTheme(
         onSystemBarsAppearanceChanged = onSystemBarsAppearanceChanged,
         themeState = themeState,
     ) {
         LaunchedEffect(component) {
-            component.errors.collect { error ->
-                currentError = error
+            merge(
+                component.errors.map(SnackbarEvent::Error),
+                component.notifications.map(SnackbarEvent::Notification),
+            ).collect { event ->
+                snackbarEvents.add(event)
             }
         }
 
-        currentError?.let { error ->
-            val message = error.asMessage()
+        snackbarEvents.firstOrNull()?.let { event ->
+            val message = event.asMessage()
 
-            LaunchedEffect(error, message) {
+            LaunchedEffect(event, message) {
                 snackbarHostState.showSnackbar(
-                    message = message,
-                    withDismissAction = true,
+                    BlinklySnackbarVisuals(
+                        message = message,
+                        type = event.type,
+                    )
                 )
 
-                if (currentError === error) {
-                    currentError = null
+                if (snackbarEvents.firstOrNull() === event) {
+                    snackbarEvents.removeAt(0)
                 }
             }
         }
@@ -135,13 +145,7 @@ fun RootContent(
             SnackbarHost(
                 hostState = snackbarHostState,
                 snackbar = { snackbarData ->
-                    Snackbar(
-                        snackbarData = snackbarData,
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError,
-                        actionColor = MaterialTheme.colorScheme.onError,
-                        dismissActionContentColor = MaterialTheme.colorScheme.onError,
-                    )
+                    BlinklySnackbar(snackbarData = snackbarData)
                 },
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -150,6 +154,35 @@ fun RootContent(
         }
     }
 }
+
+private sealed class SnackbarEvent {
+
+    abstract val type: BlinklySnackbarType
+
+    data class Error(val error: BlinklyError) : SnackbarEvent() {
+        override val type: BlinklySnackbarType = BlinklySnackbarType.ERROR
+    }
+
+    data class Notification(val notification: BlinklyNotification) : SnackbarEvent() {
+        override val type: BlinklySnackbarType = BlinklySnackbarType.NOTIFICATION
+    }
+}
+
+@Composable
+private fun SnackbarEvent.asMessage(): String =
+    when (this) {
+        is SnackbarEvent.Error -> error.asMessage()
+        is SnackbarEvent.Notification -> notification.asMessage()
+    }
+
+@Composable
+private fun BlinklyNotification.asMessage(): String =
+    when (this) {
+        is BlinklyNotification.AchievementUnlocked -> stringResource(
+            Res.string.notification_achievement_unlocked,
+            type.asTitle(),
+        )
+    }
 
 @Composable
 private fun BlinklyError.asMessage(): String =

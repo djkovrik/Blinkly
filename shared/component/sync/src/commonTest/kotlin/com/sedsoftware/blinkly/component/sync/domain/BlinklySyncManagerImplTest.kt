@@ -41,15 +41,18 @@ class BlinklySyncManagerImplTest {
     private val database: FakeBlinklyDatabase = FakeBlinklyDatabase()
     private val settings: FakeBlinklySettings = FakeBlinklySettings()
     private val remoteDataSource: FakeRemoteSyncDataSource = FakeRemoteSyncDataSource()
-    private val timeUtils: FakeTimeUtils = FakeTimeUtils(now = instant(20))
+    private val timeUtils: FakeTimeUtils = FakeTimeUtils(now = instant(50))
 
     @Test
     fun `when remote snapshot is missing then local snapshot is uploaded`() = runTest {
         // given
-        val localChangedAt = instant(10)
+        val localDatabaseChangedAt = instant(10)
+        val localSettingsChangedAt = instant(12)
         val localSnapshot = databaseSnapshot(exercises = listOf(exercise(10)))
-        settings.lastLocalChangeAt = localChangedAt
+        settings.lastLocalDatabaseChangeAt = localDatabaseChangedAt
+        settings.lastLocalSettingsChangeAt = localSettingsChangedAt
         database.snapshot = localSnapshot
+        settings.blinkBreakCount = 90
         remoteDataSource.remote = null
 
         // when
@@ -57,41 +60,30 @@ class BlinklySyncManagerImplTest {
 
         // then
         assertEquals(localSnapshot, remoteDataSource.writtenSnapshot?.database)
-        assertEquals(localChangedAt, remoteDataSource.writtenSnapshot?.updatedAt)
+        assertEquals(settingsSnapshot(blinkBreakCount = 90), remoteDataSource.writtenSnapshot?.settings)
+        assertEquals(localDatabaseChangedAt, remoteDataSource.writtenSnapshot?.databaseUpdatedAt)
+        assertEquals(localSettingsChangedAt, remoteDataSource.writtenSnapshot?.settingsUpdatedAt)
+        assertEquals(timeUtils.now(), remoteDataSource.writtenSnapshot?.updatedAt)
         assertEquals(timeUtils.now(), settings.lastSyncedAt)
-        assertEquals(localChangedAt, settings.lastRemoteUpdatedAt)
+        assertEquals(timeUtils.now(), settings.lastRemoteUpdatedAt)
         assertNull(database.replacedSnapshot)
     }
 
     @Test
-    fun `when local snapshot is newer than remote then local snapshot is uploaded`() = runTest {
+    fun `when only local database changed then local database is uploaded without overwriting remote settings`() = runTest {
         // given
-        val localChangedAt = instant(30)
-        val remoteUpdatedAt = instant(10)
+        val baseline = instant(20)
+        val localDatabaseChangedAt = instant(30)
         val localSnapshot = databaseSnapshot(exercises = listOf(exercise(30)))
-        settings.lastLocalChangeAt = localChangedAt
+        val remoteSettings = settingsSnapshot(blinkBreakCount = 75)
+        settings.lastRemoteUpdatedAt = baseline
+        settings.lastLocalDatabaseChangeAt = localDatabaseChangedAt
         database.snapshot = localSnapshot
-        remoteDataSource.remote = remoteSnapshot(remoteUpdatedAt, databaseSnapshot(exercises = listOf(exercise(10))))
-
-        // when
-        createManager(backgroundScope).syncNow()
-
-        // then
-        assertEquals(localSnapshot, remoteDataSource.writtenSnapshot?.database)
-        assertEquals(localChangedAt, remoteDataSource.writtenSnapshot?.updatedAt)
-        assertNull(database.replacedSnapshot)
-    }
-
-    @Test
-    fun `when remote snapshot is newer than local then remote snapshot is applied`() = runTest {
-        // given
-        val remoteUpdatedAt = instant(30)
-        val remoteDatabase = databaseSnapshot(exercises = listOf(exercise(30)))
-        val remoteSettings = settingsSnapshot(blinkBreakCount = 90)
-        settings.lastLocalChangeAt = instant(10)
         remoteDataSource.remote = remoteSnapshot(
-            updatedAt = remoteUpdatedAt,
-            database = remoteDatabase,
+            updatedAt = baseline,
+            databaseUpdatedAt = baseline,
+            settingsUpdatedAt = baseline,
+            database = databaseSnapshot(exercises = listOf(exercise(10))),
             settings = remoteSettings,
         )
 
@@ -99,21 +91,46 @@ class BlinklySyncManagerImplTest {
         createManager(backgroundScope).syncNow()
 
         // then
+        assertEquals(localSnapshot, remoteDataSource.writtenSnapshot?.database)
+        assertEquals(remoteSettings, remoteDataSource.writtenSnapshot?.settings)
+        assertEquals(localDatabaseChangedAt, remoteDataSource.writtenSnapshot?.databaseUpdatedAt)
+        assertEquals(baseline, remoteDataSource.writtenSnapshot?.settingsUpdatedAt)
+        assertEquals(75, settings.blinkBreakCount)
+    }
+
+    @Test
+    fun `when only remote database changed then remote database is applied`() = runTest {
+        // given
+        val baseline = instant(20)
+        val remoteDatabaseUpdatedAt = instant(30)
+        val remoteDatabase = databaseSnapshot(exercises = listOf(exercise(30)))
+        settings.lastRemoteUpdatedAt = baseline
+        remoteDataSource.remote = remoteSnapshot(
+            updatedAt = remoteDatabaseUpdatedAt,
+            databaseUpdatedAt = remoteDatabaseUpdatedAt,
+            settingsUpdatedAt = baseline,
+            database = remoteDatabase,
+        )
+
+        // when
+        createManager(backgroundScope).syncNow()
+
+        // then
         assertEquals(remoteDatabase, database.replacedSnapshot)
-        assertEquals(90, settings.blinkBreakCount)
         assertEquals(timeUtils.now(), settings.lastSyncedAt)
-        assertEquals(remoteUpdatedAt, settings.lastRemoteUpdatedAt)
+        assertEquals(remoteDatabaseUpdatedAt, settings.lastRemoteUpdatedAt)
         assertNull(remoteDataSource.writtenSnapshot)
     }
 
     @Test
-    fun `when timestamps are missing and both sides have data then snapshots are merged and uploaded`() = runTest {
+    fun `when local and remote database changed then snapshots are merged and uploaded`() = runTest {
         // given
-        val localExercise = exercise(10, ExerciseBlock.A)
-        val remoteExercise = exercise(11, ExerciseBlock.B)
-        val duplicateExercise = exercise(12, ExerciseBlock.C)
-        val localAchievement = achievement(AchievementType.FIRST_SPARK, unlockedAt = instant(12))
-        val remoteAchievement = achievement(AchievementType.FIRST_SPARK, unlockedAt = instant(10))
+        val baseline = instant(20)
+        val localExercise = exercise(30, ExerciseBlock.A)
+        val remoteExercise = exercise(31, ExerciseBlock.B)
+        val duplicateExercise = exercise(32, ExerciseBlock.C)
+        val localAchievement = achievement(AchievementType.FIRST_SPARK, unlockedAt = instant(32))
+        val remoteAchievement = achievement(AchievementType.FIRST_SPARK, unlockedAt = instant(30))
         val localReminder = reminder(uuid = "same-id", minute = 1)
         val remoteReminder = reminder(uuid = "same-id", minute = 2)
         val localDatabase = databaseSnapshot(
@@ -126,9 +143,15 @@ class BlinklySyncManagerImplTest {
             achievements = listOf(remoteAchievement),
             reminders = listOf(remoteReminder),
         )
-        settings.lastLocalChangeAt = null
+        settings.lastRemoteUpdatedAt = baseline
+        settings.lastLocalDatabaseChangeAt = instant(35)
         database.snapshot = localDatabase
-        remoteDataSource.remote = remoteSnapshot(instant(9), remoteDatabase)
+        remoteDataSource.remote = remoteSnapshot(
+            updatedAt = instant(40),
+            databaseUpdatedAt = instant(40),
+            settingsUpdatedAt = baseline,
+            database = remoteDatabase,
+        )
 
         // when
         createManager(backgroundScope).syncNow()
@@ -139,7 +162,107 @@ class BlinklySyncManagerImplTest {
         assertEquals(listOf(remoteAchievement), mergedDatabase?.achievements)
         assertEquals(listOf(remoteReminder), mergedDatabase?.reminders)
         assertEquals(mergedDatabase, database.replacedSnapshot)
+        assertEquals(timeUtils.now(), remoteDataSource.writtenSnapshot?.databaseUpdatedAt)
         assertEquals(timeUtils.now(), remoteDataSource.writtenSnapshot?.updatedAt)
+    }
+
+    @Test
+    fun `when local settings are newer than remote settings then local settings are uploaded`() = runTest {
+        // given
+        val baseline = instant(20)
+        settings.lastRemoteUpdatedAt = baseline
+        settings.lastLocalSettingsChangeAt = instant(45)
+        settings.blinkBreakCount = 95
+        remoteDataSource.remote = remoteSnapshot(
+            updatedAt = instant(40),
+            databaseUpdatedAt = baseline,
+            settingsUpdatedAt = instant(40),
+            settings = settingsSnapshot(blinkBreakCount = 70),
+        )
+
+        // when
+        createManager(backgroundScope).syncNow()
+
+        // then
+        assertEquals(settingsSnapshot(blinkBreakCount = 95), remoteDataSource.writtenSnapshot?.settings)
+        assertEquals(instant(45), remoteDataSource.writtenSnapshot?.settingsUpdatedAt)
+        assertNull(database.replacedSnapshot)
+    }
+
+    @Test
+    fun `when remote settings are newer than local settings then remote settings are applied`() = runTest {
+        // given
+        val baseline = instant(20)
+        settings.lastRemoteUpdatedAt = baseline
+        settings.lastLocalSettingsChangeAt = instant(35)
+        settings.blinkBreakCount = 95
+        remoteDataSource.remote = remoteSnapshot(
+            updatedAt = instant(40),
+            databaseUpdatedAt = baseline,
+            settingsUpdatedAt = instant(40),
+            settings = settingsSnapshot(blinkBreakCount = 70),
+        )
+
+        // when
+        createManager(backgroundScope).syncNow()
+
+        // then
+        assertEquals(70, settings.blinkBreakCount)
+        assertNull(remoteDataSource.writtenSnapshot)
+    }
+
+    @Test
+    fun `when local settings and remote database changed then composite snapshot is uploaded and remote database is applied`() =
+        runTest {
+            // given
+            val baseline = instant(20)
+            val remoteDatabase = databaseSnapshot(exercises = listOf(exercise(40)))
+            settings.lastRemoteUpdatedAt = baseline
+            settings.lastLocalSettingsChangeAt = instant(35)
+            settings.blinkBreakCount = 95
+            remoteDataSource.remote = remoteSnapshot(
+                updatedAt = instant(40),
+                databaseUpdatedAt = instant(40),
+                settingsUpdatedAt = baseline,
+                database = remoteDatabase,
+                settings = settingsSnapshot(blinkBreakCount = 70),
+            )
+
+            // when
+            createManager(backgroundScope).syncNow()
+
+            // then
+            assertEquals(remoteDatabase, remoteDataSource.writtenSnapshot?.database)
+            assertEquals(settingsSnapshot(blinkBreakCount = 95), remoteDataSource.writtenSnapshot?.settings)
+            assertEquals(remoteDatabase, database.replacedSnapshot)
+            assertEquals(95, settings.blinkBreakCount)
+        }
+
+    @Test
+    fun `when neither side changed since baseline then only sync timestamp is updated`() = runTest {
+        // given
+        val baseline = instant(20)
+        settings.lastRemoteUpdatedAt = baseline
+        val localDatabase = databaseSnapshot(exercises = listOf(exercise(10)))
+        val localSettings = settingsSnapshot(blinkBreakCount = 90)
+        database.snapshot = localDatabase
+        settings.blinkBreakCount = 90
+        remoteDataSource.remote = remoteSnapshot(
+            updatedAt = baseline,
+            databaseUpdatedAt = baseline,
+            settingsUpdatedAt = baseline,
+            database = localDatabase,
+            settings = localSettings,
+        )
+
+        // when
+        createManager(backgroundScope).syncNow()
+
+        // then
+        assertNull(remoteDataSource.writtenSnapshot)
+        assertNull(database.replacedSnapshot)
+        assertEquals(timeUtils.now(), settings.lastSyncedAt)
+        assertEquals(baseline, settings.lastRemoteUpdatedAt)
     }
 
     private fun createManager(scope: CoroutineScope): BlinklySyncManagerImpl =
@@ -165,14 +288,18 @@ class BlinklySyncManagerImplTest {
 
     private fun remoteSnapshot(
         updatedAt: Instant,
-        database: BlinklyDatabaseSnapshot,
+        database: BlinklyDatabaseSnapshot = databaseSnapshot(),
         settings: BlinklySettingsSnapshot = settingsSnapshot(),
+        databaseUpdatedAt: Instant = updatedAt,
+        settingsUpdatedAt: Instant = updatedAt,
     ): RemoteBlinklySnapshot =
         RemoteBlinklySnapshot(
             updatedAt = updatedAt,
             lastSyncedAt = null,
             settings = settings,
             database = database,
+            databaseUpdatedAt = databaseUpdatedAt,
+            settingsUpdatedAt = settingsUpdatedAt,
         )
 
     private fun settingsSnapshot(blinkBreakCount: Int = 60): BlinklySettingsSnapshot =
@@ -230,9 +357,6 @@ class BlinklySyncManagerImplTest {
         private val userFlow: MutableStateFlow<BlinklyUser?> = MutableStateFlow(user)
 
         override val currentUser: Flow<BlinklyUser?> = userFlow
-
-        override suspend fun signInWithGoogle(): Result<BlinklyUser> =
-            Result.success(requireNotNull(userFlow.value))
 
         override suspend fun completeGoogleSignIn(user: BlinklyUser): Result<BlinklyUser> {
             userFlow.value = user
@@ -331,7 +455,8 @@ class BlinklySyncManagerImplTest {
         override var displayedHighlights: List<Int> = emptyList()
         override var currentHighlightDate: LocalDate? = null
         override var onboardingDisplayed: Boolean = false
-        override var lastLocalChangeAt: Instant? = null
+        override var lastLocalDatabaseChangeAt: Instant? = null
+        override var lastLocalSettingsChangeAt: Instant? = null
         override var lastSyncedAt: Instant? = null
         override var lastRemoteUpdatedAt: Instant? = null
     }

@@ -17,14 +17,14 @@ import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
-import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
-import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.BlinklyNotification
 import com.sedsoftware.blinkly.domain.model.BlinklySyncState
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import com.sedsoftware.blinkly.domain.model.ThemeState
@@ -34,6 +34,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -47,13 +48,14 @@ import kotlin.time.Instant
 
 class RootComponentTest : ComponentTest<RootComponent>() {
 
-    private val alarmManagerMock: BlinklyAlarmManager = mock()
     private val beeperMock: BlinklyBeeper = mock {
         every { beep() } returns Unit
         every { release() } returns Unit
     }
-    private val databaseMock: BlinklyDatabase = mock()
-    private val notifierMock: BlinklyNotifier = mock()
+    private val unlockedAchievementsFlow = MutableSharedFlow<AchievementType>()
+    private val notifierMock: BlinklyNotifier = mock {
+        every { unlockedAchievements() } returns unlockedAchievementsFlow
+    }
     private val fakeSettings = FakeSettings()
     private val syncManager: FakeBlinklySyncManager = FakeBlinklySyncManager()
     private val timeUtilsMock: BlinklyTimeUtils = mock {
@@ -286,6 +288,24 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         collectJob.cancel()
     }
 
+    @Test
+    fun `when achievement unlocked then root publishes notification`() = runTest(testScheduler) {
+        // given
+        val notifications = mutableListOf<BlinklyNotification>()
+        val collectJob = launch { component.notifications.collect { notifications.add(it) } }
+        testScheduler.advanceUntilIdle()
+
+        // when
+        unlockedAchievementsFlow.emit(AchievementType.FIRST_SPARK)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(notifications).isEqualTo(
+            listOf(BlinklyNotification.AchievementUnlocked(AchievementType.FIRST_SPARK))
+        )
+        collectJob.cancel()
+    }
+
     private fun completeOnboardingFlow(currentComponent: RootComponent) {
         val onboardingComponent = currentComponent.childStack.active.instance as? RootComponent.Child.Onboarding ?: return
         val step1 = onboardingComponent.component.childStack.active.instance as OnboardingComponent.Child.Step1
@@ -328,9 +348,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         RootComponentDefault(
             componentContext = DefaultComponentContext(lifecycle),
             storeFactory = DefaultStoreFactory(),
-            alarmManager = alarmManagerMock,
             beeper = beeperMock,
-            database = databaseMock,
             dispatchers = testDispatchers,
             notifier = notifierMock,
             settings = fakeSettings,
@@ -360,7 +378,8 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         override var displayedHighlights: List<Int> = emptyList()
         override var currentHighlightDate: LocalDate? = null
         override var onboardingDisplayed: Boolean = false
-        override var lastLocalChangeAt: Instant? = null
+        override var lastLocalDatabaseChangeAt: Instant? = null
+        override var lastLocalSettingsChangeAt: Instant? = null
         override var lastSyncedAt: Instant? = null
         override var lastRemoteUpdatedAt: Instant? = null
     }
@@ -375,7 +394,6 @@ class RootComponentTest : ComponentTest<RootComponent>() {
             )
         )
 
-        override suspend fun signInOrSync() = Unit
         override suspend fun completeGoogleSignIn(user: BlinklyUser) = Unit
         override suspend fun syncNow() = Unit
     }

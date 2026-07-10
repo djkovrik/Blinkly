@@ -21,7 +21,6 @@ internal interface BlinklySyncStore : Store<BlinklySyncStore.Intent, BlinklySync
     )
 
     sealed interface Label {
-        data object RequestGoogleSignIn : Label
         data class ErrorCaught(val exception: BlinklyError) : Label
     }
 }

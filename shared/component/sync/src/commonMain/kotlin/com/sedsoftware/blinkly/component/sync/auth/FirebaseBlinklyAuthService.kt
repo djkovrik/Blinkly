@@ -16,9 +16,6 @@ class FirebaseBlinklyAuthService(
     override val currentUser: Flow<BlinklyUser?> =
         auth.authStateChanged.map { user -> user?.toBlinklyUser() }
 
-    override suspend fun signInWithGoogle(): Result<BlinklyUser> =
-        Result.failure(UnsupportedOperationException("Google Sign-In is initiated from Compose through KMPAuth"))
-
     override suspend fun completeGoogleSignIn(user: BlinklyUser): Result<BlinklyUser> =
         Result.success(user)
 

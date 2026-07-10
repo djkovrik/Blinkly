@@ -33,21 +33,28 @@ import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
-import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
-import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
+import com.sedsoftware.blinkly.domain.model.Achievement
+import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.BlinklyNotification
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import com.sedsoftware.blinkly.domain.model.asBlinklyError
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Suppress("LongParameterList")
@@ -61,16 +68,16 @@ class RootComponentDefault private constructor(
     private val achievementsComponent: (ComponentContext, (ComponentOutput) -> Unit) -> AchievementsComponent,
     private val gardenComponent: (ComponentContext, (ComponentOutput) -> Unit) -> GardenComponent,
     private val addNewReminderComponent: (ComponentContext, (ComponentOutput) -> Unit) -> AddNewReminderComponent,
+    private val achievements: Flow<List<Achievement>>,
+    private val achievementUnlockEvents: Flow<AchievementType>,
+    mainDispatcher: CoroutineDispatcher,
     private val releaseBeeper: () -> Unit,
 ) : RootComponent, ComponentContext by componentContext {
 
-    @Suppress("UnusedPrivateProperty")
     constructor(
         componentContext: ComponentContext,
         storeFactory: StoreFactory,
-        alarmManager: BlinklyAlarmManager,
         beeper: BlinklyBeeper,
-        database: BlinklyDatabase,
         dispatchers: BlinklyDispatchers,
         notifier: BlinklyNotifier,
         settings: BlinklySettings,
@@ -132,15 +139,34 @@ class RootComponentDefault private constructor(
                 addNewReminderOutput = output,
             )
         },
+        achievements = achievementsWatcher.achievements,
+        achievementUnlockEvents = notifier.unlockedAchievements(),
+        mainDispatcher = dispatchers.main,
         releaseBeeper = beeper::release,
     )
 
     private val navigation: StackNavigation<Config> = StackNavigation()
     private val themeStateValue: MutableValue<ThemeState> = MutableValue(settings.themeState)
     private val errorEvents: MutableSharedFlow<BlinklyError> = MutableSharedFlow(extraBufferCapacity = ERROR_BUFFER_CAPACITY)
+    private val notificationEvents: MutableSharedFlow<BlinklyNotification> =
+        MutableSharedFlow(extraBufferCapacity = NOTIFICATION_BUFFER_CAPACITY)
+    private val scope = CoroutineScope(mainDispatcher + SupervisorJob())
 
     init {
+        scope.launch {
+            achievements.collect {}
+        }
+        scope.launch {
+            achievementUnlockEvents.collect { type ->
+                onChildOutput(
+                    ComponentOutput.Common.NotificationReceived(
+                        BlinklyNotification.AchievementUnlocked(type),
+                    )
+                )
+            }
+        }
         lifecycle.doOnDestroy {
+            scope.cancel()
             releaseBeeper()
         }
     }
@@ -157,6 +183,7 @@ class RootComponentDefault private constructor(
     override val childStack: Value<ChildStack<*, RootComponent.Child>> = stack
     override val themeState: Value<ThemeState> = themeStateValue
     override val errors = errorEvents.asSharedFlow()
+    override val notifications = notificationEvents.asSharedFlow()
 
     override fun onBack() {
         navigation.pop()
@@ -231,6 +258,10 @@ class RootComponentDefault private constructor(
                 errorEvents.tryEmit(error)
             }
 
+            is ComponentOutput.Common.NotificationReceived -> {
+                notificationEvents.tryEmit(output.notification)
+            }
+
             else -> Unit
         }
     }
@@ -269,5 +300,6 @@ class RootComponentDefault private constructor(
 
     private companion object {
         const val ERROR_BUFFER_CAPACITY = 16
+        const val NOTIFICATION_BUFFER_CAPACITY = 16
     }
 }

@@ -11,6 +11,7 @@
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
     <string name="error_unknown">Something went wrong</string>
+    <string name="notification_achievement_unlocked">Achievement unlocked: %1$s</string>
     <string name="error_main_data_loading">Could not update the main screen</string>
     <string name="error_progress_data_loading">Could not load your progress</string>
     <string name="error_trainings_data_loading">Could not load trainings</string>

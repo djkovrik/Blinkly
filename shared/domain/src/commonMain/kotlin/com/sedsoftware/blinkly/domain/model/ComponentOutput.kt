@@ -33,12 +33,9 @@ sealed class ComponentOutput {
         data class ThemeStateChanged(val value: ThemeState) : Preferences()
     }
 
-    sealed class Sync : ComponentOutput() {
-        data object RequestGoogleSignIn : Sync()
-    }
-
     sealed class Common : ComponentOutput() {
         data object BackPressed : Common()
         data class ErrorCaught(val throwable: Throwable) : Common()
+        data class NotificationReceived(val notification: BlinklyNotification) : Common()
     }
 }

@@ -146,9 +146,7 @@ fun RootComponentFactory(
     return RootComponentDefault(
         componentContext = componentContext,
         storeFactory = DefaultStoreFactory(),
-        alarmManager = alarmManager,
         beeper = beeper,
-        database = database,
         dispatchers = dispatchers,
         notifier = notifier,
         settings = settings,

@@ -104,6 +104,7 @@ Nested component modules:
 Current screen hierarchy:
 - `RootComponentDefault` starts with `Onboarding` when onboarding has not been completed, otherwise `HomeScreen`.
 - `RootComponentDefault` owns the app-level stack and pushes `Preferences`, `Workout`, `Achievements`, `Garden`, and `AddNewReminder` from `ComponentOutput` values emitted by child components.
+- `RootComponentDefault` keeps `BlinklyAchievementsWatcher` active app-wide and maps exact `BlinklyNotifier.unlockedAchievements()` events to `BlinklyNotification.AchievementUnlocked` values exposed through `RootComponent.notifications`.
 - `HomeScreenComponentDefault` owns only the four-tab stack: main, trainings, progress, and reminders. It handles `Main.OpenProgressTab` locally with `bringToFront`; other tab outputs go up to root.
 - `PreferencesComponentDefault` owns the nested `BlinklySyncComponent`; Google sign-in UI remains in Compose, and the sync Store only receives domain-level `BlinklyUser` results.
 - `OnboardingComponentDefault` owns the onboarding step stack from step 1 through step 5. Steps 1, 2, and 3 are thin output-forwarding components; step 4 and step 5 are Store-backed.
@@ -134,6 +135,20 @@ Keep UI-specific code out of component and store layers. Compose should render s
 
 Apply these rules by default when changing Blinkly code:
 
+- Run every Gradle task in quiet mode by passing `-q` immediately after the
+  wrapper command: `.\gradlew.bat -q <task>`. Treat a zero exit code as the
+  complete success result; routine task progress and successful build output
+  are not needed.
+- Redirect both stdout and stderr from every Gradle invocation to a temporary
+  log file. On success, report only the zero exit code and do not read the log.
+  On failure, inspect only the last 200 lines first, then use targeted searches
+  such as `Select-String` with context to retrieve any additional relevant
+  sections. Do not print or read the complete log unless these bounded views
+  are insufficient to diagnose the failure.
+- On Gradle failure, use the error output produced by quiet mode first. Rerun
+  with additional diagnostics such as `--stacktrace`, `--info`, or `--debug`
+  only when the quiet error is insufficient to identify the cause, and keep
+  `-q` enabled whenever the selected diagnostic option supports it.
 - Prefer a thin Decompose component without MVIKotlin when the feature only forwards user actions to `ComponentOutput`.
 - Add MVIKotlin only when the feature needs reducer-owned state, async work, startup subscriptions, or one-off labels.
 - Retain Stores with `instanceKeeper.getStore { ... }` and expose UI state through `store.asValue().map(stateToModel)`.
@@ -171,6 +186,7 @@ Reference modules:
 
 `RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `SyncModule`, then `DomainModule`, then `RootComponentDefault`.
 `SyncModule` receives the raw database/settings implementations, exposes tracking decorators for app use, and passes `BlinklySyncManager` into `RootComponentDefault` so Preferences can create the nested sync component.
+Sync metadata is split by data type: database writes update `lastLocalDatabaseChangeAt`, settings writes update `lastLocalSettingsChangeAt`, and `lastRemoteUpdatedAt` is the baseline for detecting remote changes. `BlinklySyncManagerImpl` merges database snapshots when both local and remote changed after the baseline, and resolves settings snapshots by their settings-specific timestamp.
 
 Important local rule: configuration objects in Decompose navigation carry only persistent arguments, never dependencies. Dependencies are supplied in child factories.
 
@@ -290,7 +306,7 @@ Current store references:
 
 `main` is the reference for a tab Store with bootstrapper subscriptions, manager-based business logic, domain-derived model data, and labels mapped to parent output.
 `progress`, `reminders`, and `trainings` are references for Store-backed tabs that emit navigation outputs. `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are references for Store-backed feature screens opened by the root stack.
-`sync` is the reference for a Store that observes a domain manager state flow, emits a UI-owned sign-in request label, and performs post-auth synchronization from a domain `BlinklyUser`.
+`sync` is the reference for a Store that observes a domain manager state flow and performs post-auth synchronization from a domain `BlinklyUser`; Google Sign-In is initiated in Compose through the KMPAuth Google button container, and the Store only receives completed or failed sign-in results.
 
 ### Store structure
 
@@ -331,7 +347,7 @@ Local pattern:
 Utility reference:
 - `shared/utils/src/commonMain/kotlin/com/sedsoftware/blinkly/utils/StoreExt.kt`
 
-### Labels and errors
+### Labels, errors, and notifications
 
 The project models one-off errors as `ComponentOutput.Common.ErrorCaught`.
 When a Store label must be visible outside the feature, collect `store.labels` in the component layer, map the label to a typed `ComponentOutput`, and let the parent decide whether to handle it locally or forward it upward.
@@ -345,6 +361,11 @@ Wrap low-level failures at the point where the user-facing operation is known, s
 `RootContent` collects `RootComponent.errors`, maps `BlinklyError` to localized strings, and shows the app-wide top error snackbar.
 When adding a new user-visible error context, add the `BlinklyError` type and matching English/Russian strings in `shared/compose/src/commonMain/composeResources`; unknown or too-narrow failures should fall back to `BlinklyError.Unknown`.
 
+App-wide informational events use `BlinklyNotification` from `shared/domain/src/commonMain/kotlin/com/sedsoftware/blinkly/domain/model/BlinklyNotification.kt`.
+Components may route them upward as `ComponentOutput.Common.NotificationReceived`; `RootComponentDefault` emits them through `RootComponent.notifications`.
+Achievement unlock events originate when `BlinklyAchievementsWatcherImpl` calls `BlinklyNotifier.achievementUnlocked` after saving, so restored or initially loaded achievements do not produce stale success messages.
+`RootContent` queues errors and notifications in one top snackbar host, using error colors for failures and `secondaryContainer` colors for neutral success notifications.
+
 ## Compose Conventions
 
 Compose lives in `shared/compose` and depends on components, not the reverse.
@@ -354,6 +375,15 @@ Rules:
 - obtain Decompose `Value` state with `subscribeAsState()` in Compose
 - root rendering uses `ChildStack` from Decompose Compose extensions
 - keep business logic and navigation decisions out of composables
+- Whenever a change introduces new user-visible text, add it as a Compose
+  string resource in both
+  `shared/compose/src/commonMain/composeResources/values/strings.xml` for
+  English and
+  `shared/compose/src/commonMain/composeResources/values-ru/strings.xml` for
+  Russian in the same change. Do not hardcode new user-visible strings in
+  Kotlin or Compose code. Keep resource names, placeholders, and formatting
+  arguments consistent between the two locales, and provide the translation
+  immediately rather than relying on the default-locale fallback.
 
 References:
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/RootContent.kt`
@@ -393,8 +423,8 @@ Rules for UI changes:
   realistic single-state phone preview when that helps catch real viewport
   layout issues.
 - After intentional visual changes, run
-  `.\gradlew.bat :shared:compose:cleanRecordPaparazziDebug` to regenerate
-  goldens, then run `.\gradlew.bat :shared:compose:verifyPaparazziDebug`.
+  `.\gradlew.bat -q :shared:compose:cleanRecordPaparazziDebug` to regenerate
+  goldens, then run `.\gradlew.bat -q :shared:compose:verifyPaparazziDebug`.
 - Inspect new or materially changed PNGs in
   `shared/compose/src/test/snapshots/images` before finishing the change.
 - Commit the updated snapshot PNGs together with the UI code that caused them.

@@ -20,7 +20,8 @@ interface BlinklySettings {
     var displayedHighlights: List<Int>
     var currentHighlightDate: LocalDate?
     var onboardingDisplayed: Boolean
-    var lastLocalChangeAt: Instant?
+    var lastLocalDatabaseChangeAt: Instant?
+    var lastLocalSettingsChangeAt: Instant?
     var lastSyncedAt: Instant?
     var lastRemoteUpdatedAt: Instant?
 }

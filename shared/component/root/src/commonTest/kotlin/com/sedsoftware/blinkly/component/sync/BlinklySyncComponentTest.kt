@@ -1,7 +1,6 @@
 package com.sedsoftware.blinkly.component.sync
 
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import com.arkivanov.decompose.DefaultComponentContext
@@ -12,7 +11,6 @@ import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.BlinklySyncState
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
-import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.runTest
@@ -59,19 +57,6 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
 
         // then
         assertThat(component.model.value.status).isEqualTo(BlinklySyncComponent.Status.Synced(syncedAt))
-    }
-
-    @Test
-    fun `when unauthenticated primary clicked then component requests Google sign in`() = runTest(testScheduler) {
-        // given
-        testScheduler.advanceUntilIdle()
-
-        // when
-        component.onPrimaryButtonClick()
-        testScheduler.advanceUntilIdle()
-
-        // then
-        assertThat(componentOutput).contains(ComponentOutput.Sync.RequestGoogleSignIn)
     }
 
     @Test
@@ -166,8 +151,6 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
         var nextSyncFailure: Throwable? = null
 
         override val state: StateFlow<BlinklySyncState> = stateFlow
-
-        override suspend fun signInOrSync() = Unit
 
         override suspend fun completeGoogleSignIn(user: BlinklyUser) {
             completeGoogleSignInCalls += 1
