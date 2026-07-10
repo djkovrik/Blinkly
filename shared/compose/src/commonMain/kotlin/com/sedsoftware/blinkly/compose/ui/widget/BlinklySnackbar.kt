@@ -1,6 +1,5 @@
 package com.sedsoftware.blinkly.compose.ui.widget
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
@@ -13,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import blinkly.shared.compose.generated.resources.Res
+import blinkly.shared.compose.generated.resources.error_unknown
 import blinkly.shared.compose.generated.resources.notification_achievement_unlocked
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import com.sedsoftware.blinkly.compose.ui.extension.asTitle
@@ -89,6 +89,22 @@ private fun BlinklySnackbarPreviewDark() {
     }
 }
 
+@Preview(widthDp = 420, heightDp = 96)
+@Composable
+private fun BlinklyErrorSnackbarPreviewLight() {
+    BlinklyWidgetPreview {
+        BlinklyErrorSnackbarPreviewContent()
+    }
+}
+
+@Preview(widthDp = 420, heightDp = 96)
+@Composable
+private fun BlinklyErrorSnackbarPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
+        BlinklyErrorSnackbarPreviewContent()
+    }
+}
+
 @Composable
 private fun BlinklySnackbarPreviewContent() {
     val message = stringResource(
@@ -104,7 +120,20 @@ private fun BlinklySnackbarPreviewContent() {
             )
         ),
         modifier = Modifier
-            .fillMaxWidth()
+            .padding(16.dp),
+    )
+}
+
+@Composable
+private fun BlinklyErrorSnackbarPreviewContent() {
+    BlinklySnackbar(
+        snackbarData = PreviewSnackbarData(
+            BlinklySnackbarVisuals(
+                message = stringResource(Res.string.error_unknown),
+                type = BlinklySnackbarType.ERROR,
+            )
+        ),
+        modifier = Modifier
             .padding(16.dp),
     )
 }
