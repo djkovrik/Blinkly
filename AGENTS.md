@@ -134,6 +134,20 @@ Keep UI-specific code out of component and store layers. Compose should render s
 
 Apply these rules by default when changing Blinkly code:
 
+- Run every Gradle task in quiet mode by passing `-q` immediately after the
+  wrapper command: `.\gradlew.bat -q <task>`. Treat a zero exit code as the
+  complete success result; routine task progress and successful build output
+  are not needed.
+- Redirect both stdout and stderr from every Gradle invocation to a temporary
+  log file. On success, report only the zero exit code and do not read the log.
+  On failure, inspect only the last 200 lines first, then use targeted searches
+  such as `Select-String` with context to retrieve any additional relevant
+  sections. Do not print or read the complete log unless these bounded views
+  are insufficient to diagnose the failure.
+- On Gradle failure, use the error output produced by quiet mode first. Rerun
+  with additional diagnostics such as `--stacktrace`, `--info`, or `--debug`
+  only when the quiet error is insufficient to identify the cause, and keep
+  `-q` enabled whenever the selected diagnostic option supports it.
 - Prefer a thin Decompose component without MVIKotlin when the feature only forwards user actions to `ComponentOutput`.
 - Add MVIKotlin only when the feature needs reducer-owned state, async work, startup subscriptions, or one-off labels.
 - Retain Stores with `instanceKeeper.getStore { ... }` and expose UI state through `store.asValue().map(stateToModel)`.
@@ -355,6 +369,15 @@ Rules:
 - obtain Decompose `Value` state with `subscribeAsState()` in Compose
 - root rendering uses `ChildStack` from Decompose Compose extensions
 - keep business logic and navigation decisions out of composables
+- Whenever a change introduces new user-visible text, add it as a Compose
+  string resource in both
+  `shared/compose/src/commonMain/composeResources/values/strings.xml` for
+  English and
+  `shared/compose/src/commonMain/composeResources/values-ru/strings.xml` for
+  Russian in the same change. Do not hardcode new user-visible strings in
+  Kotlin or Compose code. Keep resource names, placeholders, and formatting
+  arguments consistent between the two locales, and provide the translation
+  immediately rather than relying on the default-locale fallback.
 
 References:
 - `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui/RootContent.kt`
@@ -394,8 +417,8 @@ Rules for UI changes:
   realistic single-state phone preview when that helps catch real viewport
   layout issues.
 - After intentional visual changes, run
-  `.\gradlew.bat :shared:compose:cleanRecordPaparazziDebug` to regenerate
-  goldens, then run `.\gradlew.bat :shared:compose:verifyPaparazziDebug`.
+  `.\gradlew.bat -q :shared:compose:cleanRecordPaparazziDebug` to regenerate
+  goldens, then run `.\gradlew.bat -q :shared:compose:verifyPaparazziDebug`.
 - Inspect new or materially changed PNGs in
   `shared/compose/src/test/snapshots/images` before finishing the change.
 - Commit the updated snapshot PNGs together with the UI code that caused them.
