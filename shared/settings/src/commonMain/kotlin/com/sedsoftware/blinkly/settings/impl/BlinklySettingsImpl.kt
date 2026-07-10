@@ -138,10 +138,16 @@ internal class BlinklySettingsImpl(
             settings.setValue(PREF_ONBOARDING_DISPLAYED, value)
         }
 
-    override var lastLocalChangeAt: Instant?
-        get() = settings.getInstant(PREF_LAST_LOCAL_CHANGE_AT)
+    override var lastLocalDatabaseChangeAt: Instant?
+        get() = settings.getInstant(PREF_LAST_LOCAL_DATABASE_CHANGE_AT) ?: settings.getInstant(PREF_LAST_LOCAL_CHANGE_AT)
         set(value) {
-            settings.setInstant(PREF_LAST_LOCAL_CHANGE_AT, value)
+            settings.setInstant(PREF_LAST_LOCAL_DATABASE_CHANGE_AT, value)
+        }
+
+    override var lastLocalSettingsChangeAt: Instant?
+        get() = settings.getInstant(PREF_LAST_LOCAL_SETTINGS_CHANGE_AT) ?: settings.getInstant(PREF_LAST_LOCAL_CHANGE_AT)
+        set(value) {
+            settings.setInstant(PREF_LAST_LOCAL_SETTINGS_CHANGE_AT, value)
         }
 
     override var lastSyncedAt: Instant?
@@ -216,6 +222,8 @@ internal class BlinklySettingsImpl(
         const val PREF_CURRENT_HIGHLIGHT_DATE = "chd"
         const val PREF_ONBOARDING_DISPLAYED = "od"
         const val PREF_LAST_LOCAL_CHANGE_AT = "sync_llca"
+        const val PREF_LAST_LOCAL_DATABASE_CHANGE_AT = "sync_lldca"
+        const val PREF_LAST_LOCAL_SETTINGS_CHANGE_AT = "sync_llsca"
         const val PREF_LAST_SYNCED_AT = "sync_lsa"
         const val PREF_LAST_REMOTE_UPDATED_AT = "sync_lrua"
         const val SYNC_TIME_EMPTY = -1L

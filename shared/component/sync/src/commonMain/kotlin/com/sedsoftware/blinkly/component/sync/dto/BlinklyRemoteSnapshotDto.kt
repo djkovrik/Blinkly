@@ -4,9 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class BlinklyRemoteSnapshotDto(
-    val schemaVersion: Int = 1,
+    val schemaVersion: Int = 2,
     val updatedAtEpochMillis: Long,
     val lastSyncedAtEpochMillis: Long? = null,
+    val databaseUpdatedAtEpochMillis: Long? = null,
+    val settingsUpdatedAtEpochMillis: Long? = null,
     val settings: SettingsDto,
     val exercises: List<ExerciseDto> = emptyList(),
     val achievements: List<AchievementDto> = emptyList(),

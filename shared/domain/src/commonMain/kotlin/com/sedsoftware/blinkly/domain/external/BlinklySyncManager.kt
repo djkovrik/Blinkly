@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface BlinklySyncManager {
     val state: Flow<BlinklySyncState>
-    suspend fun signInOrSync()
     suspend fun completeGoogleSignIn(user: BlinklyUser)
     suspend fun syncNow()
 }

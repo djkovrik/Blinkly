@@ -10,6 +10,8 @@ import com.sedsoftware.blinkly.domain.model.ThemeState
 import com.sedsoftware.blinkly.settings.impl.BlinklySettingsImpl
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class BlinklySettingsTest {
 
@@ -125,8 +127,27 @@ class BlinklySettingsTest {
         assertThat(settings.currentHighlightDate).isEqualTo(null)
     }
 
+    @Test
+    @OptIn(ExperimentalTime::class)
+    fun `when old local sync timestamp exists then typed local timestamps use it as fallback`() {
+        // given
+        val rawSettings = MapSettings()
+        val oldTimestamp = Instant.fromEpochMilliseconds(1_000)
+        rawSettings.putLong(PREF_LAST_LOCAL_CHANGE_AT, oldTimestamp.toEpochMilliseconds())
+        val settings = BlinklySettingsImpl(rawSettings)
+
+        // when
+        val databaseChangedAt = settings.lastLocalDatabaseChangeAt
+        val settingsChangedAt = settings.lastLocalSettingsChangeAt
+
+        // then
+        assertThat(databaseChangedAt).isEqualTo(oldTimestamp)
+        assertThat(settingsChangedAt).isEqualTo(oldTimestamp)
+    }
+
     private companion object {
         const val PREF_DISPLAYED_HIGHLIGHTS = "dh"
+        const val PREF_LAST_LOCAL_CHANGE_AT = "sync_llca"
         const val BLINK_BREAK_COUNT_DEFAULT = 60
         const val NEAR_FOCUS_COUNT_DEFAULT = 10
         const val NEAR_FOCUS_DURATION_DEFAULT = 5f

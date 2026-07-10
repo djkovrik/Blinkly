@@ -84,6 +84,6 @@ internal class TrackingBlinklyDatabase(
     }
 
     private fun markChanged() {
-        settings.lastLocalChangeAt = timeUtils.now()
+        settings.lastLocalDatabaseChangeAt = timeUtils.now()
     }
 }

@@ -60,19 +60,6 @@ class BlinklySyncManagerImpl(
                 ),
             )
 
-    override suspend fun signInOrSync() {
-        val user = authService.currentUser.first()
-        if (user == null) {
-            val authorizedUser = authService
-                .signInWithGoogle()
-                .getOrElse { throwable -> throw throwable.asBlinklyError(BlinklyError::SyncAuthFailed) }
-
-            syncNow(authorizedUser)
-        } else {
-            syncNow(user)
-        }
-    }
-
     override suspend fun completeGoogleSignIn(user: BlinklyUser) {
         val authorizedUser = authService
             .completeGoogleSignIn(user)
@@ -97,21 +84,34 @@ class BlinklySyncManagerImpl(
         try {
             val localDatabase = database.currentSnapshot()
             val localSettings = settings.toSnapshot()
-            val localChangedAt = settings.lastLocalChangeAt
+            val localDatabaseChangedAt = settings.lastLocalDatabaseChangeAt
+            val localSettingsChangedAt = settings.lastLocalSettingsChangeAt
+            val lastRemoteUpdatedAt = settings.lastRemoteUpdatedAt
             val remote = remoteDataSource
                 .readSnapshot(user.id)
                 .getOrElse { throwable -> throw throwable.asBlinklyError(BlinklyError::SyncReadFailed) }
 
             val now = timeUtils.now()
-            val syncedRemoteUpdatedAt = when {
-                remote == null -> uploadLocal(user.id, localDatabase, localSettings, localChangedAt ?: now, now)
-                shouldUploadLocal(localChangedAt, remote) -> uploadLocal(user.id, localDatabase, localSettings, localChangedAt ?: now, now)
-                shouldMerge(localChangedAt, localDatabase, remote) -> uploadMerged(user.id, localDatabase, localSettings, remote, now)
-                shouldApplyRemote(localChangedAt, remote) -> {
-                    applyRemote(remote)
-                    remote.updatedAt
-                }
-                else -> remote.updatedAt
+            val syncedRemoteUpdatedAt = if (remote == null) {
+                uploadLocal(
+                    userId = user.id,
+                    databaseSnapshot = localDatabase,
+                    settingsSnapshot = localSettings,
+                    databaseUpdatedAt = localDatabaseChangedAt ?: now,
+                    settingsUpdatedAt = localSettingsChangedAt ?: now,
+                    syncedAt = now,
+                ).updatedAt
+            } else {
+                syncExistingRemote(
+                    userId = user.id,
+                    localDatabase = localDatabase,
+                    localSettings = localSettings,
+                    localDatabaseChangedAt = localDatabaseChangedAt,
+                    localSettingsChangedAt = localSettingsChangedAt,
+                    lastRemoteUpdatedAt = lastRemoteUpdatedAt,
+                    remote = remote,
+                    now = now,
+                )
             }
 
             settings.lastSyncedAt = now
@@ -128,64 +128,170 @@ class BlinklySyncManagerImpl(
         userId: String,
         databaseSnapshot: BlinklyDatabaseSnapshot,
         settingsSnapshot: BlinklySettingsSnapshot,
-        updatedAt: Instant,
+        databaseUpdatedAt: Instant,
+        settingsUpdatedAt: Instant,
         syncedAt: Instant,
-    ): Instant {
+    ): RemoteBlinklySnapshot {
         val snapshot = RemoteBlinklySnapshot(
-            updatedAt = updatedAt,
+            updatedAt = syncedAt,
             lastSyncedAt = syncedAt,
             settings = settingsSnapshot,
             database = databaseSnapshot,
+            databaseUpdatedAt = databaseUpdatedAt,
+            settingsUpdatedAt = settingsUpdatedAt,
         )
 
         remoteDataSource
             .writeSnapshot(userId, snapshot)
             .getOrElse { throwable -> throw throwable.asBlinklyError(BlinklyError::SyncWriteFailed) }
 
-        return updatedAt
+        return snapshot
     }
 
-    private suspend fun uploadMerged(
+    private suspend fun syncExistingRemote(
         userId: String,
         localDatabase: BlinklyDatabaseSnapshot,
         localSettings: BlinklySettingsSnapshot,
+        localDatabaseChangedAt: Instant?,
+        localSettingsChangedAt: Instant?,
+        lastRemoteUpdatedAt: Instant?,
         remote: RemoteBlinklySnapshot,
         now: Instant,
     ): Instant {
-        val merged = remote.copy(
-            updatedAt = now,
-            lastSyncedAt = now,
-            settings = localSettings,
-            database = mergeDatabaseSnapshots(localDatabase, remote.database),
+        val localDatabaseChanged = hasLocalDatabaseChanges(localDatabase, localDatabaseChangedAt, lastRemoteUpdatedAt)
+        val localSettingsChanged = hasLocalSettingsChanges(localSettingsChangedAt, lastRemoteUpdatedAt)
+        val remoteDatabaseChanged = hasRemoteChanges(remote.databaseUpdatedAt, lastRemoteUpdatedAt)
+        val remoteSettingsChanged = hasRemoteChanges(remote.settingsUpdatedAt, lastRemoteUpdatedAt)
+
+        val resolvedDatabase = resolveDatabase(
+            local = localDatabase,
+            localChanged = localDatabaseChanged,
+            localChangedAt = localDatabaseChangedAt,
+            remote = remote,
+            remoteChanged = remoteDatabaseChanged,
+            now = now,
+        )
+        val resolvedSettings = resolveSettings(
+            local = localSettings,
+            localChanged = localSettingsChanged,
+            localChangedAt = localSettingsChangedAt,
+            remote = remote,
+            remoteChanged = remoteSettingsChanged,
+            now = now,
         )
 
-        remoteDataSource
-            .writeSnapshot(userId, merged)
-            .getOrElse { throwable -> throw throwable.asBlinklyError(BlinklyError::SyncWriteFailed) }
+        val remoteNeedsWrite = resolvedDatabase.snapshot != remote.database ||
+            resolvedSettings.snapshot != remote.settings ||
+            resolvedDatabase.updatedAt != remote.databaseUpdatedAt ||
+            resolvedSettings.updatedAt != remote.settingsUpdatedAt
 
-        database.replaceSnapshot(merged.database)
-        settings.applySnapshot(merged.settings)
+        val syncedRemote = if (remoteNeedsWrite) {
+            remote.copy(
+                updatedAt = now,
+                lastSyncedAt = now,
+                settings = resolvedSettings.snapshot,
+                database = resolvedDatabase.snapshot,
+                databaseUpdatedAt = resolvedDatabase.updatedAt,
+                settingsUpdatedAt = resolvedSettings.updatedAt,
+            )
+                .also { snapshot ->
+                    remoteDataSource
+                        .writeSnapshot(userId, snapshot)
+                        .getOrElse { throwable -> throw throwable.asBlinklyError(BlinklyError::SyncWriteFailed) }
+                }
+        } else {
+            remote
+        }
 
-        return merged.updatedAt
+        if (resolvedDatabase.snapshot != localDatabase) {
+            database.replaceSnapshot(resolvedDatabase.snapshot)
+        }
+
+        if (resolvedSettings.snapshot != localSettings) {
+            settings.applySnapshot(resolvedSettings.snapshot)
+        }
+
+        return syncedRemote.updatedAt
     }
 
-    private suspend fun applyRemote(remote: RemoteBlinklySnapshot) {
-        database.replaceSnapshot(remote.database)
-        settings.applySnapshot(remote.settings)
-    }
-
-    private fun shouldUploadLocal(localChangedAt: Instant?, remote: RemoteBlinklySnapshot): Boolean =
-        localChangedAt != null && localChangedAt > remote.updatedAt
-
-    private fun shouldMerge(
-        localChangedAt: Instant?,
+    private fun hasLocalDatabaseChanges(
         localDatabase: BlinklyDatabaseSnapshot,
-        remote: RemoteBlinklySnapshot,
+        localChangedAt: Instant?,
+        lastRemoteUpdatedAt: Instant?,
     ): Boolean =
-        localChangedAt == null && localDatabase.isNotEmpty() && remote.database.isNotEmpty()
+        isAfterBaseline(localChangedAt, lastRemoteUpdatedAt) ||
+            lastRemoteUpdatedAt == null && localChangedAt == null && localDatabase.isNotEmpty()
 
-    private fun shouldApplyRemote(localChangedAt: Instant?, remote: RemoteBlinklySnapshot): Boolean =
-        localChangedAt == null || remote.updatedAt > localChangedAt
+    private fun hasLocalSettingsChanges(localChangedAt: Instant?, lastRemoteUpdatedAt: Instant?): Boolean =
+        isAfterBaseline(localChangedAt, lastRemoteUpdatedAt)
+
+    private fun hasRemoteChanges(remoteChangedAt: Instant, lastRemoteUpdatedAt: Instant?): Boolean =
+        lastRemoteUpdatedAt == null || remoteChangedAt > lastRemoteUpdatedAt
+
+    private fun isAfterBaseline(changedAt: Instant?, lastRemoteUpdatedAt: Instant?): Boolean =
+        changedAt != null && (lastRemoteUpdatedAt == null || changedAt > lastRemoteUpdatedAt)
+
+    private fun resolveDatabase(
+        local: BlinklyDatabaseSnapshot,
+        localChanged: Boolean,
+        localChangedAt: Instant?,
+        remote: RemoteBlinklySnapshot,
+        remoteChanged: Boolean,
+        now: Instant,
+    ): ResolvedSnapshot<BlinklyDatabaseSnapshot> =
+        when {
+            localChanged && remoteChanged ->
+                ResolvedSnapshot(
+                    snapshot = mergeDatabaseSnapshots(local, remote.database),
+                    updatedAt = now,
+                )
+
+            localChanged ->
+                ResolvedSnapshot(
+                    snapshot = local,
+                    updatedAt = localChangedAt ?: now,
+                )
+
+            else ->
+                ResolvedSnapshot(
+                    snapshot = remote.database,
+                    updatedAt = remote.databaseUpdatedAt,
+                )
+        }
+
+    private fun resolveSettings(
+        local: BlinklySettingsSnapshot,
+        localChanged: Boolean,
+        localChangedAt: Instant?,
+        remote: RemoteBlinklySnapshot,
+        remoteChanged: Boolean,
+        now: Instant,
+    ): ResolvedSnapshot<BlinklySettingsSnapshot> =
+        when {
+            localChanged && remoteChanged && localChangedAt != null && localChangedAt > remote.settingsUpdatedAt ->
+                ResolvedSnapshot(
+                    snapshot = local,
+                    updatedAt = localChangedAt,
+                )
+
+            localChanged && remoteChanged ->
+                ResolvedSnapshot(
+                    snapshot = remote.settings,
+                    updatedAt = remote.settingsUpdatedAt,
+                )
+
+            localChanged ->
+                ResolvedSnapshot(
+                    snapshot = local,
+                    updatedAt = localChangedAt ?: now,
+                )
+
+            else ->
+                ResolvedSnapshot(
+                    snapshot = remote.settings,
+                    updatedAt = remote.settingsUpdatedAt,
+                )
+        }
 
     private fun mergeDatabaseSnapshots(
         local: BlinklyDatabaseSnapshot,
@@ -215,6 +321,11 @@ class BlinklySyncManagerImpl(
     private data class OperationState(
         val isSyncing: Boolean = false,
         val error: BlinklyError? = null,
+    )
+
+    private data class ResolvedSnapshot<T>(
+        val snapshot: T,
+        val updatedAt: Instant,
     )
 }
 

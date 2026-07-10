@@ -55,8 +55,6 @@ internal class BlinklySyncStoreProvider(
                                         publish(Label.ErrorCaught(error))
                                     }
                             }
-                        } else {
-                            publish(Label.RequestGoogleSignIn)
                         }
                     }
 

@@ -7,4 +7,6 @@ data class RemoteBlinklySnapshot(
     val lastSyncedAt: Instant?,
     val settings: BlinklySettingsSnapshot,
     val database: BlinklyDatabaseSnapshot,
+    val databaseUpdatedAt: Instant = updatedAt,
+    val settingsUpdatedAt: Instant = updatedAt,
 )

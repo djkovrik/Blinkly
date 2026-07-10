@@ -171,6 +171,7 @@ Reference modules:
 
 `RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `SyncModule`, then `DomainModule`, then `RootComponentDefault`.
 `SyncModule` receives the raw database/settings implementations, exposes tracking decorators for app use, and passes `BlinklySyncManager` into `RootComponentDefault` so Preferences can create the nested sync component.
+Sync metadata is split by data type: database writes update `lastLocalDatabaseChangeAt`, settings writes update `lastLocalSettingsChangeAt`, and `lastRemoteUpdatedAt` is the baseline for detecting remote changes. `BlinklySyncManagerImpl` merges database snapshots when both local and remote changed after the baseline, and resolves settings snapshots by their settings-specific timestamp.
 
 Important local rule: configuration objects in Decompose navigation carry only persistent arguments, never dependencies. Dependencies are supplied in child factories.
 
@@ -290,7 +291,7 @@ Current store references:
 
 `main` is the reference for a tab Store with bootstrapper subscriptions, manager-based business logic, domain-derived model data, and labels mapped to parent output.
 `progress`, `reminders`, and `trainings` are references for Store-backed tabs that emit navigation outputs. `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are references for Store-backed feature screens opened by the root stack.
-`sync` is the reference for a Store that observes a domain manager state flow, emits a UI-owned sign-in request label, and performs post-auth synchronization from a domain `BlinklyUser`.
+`sync` is the reference for a Store that observes a domain manager state flow and performs post-auth synchronization from a domain `BlinklyUser`; Google Sign-In is initiated in Compose through the KMPAuth Google button container, and the Store only receives completed or failed sign-in results.
 
 ### Store structure
 

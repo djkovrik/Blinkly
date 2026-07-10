@@ -46,9 +46,6 @@ class BlinklySyncComponentDefault(
                 when (label) {
                     is BlinklySyncStore.Label.ErrorCaught ->
                         syncOutput(ComponentOutput.Common.ErrorCaught(label.exception))
-
-                    BlinklySyncStore.Label.RequestGoogleSignIn ->
-                        syncOutput(ComponentOutput.Sync.RequestGoogleSignIn)
                 }
             }
         }
