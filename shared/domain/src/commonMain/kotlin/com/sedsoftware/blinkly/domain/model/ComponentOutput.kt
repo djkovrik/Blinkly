@@ -36,5 +36,6 @@ sealed class ComponentOutput {
     sealed class Common : ComponentOutput() {
         data object BackPressed : Common()
         data class ErrorCaught(val throwable: Throwable) : Common()
+        data class NotificationReceived(val notification: BlinklyNotification) : Common()
     }
 }

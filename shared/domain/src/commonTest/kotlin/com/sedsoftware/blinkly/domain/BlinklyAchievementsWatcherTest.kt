@@ -51,11 +51,10 @@ class BlinklyAchievementsWatcherTest : BaseDomainTest() {
             AchievementLevel.BEGINNER,
             today,
         )
-
         // when
         val collectJob = launch { watcher.achievements.collect {} }
+        testScheduler.advanceUntilIdle()
 
-        achievementsFlow.emit(emptyList())
         calendarFlow.emit(calendar)
         testScheduler.advanceUntilIdle()
 

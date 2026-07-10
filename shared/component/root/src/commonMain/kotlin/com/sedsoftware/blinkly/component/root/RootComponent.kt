@@ -11,6 +11,7 @@ import com.sedsoftware.blinkly.component.newreminder.AddNewReminderComponent
 import com.sedsoftware.blinkly.component.onboarding.OnboardingComponent
 import com.sedsoftware.blinkly.component.preferences.PreferencesComponent
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.BlinklyNotification
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -19,6 +20,7 @@ interface RootComponent : BackHandlerOwner {
     val childStack: Value<ChildStack<*, Child>>
     val themeState: Value<ThemeState>
     val errors: SharedFlow<BlinklyError>
+    val notifications: SharedFlow<BlinklyNotification>
 
     fun onBack()
 

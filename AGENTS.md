@@ -104,6 +104,7 @@ Nested component modules:
 Current screen hierarchy:
 - `RootComponentDefault` starts with `Onboarding` when onboarding has not been completed, otherwise `HomeScreen`.
 - `RootComponentDefault` owns the app-level stack and pushes `Preferences`, `Workout`, `Achievements`, `Garden`, and `AddNewReminder` from `ComponentOutput` values emitted by child components.
+- `RootComponentDefault` keeps `BlinklyAchievementsWatcher` active app-wide and maps exact `BlinklyNotifier.unlockedAchievements()` events to `BlinklyNotification.AchievementUnlocked` values exposed through `RootComponent.notifications`.
 - `HomeScreenComponentDefault` owns only the four-tab stack: main, trainings, progress, and reminders. It handles `Main.OpenProgressTab` locally with `bringToFront`; other tab outputs go up to root.
 - `PreferencesComponentDefault` owns the nested `BlinklySyncComponent`; Google sign-in UI remains in Compose, and the sync Store only receives domain-level `BlinklyUser` results.
 - `OnboardingComponentDefault` owns the onboarding step stack from step 1 through step 5. Steps 1, 2, and 3 are thin output-forwarding components; step 4 and step 5 are Store-backed.
@@ -346,7 +347,7 @@ Local pattern:
 Utility reference:
 - `shared/utils/src/commonMain/kotlin/com/sedsoftware/blinkly/utils/StoreExt.kt`
 
-### Labels and errors
+### Labels, errors, and notifications
 
 The project models one-off errors as `ComponentOutput.Common.ErrorCaught`.
 When a Store label must be visible outside the feature, collect `store.labels` in the component layer, map the label to a typed `ComponentOutput`, and let the parent decide whether to handle it locally or forward it upward.
@@ -359,6 +360,11 @@ Wrap low-level failures at the point where the user-facing operation is known, s
 `RootComponentDefault` maps incoming `ComponentOutput.Common.ErrorCaught` values to `BlinklyError`, logs the original cause, and emits them through `RootComponent.errors`.
 `RootContent` collects `RootComponent.errors`, maps `BlinklyError` to localized strings, and shows the app-wide top error snackbar.
 When adding a new user-visible error context, add the `BlinklyError` type and matching English/Russian strings in `shared/compose/src/commonMain/composeResources`; unknown or too-narrow failures should fall back to `BlinklyError.Unknown`.
+
+App-wide informational events use `BlinklyNotification` from `shared/domain/src/commonMain/kotlin/com/sedsoftware/blinkly/domain/model/BlinklyNotification.kt`.
+Components may route them upward as `ComponentOutput.Common.NotificationReceived`; `RootComponentDefault` emits them through `RootComponent.notifications`.
+Achievement unlock events originate when `BlinklyAchievementsWatcherImpl` calls `BlinklyNotifier.achievementUnlocked` after saving, so restored or initially loaded achievements do not produce stale success messages.
+`RootContent` queues errors and notifications in one top snackbar host, using error colors for failures and `secondaryContainer` colors for neutral success notifications.
 
 ## Compose Conventions
 

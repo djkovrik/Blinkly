@@ -144,7 +144,9 @@ internal class BlinklyAchievementsWatcherImpl(
     }
 
     private fun isAchievementUnlocked(achievementType: AchievementType): Boolean {
-        return _currentAchievements.value.any { it.type == achievementType }
+        return _currentAchievements.value.any { achievement ->
+            achievement.type == achievementType && achievement.unlockedAt != null
+        }
     }
 
     private fun buildFullAchievementsList(unlockedAchievements: List<Achievement>): List<Achievement> {
