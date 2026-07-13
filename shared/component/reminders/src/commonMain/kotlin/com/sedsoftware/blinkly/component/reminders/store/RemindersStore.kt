@@ -9,6 +9,7 @@ import com.sedsoftware.blinkly.domain.model.Reminder
 internal interface RemindersStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
+        data object AddNewReminder : Intent
         data class DeleteReminder(val uuid: String) : Intent
         data object UndoDelete : Intent
         data object DeleteMessageShown : Intent
@@ -19,9 +20,11 @@ internal interface RemindersStore : Store<Intent, State, Label> {
         val deletedReminder: Reminder? = null,
         val pendingDeleteUuid: String? = null,
         val isRestoringDeleted: Boolean = false,
+        val isRequestingNotificationPermission: Boolean = false,
     )
 
     sealed class Label {
         data class ErrorCaught(val exception: Throwable) : Label()
+        data object OpenAddNewReminder : Label()
     }
 }

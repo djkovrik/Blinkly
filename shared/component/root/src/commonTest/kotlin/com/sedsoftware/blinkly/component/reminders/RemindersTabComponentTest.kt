@@ -3,6 +3,7 @@ package com.sedsoftware.blinkly.component.reminders
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.arkivanov.decompose.DefaultComponentContext
@@ -10,13 +11,17 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.reminders.integration.RemindersTabComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
+import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
+import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
+import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.DayOfWeek
@@ -27,6 +32,7 @@ import kotlin.test.Test
 class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
 
     private val reminderManager: FakeReminderManager = FakeReminderManager()
+    private val notifier: FakeNotifier = FakeNotifier()
 
     @Test
     fun `when reminders emitted then model contains reminder items`() = runTest(testScheduler) {
@@ -57,11 +63,98 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
 
     @Test
     fun `when add new clicked then output opens add new screen`() = runTest(testScheduler) {
+        // given
+        notifier.permissionGranted = true
+
         // when
         component.onAddNewClick()
+        testScheduler.advanceUntilIdle()
 
         // then
         assertThat(componentOutput).contains(ComponentOutput.Reminders.OpenAddNew)
+    }
+
+    @Test
+    fun `when add new clicked without permission then request permission and open after grant`() = runTest(testScheduler) {
+        // given
+        testScheduler.advanceUntilIdle()
+
+        // when
+        component.onAddNewClick()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(notifier.requestCount).isEqualTo(1)
+        assertThat(componentOutput.contains(ComponentOutput.Reminders.OpenAddNew)).isFalse()
+
+        // when
+        notifier.permissionEvents.emit(PermissionResult.Granted)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutput).contains(ComponentOutput.Reminders.OpenAddNew)
+    }
+
+    @Test
+    fun `when notification permission denied then add new screen is not opened`() = runTest(testScheduler) {
+        // given
+        testScheduler.advanceUntilIdle()
+
+        // when
+        component.onAddNewClick()
+        testScheduler.advanceUntilIdle()
+        notifier.permissionEvents.emit(PermissionResult.Denied)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutput.contains(ComponentOutput.Reminders.OpenAddNew)).isFalse()
+    }
+
+    @Test
+    fun `when notification permission denied always then settings error is emitted`() = runTest(testScheduler) {
+        // given
+        testScheduler.advanceUntilIdle()
+
+        // when
+        component.onAddNewClick()
+        testScheduler.advanceUntilIdle()
+        notifier.permissionEvents.emit(PermissionResult.DeniedAlways)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(
+            componentOutput
+                .filterIsInstance<ComponentOutput.Common.ErrorCaught>()
+                .any { it.throwable is BlinklyError.NotificationPermissionDeniedAlways }
+        ).isTrue()
+    }
+
+    @Test
+    fun `when notification permission check fails then error is emitted`() = runTest(testScheduler) {
+        // given
+        val exception = IllegalStateException("permission check failed")
+        notifier.checkException = exception
+
+        // when
+        component.onAddNewClick()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.NotificationPermissionChecking>(exception)).isTrue()
+    }
+
+    @Test
+    fun `when notification permission request fails then error is emitted`() = runTest(testScheduler) {
+        // given
+        val exception = IllegalStateException("permission request failed")
+        notifier.requestException = exception
+
+        // when
+        component.onAddNewClick()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.NotificationPermissionRequesting>(exception)).isTrue()
     }
 
     @Test
@@ -179,8 +272,34 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
             storeFactory = DefaultStoreFactory(),
             dispatchers = testDispatchers,
             reminderManager = reminderManager,
+            notifier = notifier,
             remindersTabOutput = { componentOutput.add(it) },
         )
+
+    private class FakeNotifier : BlinklyNotifier {
+        val permissionEvents: MutableSharedFlow<PermissionResult> = MutableSharedFlow()
+        var permissionGranted: Boolean = false
+        var requestCount: Int = 0
+        var checkException: Throwable? = null
+        var requestException: Throwable? = null
+
+        override fun permissionEvents(): Flow<PermissionResult> = permissionEvents
+
+        override suspend fun isNotificationPermissionGranted(): Boolean {
+            checkException?.let { throw it }
+            return permissionGranted
+        }
+
+        override suspend fun requestNotificationPermission() {
+            requestCount += 1
+            requestException?.let { throw it }
+        }
+
+        override suspend fun achievementUnlocked(type: AchievementType) = Unit
+
+        override fun unlockedAchievements(): Flow<AchievementType> =
+            MutableSharedFlow()
+    }
 
     private fun reminder(
         uuid: String,

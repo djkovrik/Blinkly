@@ -14,10 +14,13 @@ import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
+import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Achievement
+import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
+import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeGarden
@@ -121,6 +124,13 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
                 override suspend fun rescheduleAll() = Unit
                 override suspend fun cancel(uuid: String) = Unit
                 override suspend fun cancelAll() = Unit
+            },
+            notifier = object : BlinklyNotifier {
+                override fun permissionEvents(): Flow<PermissionResult> = flowOf()
+                override suspend fun isNotificationPermissionGranted(): Boolean = true
+                override suspend fun requestNotificationPermission() = Unit
+                override suspend fun achievementUnlocked(type: AchievementType) = Unit
+                override fun unlockedAchievements(): Flow<AchievementType> = flowOf()
             },
             treeProgressWatcher = object : BlinklyTreeProgressWatcher {
                 override val tree: Flow<Tree> = flowOf(Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f))

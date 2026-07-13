@@ -55,6 +55,9 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val unlockedAchievementsFlow = MutableSharedFlow<AchievementType>()
     private val notifierMock: BlinklyNotifier = mock {
         every { unlockedAchievements() } returns unlockedAchievementsFlow
+        every { permissionEvents() } returns emptyFlow()
+        everySuspend { isNotificationPermissionGranted() } returns true
+        everySuspend { requestNotificationPermission() } returns Unit
     }
     private val fakeSettings = FakeSettings()
     private val syncManager: FakeBlinklySyncManager = FakeBlinklySyncManager()
@@ -243,6 +246,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         val currentTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.RemindersTab
         // when
         currentTabChild.component.onAddNewClick()
+        testScheduler.advanceUntilIdle()
         // then
         assertThat(component.childStack.active.instance is RootComponent.Child.AddNewReminder).isTrue()
         // when

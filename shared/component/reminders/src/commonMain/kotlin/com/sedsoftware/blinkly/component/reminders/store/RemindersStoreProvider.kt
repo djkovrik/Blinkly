@@ -9,6 +9,7 @@ import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.Intent
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.Label
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.State
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
@@ -32,6 +33,7 @@ internal class RemindersStoreProvider(
             autoInit = autoInit,
             bootstrapper = coroutineBootstrapper(mainContext) {
                 dispatch(Action.ObserveReminders)
+                dispatch(Action.ObserveNotificationPermission)
             },
             executorFactory = coroutineExecutorFactory(mainContext) {
                 onAction<Action.ObserveReminders> {
@@ -39,6 +41,61 @@ internal class RemindersStoreProvider(
                         manager.observeReminders()
                             .catch { publish(Label.ErrorCaught(it.asBlinklyError(BlinklyError::RemindersLoading))) }
                             .collect { dispatch(Msg.RemindersUpdated(it)) }
+                    }
+                }
+
+                onAction<Action.ObserveNotificationPermission> {
+                    launch {
+                        manager.observePermissionEvents()
+                            .catch {
+                                dispatch(Msg.NotificationPermissionRequestFinished)
+                                publish(Label.ErrorCaught(it.asBlinklyError(BlinklyError::NotificationPermissionChecking)))
+                            }
+                            .collect { result ->
+                                if (!state().isRequestingNotificationPermission) return@collect
+
+                                dispatch(Msg.NotificationPermissionRequestFinished)
+                                when (result) {
+                                    PermissionResult.Granted -> publish(Label.OpenAddNewReminder)
+                                    PermissionResult.Denied -> Unit
+                                    PermissionResult.DeniedAlways -> {
+                                        publish(Label.ErrorCaught(BlinklyError.NotificationPermissionDeniedAlways()))
+                                    }
+                                }
+                            }
+                    }
+                }
+
+                onIntent<Intent.AddNewReminder> {
+                    if (state().isRequestingNotificationPermission) return@onIntent
+
+                    dispatch(Msg.NotificationPermissionRequestStarted)
+                    launch {
+                        val permissionGranted = withContext(ioContext) {
+                            manager.isNotificationPermissionGranted()
+                        }.getOrElse { throwable ->
+                            dispatch(Msg.NotificationPermissionRequestFinished)
+                            publish(Label.ErrorCaught(BlinklyError.NotificationPermissionChecking(throwable)))
+                            return@launch
+                        }
+
+                        if (permissionGranted) {
+                            dispatch(Msg.NotificationPermissionRequestFinished)
+                            publish(Label.OpenAddNewReminder)
+                        } else {
+                            unwrap(
+                                result = manager.requestNotificationPermission(),
+                                onSuccess = {},
+                                onError = { throwable ->
+                                    dispatch(Msg.NotificationPermissionRequestFinished)
+                                    publish(
+                                        Label.ErrorCaught(
+                                            BlinklyError.NotificationPermissionRequesting(throwable)
+                                        )
+                                    )
+                                },
+                            )
+                        }
                     }
                 }
 
@@ -118,12 +175,21 @@ internal class RemindersStoreProvider(
                     is Msg.RestoreFinished -> copy(
                         isRestoringDeleted = false,
                     )
+
+                    is Msg.NotificationPermissionRequestStarted -> copy(
+                        isRequestingNotificationPermission = true,
+                    )
+
+                    is Msg.NotificationPermissionRequestFinished -> copy(
+                        isRequestingNotificationPermission = false,
+                    )
                 }
             },
         ) {}
 
     sealed interface Action {
         data object ObserveReminders : Action
+        data object ObserveNotificationPermission : Action
     }
 
     sealed interface Msg {
@@ -134,5 +200,7 @@ internal class RemindersStoreProvider(
         data object DeleteFinished : Msg
         data object RestoreStarted : Msg
         data object RestoreFinished : Msg
+        data object NotificationPermissionRequestStarted : Msg
+        data object NotificationPermissionRequestFinished : Msg
     }
 }

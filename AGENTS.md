@@ -89,7 +89,7 @@ Top-level component modules:
 - `home` - shell with four tabs; owns tab stack navigation and forwards root-level tab outputs upward
 - `main` - implemented main dashboard tab with MVIKotlin Store, feature-local manager, Compose UI, preview component, and common tests
 - `progress` - progress tab with MVIKotlin Store, progress manager, calendar/garden/achievement summary state, outputs for achievements and garden screens, Compose UI, preview component, and common tests
-- `reminders` - reminders tab with MVIKotlin Store, reminders manager, reminder list/delete/undo state, output for add-new-reminder, Compose UI, preview component, and common tests
+- `reminders` - reminders tab with MVIKotlin Store, reminders manager, reminder list/delete/undo state, notification-permission gating before the add-new-reminder output, Compose UI, preview component, and common tests
 - `sync` - settings-embedded sync component with MVIKotlin Store, Google sign-in bridge, Firestore snapshot data source, sync manager, DTO mappers, preview component, and common tests
 - `trainings` - trainings tab with MVIKotlin Store, trainings manager, exercise block cards, outputs for workout execution, Compose UI, preview component, and common tests
 
@@ -189,6 +189,7 @@ Reference modules:
 - `shared/utils/src/commonMain/kotlin/com/sedsoftware/blinkly/utils/di/UtilsModule.kt`
 
 `RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `SyncModule`, then `DomainModule`, then `RootComponentDefault`.
+`RootComponentDefault` passes `BlinklyNotifier` through `HomeScreenComponentDefault` to the reminders tab so adding a reminder checks or requests notification permission before root navigation opens the add-new-reminder screen.
 `SyncModule` receives the raw database/settings implementations, exposes tracking decorators for app use, and passes `BlinklySyncManager` into `RootComponentDefault` so Preferences can create the nested sync component.
 Sync metadata is split by data type: database writes update `lastLocalDatabaseChangeAt`, settings writes update `lastLocalSettingsChangeAt`, and `lastRemoteUpdatedAt` is the baseline for detecting remote changes. `BlinklySyncManagerImpl` merges database snapshots when both local and remote changed after the baseline, and resolves settings snapshots by their settings-specific timestamp.
 
