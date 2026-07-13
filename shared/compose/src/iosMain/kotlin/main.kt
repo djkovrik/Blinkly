@@ -1,5 +1,5 @@
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.window.ComposeUIViewController
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
@@ -53,7 +53,7 @@ private fun initializeGoogleAuth() {
 
 @Composable
 private fun SystemBarsAppearanceChanged(useDarkIcons: Boolean) {
-    LaunchedEffect(useDarkIcons) {
+    SideEffect {
         UIApplication.sharedApplication.setStatusBarStyle(
             if (useDarkIcons) UIStatusBarStyleDarkContent else UIStatusBarStyleLightContent
         )

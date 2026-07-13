@@ -6,10 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.WindowCompat
 import com.arkivanov.decompose.defaultComponentContext
 import com.sedsoftware.blinkly.component.root.RootComponentFactory
 import com.sedsoftware.blinkly.compose.auth.initializeBlinklyGoogleAuth
@@ -35,8 +35,8 @@ class AppActivity : ComponentActivity() {
                 .start()
         }
 
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         permissionsController.bind(this)
         initializeBlinklyGoogleAuth(serverId = getString(R.string.default_web_client_id))
@@ -91,9 +91,9 @@ class AppActivity : ComponentActivity() {
 @Composable
 private fun SystemBarsAppearanceChanged(useDarkIcons: Boolean) {
     val view = LocalView.current
-    LaunchedEffect(useDarkIcons) {
+    SideEffect {
         val window = (view.context as Activity).window
-        WindowInsetsControllerCompat(window, window.decorView).apply {
+        WindowCompat.getInsetsController(window, window.decorView).apply {
             isAppearanceLightStatusBars = useDarkIcons
             isAppearanceLightNavigationBars = useDarkIcons
         }
