@@ -25,6 +25,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
+import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
@@ -133,6 +134,10 @@ fun RootComponentFactory(
         )
     }
 
+    val syncManager: BlinklySyncManager by lazy {
+        syncModule.createSyncManager(domainModule.reminderManager::rescheduleAll)
+    }
+
     val beeper: BlinklyBeeper by lazy {
         val beeperModule = BeeperModule(
             dependencies = object : BeeperModuleDependencies {
@@ -150,7 +155,7 @@ fun RootComponentFactory(
         dispatchers = dispatchers,
         notifier = notifier,
         settings = settings,
-        syncManager = syncModule.syncManager,
+        syncManager = syncManager,
         timeUtils = timeUtils,
         achievementsWatcher = domainModule.achievementsWatcher,
         calendarWatcher = domainModule.calendarWatcher,

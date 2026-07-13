@@ -3,12 +3,14 @@ import com.sedsoftware.blinkly.domain.model.AchievementType;
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock;
 import com.sedsoftware.blinkly.domain.model.ExerciseType;
 import com.sedsoftware.blinkly.domain.model.ReminderInterval;
+import com.sedsoftware.blinkly.domain.model.ReminderScheduleType;
 import com.sedsoftware.blinkly.domain.model.ReminderType;
 import kotlin.Int;
 import kotlin.collections.List;
 import kotlin.time.Instant;
 import kotlinx.datetime.DayOfWeek;
 import kotlinx.datetime.LocalDateTime;
+import kotlinx.datetime.LocalTime;
 
 ---- ACHIEVEMENTS
 CREATE TABLE IF NOT EXISTS AchievementEntity(
@@ -51,26 +53,64 @@ DELETE FROM ExerciseEntity;
 
 
 ---- REMINDERS
+CREATE TABLE IF NOT EXISTS ReminderScheduleEntity(
+    id TEXT NOT NULL PRIMARY KEY,
+    reminderType TEXT AS ReminderType NOT NULL,
+    scheduleType TEXT AS ReminderScheduleType NOT NULL,
+    timeFrom TEXT AS LocalTime NOT NULL,
+    timeUntil TEXT AS LocalTime,
+    intervalMinutes INTEGER AS Int,
+    weekDays TEXT AS List<DayOfWeek> NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS ReminderEntity(
     uuid TEXT NOT NULL PRIMARY KEY,
+    scheduleId TEXT NOT NULL,
     date TEXT AS LocalDateTime NOT NULL,
     type TEXT AS ReminderType NOT NULL,
     interval TEXT AS ReminderInterval NOT NULL,
-    weekDays TEXT AS List<DayOfWeek> NOT NULL,
     UNIQUE(uuid)
 );
 
+insertReminderSchedule:
+INSERT OR REPLACE INTO ReminderScheduleEntity(
+    id,
+    reminderType,
+    scheduleType,
+    timeFrom,
+    timeUntil,
+    intervalMinutes,
+    weekDays
+)
+VALUES (:id, :reminderType, :scheduleType, :timeFrom, :timeUntil, :intervalMinutes, :weekDays);
+
 insertReminder:
-INSERT OR REPLACE INTO ReminderEntity(uuid, date, type, interval, weekDays)
-VALUES (:uuid, :date, :type, :interval, :weekDays);
+INSERT OR REPLACE INTO ReminderEntity(uuid, scheduleId, date, type, interval)
+VALUES (:uuid, :scheduleId, :date, :type, :interval);
+
+getReminderSchedules:
+SELECT *
+FROM ReminderScheduleEntity;
 
 getReminders:
 SELECT *
 FROM ReminderEntity;
 
-deleteReminder:
+getRemindersBySchedule:
+SELECT *
+FROM ReminderEntity
+WHERE scheduleId = :scheduleId;
+
+deleteRemindersBySchedule:
 DELETE FROM ReminderEntity
-WHERE uuid = :uuid;
+WHERE scheduleId = :scheduleId;
+
+deleteReminderSchedule:
+DELETE FROM ReminderScheduleEntity
+WHERE id = :id;
 
 deleteReminders:
 DELETE FROM ReminderEntity;
+
+deleteReminderSchedules:
+DELETE FROM ReminderScheduleEntity;

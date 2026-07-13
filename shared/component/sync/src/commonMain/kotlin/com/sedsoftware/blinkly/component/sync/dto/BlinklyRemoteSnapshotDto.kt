@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class BlinklyRemoteSnapshotDto(
-    val schemaVersion: Int = 2,
+    val schemaVersion: Int = 3,
     val updatedAtEpochMillis: Long,
     val lastSyncedAtEpochMillis: Long? = null,
     val databaseUpdatedAtEpochMillis: Long? = null,
@@ -12,7 +12,8 @@ internal data class BlinklyRemoteSnapshotDto(
     val settings: SettingsDto,
     val exercises: List<ExerciseDto> = emptyList(),
     val achievements: List<AchievementDto> = emptyList(),
-    val reminders: List<ReminderDto> = emptyList(),
+    val reminderSchedules: List<ReminderScheduleDto>,
+    val reminders: List<ReminderDto>,
 )
 
 @Serializable
@@ -51,8 +52,19 @@ internal data class AchievementDto(
 @Serializable
 internal data class ReminderDto(
     val uuid: String,
+    val scheduleId: String,
     val dateIso: String,
     val type: String,
     val interval: String,
+)
+
+@Serializable
+internal data class ReminderScheduleDto(
+    val id: String,
+    val reminderType: String,
+    val scheduleType: String,
+    val timeFromIso: String,
+    val timeUntilIso: String? = null,
+    val intervalMinutes: Int? = null,
     val weekDays: List<String>,
 )

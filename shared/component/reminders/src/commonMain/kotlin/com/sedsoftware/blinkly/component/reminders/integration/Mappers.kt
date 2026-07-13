@@ -1,42 +1,38 @@
 package com.sedsoftware.blinkly.component.reminders.integration
 
-import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.Interval
 import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.Model
 import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.ReminderItem
+import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.Schedule
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.State
-import com.sedsoftware.blinkly.domain.model.Reminder
-import com.sedsoftware.blinkly.domain.model.ReminderInterval
-import com.sedsoftware.blinkly.domain.model.ReminderType
+import com.sedsoftware.blinkly.domain.model.ReminderScheduleConfiguration
+import com.sedsoftware.blinkly.domain.model.ScheduledReminder
 
 internal val stateToModel: (State) -> Model = { state ->
     Model(
         reminders = state.reminders
-            .sortedWith(compareBy<Reminder> { it.date.date }.thenBy { it.date.time })
-            .map(::reminderToItem),
+            .mapNotNull(::reminderToItem)
+            .sortedBy(ReminderItem::nextAt),
         deletedReminder = state.deletedReminder?.let(::reminderToItem),
     )
 }
 
-private fun reminderToItem(reminder: Reminder): ReminderItem =
-    ReminderItem(
-        uuid = reminder.uuid,
-        title = reminder.type.title,
-        description = reminder.type.description,
-        time = reminder.date.time,
-        nextDate = reminder.date.date,
-        interval = when (reminder.interval) {
-            ReminderInterval.DAILY -> Interval.DAILY
-            ReminderInterval.WEEKLY -> Interval.WEEKLY
+private fun reminderToItem(reminder: ScheduledReminder): ReminderItem? {
+    val nextAt = reminder.nextAlarm?.date ?: return null
+    return ReminderItem(
+        id = reminder.schedule.id,
+        nextAt = nextAt,
+        schedule = when (val configuration = reminder.schedule.configuration) {
+            is ReminderScheduleConfiguration.Daily -> Schedule.Daily(configuration.time)
+            is ReminderScheduleConfiguration.WeeklySingle -> Schedule.Weekly(
+                time = configuration.time,
+                day = configuration.day,
+            )
+            is ReminderScheduleConfiguration.WorkdayPeriod -> Schedule.WorkdayPeriod(
+                from = configuration.from,
+                until = configuration.until,
+                intervalMinutes = configuration.intervalMinutes,
+                days = configuration.days,
+            )
         },
-        days = reminder.weekDays,
     )
-
-private val ReminderType.title: String
-    get() = when (this) {
-        ReminderType.TWENTY_X3 -> "20-20-20"
-    }
-
-private val ReminderType.description: String
-    get() = when (this) {
-        ReminderType.TWENTY_X3 -> "Look 20 feet away for 20 seconds"
-    }
+}

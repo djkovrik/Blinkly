@@ -6,7 +6,6 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
-import assertk.assertions.isNotZero
 import assertk.assertions.isTrue
 import assertk.assertions.isZero
 import com.arkivanov.decompose.DefaultComponentContext
@@ -48,10 +47,10 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         listOf(
             Reminder(
                 uuid = "uuid",
+                scheduleId = "schedule",
                 date = LocalDateTime(2026, 3, 8, 12, 34),
                 type = ReminderType.TWENTY_X3,
                 interval = ReminderInterval.DAILY,
-                weekDays = DayOfWeek.entries.toList(),
             )
         )
 
@@ -442,7 +441,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
     }
 
     @Test
-    fun `when created reminders changed then last step state updated`() = runTest(testScheduler) {
+    fun `when physical reminders changed then onboarding count uses physical flow`() = runTest(testScheduler) {
         // given
         val step5 = getStep5Component()
         with(step5.model.value) {
@@ -455,7 +454,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
         // then
         with(step5.model.value) {
-            assertThat(createdRemindersCount).isNotZero()
+            assertThat(createdRemindersCount).isEqualTo(testReminders.size)
         }
 
         // when

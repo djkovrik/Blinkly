@@ -17,9 +17,9 @@ import kotlinx.coroutines.CoroutineScope
 interface SyncModule {
     val authService: BlinklyAuthService
     val remoteSyncDataSource: BlinklyRemoteSyncDataSource
-    val syncManager: BlinklySyncManager
     val trackedDatabase: BlinklyDatabase
     val trackedSettings: BlinklySettings
+    fun createSyncManager(rescheduleReminders: suspend () -> Unit): BlinklySyncManager
 }
 
 interface SyncModuleDependencies {
@@ -44,7 +44,7 @@ fun SyncModule(dependencies: SyncModuleDependencies): SyncModule =
             CoroutineScope(dependencies.dispatchers.main)
         }
 
-        override val syncManager: BlinklySyncManager by lazy {
+        override fun createSyncManager(rescheduleReminders: suspend () -> Unit): BlinklySyncManager =
             BlinklySyncManagerImpl(
                 authService = authService,
                 database = dependencies.database,
@@ -52,8 +52,8 @@ fun SyncModule(dependencies: SyncModuleDependencies): SyncModule =
                 remoteDataSource = remoteSyncDataSource,
                 timeUtils = dependencies.timeUtils,
                 scope = scope,
+                rescheduleReminders = rescheduleReminders,
             )
-        }
 
         override val trackedDatabase: BlinklyDatabase by lazy {
             TrackingBlinklyDatabase(

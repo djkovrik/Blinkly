@@ -96,6 +96,10 @@
     <string name="reminders_weekly">Еженедельно</string>
     <string name="reminders_next">Ближайшее</string>
     <string name="reminders_days_every_day">Каждый день</string>
+    <string name="reminders_days_weekdays">Будни</string>
+    <string name="reminders_workday_period">Рабочий период</string>
+    <string name="reminders_every_minutes">Каждые %1$d мин</string>
+    <string name="reminders_next_at">Ближайшее %1$s · %2$s</string>
     <string name="reminders_overview_title">Расписание перерывов 20-20-20</string>
     <string name="reminders_overview_count">Активных напоминаний: %1$d</string>
     <string name="reminders_overview_next">Ближайшее: %1$s, %2$s</string>

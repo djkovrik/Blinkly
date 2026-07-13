@@ -15,6 +15,7 @@ import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.RemoteBlinklySnapshot
 import com.sedsoftware.blinkly.domain.model.Reminder
+import com.sedsoftware.blinkly.domain.model.ReminderSchedule
 import com.sedsoftware.blinkly.domain.model.applySnapshot
 import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.domain.model.toSnapshot
@@ -35,6 +36,7 @@ class BlinklySyncManagerImpl(
     private val remoteDataSource: BlinklyRemoteSyncDataSource,
     private val timeUtils: BlinklyTimeUtils,
     scope: CoroutineScope,
+    private val rescheduleReminders: suspend () -> Unit = {},
 ) : BlinklySyncManager {
 
     private val operationState: MutableStateFlow<OperationState> = MutableStateFlow(OperationState())
@@ -204,7 +206,13 @@ class BlinklySyncManagerImpl(
         }
 
         if (resolvedDatabase.snapshot != localDatabase) {
+            val remindersChanged =
+                resolvedDatabase.snapshot.reminderSchedules != localDatabase.reminderSchedules ||
+                    resolvedDatabase.snapshot.reminders != localDatabase.reminders
             database.replaceSnapshot(resolvedDatabase.snapshot)
+            if (remindersChanged) {
+                rescheduleReminders()
+            }
         }
 
         if (resolvedSettings.snapshot != localSettings) {
@@ -297,14 +305,22 @@ class BlinklySyncManagerImpl(
         local: BlinklyDatabaseSnapshot,
         remote: BlinklyDatabaseSnapshot,
     ): BlinklyDatabaseSnapshot =
-        BlinklyDatabaseSnapshot(
-            exercises = (remote.exercises + local.exercises).distinctBy(Exercise::syncKey),
-            achievements = (remote.achievements + local.achievements)
-                .groupBy(Achievement::type)
-                .values
-                .map(::mergeAchievements),
-            reminders = (remote.reminders + local.reminders).distinctBy(Reminder::uuid),
-        )
+        (remote.reminderSchedules + local.reminderSchedules)
+            .distinctBy(ReminderSchedule::id)
+            .let { schedules ->
+                val scheduleIds = schedules.mapTo(hashSetOf(), ReminderSchedule::id)
+                BlinklyDatabaseSnapshot(
+                    exercises = (remote.exercises + local.exercises).distinctBy(Exercise::syncKey),
+                    achievements = (remote.achievements + local.achievements)
+                        .groupBy(Achievement::type)
+                        .values
+                        .map(::mergeAchievements),
+                    reminderSchedules = schedules,
+                    reminders = (remote.reminders + local.reminders)
+                        .distinctBy(Reminder::uuid)
+                        .filter { reminder -> reminder.scheduleId in scheduleIds },
+                )
+            }
 
     private fun mergeAchievements(items: List<Achievement>): Achievement {
         val first = items.first()
@@ -316,7 +332,7 @@ class BlinklySyncManagerImpl(
     }
 
     private fun BlinklyDatabaseSnapshot.isNotEmpty(): Boolean =
-        exercises.isNotEmpty() || achievements.isNotEmpty() || reminders.isNotEmpty()
+        exercises.isNotEmpty() || achievements.isNotEmpty() || reminderSchedules.isNotEmpty() || reminders.isNotEmpty()
 
     private data class OperationState(
         val isSyncing: Boolean = false,

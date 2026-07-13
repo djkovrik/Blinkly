@@ -65,8 +65,8 @@ class RemindersTabComponentDefault(
         store.accept(RemindersStore.Intent.AddNewReminder)
     }
 
-    override fun onDeleteReminder(uuid: String) {
-        store.accept(RemindersStore.Intent.DeleteReminder(uuid))
+    override fun onDeleteReminder(scheduleId: String) {
+        store.accept(RemindersStore.Intent.DeleteReminder(scheduleId))
     }
 
     override fun onUndoDelete() {

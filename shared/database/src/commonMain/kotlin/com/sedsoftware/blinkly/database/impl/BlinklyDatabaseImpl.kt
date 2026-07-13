@@ -10,12 +10,15 @@ import com.sedsoftware.blinkly.database.BlinklyAppDatabase
 import com.sedsoftware.blinkly.database.BlinklyAppDatabaseQueries
 import com.sedsoftware.blinkly.database.ExerciseEntity
 import com.sedsoftware.blinkly.database.ReminderEntity
+import com.sedsoftware.blinkly.database.ReminderScheduleEntity
 import com.sedsoftware.blinkly.database.adapter.DayOfWeekAdapter
 import com.sedsoftware.blinkly.database.adapter.InstantAdapter
 import com.sedsoftware.blinkly.database.adapter.LocalDateTimeAdapter
+import com.sedsoftware.blinkly.database.adapter.LocalTimeAdapter
 import com.sedsoftware.blinkly.database.mapper.AchievementMapper
 import com.sedsoftware.blinkly.database.mapper.ExerciseMapper
 import com.sedsoftware.blinkly.database.mapper.ReminderMapper
+import com.sedsoftware.blinkly.database.mapper.ReminderScheduleMapper
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
@@ -23,6 +26,9 @@ import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.BlinklyDatabaseSnapshot
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.Reminder
+import com.sedsoftware.blinkly.domain.model.ReminderSchedule
+import com.sedsoftware.blinkly.domain.model.ReminderScheduleConfiguration
+import com.sedsoftware.blinkly.domain.model.ReminderScheduleType
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -37,6 +43,7 @@ internal class BlinklyDatabaseImpl(
     private val achievementMapper: AchievementMapper = AchievementMapper()
     private val exerciseMapper: ExerciseMapper = ExerciseMapper(timeUtils.timeZone())
     private val reminderMapper: ReminderMapper = ReminderMapper()
+    private val reminderScheduleMapper: ReminderScheduleMapper = ReminderScheduleMapper()
 
     private val database: BlinklyAppDatabase =
         BlinklyAppDatabase(
@@ -56,8 +63,15 @@ internal class BlinklyDatabaseImpl(
                 dateAdapter = LocalDateTimeAdapter,
                 typeAdapter = EnumColumnAdapter(),
                 intervalAdapter = EnumColumnAdapter(),
+            ),
+            ReminderScheduleEntityAdapter = ReminderScheduleEntity.Adapter(
+                reminderTypeAdapter = EnumColumnAdapter(),
+                scheduleTypeAdapter = EnumColumnAdapter(),
+                timeFromAdapter = LocalTimeAdapter,
+                timeUntilAdapter = LocalTimeAdapter,
+                intervalMinutesAdapter = IntColumnAdapter,
                 weekDaysAdapter = DayOfWeekAdapter,
-            )
+            ),
         )
 
     private val queries: BlinklyAppDatabaseQueries
@@ -82,11 +96,18 @@ internal class BlinklyDatabaseImpl(
             .mapToList(dispatchers.io)
             .map(reminderMapper::toDomain)
 
+    override fun currentReminderSchedules(): Flow<List<ReminderSchedule>> =
+        queries.getReminderSchedules()
+            .asFlow()
+            .mapToList(dispatchers.io)
+            .map(reminderScheduleMapper::toDomain)
+
     override suspend fun currentSnapshot(): BlinklyDatabaseSnapshot =
         withContext(dispatchers.io) {
             BlinklyDatabaseSnapshot(
                 exercises = exerciseMapper.toDomain(queries.getExercises().executeAsList()),
                 achievements = achievementMapper.toDomain(queries.getAchievements().executeAsList()),
+                reminderSchedules = reminderScheduleMapper.toDomain(queries.getReminderSchedules().executeAsList()),
                 reminders = reminderMapper.toDomain(queries.getReminders().executeAsList()),
             )
         }
@@ -97,9 +118,11 @@ internal class BlinklyDatabaseImpl(
                 queries.deleteExercises()
                 queries.deleteAchievements()
                 queries.deleteReminders()
+                queries.deleteReminderSchedules()
 
                 snapshot.exercises.forEach(::insertExercise)
                 snapshot.achievements.forEach(::insertAchievement)
+                snapshot.reminderSchedules.forEach(::insertReminderSchedule)
                 snapshot.reminders.forEach(::insertReminder)
             }
         }
@@ -145,29 +168,36 @@ internal class BlinklyDatabaseImpl(
         }
     }
 
-    override suspend fun saveReminder(reminder: Reminder) {
+    override suspend fun remindersBySchedule(scheduleId: String): List<Reminder> =
         withContext(dispatchers.io) {
-            insertReminder(reminder)
+            reminderMapper.toDomain(queries.getRemindersBySchedule(scheduleId).executeAsList())
         }
-    }
 
-    override suspend fun saveReminders(reminders: List<Reminder>) {
+    override suspend fun saveReminderSchedule(schedule: ReminderSchedule, reminders: List<Reminder>) {
         withContext(dispatchers.io) {
             queries.transaction {
+                queries.deleteRemindersBySchedule(schedule.id)
+                insertReminderSchedule(schedule)
                 reminders.forEach(::insertReminder)
             }
         }
     }
 
-    override suspend fun deleteReminder(uuid: String) {
+    override suspend fun deleteReminderSchedule(scheduleId: String) {
         withContext(dispatchers.io) {
-            queries.deleteReminder(uuid)
+            queries.transaction {
+                queries.deleteRemindersBySchedule(scheduleId)
+                queries.deleteReminderSchedule(scheduleId)
+            }
         }
     }
 
     override suspend fun deleteReminders() {
         withContext(dispatchers.io) {
-            queries.deleteReminders()
+            queries.transaction {
+                queries.deleteReminders()
+                queries.deleteReminderSchedules()
+            }
         }
     }
 
@@ -190,10 +220,35 @@ internal class BlinklyDatabaseImpl(
     private fun insertReminder(reminder: Reminder) {
         queries.insertReminder(
             uuid = reminder.uuid,
+            scheduleId = reminder.scheduleId,
             date = reminder.date,
             type = reminder.type,
             interval = reminder.interval,
-            weekDays = reminder.weekDays,
+        )
+    }
+
+    private fun insertReminderSchedule(schedule: ReminderSchedule) {
+        val configuration = schedule.configuration
+        queries.insertReminderSchedule(
+            id = schedule.id,
+            reminderType = schedule.reminderType,
+            scheduleType = when (configuration) {
+                is ReminderScheduleConfiguration.Daily -> ReminderScheduleType.DAILY
+                is ReminderScheduleConfiguration.WeeklySingle -> ReminderScheduleType.WEEKLY_SINGLE
+                is ReminderScheduleConfiguration.WorkdayPeriod -> ReminderScheduleType.WORKDAY_PERIOD
+            },
+            timeFrom = when (configuration) {
+                is ReminderScheduleConfiguration.Daily -> configuration.time
+                is ReminderScheduleConfiguration.WeeklySingle -> configuration.time
+                is ReminderScheduleConfiguration.WorkdayPeriod -> configuration.from
+            },
+            timeUntil = (configuration as? ReminderScheduleConfiguration.WorkdayPeriod)?.until,
+            intervalMinutes = (configuration as? ReminderScheduleConfiguration.WorkdayPeriod)?.intervalMinutes,
+            weekDays = when (configuration) {
+                is ReminderScheduleConfiguration.Daily -> emptyList()
+                is ReminderScheduleConfiguration.WeeklySingle -> listOf(configuration.day)
+                is ReminderScheduleConfiguration.WorkdayPeriod -> configuration.days
+            },
         )
     }
 }

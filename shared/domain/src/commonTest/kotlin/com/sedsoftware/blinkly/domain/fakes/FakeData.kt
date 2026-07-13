@@ -12,7 +12,6 @@ import com.sedsoftware.blinkly.domain.model.ReminderInterval
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
@@ -508,10 +507,10 @@ internal object FakeData {
     fun getReminder(date: LocalDateTime): Reminder {
         return Reminder(
             uuid = "test",
+            scheduleId = "test-schedule",
             date = date,
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.DAILY,
-            weekDays = DayOfWeek.entries.toList(),
         )
     }
 }

@@ -8,10 +8,10 @@ internal class ReminderMapper {
         from.map { item: ReminderEntity ->
             Reminder(
                 uuid = item.uuid,
+                scheduleId = item.scheduleId,
                 date = item.date,
                 type = item.type,
                 interval = item.interval,
-                weekDays = item.weekDays,
             )
         }
 }

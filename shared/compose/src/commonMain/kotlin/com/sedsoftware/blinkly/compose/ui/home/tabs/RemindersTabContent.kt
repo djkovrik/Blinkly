@@ -47,11 +47,13 @@ import blinkly.shared.compose.generated.resources.icon_plus
 import blinkly.shared.compose.generated.resources.reminders_add
 import blinkly.shared.compose.generated.resources.reminders_daily
 import blinkly.shared.compose.generated.resources.reminders_days_every_day
+import blinkly.shared.compose.generated.resources.reminders_days_weekdays
 import blinkly.shared.compose.generated.resources.reminders_deleted
 import blinkly.shared.compose.generated.resources.reminders_empty_cta
 import blinkly.shared.compose.generated.resources.reminders_empty_description
 import blinkly.shared.compose.generated.resources.reminders_empty_title
 import blinkly.shared.compose.generated.resources.reminders_next
+import blinkly.shared.compose.generated.resources.reminders_next_at
 import blinkly.shared.compose.generated.resources.reminders_overview_count
 import blinkly.shared.compose.generated.resources.reminders_overview_hint
 import blinkly.shared.compose.generated.resources.reminders_overview_next
@@ -59,10 +61,12 @@ import blinkly.shared.compose.generated.resources.reminders_overview_title
 import blinkly.shared.compose.generated.resources.reminders_title
 import blinkly.shared.compose.generated.resources.reminders_undo
 import blinkly.shared.compose.generated.resources.reminders_weekly
+import blinkly.shared.compose.generated.resources.reminders_workday_period
+import blinkly.shared.compose.generated.resources.reminders_every_minutes
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent
-import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.Interval
 import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.ReminderItem
+import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.Schedule
 import com.sedsoftware.blinkly.component.reminders.integration.RemindersTabComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import com.sedsoftware.blinkly.compose.ui.extension.asLabel
@@ -90,7 +94,7 @@ fun RemindersTabContent(
     val deletedMessage = stringResource(resource = Res.string.reminders_deleted)
     val undoLabel = stringResource(resource = Res.string.reminders_undo)
 
-    LaunchedEffect(deletedReminder?.uuid) {
+    LaunchedEffect(deletedReminder?.id) {
         if (deletedReminder != null) {
             val result = snackbarHostState.showSnackbar(
                 message = deletedMessage,
@@ -170,11 +174,12 @@ fun RemindersTabContent(
 
                     items(
                         items = model.reminders,
-                        key = { item -> item.uuid },
+                        key = { item -> item.id },
+                        contentType = { item -> item.schedule.contentType },
                     ) { item ->
                         ReminderCard(
                             item = item,
-                            onDeleteClick = { component.onDeleteReminder(item.uuid) },
+                            onDeleteClick = { component.onDeleteReminder(item.id) },
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -245,8 +250,7 @@ private fun RemindersOverview(
     modifier: Modifier = Modifier,
 ) {
     val nextReminder = reminders.minWithOrNull(
-        compareBy<ReminderItem> { item -> item.nextDate }
-            .thenBy { item -> item.time }
+        compareBy(ReminderItem::nextAt)
     )
 
     BlinklyAppCard(
@@ -263,7 +267,7 @@ private fun RemindersOverview(
 
         BlinklyMetricRow(
             label = stringResource(resource = Res.string.reminders_overview_count, reminders.size),
-            value = nextReminder?.time?.toHumanReadableString().orEmpty(),
+            value = nextReminder?.nextAt?.time?.toHumanReadableString().orEmpty(),
             valueColor = MaterialTheme.colorScheme.onPrimaryContainer,
         )
 
@@ -271,8 +275,8 @@ private fun RemindersOverview(
             Text(
                 text = stringResource(
                     resource = Res.string.reminders_overview_next,
-                    nextReminder.time.toHumanReadableString(),
-                    nextReminder.nextDate.asShortDate(),
+                    nextReminder.nextAt.time.toHumanReadableString(),
+                    nextReminder.nextAt.date.asShortDate(),
                 ),
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f),
                 style = MaterialTheme.typography.bodyMedium,
@@ -293,6 +297,7 @@ private fun ReminderCard(
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val schedule = item.schedule
     BlinklyAppCard(
         contentPadding = BlinklySpacing.CompactCardPadding,
         modifier = modifier,
@@ -304,7 +309,7 @@ private fun ReminderCard(
         ) {
             Column(
                 horizontalAlignment = Alignment.Start,
-                modifier = Modifier.widthIn(min = 72.dp, max = 88.dp),
+                modifier = Modifier.widthIn(min = 72.dp, max = 96.dp),
             ) {
                 Box(
                     modifier = Modifier
@@ -314,18 +319,21 @@ private fun ReminderCard(
                 )
 
                 Text(
-                    text = item.time.toHumanReadableString(),
+                    text = schedule.primaryTimeLabel(),
                     color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = if (schedule is Schedule.WorkdayPeriod) {
+                        MaterialTheme.typography.labelLarge
+                    } else {
+                        MaterialTheme.typography.titleSmall
+                    },
                     fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Clip,
-                    softWrap = false,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 8.dp),
                 )
 
                 Text(
-                    text = item.interval.intervalLabel(),
+                    text = schedule.scheduleLabel(),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelMedium,
                 )
@@ -345,8 +353,26 @@ private fun ReminderCard(
                     horizontalArrangement = Arrangement.spacedBy(space = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(space = 6.dp),
                 ) {
-                    ReminderPill(text = item.daysLabel())
-                    ReminderPill(text = "${stringResource(resource = Res.string.reminders_next)} ${item.nextDate.asShortDate()}")
+                    ReminderPill(text = schedule.daysLabel())
+                    if (schedule is Schedule.WorkdayPeriod) {
+                        ReminderPill(
+                            text = stringResource(
+                                resource = Res.string.reminders_every_minutes,
+                                schedule.intervalMinutes,
+                            )
+                        )
+                        ReminderPill(
+                            text = stringResource(
+                                resource = Res.string.reminders_next_at,
+                                item.nextAt.time.toHumanReadableString(),
+                                item.nextAt.date.asShortDate(),
+                            )
+                        )
+                    } else {
+                        ReminderPill(
+                            text = "${stringResource(resource = Res.string.reminders_next)} ${item.nextAt.date.asShortDate()}"
+                        )
+                    }
                 }
             }
 
@@ -394,16 +420,27 @@ private fun ReminderPill(
 }
 
 @Composable
-private fun Interval.intervalLabel(): String =
+private fun Schedule.scheduleLabel(): String =
     when (this) {
-        Interval.DAILY -> stringResource(resource = Res.string.reminders_daily)
-        Interval.WEEKLY -> stringResource(resource = Res.string.reminders_weekly)
+        is Schedule.Daily -> stringResource(resource = Res.string.reminders_daily)
+        is Schedule.Weekly -> stringResource(resource = Res.string.reminders_weekly)
+        is Schedule.WorkdayPeriod -> stringResource(resource = Res.string.reminders_workday_period)
     }
 
 @Composable
-private fun ReminderItem.daysLabel(): String {
-    if (interval == Interval.DAILY || days.isEmpty()) {
+private fun Schedule.daysLabel(): String {
+    val days = when (this) {
+        is Schedule.Daily -> emptyList()
+        is Schedule.Weekly -> listOf(day)
+        is Schedule.WorkdayPeriod -> days
+    }
+
+    if (this is Schedule.Daily || days.size == DayOfWeek.entries.size) {
         return stringResource(resource = Res.string.reminders_days_every_day)
+    }
+
+    if (days == WORKDAYS) {
+        return stringResource(resource = Res.string.reminders_days_weekdays)
     }
 
     val labels = mutableListOf<String>()
@@ -413,6 +450,29 @@ private fun ReminderItem.daysLabel(): String {
 
     return labels.joinToString(separator = ", ")
 }
+
+private fun Schedule.primaryTimeLabel(): String =
+    when (this) {
+        is Schedule.Daily -> time.toHumanReadableString()
+        is Schedule.Weekly -> time.toHumanReadableString()
+        is Schedule.WorkdayPeriod ->
+            "${from.toHumanReadableString()}–\u200B${until.toHumanReadableString()}"
+    }
+
+private val Schedule.contentType: String
+    get() = when (this) {
+        is Schedule.Daily, is Schedule.Weekly -> "regular"
+        is Schedule.WorkdayPeriod -> "workday-period"
+    }
+
+private val WORKDAYS: List<DayOfWeek> =
+    listOf(
+        DayOfWeek.MONDAY,
+        DayOfWeek.TUESDAY,
+        DayOfWeek.WEDNESDAY,
+        DayOfWeek.THURSDAY,
+        DayOfWeek.FRIDAY,
+    )
 
 private fun LocalDate.asShortDate(): String =
     "${day.toString().padStart(2, '0')}.${(month.ordinal + 1).toString().padStart(2, '0')}"
@@ -446,15 +506,7 @@ private fun RemindersTabContentEmptyPreviewLight() {
 private fun RemindersPreviewContent() {
     RemindersTabContent(
         component = RemindersTabComponentPreview(
-            reminders = RemindersTabComponentPreview.defaultReminders + RemindersTabComponent.ReminderItem(
-                uuid = "friday",
-                title = "20-20-20",
-                description = "Look 20 feet away for 20 seconds",
-                time = kotlinx.datetime.LocalTime(hour = 16, minute = 0),
-                nextDate = LocalDate(year = 2026, month = 6, day = 26),
-                interval = Interval.WEEKLY,
-                days = listOf(DayOfWeek.FRIDAY),
-            )
+            reminders = RemindersTabComponentPreview.defaultReminders,
         )
     )
 }

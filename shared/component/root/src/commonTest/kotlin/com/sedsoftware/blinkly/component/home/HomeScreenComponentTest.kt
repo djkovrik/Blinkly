@@ -22,6 +22,7 @@ import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
+import com.sedsoftware.blinkly.domain.model.ScheduledReminder
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeGarden
 import com.sedsoftware.blinkly.domain.model.TreeStage
@@ -113,6 +114,7 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
             },
             reminderManager = object : BlinklyReminderManager {
                 override fun createdReminders(): Flow<List<Reminder>> = flowOf(emptyList())
+                override fun createdSchedules(): Flow<List<ScheduledReminder>> = flowOf(emptyList())
                 override suspend fun scheduleDaily(time: LocalTime) = Unit
                 override suspend fun scheduleWeeklySingle(time: LocalTime, dayOfWeek: DayOfWeek) = Unit
                 override suspend fun scheduleWeeklyDayPeriod(
@@ -122,7 +124,7 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
                     days: List<DayOfWeek>,
                 ) = Unit
                 override suspend fun rescheduleAll() = Unit
-                override suspend fun cancel(uuid: String) = Unit
+                override suspend fun cancelSchedule(scheduleId: String) = Unit
                 override suspend fun cancelAll() = Unit
             },
             notifier = object : BlinklyNotifier {

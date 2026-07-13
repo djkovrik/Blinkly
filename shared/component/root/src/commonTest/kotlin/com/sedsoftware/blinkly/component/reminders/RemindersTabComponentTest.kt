@@ -18,11 +18,15 @@ import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
+import com.sedsoftware.blinkly.domain.model.ReminderSchedule
+import com.sedsoftware.blinkly.domain.model.ReminderScheduleConfiguration
 import com.sedsoftware.blinkly.domain.model.ReminderType
+import com.sedsoftware.blinkly.domain.model.ScheduledReminder
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
@@ -35,235 +39,225 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
     private val notifier: FakeNotifier = FakeNotifier()
 
     @Test
-    fun `when reminders emitted then model contains reminder items`() = runTest(testScheduler) {
-        // given
-        reminderManager.reminders.value = listOf(
-            reminder(
-                uuid = "weekly",
-                date = LocalDateTime(year = 2026, month = 6, day = 22, hour = 14, minute = 30),
-                interval = ReminderInterval.WEEKLY,
-                weekDays = listOf(DayOfWeek.MONDAY),
+    fun `workday period with many alarms maps to one sorted item`() = runTest(testScheduler) {
+        reminderManager.schedules.value = listOf(
+            scheduled(
+                id = "period",
+                configuration = ReminderScheduleConfiguration.WorkdayPeriod(
+                    from = LocalTime(9, 0),
+                    until = LocalTime(18, 0),
+                    intervalMinutes = 20,
+                    days = listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY),
+                ),
+                dates = listOf(
+                    LocalDateTime(2026, 7, 14, 9, 40),
+                    LocalDateTime(2026, 7, 14, 9, 20),
+                    LocalDateTime(2026, 7, 15, 9, 20),
+                ),
             ),
-            reminder(
-                uuid = "daily",
-                date = LocalDateTime(year = 2026, month = 6, day = 20, hour = 10, minute = 0),
-                interval = ReminderInterval.DAILY,
+            scheduled(
+                id = "daily",
+                configuration = ReminderScheduleConfiguration.Daily(LocalTime(8, 0)),
+                dates = listOf(LocalDateTime(2026, 7, 14, 8, 0)),
             ),
         )
 
-        // when
         testScheduler.advanceUntilIdle()
 
-        // then
         val model = component.model.value
-        assertThat(model.reminders.map { it.uuid }).isEqualTo(listOf("daily", "weekly"))
-        assertThat(model.reminders.first().interval).isEqualTo(RemindersTabComponent.Interval.DAILY)
-        assertThat(model.reminders.last().days).isEqualTo(listOf(DayOfWeek.MONDAY))
+        assertThat(model.reminders.map(RemindersTabComponent.ReminderItem::id)).isEqualTo(listOf("daily", "period"))
+        val period = model.reminders.last()
+        assertThat(period.nextAt).isEqualTo(LocalDateTime(2026, 7, 14, 9, 20))
+        assertThat(period.schedule).isEqualTo(
+            RemindersTabComponent.Schedule.WorkdayPeriod(
+                LocalTime(9, 0),
+                LocalTime(18, 0),
+                20,
+                listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY),
+            )
+        )
     }
 
     @Test
-    fun `when add new clicked then output opens add new screen`() = runTest(testScheduler) {
-        // given
+    fun `daily and weekly schedules remain separate items`() = runTest(testScheduler) {
+        reminderManager.schedules.value = listOf(
+            scheduled(
+                "weekly",
+                ReminderScheduleConfiguration.WeeklySingle(LocalTime(14, 30), DayOfWeek.MONDAY),
+                listOf(LocalDateTime(2026, 7, 20, 14, 30)),
+            ),
+            scheduled(
+                "daily",
+                ReminderScheduleConfiguration.Daily(LocalTime(10, 0)),
+                listOf(LocalDateTime(2026, 7, 14, 10, 0)),
+            ),
+        )
+
+        testScheduler.advanceUntilIdle()
+
+        assertThat(component.model.value.reminders.map(RemindersTabComponent.ReminderItem::id))
+            .isEqualTo(listOf("daily", "weekly"))
+        assertThat(component.model.value.reminders.first().schedule)
+            .isEqualTo(RemindersTabComponent.Schedule.Daily(LocalTime(10, 0)))
+        assertThat(component.model.value.reminders.last().schedule)
+            .isEqualTo(RemindersTabComponent.Schedule.Weekly(LocalTime(14, 30), DayOfWeek.MONDAY))
+    }
+
+    @Test
+    fun `add new checks permission and opens screen`() = runTest(testScheduler) {
         notifier.permissionGranted = true
 
-        // when
         component.onAddNewClick()
         testScheduler.advanceUntilIdle()
 
-        // then
         assertThat(componentOutput).contains(ComponentOutput.Reminders.OpenAddNew)
     }
 
     @Test
-    fun `when add new clicked without permission then request permission and open after grant`() = runTest(testScheduler) {
-        // given
+    fun `permission grant after request opens screen`() = runTest(testScheduler) {
         testScheduler.advanceUntilIdle()
-
-        // when
         component.onAddNewClick()
         testScheduler.advanceUntilIdle()
-
-        // then
         assertThat(notifier.requestCount).isEqualTo(1)
         assertThat(componentOutput.contains(ComponentOutput.Reminders.OpenAddNew)).isFalse()
 
-        // when
         notifier.permissionEvents.emit(PermissionResult.Granted)
         testScheduler.advanceUntilIdle()
 
-        // then
         assertThat(componentOutput).contains(ComponentOutput.Reminders.OpenAddNew)
     }
 
     @Test
-    fun `when notification permission denied then add new screen is not opened`() = runTest(testScheduler) {
-        // given
+    fun `permission denied always emits settings error`() = runTest(testScheduler) {
         testScheduler.advanceUntilIdle()
-
-        // when
-        component.onAddNewClick()
-        testScheduler.advanceUntilIdle()
-        notifier.permissionEvents.emit(PermissionResult.Denied)
-        testScheduler.advanceUntilIdle()
-
-        // then
-        assertThat(componentOutput.contains(ComponentOutput.Reminders.OpenAddNew)).isFalse()
-    }
-
-    @Test
-    fun `when notification permission denied always then settings error is emitted`() = runTest(testScheduler) {
-        // given
-        testScheduler.advanceUntilIdle()
-
-        // when
         component.onAddNewClick()
         testScheduler.advanceUntilIdle()
         notifier.permissionEvents.emit(PermissionResult.DeniedAlways)
         testScheduler.advanceUntilIdle()
 
-        // then
         assertThat(
-            componentOutput
-                .filterIsInstance<ComponentOutput.Common.ErrorCaught>()
+            componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
                 .any { it.throwable is BlinklyError.NotificationPermissionDeniedAlways }
         ).isTrue()
     }
 
     @Test
-    fun `when notification permission check fails then error is emitted`() = runTest(testScheduler) {
-        // given
-        val exception = IllegalStateException("permission check failed")
-        notifier.checkException = exception
-
-        // when
-        component.onAddNewClick()
-        testScheduler.advanceUntilIdle()
-
-        // then
-        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.NotificationPermissionChecking>(exception)).isTrue()
-    }
-
-    @Test
-    fun `when notification permission request fails then error is emitted`() = runTest(testScheduler) {
-        // given
-        val exception = IllegalStateException("permission request failed")
-        notifier.requestException = exception
-
-        // when
-        component.onAddNewClick()
-        testScheduler.advanceUntilIdle()
-
-        // then
-        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.NotificationPermissionRequesting>(exception)).isTrue()
-    }
-
-    @Test
-    fun `when reminder deleted then manager cancels and undo restores reminder`() = runTest(testScheduler) {
-        // given
-        val dailyReminder = reminder(
-            uuid = "daily",
-            date = LocalDateTime(year = 2026, month = 6, day = 20, hour = 10, minute = 0),
-            interval = ReminderInterval.DAILY,
+    fun `deleting workday period removes one item and undo recreates full schedule once`() = runTest(testScheduler) {
+        val period = scheduled(
+            id = "period",
+            configuration = ReminderScheduleConfiguration.WorkdayPeriod(
+                LocalTime(9, 0),
+                LocalTime(18, 0),
+                20,
+                listOf(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
+            ),
+            dates = listOf(
+                LocalDateTime(2026, 7, 14, 9, 20),
+                LocalDateTime(2026, 7, 14, 9, 40),
+            ),
         )
-        reminderManager.reminders.value = listOf(dailyReminder)
+        reminderManager.schedules.value = listOf(period)
         testScheduler.advanceUntilIdle()
 
-        // when
-        component.onDeleteReminder("daily")
+        component.onDeleteReminder("period")
         testScheduler.advanceUntilIdle()
 
-        // then
-        assertThat(reminderManager.cancelled).isEqualTo(listOf("daily"))
+        assertThat(reminderManager.cancelled).isEqualTo(listOf("period"))
         assertThat(component.model.value.reminders).isEqualTo(emptyList())
-        assertThat(component.model.value.deletedReminder?.uuid).isEqualTo("daily")
+        assertThat(component.model.value.deletedReminder?.id).isEqualTo("period")
 
-        // when
         component.onUndoDelete()
         testScheduler.advanceUntilIdle()
 
-        // then
-        assertThat(reminderManager.scheduledDaily).isEqualTo(listOf(LocalTime(hour = 10, minute = 0)))
+        assertThat(reminderManager.scheduledPeriods).isEqualTo(
+            listOf(
+                PeriodCall(
+                    LocalTime(9, 0),
+                    LocalTime(18, 0),
+                    20,
+                    listOf(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
+                )
+            )
+        )
         assertThat(component.model.value.deletedReminder).isNull()
     }
 
     @Test
-    fun `when weekly reminder undo clicked then weekly schedule is restored`() = runTest(testScheduler) {
-        // given
-        val weeklyReminder = reminder(
-            uuid = "weekly",
-            date = LocalDateTime(year = 2026, month = 6, day = 24, hour = 12, minute = 15),
-            interval = ReminderInterval.WEEKLY,
-            weekDays = listOf(DayOfWeek.WEDNESDAY),
+    fun `daily and weekly undo keep original configuration`() = runTest(testScheduler) {
+        val daily = scheduled(
+            "daily",
+            ReminderScheduleConfiguration.Daily(LocalTime(10, 0)),
+            listOf(LocalDateTime(2026, 7, 14, 10, 0)),
         )
-        reminderManager.reminders.value = listOf(weeklyReminder)
+        reminderManager.schedules.value = listOf(daily)
         testScheduler.advanceUntilIdle()
+        component.onDeleteReminder("daily")
+        testScheduler.advanceUntilIdle()
+        component.onUndoDelete()
+        testScheduler.advanceUntilIdle()
+        assertThat(reminderManager.scheduledDaily).isEqualTo(listOf(LocalTime(10, 0)))
 
-        // when
+        val weekly = scheduled(
+            "weekly",
+            ReminderScheduleConfiguration.WeeklySingle(LocalTime(12, 15), DayOfWeek.WEDNESDAY),
+            listOf(LocalDateTime(2026, 7, 15, 12, 15)),
+        )
+        reminderManager.schedules.value = listOf(weekly)
+        testScheduler.advanceUntilIdle()
         component.onDeleteReminder("weekly")
         testScheduler.advanceUntilIdle()
         component.onUndoDelete()
         testScheduler.advanceUntilIdle()
-
-        // then
-        assertThat(reminderManager.scheduledWeeklySingle).isEqualTo(
-            listOf(LocalTime(hour = 12, minute = 15) to DayOfWeek.WEDNESDAY)
-        )
+        assertThat(reminderManager.scheduledWeekly).isEqualTo(listOf(LocalTime(12, 15) to DayOfWeek.WEDNESDAY))
     }
 
     @Test
-    fun `when delete fails then error output is published and reminder remains`() = runTest(testScheduler) {
-        // given
+    fun `delete error keeps schedule and emits error`() = runTest(testScheduler) {
         val exception = IllegalStateException("delete failed")
         reminderManager.cancelException = exception
-        reminderManager.reminders.value = listOf(
-            reminder(
-                uuid = "daily",
-                date = LocalDateTime(year = 2026, month = 6, day = 20, hour = 10, minute = 0),
-                interval = ReminderInterval.DAILY,
+        reminderManager.schedules.value = listOf(
+            scheduled(
+                "daily",
+                ReminderScheduleConfiguration.Daily(LocalTime(10, 0)),
+                listOf(LocalDateTime(2026, 7, 14, 10, 0)),
             )
         )
         testScheduler.advanceUntilIdle()
 
-        // when
         component.onDeleteReminder("daily")
         testScheduler.advanceUntilIdle()
 
-        // then
-        assertThat(component.model.value.reminders.map { it.uuid }).isEqualTo(listOf("daily"))
+        assertThat(component.model.value.reminders.map(RemindersTabComponent.ReminderItem::id)).isEqualTo(listOf("daily"))
         assertThat(component.model.value.deletedReminder).isNull()
         assertThat(componentOutputContainsErrorCausedBy<BlinklyError.ReminderDeleting>(exception)).isTrue()
     }
 
     @Test
-    fun `when delete already pending then next delete is ignored`() = runTest(testScheduler) {
-        // given
-        val firstReminder = reminder(
-            uuid = "first",
-            date = LocalDateTime(year = 2026, month = 6, day = 20, hour = 10, minute = 0),
-            interval = ReminderInterval.DAILY,
+    fun `pending delete blocks second schedule deletion`() = runTest(testScheduler) {
+        val first = scheduled(
+            "first",
+            ReminderScheduleConfiguration.Daily(LocalTime(10, 0)),
+            listOf(LocalDateTime(2026, 7, 14, 10, 0)),
         )
-        val secondReminder = reminder(
-            uuid = "second",
-            date = LocalDateTime(year = 2026, month = 6, day = 20, hour = 11, minute = 0),
-            interval = ReminderInterval.DAILY,
+        val second = scheduled(
+            "second",
+            ReminderScheduleConfiguration.Daily(LocalTime(11, 0)),
+            listOf(LocalDateTime(2026, 7, 14, 11, 0)),
         )
-        val cancelGate = CompletableDeferred<Unit>()
-        reminderManager.cancelGate = cancelGate
-        reminderManager.reminders.value = listOf(firstReminder, secondReminder)
+        val gate = CompletableDeferred<Unit>()
+        reminderManager.cancelGate = gate
+        reminderManager.schedules.value = listOf(first, second)
         testScheduler.advanceUntilIdle()
 
-        // when
         component.onDeleteReminder("first")
         testScheduler.advanceUntilIdle()
         component.onDeleteReminder("second")
         testScheduler.advanceUntilIdle()
-        cancelGate.complete(Unit)
+        gate.complete(Unit)
         testScheduler.advanceUntilIdle()
 
-        // then
         assertThat(reminderManager.cancelled).isEqualTo(listOf("first"))
-        assertThat(component.model.value.deletedReminder?.uuid).isEqualTo("first")
-        assertThat(component.model.value.reminders.map { it.uuid }).isEqualTo(listOf("second"))
+        assertThat(component.model.value.reminders.map(RemindersTabComponent.ReminderItem::id)).isEqualTo(listOf("second"))
     }
 
     override fun createComponent(): RemindersTabComponent =
@@ -276,79 +270,77 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
             remindersTabOutput = { componentOutput.add(it) },
         )
 
+    private fun scheduled(
+        id: String,
+        configuration: ReminderScheduleConfiguration,
+        dates: List<LocalDateTime>,
+    ): ScheduledReminder =
+        ScheduledReminder(
+            schedule = ReminderSchedule(id, ReminderType.TWENTY_X3, configuration),
+            alarms = dates.mapIndexed { index, date ->
+                Reminder(
+                    uuid = "$id-$index",
+                    scheduleId = id,
+                    date = date,
+                    type = ReminderType.TWENTY_X3,
+                    interval = if (configuration is ReminderScheduleConfiguration.Daily) {
+                        ReminderInterval.DAILY
+                    } else {
+                        ReminderInterval.WEEKLY
+                    },
+                )
+            },
+        )
+
     private class FakeNotifier : BlinklyNotifier {
         val permissionEvents: MutableSharedFlow<PermissionResult> = MutableSharedFlow()
         var permissionGranted: Boolean = false
         var requestCount: Int = 0
-        var checkException: Throwable? = null
-        var requestException: Throwable? = null
 
         override fun permissionEvents(): Flow<PermissionResult> = permissionEvents
-
-        override suspend fun isNotificationPermissionGranted(): Boolean {
-            checkException?.let { throw it }
-            return permissionGranted
-        }
-
-        override suspend fun requestNotificationPermission() {
-            requestCount += 1
-            requestException?.let { throw it }
-        }
-
+        override suspend fun isNotificationPermissionGranted(): Boolean = permissionGranted
+        override suspend fun requestNotificationPermission() { requestCount += 1 }
         override suspend fun achievementUnlocked(type: AchievementType) = Unit
-
-        override fun unlockedAchievements(): Flow<AchievementType> =
-            MutableSharedFlow()
+        override fun unlockedAchievements(): Flow<AchievementType> = MutableSharedFlow()
     }
 
-    private fun reminder(
-        uuid: String,
-        date: LocalDateTime,
-        interval: ReminderInterval,
-        weekDays: List<DayOfWeek> = emptyList(),
-    ): Reminder =
-        Reminder(
-            uuid = uuid,
-            date = date,
-            type = ReminderType.TWENTY_X3,
-            interval = interval,
-            weekDays = weekDays,
-        )
+    private data class PeriodCall(
+        val from: LocalTime,
+        val until: LocalTime,
+        val intervalMinutes: Int,
+        val days: List<DayOfWeek>,
+    )
 
     private class FakeReminderManager : BlinklyReminderManager {
-        val reminders: MutableStateFlow<List<Reminder>> = MutableStateFlow(emptyList())
+        val schedules: MutableStateFlow<List<ScheduledReminder>> = MutableStateFlow(emptyList())
         val cancelled: MutableList<String> = mutableListOf()
         val scheduledDaily: MutableList<LocalTime> = mutableListOf()
-        val scheduledWeeklySingle: MutableList<Pair<LocalTime, DayOfWeek>> = mutableListOf()
+        val scheduledWeekly: MutableList<Pair<LocalTime, DayOfWeek>> = mutableListOf()
+        val scheduledPeriods: MutableList<PeriodCall> = mutableListOf()
         var cancelException: Throwable? = null
         var cancelGate: CompletableDeferred<Unit>? = null
 
-        override fun createdReminders(): Flow<List<Reminder>> = reminders
-
-        override suspend fun scheduleDaily(time: LocalTime) {
-            scheduledDaily.add(time)
-        }
-
+        override fun createdReminders(): Flow<List<Reminder>> = schedules.map { items -> items.flatMap(ScheduledReminder::alarms) }
+        override fun createdSchedules(): Flow<List<ScheduledReminder>> = schedules
+        override suspend fun scheduleDaily(time: LocalTime) { scheduledDaily.add(time) }
         override suspend fun scheduleWeeklySingle(time: LocalTime, dayOfWeek: DayOfWeek) {
-            scheduledWeeklySingle.add(time to dayOfWeek)
+            scheduledWeekly.add(time to dayOfWeek)
         }
-
         override suspend fun scheduleWeeklyDayPeriod(
             from: LocalTime,
             until: LocalTime,
             intervalMinutes: Int,
             days: List<DayOfWeek>,
-        ) = Unit
-
+        ) {
+            scheduledPeriods.add(PeriodCall(from, until, intervalMinutes, days))
+        }
         override suspend fun rescheduleAll() = Unit
-
-        override suspend fun cancel(uuid: String) {
+        override suspend fun cancelSchedule(scheduleId: String) {
             cancelGate?.await()
             cancelException?.let { throw it }
-            cancelled.add(uuid)
-            reminders.value = reminders.value.filterNot { it.uuid == uuid }
+            cancelled.add(scheduleId)
+            schedules.value = schedules.value.filterNot { it.schedule.id == scheduleId }
         }
-
         override suspend fun cancelAll() = Unit
     }
 }

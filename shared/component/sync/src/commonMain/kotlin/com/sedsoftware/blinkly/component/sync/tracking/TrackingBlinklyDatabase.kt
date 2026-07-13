@@ -7,6 +7,7 @@ import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.BlinklyDatabaseSnapshot
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.Reminder
+import com.sedsoftware.blinkly.domain.model.ReminderSchedule
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.flow.Flow
 
@@ -24,6 +25,9 @@ internal class TrackingBlinklyDatabase(
 
     override fun currentReminders(): Flow<List<Reminder>> =
         delegate.currentReminders()
+
+    override fun currentReminderSchedules(): Flow<List<ReminderSchedule>> =
+        delegate.currentReminderSchedules()
 
     override suspend fun currentSnapshot(): BlinklyDatabaseSnapshot =
         delegate.currentSnapshot()
@@ -63,18 +67,16 @@ internal class TrackingBlinklyDatabase(
         markChanged()
     }
 
-    override suspend fun saveReminder(reminder: Reminder) {
-        delegate.saveReminder(reminder)
+    override suspend fun remindersBySchedule(scheduleId: String): List<Reminder> =
+        delegate.remindersBySchedule(scheduleId)
+
+    override suspend fun saveReminderSchedule(schedule: ReminderSchedule, reminders: List<Reminder>) {
+        delegate.saveReminderSchedule(schedule, reminders)
         markChanged()
     }
 
-    override suspend fun saveReminders(reminders: List<Reminder>) {
-        delegate.saveReminders(reminders)
-        markChanged()
-    }
-
-    override suspend fun deleteReminder(uuid: String) {
-        delegate.deleteReminder(uuid)
+    override suspend fun deleteReminderSchedule(scheduleId: String) {
+        delegate.deleteReminderSchedule(scheduleId)
         markChanged()
     }
 

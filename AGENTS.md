@@ -89,7 +89,7 @@ Top-level component modules:
 - `home` - shell with four tabs; owns tab stack navigation and forwards root-level tab outputs upward
 - `main` - implemented main dashboard tab with MVIKotlin Store, feature-local manager, Compose UI, preview component, and common tests
 - `progress` - progress tab with MVIKotlin Store, progress manager, calendar/garden/achievement summary state, outputs for achievements and garden screens, Compose UI, preview component, and common tests
-- `reminders` - reminders tab with MVIKotlin Store, reminders manager, reminder list/delete/undo state, notification-permission gating before the add-new-reminder output, Compose UI, preview component, and common tests
+- `reminders` - reminders tab with MVIKotlin Store, logical schedule list/delete/undo state, notification-permission gating before the add-new-reminder output, Compose UI, preview component, and common tests; one Workday Period schedule owns many physical weekly alarms but renders as one list item
 - `sync` - settings-embedded sync component with MVIKotlin Store, Google sign-in bridge, Firestore snapshot data source, sync manager, DTO mappers, preview component, and common tests
 - `trainings` - trainings tab with MVIKotlin Store, trainings manager, exercise block cards, outputs for workout execution, Compose UI, preview component, and common tests
 
@@ -116,6 +116,7 @@ Current implementation notes:
 - `progress`, `reminders`, and `trainings` are the current references for Store-backed tabs that emit root-handled navigation outputs.
 - `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are the current references for Store-backed feature screens that are physically grouped under their owning product area but opened on the root stack.
 - `sync` is the current reference for a reusable Store-backed settings child component that observes an external manager and bridges a Compose-owned Google sign-in result back into component state.
+- Reminder persistence separates logical `ReminderSchedule` parents from physical `Reminder` alarm rows. The logical schedule is the list/delete/undo/sync identity; physical reminders carry `scheduleId` and remain the Alarmee/reschedule unit. Workday Period creates one parent with many weekly children, while onboarding intentionally counts the physical children.
 - `step4`, `step5`, `main`, `preferences`, `progress`, `achievements`, `garden`, `reminders`, `newreminder`, `trainings`, `workout`, and `sync` are the current reference implementations for MVIKotlin stores.
 
 ## Architecture Rules
@@ -188,10 +189,10 @@ Reference modules:
 - `shared/component/sync/src/commonMain/kotlin/com/sedsoftware/blinkly/component/sync/di/SyncModule.kt`
 - `shared/utils/src/commonMain/kotlin/com/sedsoftware/blinkly/utils/di/UtilsModule.kt`
 
-`RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `SyncModule`, then `DomainModule`, then `RootComponentDefault`.
+`RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `SyncModule` tracking wrappers, then `DomainModule`, then creates `BlinklySyncManager` with the domain reminder reschedule callback before `RootComponentDefault`.
 `RootComponentDefault` passes `BlinklyNotifier` through `HomeScreenComponentDefault` to the reminders tab so adding a reminder checks or requests notification permission before root navigation opens the add-new-reminder screen.
-`SyncModule` receives the raw database/settings implementations, exposes tracking decorators for app use, and passes `BlinklySyncManager` into `RootComponentDefault` so Preferences can create the nested sync component.
-Sync metadata is split by data type: database writes update `lastLocalDatabaseChangeAt`, settings writes update `lastLocalSettingsChangeAt`, and `lastRemoteUpdatedAt` is the baseline for detecting remote changes. `BlinklySyncManagerImpl` merges database snapshots when both local and remote changed after the baseline, and resolves settings snapshots by their settings-specific timestamp.
+`SyncModule` receives the raw database/settings implementations, exposes tracking decorators for app use, and creates `BlinklySyncManager` after `DomainModule` is available so applying changed remote reminder rows can reschedule their physical alarms.
+Sync metadata is split by data type: database writes update `lastLocalDatabaseChangeAt`, settings writes update `lastLocalSettingsChangeAt`, and `lastRemoteUpdatedAt` is the baseline for detecting remote changes. `BlinklySyncManagerImpl` merges database snapshots when both local and remote changed after the baseline, resolves settings snapshots by their settings-specific timestamp, deduplicates reminder schedules by schedule ID and physical reminders by alarm UUID, and reschedules alarms when restored reminder data differs.
 
 Important local rule: configuration objects in Decompose navigation carry only persistent arguments, never dependencies. Dependencies are supplied in child factories.
 

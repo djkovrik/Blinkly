@@ -17,6 +17,8 @@ import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.RemoteBlinklySnapshot
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
+import com.sedsoftware.blinkly.domain.model.ReminderSchedule
+import com.sedsoftware.blinkly.domain.model.ReminderScheduleConfiguration
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import com.sedsoftware.blinkly.domain.model.Workout
@@ -25,7 +27,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -42,6 +43,7 @@ class BlinklySyncManagerImplTest {
     private val settings: FakeBlinklySettings = FakeBlinklySettings()
     private val remoteDataSource: FakeRemoteSyncDataSource = FakeRemoteSyncDataSource()
     private val timeUtils: FakeTimeUtils = FakeTimeUtils(now = instant(50))
+    private var rescheduleCount: Int = 0
 
     @Test
     fun `when remote snapshot is missing then local snapshot is uploaded`() = runTest {
@@ -120,6 +122,26 @@ class BlinklySyncManagerImplTest {
         assertEquals(timeUtils.now(), settings.lastSyncedAt)
         assertEquals(remoteDatabaseUpdatedAt, settings.lastRemoteUpdatedAt)
         assertNull(remoteDataSource.writtenSnapshot)
+        assertEquals(0, rescheduleCount)
+    }
+
+    @Test
+    fun `when remote reminders changed then physical alarms are rescheduled`() = runTest {
+        val baseline = instant(20)
+        val remoteReminder = reminder(uuid = "remote", minute = 20)
+        val remoteDatabase = databaseSnapshot(reminders = listOf(remoteReminder))
+        settings.lastRemoteUpdatedAt = baseline
+        remoteDataSource.remote = remoteSnapshot(
+            updatedAt = instant(30),
+            databaseUpdatedAt = instant(30),
+            settingsUpdatedAt = baseline,
+            database = remoteDatabase,
+        )
+
+        createManager(backgroundScope).syncNow()
+
+        assertEquals(remoteDatabase, database.replacedSnapshot)
+        assertEquals(1, rescheduleCount)
     }
 
     @Test
@@ -273,16 +295,27 @@ class BlinklySyncManagerImplTest {
             remoteDataSource = remoteDataSource,
             timeUtils = timeUtils,
             scope = scope,
+            rescheduleReminders = { rescheduleCount += 1 },
         )
 
     private fun databaseSnapshot(
         exercises: List<Exercise> = emptyList(),
         achievements: List<Achievement> = emptyList(),
         reminders: List<Reminder> = emptyList(),
+        reminderSchedules: List<ReminderSchedule> = reminders
+            .distinctBy(Reminder::scheduleId)
+            .map { reminder ->
+                ReminderSchedule(
+                    id = reminder.scheduleId,
+                    reminderType = reminder.type,
+                    configuration = ReminderScheduleConfiguration.Daily(reminder.date.time),
+                )
+            },
     ): BlinklyDatabaseSnapshot =
         BlinklyDatabaseSnapshot(
             exercises = exercises,
             achievements = achievements,
+            reminderSchedules = reminderSchedules,
             reminders = reminders,
         )
 
@@ -344,10 +377,10 @@ class BlinklySyncManagerImplTest {
     private fun reminder(uuid: String, minute: Int): Reminder =
         Reminder(
             uuid = uuid,
+            scheduleId = "schedule",
             date = LocalDateTime(year = 2026, month = 1, day = 1, hour = 9, minute = minute),
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.DAILY,
-            weekDays = listOf(DayOfWeek.MONDAY),
         )
 
     private fun instant(minute: Int): Instant =
@@ -384,11 +417,12 @@ class BlinklySyncManagerImplTest {
     }
 
     private class FakeBlinklyDatabase : BlinklyDatabase {
-        var snapshot: BlinklyDatabaseSnapshot = BlinklyDatabaseSnapshot(emptyList(), emptyList(), emptyList())
+        var snapshot: BlinklyDatabaseSnapshot = BlinklyDatabaseSnapshot(emptyList(), emptyList(), emptyList(), emptyList())
         var replacedSnapshot: BlinklyDatabaseSnapshot? = null
 
         override fun currentCalendar(): Flow<List<Workout>> = flowOf(emptyList())
         override fun currentAchievements(): Flow<List<Achievement>> = flowOf(snapshot.achievements)
+        override fun currentReminderSchedules(): Flow<List<ReminderSchedule>> = flowOf(snapshot.reminderSchedules)
         override fun currentReminders(): Flow<List<Reminder>> = flowOf(snapshot.reminders)
 
         override suspend fun currentSnapshot(): BlinklyDatabaseSnapshot = snapshot
@@ -422,20 +456,25 @@ class BlinklySyncManagerImplTest {
             snapshot = snapshot.copy(exercises = emptyList())
         }
 
-        override suspend fun saveReminder(reminder: Reminder) {
-            snapshot = snapshot.copy(reminders = snapshot.reminders + reminder)
+        override suspend fun remindersBySchedule(scheduleId: String): List<Reminder> =
+            snapshot.reminders.filter { it.scheduleId == scheduleId }
+
+        override suspend fun saveReminderSchedule(schedule: ReminderSchedule, reminders: List<Reminder>) {
+            snapshot = snapshot.copy(
+                reminderSchedules = snapshot.reminderSchedules.filterNot { it.id == schedule.id } + schedule,
+                reminders = snapshot.reminders.filterNot { it.scheduleId == schedule.id } + reminders,
+            )
         }
 
-        override suspend fun saveReminders(reminders: List<Reminder>) {
-            snapshot = snapshot.copy(reminders = snapshot.reminders + reminders)
-        }
-
-        override suspend fun deleteReminder(uuid: String) {
-            snapshot = snapshot.copy(reminders = snapshot.reminders.filterNot { it.uuid == uuid })
+        override suspend fun deleteReminderSchedule(scheduleId: String) {
+            snapshot = snapshot.copy(
+                reminderSchedules = snapshot.reminderSchedules.filterNot { it.id == scheduleId },
+                reminders = snapshot.reminders.filterNot { it.scheduleId == scheduleId },
+            )
         }
 
         override suspend fun deleteReminders() {
-            snapshot = snapshot.copy(reminders = emptyList())
+            snapshot = snapshot.copy(reminderSchedules = emptyList(), reminders = emptyList())
         }
     }
 

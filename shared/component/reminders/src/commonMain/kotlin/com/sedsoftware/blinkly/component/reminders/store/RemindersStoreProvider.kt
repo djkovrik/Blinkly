@@ -10,7 +10,7 @@ import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.Label
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.State
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.PermissionResult
-import com.sedsoftware.blinkly.domain.model.Reminder
+import com.sedsoftware.blinkly.domain.model.ScheduledReminder
 import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
@@ -100,16 +100,16 @@ internal class RemindersStoreProvider(
                 }
 
                 onIntent<Intent.DeleteReminder> { intent ->
-                    if (state().pendingDeleteUuid != null) return@onIntent
+                    if (state().pendingDeleteScheduleId != null) return@onIntent
 
-                    val reminder = state().reminders.firstOrNull { it.uuid == intent.uuid } ?: return@onIntent
-                    dispatch(Msg.DeleteStarted(intent.uuid))
+                    val reminder = state().reminders.firstOrNull { it.schedule.id == intent.scheduleId } ?: return@onIntent
+                    dispatch(Msg.DeleteStarted(intent.scheduleId))
 
                     launch {
                         unwrap(
-                            result = withContext(ioContext) { manager.deleteReminder(intent.uuid) },
+                            result = withContext(ioContext) { manager.deleteReminder(intent.scheduleId) },
                             onSuccess = {
-                                if (state().pendingDeleteUuid == intent.uuid) {
+                                if (state().pendingDeleteScheduleId == intent.scheduleId) {
                                     dispatch(Msg.ReminderDeleted(reminder))
                                 }
                             },
@@ -150,9 +150,9 @@ internal class RemindersStoreProvider(
                     )
 
                     is Msg.ReminderDeleted -> copy(
-                        reminders = reminders.filterNot { it.uuid == msg.item.uuid },
+                        reminders = reminders.filterNot { it.schedule.id == msg.item.schedule.id },
                         deletedReminder = msg.item,
-                        pendingDeleteUuid = null,
+                        pendingDeleteScheduleId = null,
                     )
 
                     is Msg.DeletedMessageShown -> copy(
@@ -161,11 +161,11 @@ internal class RemindersStoreProvider(
                     )
 
                     is Msg.DeleteStarted -> copy(
-                        pendingDeleteUuid = msg.uuid,
+                        pendingDeleteScheduleId = msg.scheduleId,
                     )
 
                     is Msg.DeleteFinished -> copy(
-                        pendingDeleteUuid = null,
+                        pendingDeleteScheduleId = null,
                     )
 
                     is Msg.RestoreStarted -> copy(
@@ -193,10 +193,10 @@ internal class RemindersStoreProvider(
     }
 
     sealed interface Msg {
-        data class RemindersUpdated(val items: List<Reminder>) : Msg
-        data class ReminderDeleted(val item: Reminder) : Msg
+        data class RemindersUpdated(val items: List<ScheduledReminder>) : Msg
+        data class ReminderDeleted(val item: ScheduledReminder) : Msg
         data object DeletedMessageShown : Msg
-        data class DeleteStarted(val uuid: String) : Msg
+        data class DeleteStarted(val scheduleId: String) : Msg
         data object DeleteFinished : Msg
         data object RestoreStarted : Msg
         data object RestoreFinished : Msg

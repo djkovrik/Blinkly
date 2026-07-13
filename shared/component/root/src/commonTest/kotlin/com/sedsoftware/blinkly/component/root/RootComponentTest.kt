@@ -84,6 +84,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     }
     private val reminderManagerMock: BlinklyReminderManager = mock {
         every { createdReminders() } returns emptyFlow()
+        every { createdSchedules() } returns emptyFlow()
     }
     private val treeProgressWatcherMock: BlinklyTreeProgressWatcher = mock {
         every { tree } returns emptyFlow()
@@ -341,6 +342,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private fun prepareStep5Dependencies() {
         every { notifierMock.permissionEvents() } returns emptyFlow()
         every { reminderManagerMock.createdReminders() } returns emptyFlow()
+        every { reminderManagerMock.createdSchedules() } returns emptyFlow()
     }
 
     private fun switchTab(tab: HomeScreenTab) {
