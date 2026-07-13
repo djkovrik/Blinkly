@@ -1,5 +1,6 @@
 package com.sedsoftware.blinkly.alarm.impl
 
+import com.sedsoftware.blinkly.alarm.NotificationConstants
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
@@ -57,16 +58,12 @@ internal class BlinklyAlarmManagerImpl(
                 repeatInterval = interval,
                 androidNotificationConfiguration = AndroidNotificationConfiguration(
                     priority = AndroidNotificationPriority.MAXIMUM,
-                    channelId = BLINKLY_CHANNEL_ID,
+                    channelId = NotificationConstants.CHANNEL_ID,
                 ),
                 iosNotificationConfiguration = IosNotificationConfiguration(
                     soundFilename = "ding.wav",
                 ),
             )
         )
-    }
-
-    private companion object {
-        const val BLINKLY_CHANNEL_ID = "BlinklyReminders"
     }
 }
