@@ -18,6 +18,7 @@ sealed class BlinklyError(message: String, cause: Throwable? = null) : Exception
     class InitialRemindersClearing(cause: Throwable) : BlinklyError("Unable to clear initial reminders", cause)
     class NotificationPermissionChecking(cause: Throwable) : BlinklyError("Unable to check notification permission", cause)
     class NotificationPermissionRequesting(cause: Throwable) : BlinklyError("Unable to request notification permission", cause)
+    class NotificationPermissionDeniedAlways : BlinklyError("Notification permission must be enabled in app settings")
     class WorkoutDataLoading(cause: Throwable) : BlinklyError("Unable to update workout data", cause)
     class WorkoutSaving(cause: Throwable) : BlinklyError("Unable to save workout", cause)
     class SyncAuthFailed(cause: Throwable) : BlinklyError("Unable to authorize sync", cause)

@@ -63,6 +63,10 @@ internal class InitialRemindersStoreProvider(
                                 val granted = result == PermissionResult.Granted
                                 dispatch(Msg.NotificationPermissionChanged(granted))
                                 dispatch(Msg.ShowInitialSetupChanged(granted))
+
+                                if (result == PermissionResult.DeniedAlways) {
+                                    publish(Label.ErrorCaught(BlinklyError.NotificationPermissionDeniedAlways()))
+                                }
                             }
                     }
                 }

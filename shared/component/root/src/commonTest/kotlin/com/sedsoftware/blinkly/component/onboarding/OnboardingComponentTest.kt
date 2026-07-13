@@ -249,6 +249,39 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
     }
 
     @Test
+    fun `when permission is denied always then switch back and emit settings error`() = runTest(testScheduler) {
+        // given
+        val step5 = getStep5Component()
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns false
+        testScheduler.advanceUntilIdle()
+
+        step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+        permissionsFlow.emit(PermissionResult.Denied)
+        testScheduler.advanceUntilIdle()
+
+        step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+        permissionsFlow.emit(PermissionResult.Denied)
+        testScheduler.advanceUntilIdle()
+
+        // when
+        step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+        permissionsFlow.emit(PermissionResult.DeniedAlways)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        verifySuspend(exactly(3)) { notifierMock.requestNotificationPermission() }
+        assertThat(step5.model.value.showInitialSetup).isFalse()
+        assertThat(
+            componentOutput
+                .filterIsInstance<ComponentOutput.Common.ErrorCaught>()
+                .any { it.throwable is BlinklyError.NotificationPermissionDeniedAlways }
+        ).isTrue()
+    }
+
+    @Test
     fun `when agreed on initial setup and granted permission then show initial setup`() = runTest(testScheduler) {
         // given
         val step5 = getStep5Component()

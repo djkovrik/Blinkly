@@ -25,6 +25,7 @@ import blinkly.shared.compose.generated.resources.error_initial_reminders_creati
 import blinkly.shared.compose.generated.resources.error_initial_reminders_loading
 import blinkly.shared.compose.generated.resources.error_main_data_loading
 import blinkly.shared.compose.generated.resources.error_notification_permission_checking
+import blinkly.shared.compose.generated.resources.error_notification_permission_denied_always
 import blinkly.shared.compose.generated.resources.error_notification_permission_requesting
 import blinkly.shared.compose.generated.resources.error_preferences_loading
 import blinkly.shared.compose.generated.resources.error_preferences_saving
@@ -204,6 +205,7 @@ private fun BlinklyError.asMessage(): String =
             is BlinklyError.InitialRemindersClearing -> Res.string.error_initial_reminders_clearing
             is BlinklyError.NotificationPermissionChecking -> Res.string.error_notification_permission_checking
             is BlinklyError.NotificationPermissionRequesting -> Res.string.error_notification_permission_requesting
+            is BlinklyError.NotificationPermissionDeniedAlways -> Res.string.error_notification_permission_denied_always
             is BlinklyError.WorkoutDataLoading -> Res.string.error_workout_data_loading
             is BlinklyError.WorkoutSaving -> Res.string.error_workout_saving
             is BlinklyError.Unknown -> Res.string.error_unknown

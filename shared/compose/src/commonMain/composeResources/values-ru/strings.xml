@@ -25,6 +25,7 @@
     <string name="error_initial_reminders_clearing">Не удалось очистить первые напоминания</string>
     <string name="error_notification_permission_checking">Не удалось проверить разрешение на уведомления</string>
     <string name="error_notification_permission_requesting">Не удалось запросить разрешение на уведомления</string>
+    <string name="error_notification_permission_denied_always">Разрешите уведомления в настройках приложения</string>
     <string name="error_workout_data_loading">Не удалось обновить прогресс тренировки</string>
     <string name="error_workout_saving">Не удалось сохранить тренировку</string>
     <string name="error_sync_auth_failed">Не удалось войти для синхронизации</string>
