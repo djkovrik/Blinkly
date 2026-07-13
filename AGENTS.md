@@ -158,6 +158,10 @@ Apply these rules by default when changing Blinkly code:
 - Route cross-component events upward through `ComponentOutput`; do not let child components manipulate parent navigation directly.
 - Keep dependencies in constructors and root or parent factories; never place dependencies into Decompose navigation configs.
 - When adding or materially changing a shared module, component module, feature screen, or dependency wiring, update this guide in the same change. Keep `Repository Layout`, `Module Map`, `Shared layering`, and `Manual dependency injection` accurate, including new DI modules, external interfaces, root factory wiring, and navigation ownership.
+- When diagnosing a bug or technical problem, proactively propose adding the
+  resulting guidance to this file if the solution reveals a reusable project
+  rule, design principle, or implementation pattern. Do not propose documenting
+  one-off fixes or narrowly specific edge cases.
 - Keep Compose as a rendering layer only. Do not move business logic, navigation decisions, or mutable feature state into composables.
 - Cover Decompose behaviour in `shared/component/root/src/commonTest`, extending `ComponentTest<T>` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
 - Keep `*Default` component implementations as the real runtime wiring for Stores, dependencies, labels, lifecycle, and output routing. Use separate `*Preview` implementations only for Compose previews; they should implement the same public component interface with static `MutableValue` model data and no production dependencies.
@@ -250,6 +254,12 @@ Local reference patterns:
 - `ProgressTabComponentDefault`, `RemindersTabComponentDefault`, and `TrainingsTabComponentDefault` for Store-backed tab state and root-handled navigation outputs
 
 Keep navigation on the main thread. This matches Decompose guidance.
+
+When a `ChildStack` must use the same transition for UI back actions and the
+system back button, use `handleBackButton = true` with the regular
+`stackAnimation`. Do not add `PredictiveBackParams` unless gesture-driven
+predictive back animation is explicitly required, because it introduces a
+separate animation path that can differ from the configured stack animator.
 
 ### Outputs
 

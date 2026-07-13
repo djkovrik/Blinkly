@@ -12,10 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
-import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.PredictiveBackParams
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.stackAnimation
-import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.materialPredictiveBackAnimatable
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.sedsoftware.blinkly.component.onboarding.OnboardingComponent
 import com.sedsoftware.blinkly.component.onboarding.integration.OnboardingComponentPreview
@@ -43,16 +41,8 @@ fun OnboardingContent(
     Box {
         ChildStack(
             stack = component.childStack,
-            animation = stackAnimation(
-                animator = slide(),
-                predictiveBackParams = {
-                    PredictiveBackParams(
-                        backHandler = component.backHandler,
-                        onBack = component::onBack,
-                        animatable = ::materialPredictiveBackAnimatable,
-                    )
-                }
-            ),
+            // Keep button and system back navigation on the same slide animation path.
+            animation = stackAnimation(animator = slide()),
             modifier = modifier.fillMaxSize(),
         ) {
             when (val child = it.instance) {
