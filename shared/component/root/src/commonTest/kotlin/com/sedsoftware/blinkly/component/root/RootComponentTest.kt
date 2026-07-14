@@ -85,6 +85,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val reminderManagerMock: BlinklyReminderManager = mock {
         every { createdReminders() } returns emptyFlow()
         every { createdSchedules() } returns emptyFlow()
+        every { canScheduleExactAlarms() } returns true
     }
     private val treeProgressWatcherMock: BlinklyTreeProgressWatcher = mock {
         every { tree } returns emptyFlow()

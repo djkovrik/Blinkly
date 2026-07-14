@@ -23,9 +23,11 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
 internal class BlinklyReminderManagerImpl(
@@ -231,30 +233,65 @@ internal class BlinklyReminderManagerImpl(
         database.deleteReminderSchedule(scheduleId)
     }
 
+    override fun canScheduleExactAlarms(): Boolean =
+        alarmManager.canScheduleExactAlarms()
+
+    override fun requestExactAlarmPermission() {
+        alarmManager.requestExactAlarmPermission()
+    }
+
     override suspend fun rescheduleAll() {
-        alarmManager.cancelAll()
         val remindersToSchedule = database.currentReminders().first()
+        remindersToSchedule.forEach { reminder -> alarmManager.cancel(reminder.uuid) }
+        val now = timeUtils.now()
+        val timeZone = timeUtils.timeZone()
 
         for (reminder in remindersToSchedule) {
+            val nextOccurrence = reminder.nextOccurrence(now, timeZone)
             if (reminder.interval == ReminderInterval.DAILY) {
                 alarmManager.scheduleDaily(
                     uuid = reminder.uuid,
                     type = reminder.type,
-                    startingDate = reminder.date,
+                    startingDate = nextOccurrence,
                 )
             } else {
                 alarmManager.scheduleWeekly(
                     uuid = reminder.uuid,
                     type = reminder.type,
-                    startingDate = reminder.date,
+                    startingDate = nextOccurrence,
                 )
             }
         }
     }
 
     override suspend fun cancelAll() {
-        alarmManager.cancelAll()
+        val remindersToCancel = database.currentReminders().first()
+        remindersToCancel.forEach { reminder -> alarmManager.cancel(reminder.uuid) }
         database.deleteReminders()
+    }
+
+    private fun Reminder.nextOccurrence(now: Instant, timeZone: TimeZone): LocalDateTime {
+        val currentLocal = now.toLocalDateTime(timeZone)
+        val daysToAdd = when (interval) {
+            ReminderInterval.DAILY -> 0
+            ReminderInterval.WEEKLY ->
+                (date.dayOfWeek.ordinal - currentLocal.dayOfWeek.ordinal + FULL_WEEK_DAYS) % FULL_WEEK_DAYS
+        }
+        val candidate = LocalDateTime(
+            date = currentLocal.date.plus(daysToAdd.toLong(), DateTimeUnit.DAY),
+            time = date.time,
+        )
+
+        if (candidate.toInstant(timeZone) > now) return candidate
+
+        val intervalDays = when (interval) {
+            ReminderInterval.DAILY -> 1L
+            ReminderInterval.WEEKLY -> FULL_WEEK_DAYS.toLong()
+        }
+        return LocalDateTime(
+            date = candidate.date.plus(intervalDays, DateTimeUnit.DAY),
+            time = candidate.time,
+        )
     }
 
     private companion object {

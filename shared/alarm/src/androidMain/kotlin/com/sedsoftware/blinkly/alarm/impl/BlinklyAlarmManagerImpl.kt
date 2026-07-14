@@ -2,6 +2,7 @@ package com.sedsoftware.blinkly.alarm.impl
 
 import com.sedsoftware.blinkly.alarm.NotificationConstants
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
+import com.sedsoftware.blinkly.domain.external.BlinklyExactAlarmPermissionController
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
@@ -19,6 +20,8 @@ import kotlinx.datetime.LocalDateTime
 internal class BlinklyAlarmManagerImpl(
     val timeUtils: BlinklyTimeUtils,
     val notificationConfigurations: Map<ReminderType, ReminderConfig>,
+    val exactAlarmPermissionController: BlinklyExactAlarmPermissionController =
+        BlinklyExactAlarmPermissionController.Granted,
     val platformConfiguration: AlarmeePlatformConfiguration = getAlarmeePlatformConfiguration(),
     val alarmeeService: AlarmeeService = createAlarmeeService(),
 ) : BlinklyAlarmManager {
@@ -40,8 +43,11 @@ internal class BlinklyAlarmManagerImpl(
         service.cancel(uuid = uuid)
     }
 
-    override fun cancelAll() {
-        service.cancelAll()
+    override fun canScheduleExactAlarms(): Boolean =
+        exactAlarmPermissionController.canScheduleExactAlarms()
+
+    override fun requestExactAlarmPermission() {
+        exactAlarmPermissionController.requestExactAlarmPermission()
     }
 
     private fun schedule(uuid: String, type: ReminderType, startingDate: LocalDateTime, interval: RepeatInterval) {

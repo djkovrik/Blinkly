@@ -29,6 +29,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -39,7 +40,6 @@ class BlinklyReminderManagerTest : BaseDomainTest() {
         every { scheduleDaily(any(), any(), any()) } returns Unit
         every { scheduleWeekly(any(), any(), any()) } returns Unit
         every { cancel(any()) } returns Unit
-        every { cancelAll() } returns Unit
     }
 
     private lateinit var database: FakeDatabase
@@ -172,26 +172,38 @@ class BlinklyReminderManagerTest : BaseDomainTest() {
     }
 
     @Test
-    fun `reschedule all schedules every physical child exactly once`() = runTest(testScheduler) {
-        val daily = reminder("daily", "daily-schedule", ReminderInterval.DAILY, LocalDateTime(2026, 3, 16, 10, 0))
-        val weekly = reminder("weekly", "period", ReminderInterval.WEEKLY, LocalDateTime(2026, 3, 16, 9, 20))
+    fun `reschedule all schedules every physical child at next local occurrence`() = runTest(testScheduler) {
+        val timeZone = TimeZone.of("Europe/Moscow")
+        every { timeUtils.timeZone() } returns timeZone
+        every { timeUtils.now() } returns LocalDateTime(2026, 3, 15, 12, 0).toInstant(timeZone)
+        val daily = reminder("daily", "daily-schedule", ReminderInterval.DAILY, LocalDateTime(2026, 3, 14, 10, 0))
+        val weekly = reminder("weekly", "period", ReminderInterval.WEEKLY, LocalDateTime(2026, 3, 9, 9, 20))
         database.replaceReminders(listOf(daily, weekly))
 
         manager.rescheduleAll()
 
-        verify(exactly(1)) { alarmManager.cancelAll() }
-        verify(exactly(1)) { alarmManager.scheduleDaily(daily.uuid, daily.type, daily.date) }
-        verify(exactly(1)) { alarmManager.scheduleWeekly(weekly.uuid, weekly.type, weekly.date) }
+        verify(exactly(1)) { alarmManager.cancel(daily.uuid) }
+        verify(exactly(1)) { alarmManager.cancel(weekly.uuid) }
+        verify(exactly(1)) {
+            alarmManager.scheduleDaily(daily.uuid, daily.type, LocalDateTime(2026, 3, 16, 10, 0))
+        }
+        verify(exactly(1)) {
+            alarmManager.scheduleWeekly(weekly.uuid, weekly.type, LocalDateTime(2026, 3, 16, 9, 20))
+        }
     }
 
     @Test
     fun `cancel all clears schedules and physical alarms`() = runTest(testScheduler) {
         every { timeUtils.now() } returns LocalDateTime(2026, 3, 15, 12, 0).toInstant(timeUtils.timeZone())
         manager.scheduleDaily(LocalTime(13, 0))
+        manager.scheduleWeeklySingle(LocalTime(14, 0), DayOfWeek.MONDAY)
+        val alarmsToCancel = database.reminders
 
         manager.cancelAll()
 
-        verify(exactly(1)) { alarmManager.cancelAll() }
+        alarmsToCancel.forEach { alarm ->
+            verify(exactly(1)) { alarmManager.cancel(alarm.uuid) }
+        }
         assertThat(database.schedules).isEqualTo(emptyList())
         assertThat(database.reminders).isEqualTo(emptyList())
         assertThat(manager.createdSchedules().first().firstOrNull()).isNull()

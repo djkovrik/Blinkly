@@ -12,7 +12,7 @@ internal fun getAlarmeePlatformConfiguration(): AlarmeePlatformConfiguration {
     return AlarmeeAndroidPlatformConfiguration(
         notificationIconResId = R.drawable.ic_reminder,
         notificationIconColor = Color.White,
-        useExactScheduling = false,
+        useExactScheduling = true,
         notificationChannels = listOf(
             AlarmeeNotificationChannel(
                 id = NotificationConstants.CHANNEL_ID,

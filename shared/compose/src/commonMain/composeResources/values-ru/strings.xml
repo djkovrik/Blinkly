@@ -26,6 +26,10 @@
     <string name="error_notification_permission_checking">Не удалось проверить разрешение на уведомления</string>
     <string name="error_notification_permission_requesting">Не удалось запросить разрешение на уведомления</string>
     <string name="error_notification_permission_denied_always">Разрешите уведомления в настройках приложения</string>
+    <string name="error_exact_alarm_permission_checking">Не удалось проверить доступ к будильникам и напоминаниям</string>
+    <string name="error_exact_alarm_permission_requesting">Не удалось открыть настройки будильников и напоминаний</string>
+    <string name="error_exact_alarm_permission_denied">Разрешите будильники и напоминания в системных настройках</string>
+    <string name="error_reminders_rescheduling">Не удалось перепланировать напоминания</string>
     <string name="error_workout_data_loading">Не удалось обновить прогресс тренировки</string>
     <string name="error_workout_saving">Не удалось сохранить тренировку</string>
     <string name="error_sync_auth_failed">Не удалось войти для синхронизации</string>

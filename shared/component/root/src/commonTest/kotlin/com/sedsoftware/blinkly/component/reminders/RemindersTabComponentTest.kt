@@ -7,6 +7,8 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.essenty.lifecycle.pause
+import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.reminders.integration.RemindersTabComponentDefault
@@ -139,6 +141,44 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
             componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
                 .any { it.throwable is BlinklyError.NotificationPermissionDeniedAlways }
         ).isTrue()
+    }
+
+    @Test
+    fun `exact alarm permission grant reschedules alarms and opens screen after resume`() = runTest(testScheduler) {
+        notifier.permissionGranted = true
+        reminderManager.exactAlarmPermissionGranted = false
+
+        component.onAddNewClick()
+        testScheduler.advanceUntilIdle()
+
+        assertThat(reminderManager.exactAlarmPermissionRequestCount).isEqualTo(1)
+        assertThat(componentOutput.contains(ComponentOutput.Reminders.OpenAddNew)).isFalse()
+
+        lifecycle.pause()
+        reminderManager.exactAlarmPermissionGranted = true
+        lifecycle.resume()
+        testScheduler.advanceUntilIdle()
+
+        assertThat(reminderManager.rescheduleCount).isEqualTo(1)
+        assertThat(componentOutput).contains(ComponentOutput.Reminders.OpenAddNew)
+    }
+
+    @Test
+    fun `exact alarm permission denial emits settings error after resume`() = runTest(testScheduler) {
+        notifier.permissionGranted = true
+        reminderManager.exactAlarmPermissionGranted = false
+
+        component.onAddNewClick()
+        testScheduler.advanceUntilIdle()
+        lifecycle.pause()
+        lifecycle.resume()
+        testScheduler.advanceUntilIdle()
+
+        assertThat(
+            componentOutput.filterIsInstance<ComponentOutput.Common.ErrorCaught>()
+                .any { it.throwable is BlinklyError.ExactAlarmPermissionDenied }
+        ).isTrue()
+        assertThat(reminderManager.rescheduleCount).isEqualTo(0)
     }
 
     @Test
@@ -319,6 +359,9 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
         val scheduledPeriods: MutableList<PeriodCall> = mutableListOf()
         var cancelException: Throwable? = null
         var cancelGate: CompletableDeferred<Unit>? = null
+        var exactAlarmPermissionGranted: Boolean = true
+        var exactAlarmPermissionRequestCount: Int = 0
+        var rescheduleCount: Int = 0
 
         override fun createdReminders(): Flow<List<Reminder>> = schedules.map { items -> items.flatMap(ScheduledReminder::alarms) }
         override fun createdSchedules(): Flow<List<ScheduledReminder>> = schedules
@@ -334,7 +377,13 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
         ) {
             scheduledPeriods.add(PeriodCall(from, until, intervalMinutes, days))
         }
-        override suspend fun rescheduleAll() = Unit
+        override fun canScheduleExactAlarms(): Boolean = exactAlarmPermissionGranted
+        override fun requestExactAlarmPermission() {
+            exactAlarmPermissionRequestCount += 1
+        }
+        override suspend fun rescheduleAll() {
+            rescheduleCount += 1
+        }
         override suspend fun cancelSchedule(scheduleId: String) {
             cancelGate?.await()
             cancelException?.let { throw it }

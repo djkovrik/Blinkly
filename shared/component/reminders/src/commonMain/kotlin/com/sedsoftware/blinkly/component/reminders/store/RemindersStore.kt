@@ -10,6 +10,7 @@ internal interface RemindersStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
         data object AddNewReminder : Intent
+        data object AppResumed : Intent
         data class DeleteReminder(val scheduleId: String) : Intent
         data object UndoDelete : Intent
         data object DeleteMessageShown : Intent
@@ -21,6 +22,7 @@ internal interface RemindersStore : Store<Intent, State, Label> {
         val pendingDeleteScheduleId: String? = null,
         val isRestoringDeleted: Boolean = false,
         val isRequestingNotificationPermission: Boolean = false,
+        val isAwaitingExactAlarmPermission: Boolean = false,
     )
 
     sealed class Label {

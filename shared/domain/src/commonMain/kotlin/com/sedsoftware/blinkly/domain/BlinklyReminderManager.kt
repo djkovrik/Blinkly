@@ -13,6 +13,8 @@ interface BlinklyReminderManager {
     suspend fun scheduleDaily(time: LocalTime)
     suspend fun scheduleWeeklySingle(time: LocalTime, dayOfWeek: DayOfWeek)
     suspend fun scheduleWeeklyDayPeriod(from: LocalTime, until: LocalTime, intervalMinutes: Int, days: List<DayOfWeek>)
+    fun canScheduleExactAlarms(): Boolean = true
+    fun requestExactAlarmPermission() = Unit
     suspend fun rescheduleAll()
     suspend fun cancelSchedule(scheduleId: String)
     suspend fun cancelAll()

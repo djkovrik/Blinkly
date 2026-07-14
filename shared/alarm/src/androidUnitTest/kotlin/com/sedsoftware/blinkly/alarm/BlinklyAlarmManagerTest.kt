@@ -1,7 +1,6 @@
 package com.sedsoftware.blinkly.alarm
 
 import assertk.assertThat
-import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
@@ -113,28 +112,6 @@ class BlinklyAlarmManagerTest {
         // then
         assertThat(alarms.size).isEqualTo(1)
         assertThat(alarms[uuid2]).isNotNull()
-    }
-
-    @Test
-    fun `when cancelAll called then cancel all reminders`() = runTest {
-        // given
-        val uuid1 = Uuid.random().toString()
-        val type1 = ReminderType.TWENTY_X3
-        val date1 = LocalDateTime(2026, 3, 1, 12, 35)
-        val uuid2 = Uuid.random().toString()
-        val type2 = ReminderType.TWENTY_X3
-        val date2 = LocalDateTime(2026, 3, 4, 2, 3)
-        manager.scheduleDaily(uuid1, type1, date1)
-        manager.scheduleDaily(uuid2, type2, date2)
-        var alarms = fakeService.currentAlarms()
-        assertThat(alarms.size).isEqualTo(2)
-
-        // when
-        manager.cancelAll()
-        alarms = fakeService.currentAlarms()
-
-        // then
-        assertThat(alarms).isEmpty()
     }
 
     private companion object {

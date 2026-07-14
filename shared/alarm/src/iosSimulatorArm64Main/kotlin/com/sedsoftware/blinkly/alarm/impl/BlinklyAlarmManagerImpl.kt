@@ -40,10 +40,6 @@ internal class BlinklyAlarmManagerImpl(
         service.cancel(uuid = uuid)
     }
 
-    override fun cancelAll() {
-        service.cancelAll()
-    }
-
     private fun schedule(uuid: String, type: ReminderType, startingDate: LocalDateTime, interval: RepeatInterval) {
         val title: String = notificationConfigurations[type]?.title.orEmpty()
         val description: String = notificationConfigurations[type]?.description.orEmpty()

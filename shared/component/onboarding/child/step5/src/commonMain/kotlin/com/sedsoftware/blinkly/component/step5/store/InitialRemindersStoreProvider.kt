@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineExecutorFactory
 import com.sedsoftware.blinkly.component.step5.domain.InitialRemindersManager
+import com.sedsoftware.blinkly.component.step5.domain.InitialRemindersManager.ExactAlarmPermissionResult
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.Intent
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.Label
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore.State
@@ -134,16 +135,79 @@ internal class InitialRemindersStoreProvider(
                     val setupState = state()
                     dispatch(Msg.SavingChanged(true))
 
+                    manager.prepareExactAlarmPermission().fold(
+                        onSuccess = { permissionResult ->
+                            when (permissionResult) {
+                                ExactAlarmPermissionResult.Granted -> {
+                                    launch {
+                                        unwrap(
+                                            result = withContext(ioContext) { manager.setupInitial(setupState) },
+                                            onSuccess = {
+                                                dispatch(Msg.InitialSetupApplied)
+                                            },
+                                            onError = { throwable ->
+                                                dispatch(Msg.SavingChanged(false))
+                                                publish(
+                                                    Label.ErrorCaught(
+                                                        BlinklyError.InitialRemindersCreating(throwable)
+                                                    )
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+
+                                ExactAlarmPermissionResult.Requested -> {
+                                    dispatch(Msg.ExactAlarmPermissionRequestStarted)
+                                }
+                            }
+                        },
+                        onFailure = { throwable ->
+                            dispatch(Msg.SavingChanged(false))
+                            publish(Label.ErrorCaught(BlinklyError.ExactAlarmPermissionRequesting(throwable)))
+                        },
+                    )
+                }
+
+                onIntent<Intent.AppResumed> {
+                    if (!state().isAwaitingExactAlarmPermission) return@onIntent
+
+                    dispatch(Msg.ExactAlarmPermissionRequestFinished)
                     launch {
+                        val permissionGranted = manager.isExactAlarmPermissionGranted().getOrElse { throwable ->
+                            dispatch(Msg.SavingChanged(false))
+                            publish(Label.ErrorCaught(BlinklyError.ExactAlarmPermissionChecking(throwable)))
+                            return@launch
+                        }
+
+                        if (!permissionGranted) {
+                            dispatch(Msg.SavingChanged(false))
+                            publish(Label.ErrorCaught(BlinklyError.ExactAlarmPermissionDenied()))
+                            return@launch
+                        }
+
+                        val setupState = state()
+                        val hasExistingReminders = setupState.createdReminders.isNotEmpty()
                         unwrap(
-                            result = withContext(ioContext) { manager.setupInitial(setupState) },
+                            result = withContext(ioContext) {
+                                if (hasExistingReminders) {
+                                    manager.rescheduleAll()
+                                } else {
+                                    manager.setupInitial(setupState)
+                                }
+                            },
                             onSuccess = {
                                 dispatch(Msg.InitialSetupApplied)
                             },
                             onError = { throwable ->
                                 dispatch(Msg.SavingChanged(false))
-                                publish(Label.ErrorCaught(BlinklyError.InitialRemindersCreating(throwable)))
-                            }
+                                val error = if (hasExistingReminders) {
+                                    BlinklyError.RemindersRescheduling(throwable)
+                                } else {
+                                    BlinklyError.InitialRemindersCreating(throwable)
+                                }
+                                publish(Label.ErrorCaught(error))
+                            },
                         )
                     }
                 }
@@ -225,6 +289,14 @@ internal class InitialRemindersStoreProvider(
                         isSaving = msg.saving,
                     )
 
+                    is Msg.ExactAlarmPermissionRequestStarted -> copy(
+                        isAwaitingExactAlarmPermission = true,
+                    )
+
+                    is Msg.ExactAlarmPermissionRequestFinished -> copy(
+                        isAwaitingExactAlarmPermission = false,
+                    )
+
                     is Msg.InitialSetupApplied -> copy(
                         isSaving = false,
                         initialSetupApplied = true,
@@ -252,6 +324,8 @@ internal class InitialRemindersStoreProvider(
         data object RemindersDeleted : Msg
         data class ValidationFailed(val error: ValidationError) : Msg
         data class SavingChanged(val saving: Boolean) : Msg
+        data object ExactAlarmPermissionRequestStarted : Msg
+        data object ExactAlarmPermissionRequestFinished : Msg
         data object InitialSetupApplied : Msg
     }
 

@@ -7,6 +7,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.russhwolf.settings.Settings
 import com.sedsoftware.blinkly.alarm.di.AlarmModule
 import com.sedsoftware.blinkly.alarm.di.AlarmModuleDependencies
+import com.sedsoftware.blinkly.alarm.impl.BlinklyExactAlarmPermissionControllerAndroid
 import com.sedsoftware.blinkly.beeper.BeeperWrapper
 import com.sedsoftware.blinkly.beeper.BeeperWrapperFactory
 import com.sedsoftware.blinkly.beeper.di.BeeperModule
@@ -64,6 +65,8 @@ fun RootComponentFactory(
             dependencies = object : AlarmModuleDependencies {
                 override val timeUtils: BlinklyTimeUtils = timeUtils
                 override val contentConfigurations: Map<ReminderType, ReminderConfig> = contentConfigurations
+                override val exactAlarmPermissionController =
+                    BlinklyExactAlarmPermissionControllerAndroid(context)
             }
         )
 

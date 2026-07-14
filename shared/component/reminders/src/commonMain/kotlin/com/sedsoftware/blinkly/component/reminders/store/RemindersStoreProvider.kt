@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.coroutineExecutorFactory
 import com.sedsoftware.blinkly.component.reminders.domain.RemindersManager
+import com.sedsoftware.blinkly.component.reminders.domain.RemindersManager.ExactAlarmPermissionResult
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.Intent
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.Label
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStore.State
@@ -56,7 +57,25 @@ internal class RemindersStoreProvider(
 
                                 dispatch(Msg.NotificationPermissionRequestFinished)
                                 when (result) {
-                                    PermissionResult.Granted -> publish(Label.OpenAddNewReminder)
+                                    PermissionResult.Granted -> {
+                                        manager.prepareExactAlarmPermission().fold(
+                                            onSuccess = { exactAlarmPermission ->
+                                                when (exactAlarmPermission) {
+                                                    ExactAlarmPermissionResult.Granted -> publish(Label.OpenAddNewReminder)
+                                                    ExactAlarmPermissionResult.Requested -> {
+                                                        dispatch(Msg.ExactAlarmPermissionRequestStarted)
+                                                    }
+                                                }
+                                            },
+                                            onFailure = { throwable ->
+                                                publish(
+                                                    Label.ErrorCaught(
+                                                        BlinklyError.ExactAlarmPermissionRequesting(throwable)
+                                                    )
+                                                )
+                                            },
+                                        )
+                                    }
                                     PermissionResult.Denied -> Unit
                                     PermissionResult.DeniedAlways -> {
                                         publish(Label.ErrorCaught(BlinklyError.NotificationPermissionDeniedAlways()))
@@ -67,7 +86,9 @@ internal class RemindersStoreProvider(
                 }
 
                 onIntent<Intent.AddNewReminder> {
-                    if (state().isRequestingNotificationPermission) return@onIntent
+                    if (state().isRequestingNotificationPermission || state().isAwaitingExactAlarmPermission) {
+                        return@onIntent
+                    }
 
                     dispatch(Msg.NotificationPermissionRequestStarted)
                     launch {
@@ -81,7 +102,23 @@ internal class RemindersStoreProvider(
 
                         if (permissionGranted) {
                             dispatch(Msg.NotificationPermissionRequestFinished)
-                            publish(Label.OpenAddNewReminder)
+                            manager.prepareExactAlarmPermission().fold(
+                                onSuccess = { exactAlarmPermission ->
+                                    when (exactAlarmPermission) {
+                                        ExactAlarmPermissionResult.Granted -> publish(Label.OpenAddNewReminder)
+                                        ExactAlarmPermissionResult.Requested -> {
+                                            dispatch(Msg.ExactAlarmPermissionRequestStarted)
+                                        }
+                                    }
+                                },
+                                onFailure = { throwable ->
+                                    publish(
+                                        Label.ErrorCaught(
+                                            BlinklyError.ExactAlarmPermissionRequesting(throwable)
+                                        )
+                                    )
+                                },
+                            )
                         } else {
                             unwrap(
                                 result = manager.requestNotificationPermission(),
@@ -96,6 +133,31 @@ internal class RemindersStoreProvider(
                                 },
                             )
                         }
+                    }
+                }
+
+                onIntent<Intent.AppResumed> {
+                    if (!state().isAwaitingExactAlarmPermission) return@onIntent
+
+                    dispatch(Msg.ExactAlarmPermissionRequestFinished)
+                    launch {
+                        val permissionGranted = manager.isExactAlarmPermissionGranted().getOrElse { throwable ->
+                            publish(Label.ErrorCaught(BlinklyError.ExactAlarmPermissionChecking(throwable)))
+                            return@launch
+                        }
+
+                        if (!permissionGranted) {
+                            publish(Label.ErrorCaught(BlinklyError.ExactAlarmPermissionDenied()))
+                            return@launch
+                        }
+
+                        unwrap(
+                            result = withContext(ioContext) { manager.rescheduleAll() },
+                            onSuccess = { publish(Label.OpenAddNewReminder) },
+                            onError = { throwable ->
+                                publish(Label.ErrorCaught(BlinklyError.RemindersRescheduling(throwable)))
+                            },
+                        )
                     }
                 }
 
@@ -183,6 +245,14 @@ internal class RemindersStoreProvider(
                     is Msg.NotificationPermissionRequestFinished -> copy(
                         isRequestingNotificationPermission = false,
                     )
+
+                    is Msg.ExactAlarmPermissionRequestStarted -> copy(
+                        isAwaitingExactAlarmPermission = true,
+                    )
+
+                    is Msg.ExactAlarmPermissionRequestFinished -> copy(
+                        isAwaitingExactAlarmPermission = false,
+                    )
                 }
             },
         ) {}
@@ -202,5 +272,7 @@ internal class RemindersStoreProvider(
         data object RestoreFinished : Msg
         data object NotificationPermissionRequestStarted : Msg
         data object NotificationPermissionRequestFinished : Msg
+        data object ExactAlarmPermissionRequestStarted : Msg
+        data object ExactAlarmPermissionRequestFinished : Msg
     }
 }

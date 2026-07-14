@@ -18,6 +18,7 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
         data class OnWeekDayToggled(val weekDay: DayOfWeek) : Intent
         data object OnInitialSetupApply : Intent
         data object OnInitialSetupClear : Intent
+        data object AppResumed : Intent
     }
 
     data class State(
@@ -31,6 +32,7 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
         val createdReminders: List<Reminder> = emptyList(),
         val initialSetupApplied: Boolean = false,
         val isSaving: Boolean = false,
+        val isAwaitingExactAlarmPermission: Boolean = false,
         val validationError: ValidationError? = null,
     )
 

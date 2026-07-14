@@ -29,6 +29,10 @@
     <string name="error_notification_permission_checking">Could not check notification permission</string>
     <string name="error_notification_permission_requesting">Could not request notification permission</string>
     <string name="error_notification_permission_denied_always">Allow notifications in app settings</string>
+    <string name="error_exact_alarm_permission_checking">Could not check alarms and reminders access</string>
+    <string name="error_exact_alarm_permission_requesting">Could not open alarms and reminders settings</string>
+    <string name="error_exact_alarm_permission_denied">Allow alarms and reminders in system settings</string>
+    <string name="error_reminders_rescheduling">Could not reschedule reminders</string>
     <string name="error_workout_data_loading">Could not update workout progress</string>
     <string name="error_workout_saving">Could not save workout</string>
     <string name="error_sync_auth_failed">Could not sign in for sync</string>

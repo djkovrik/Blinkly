@@ -8,4 +8,5 @@ actual fun getBlinklyAlarmManagerImplementation(dependencies: AlarmModuleDepende
     BlinklyAlarmManagerImpl(
         timeUtils = dependencies.timeUtils,
         notificationConfigurations = dependencies.contentConfigurations,
+        exactAlarmPermissionController = dependencies.exactAlarmPermissionController,
     )
