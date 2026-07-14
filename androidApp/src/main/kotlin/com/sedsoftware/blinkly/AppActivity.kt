@@ -1,8 +1,10 @@
 package com.sedsoftware.blinkly
 
 import android.app.Activity
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
@@ -36,7 +38,12 @@ class AppActivity : ComponentActivity() {
         }
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            navigationBarStyle = SystemBarStyle.light(
+                scrim = Color.TRANSPARENT,
+                darkScrim = Color.TRANSPARENT,
+            ),
+        )
 
         permissionsController.bind(this)
         initializeBlinklyGoogleAuth(serverId = getString(R.string.default_web_client_id))
