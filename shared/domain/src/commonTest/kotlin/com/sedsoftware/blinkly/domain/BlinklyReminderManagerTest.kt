@@ -6,7 +6,6 @@ import assertk.assertions.isNull
 import com.sedsoftware.blinkly.domain.base.BaseDomainTest
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
-import com.sedsoftware.blinkly.domain.impl.BlinklyReminderManagerImpl
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.BlinklyDatabaseSnapshot
 import com.sedsoftware.blinkly.domain.model.Exercise
@@ -48,7 +47,7 @@ class BlinklyReminderManagerTest : BaseDomainTest() {
     @BeforeTest
     fun setup() {
         database = FakeDatabase()
-        manager = BlinklyReminderManagerImpl(
+        manager = createBlinklyReminderManager(
             alarmManager = alarmManager,
             database = database,
             timeUtils = timeUtils,

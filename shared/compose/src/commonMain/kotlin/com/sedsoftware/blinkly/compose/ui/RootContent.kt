@@ -190,6 +190,7 @@ private fun BlinklyNotification.asMessage(): String =
     }
 
 @Composable
+@Suppress("CyclomaticComplexMethod")
 private fun BlinklyError.asMessage(): String =
     stringResource(
         resource = syncMessageResource() ?: when (this) {

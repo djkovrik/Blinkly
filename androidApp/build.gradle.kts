@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.splash)
     implementation(libs.lib.alarmee)
+    implementation(libs.lib.kermit)
     implementation(libs.lib.moko.permissions)
     implementation(libs.ark.decompose.core)
     implementation(libs.ark.decompose.extensions)
