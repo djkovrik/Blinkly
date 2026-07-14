@@ -8,6 +8,7 @@ sealed interface ExerciseEvent {
         override val block: ExerciseBlock,
         override val exercise: ExerciseType,
         val movement: EyeMovement,
+        val durationMs: Long,
     ) : ExerciseEvent
 
     data class Tick(

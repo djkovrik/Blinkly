@@ -21,6 +21,7 @@ interface WorkoutComponent {
         val currentExerciseIndex: Int,
         val phase: Phase,
         val movement: EyeMovement?,
+        val movementDurationMs: Long?,
         val movementTrigger: Int,
         val progress: Progress?,
         val timerRemainingSeconds: Int?,

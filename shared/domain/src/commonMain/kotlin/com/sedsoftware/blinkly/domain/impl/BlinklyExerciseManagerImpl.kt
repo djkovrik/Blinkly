@@ -101,7 +101,14 @@ internal class BlinklyExerciseManagerImpl(
 
         when (node) {
             is MovementNode -> {
-                _events.emit(ExerciseEvent.Movement(block, type, node.movement))
+                _events.emit(
+                    ExerciseEvent.Movement(
+                        block = block,
+                        exercise = type,
+                        movement = node.movement,
+                        durationMs = node.delay.value,
+                    )
+                )
             }
 
             is TickNode -> {

@@ -233,6 +233,7 @@ private fun WorkoutExercise(
 
         BlinklyEyePanel(
             movement = model.movement,
+            movementDurationMs = model.movementDurationMs,
             animationTrigger = model.movementTrigger,
             restState = exercise.restState(),
             modifier = Modifier.fillMaxWidth(),
@@ -853,6 +854,7 @@ private fun WorkoutExercisePreview(
     block: ExerciseBlock,
     exercise: ExerciseType,
     movement: EyeMovement? = null,
+    movementDurationMs: Long? = exercise.previewMovementDurationMs(),
     timerRemainingSeconds: Int? = null,
     isDarkTheme: Boolean = false
 ) {
@@ -863,6 +865,7 @@ private fun WorkoutExercisePreview(
                 currentExercise = exercise,
                 phase = WorkoutComponent.Phase.RUNNING,
                 movement = movement,
+                movementDurationMs = movementDurationMs,
                 movementTrigger = 1,
                 progress = WorkoutComponent.Progress(percent = 42, remainingMs = 9_000L, totalMs = 16_000L),
                 timerRemainingSeconds = timerRemainingSeconds,
@@ -870,6 +873,15 @@ private fun WorkoutExercisePreview(
         )
     }
 }
+
+private fun ExerciseType.previewMovementDurationMs(): Long? =
+    when (this) {
+        ExerciseType.BLINK_BREAK -> 350L
+        ExerciseType.DIAGONAL_GAZES -> 1_000L
+        ExerciseType.FIGURE_EIGHT -> 4_000L
+        ExerciseType.CLOCK_ROLLS -> 2_000L
+        else -> null
+    }
 
 private const val SECONDS_IN_MINUTE = 60
 private const val TWO_DIGIT_THRESHOLD = 10

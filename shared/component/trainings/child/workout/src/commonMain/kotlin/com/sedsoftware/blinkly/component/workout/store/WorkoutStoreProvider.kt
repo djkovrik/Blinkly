@@ -55,7 +55,12 @@ internal class WorkoutStoreProvider(
                             }
                             .collect { event ->
                                 when (event) {
-                                    is ExerciseEvent.Movement -> dispatch(Msg.MovementUpdated(event.movement))
+                                    is ExerciseEvent.Movement -> dispatch(
+                                        Msg.MovementUpdated(
+                                            movement = event.movement,
+                                            durationMs = event.durationMs,
+                                        )
+                                    )
                                     is ExerciseEvent.Progress -> dispatch(Msg.ProgressUpdated(event.progress))
                                     is ExerciseEvent.Tick -> dispatch(Msg.TickUpdated(event.second))
                                     is ExerciseEvent.Beep -> beeper.beep()
@@ -108,6 +113,7 @@ internal class WorkoutStoreProvider(
                     Msg.ExerciseStarted -> copy(
                         phase = Phase.RUNNING,
                         movement = null,
+                        movementDurationMs = null,
                         progress = null,
                         timerElapsedSeconds = null,
                     )
@@ -117,6 +123,7 @@ internal class WorkoutStoreProvider(
 
                     is Msg.MovementUpdated -> copy(
                         movement = msg.movement,
+                        movementDurationMs = msg.durationMs,
                         movementTrigger = movementTrigger + 1,
                     )
 
@@ -132,6 +139,7 @@ internal class WorkoutStoreProvider(
                                 currentExerciseIndex = exercises.lastIndex.coerceAtLeast(0),
                                 phase = Phase.COMPLETED,
                                 movement = null,
+                                movementDurationMs = null,
                                 progress = progress?.copy(percent = FULL_PROGRESS),
                                 timerElapsedSeconds = null,
                             )
@@ -140,6 +148,7 @@ internal class WorkoutStoreProvider(
                                 currentExerciseIndex = nextExerciseIndex,
                                 phase = Phase.READY,
                                 movement = null,
+                                movementDurationMs = null,
                                 progress = null,
                                 timerElapsedSeconds = null,
                             )
@@ -149,6 +158,7 @@ internal class WorkoutStoreProvider(
                     Msg.BlockCompleted -> copy(
                         phase = Phase.COMPLETED,
                         movement = null,
+                        movementDurationMs = null,
                         progress = progress?.copy(percent = FULL_PROGRESS, remainingMs = 0L),
                         timerElapsedSeconds = null,
                     )
@@ -165,7 +175,10 @@ internal class WorkoutStoreProvider(
         data object ExerciseStarted : Msg
         data object ExercisePaused : Msg
         data object ExerciseResumed : Msg
-        data class MovementUpdated(val movement: EyeMovement) : Msg
+        data class MovementUpdated(
+            val movement: EyeMovement,
+            val durationMs: Long,
+        ) : Msg
         data class ProgressUpdated(val progress: ExerciseProgress) : Msg
         data class TickUpdated(val second: Int) : Msg
         data class ExerciseCompleted(val exercise: ExerciseType) : Msg

@@ -14,17 +14,17 @@ internal fun diagonalScript(settings: BlinklySettings): ExerciseScript =
     exercise(ExerciseType.DIAGONAL_GAZES) {
 
         repeat(settings.diagonalGazesCount) {
-            DiagonalTopLeft every 1.seconds
+            DiagonalTopLeft every settings.diagonalGazesDuration.seconds
 
-            DiagonalBottomRight every 1.seconds
+            DiagonalBottomRight every settings.diagonalGazesDuration.seconds
         }
 
         beep()
 
         repeat(settings.diagonalGazesCount) {
-            DiagonalTopRight every 1.seconds
+            DiagonalTopRight every settings.diagonalGazesDuration.seconds
 
-            DiagonalBottomLeft every 1.seconds
+            DiagonalBottomLeft every settings.diagonalGazesDuration.seconds
         }
 
         completeBlock()
