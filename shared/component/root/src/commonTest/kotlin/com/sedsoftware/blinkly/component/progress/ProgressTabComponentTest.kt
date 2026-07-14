@@ -77,6 +77,8 @@ class ProgressTabComponentTest : ComponentTest<ProgressTabComponent>() {
             .isEqualTo(ProgressTabComponent.CalendarDayState.WORKOUT)
         assertThat(model.calendarWeeks.flatten().filterNotNull().first { it.date.day == 8 }.state)
             .isEqualTo(ProgressTabComponent.CalendarDayState.EMPTY)
+        assertThat(model.calendarWeeks.flatten().filterNotNull().single { it.isToday }.date.day)
+            .isEqualTo(15)
         assertThat(model.recentAchievements.map { it?.type }).isEqualTo(
             listOf(AchievementType.FAR_SIGHTED, AchievementType.BLINK_MASTER, AchievementType.DIAMOND_EYES)
         )

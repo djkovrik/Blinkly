@@ -57,6 +57,7 @@ internal class ProgressTabManager(
                     ProgressCalendarDay(
                         date = date,
                         state = exercises.toCalendarDayState(),
+                        isToday = date == today,
                     )
                 )
             }
