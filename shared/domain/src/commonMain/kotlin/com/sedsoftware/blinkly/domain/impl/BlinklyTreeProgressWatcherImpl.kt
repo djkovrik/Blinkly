@@ -84,14 +84,15 @@ class BlinklyTreeProgressWatcherImpl(
         val progress = calculateProgress(workouts)
         val totalProgress = (progress.beforeToday + progress.today).coerceAtMost(MAX_GARDEN_PROGRESS)
         val grownTreesCount = (totalProgress / TREE_FULL_PROGRESS).toInt().coerceIn(0, TreeType.entries.size)
-        val nextTreeType = TreeType.entries.getOrNull(grownTreesCount)
+        val currentTree = calculateCurrentTree(workouts)
+        val nextTreeType = TreeType.entries.getOrNull(currentTree.type.index)
         val daysToNextTree = nextTreeType?.let {
-            val nextTreeThreshold = TREE_FULL_PROGRESS * (grownTreesCount + 1)
-            ceil(nextTreeThreshold - totalProgress).toInt().coerceAtLeast(0)
+            val nextTreeStartThreshold = TREE_FULL_PROGRESS * currentTree.type.index
+            ceil(nextTreeStartThreshold - totalProgress).toInt().coerceAtLeast(1)
         }
 
         return TreeGarden(
-            currentTree = calculateCurrentTree(workouts),
+            currentTree = currentTree,
             grownTrees = TreeType.entries
                 .take(grownTreesCount)
                 .map { type -> Tree(TreeStage.MAGNIFICENT, type, HUNDRED_PERCENTS) },

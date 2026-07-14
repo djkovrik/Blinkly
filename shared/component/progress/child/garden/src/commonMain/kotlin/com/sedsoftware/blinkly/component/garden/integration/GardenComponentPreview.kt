@@ -14,14 +14,16 @@ class GardenComponentPreview(
     selectedTree: Tree? = null,
 ) : GardenComponent {
 
+    private val nextTreeType: TreeType? = TreeType.entries.getOrNull(currentTree.type.index)
+
     override val model: Value<Model> = MutableValue(
         Model(
             currentTree = currentTree,
             grownTrees = grownTrees,
             grownTreesCount = grownTrees.size,
             totalTrees = TreeType.entries.size,
-            nextTreeType = TreeType.entries.getOrNull(grownTrees.size),
-            daysToNextTree = PREVIEW_DAYS_TO_NEXT_TREE,
+            nextTreeType = nextTreeType,
+            daysToNextTree = nextTreeType?.let { PREVIEW_DAYS_TO_NEXT_TREE },
             selectedTree = selectedTree,
         )
     )

@@ -35,12 +35,13 @@ class GardenComponentTest : ComponentTest<GardenComponent>() {
         val grownTrees = listOf(
             Tree(TreeStage.MAGNIFICENT, TreeType.FRAXINUS_EXCELSIOR, 100f),
             Tree(TreeStage.MAGNIFICENT, TreeType.GINKGO_BILOBA, 100f),
+            Tree(TreeStage.MAGNIFICENT, TreeType.SALIX_BABYLONICA, 100f),
         )
         gardenFlow.value = TreeGarden(
             currentTree = currentTree,
             grownTrees = grownTrees,
             totalTrees = TreeType.entries.size,
-            nextTreeType = TreeType.SALIX_BABYLONICA,
+            nextTreeType = TreeType.ADANSONIA,
             daysToNextTree = 11,
         )
 
@@ -51,9 +52,9 @@ class GardenComponentTest : ComponentTest<GardenComponent>() {
         val model = component.model.value
         assertThat(model.currentTree).isEqualTo(currentTree)
         assertThat(model.grownTrees).isEqualTo(grownTrees)
-        assertThat(model.grownTreesCount).isEqualTo(2)
+        assertThat(model.grownTreesCount).isEqualTo(3)
         assertThat(model.totalTrees).isEqualTo(TreeType.entries.size)
-        assertThat(model.nextTreeType).isEqualTo(TreeType.SALIX_BABYLONICA)
+        assertThat(model.nextTreeType).isEqualTo(TreeType.ADANSONIA)
         assertThat(model.daysToNextTree).isEqualTo(11)
         assertThat(model.selectedTree).isNull()
     }
@@ -114,6 +115,30 @@ class GardenComponentTest : ComponentTest<GardenComponent>() {
     }
 
     @Test
+    fun `when last tree is growing then model has no next tree and garden is not complete`() = runTest(testScheduler) {
+        // given
+        gardenFlow.value = TreeGarden(
+            currentTree = Tree(TreeStage.TINY, TreeType.QUERCUS_ROBUR, 0f),
+            grownTrees = TreeType.entries.dropLast(1).map { type ->
+                Tree(TreeStage.MAGNIFICENT, type, 100f)
+            },
+            totalTrees = TreeType.entries.size,
+            nextTreeType = null,
+            daysToNextTree = null,
+        )
+
+        // when
+        testScheduler.advanceUntilIdle()
+
+        // then
+        val model = component.model.value
+        assertThat(model.grownTreesCount).isEqualTo(TreeType.entries.lastIndex)
+        assertThat(model.totalTrees).isEqualTo(TreeType.entries.size)
+        assertThat(model.nextTreeType).isNull()
+        assertThat(model.daysToNextTree).isNull()
+    }
+
+    @Test
     fun `when back clicked then component emits back output`() = runTest(testScheduler) {
         // when
         component.onBackClick()
@@ -167,7 +192,7 @@ class GardenComponentTest : ComponentTest<GardenComponent>() {
             currentTree = DEFAULT_TREE,
             grownTrees = grownTrees,
             totalTrees = TreeType.entries.size,
-            nextTreeType = TreeType.FRAXINUS_EXCELSIOR,
+            nextTreeType = TreeType.GINKGO_BILOBA,
             daysToNextTree = 28,
         )
 

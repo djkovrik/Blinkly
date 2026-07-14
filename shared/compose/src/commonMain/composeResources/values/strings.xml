@@ -246,6 +246,7 @@
     <string name="garden_stats_title">Garden stats</string>
     <string name="garden_grown_count">Grown: %1$d of %2$d plants</string>
     <string name="garden_next_tree">Next plant: %1$s in %2$d days</string>
+    <string name="garden_last_tree">This is the last plant in the garden</string>
     <string name="garden_all_grown">All plants are grown</string>
 
     <!-- Main tab -->

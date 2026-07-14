@@ -600,7 +600,7 @@ class BlinklyTreeProgressWatcherTest : BaseDomainTest() {
     }
 
     @Test
-    fun `when no data in database then garden has no grown trees and first next tree`() = runTest(testScheduler) {
+    fun `when no data in database then garden shows the tree after current as next`() = runTest(testScheduler) {
         // given
         every { database.currentCalendar() } returns flowOf(emptyList())
         val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
@@ -612,7 +612,7 @@ class BlinklyTreeProgressWatcherTest : BaseDomainTest() {
         assertThat(result.currentTree).isEqualTo(Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f))
         assertThat(result.grownTrees).isEqualTo(emptyList())
         assertThat(result.totalTrees).isEqualTo(TreeType.entries.size)
-        assertThat(result.nextTreeType).isEqualTo(TreeType.FRAXINUS_EXCELSIOR)
+        assertThat(result.nextTreeType).isEqualTo(TreeType.GINKGO_BILOBA)
         assertThat(result.daysToNextTree).isEqualTo(28)
     }
 
@@ -632,7 +632,25 @@ class BlinklyTreeProgressWatcherTest : BaseDomainTest() {
             listOf(Tree(TreeStage.MAGNIFICENT, TreeType.FRAXINUS_EXCELSIOR, 100f))
         )
         assertThat(result.nextTreeType).isEqualTo(TreeType.GINKGO_BILOBA)
-        assertThat(result.daysToNextTree).isEqualTo(28)
+        assertThat(result.daysToNextTree).isEqualTo(1)
+    }
+
+    @Test
+    fun `when last tree is growing then garden has no next tree and is not complete`() = runTest(testScheduler) {
+        // given
+        val calendar = FakeData.getCalendarWithFullDays(yesterday, 252)
+        every { database.currentCalendar() } returns flowOf(calendar)
+        every { timeUtils.now() } returns now
+        val watcher = BlinklyTreeProgressWatcherImpl(timeUtils, database, testDispatchers)
+
+        // when
+        val result = watcher.garden.first()
+
+        // then
+        assertThat(result.currentTree).isEqualTo(Tree(TreeStage.TINY, TreeType.QUERCUS_ROBUR, 0f))
+        assertThat(result.grownTrees.size).isEqualTo(TreeType.entries.lastIndex)
+        assertThat(result.nextTreeType).isEqualTo(null)
+        assertThat(result.daysToNextTree).isEqualTo(null)
     }
 
     @Test
