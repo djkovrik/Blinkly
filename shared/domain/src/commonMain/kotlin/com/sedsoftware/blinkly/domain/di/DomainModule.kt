@@ -6,6 +6,7 @@ import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
+import com.sedsoftware.blinkly.domain.createBlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
@@ -16,7 +17,6 @@ import com.sedsoftware.blinkly.domain.impl.BlinklyAchievementsWatcherImpl
 import com.sedsoftware.blinkly.domain.impl.BlinklyCalendarWatcherImpl
 import com.sedsoftware.blinkly.domain.impl.BlinklyExerciseManagerImpl
 import com.sedsoftware.blinkly.domain.impl.BlinklyHighlightsProviderImpl
-import com.sedsoftware.blinkly.domain.impl.BlinklyReminderManagerImpl
 import com.sedsoftware.blinkly.domain.impl.BlinklyTreeProgressWatcherImpl
 
 interface DomainModule {
@@ -82,7 +82,7 @@ fun DomainModule(dependencies: DomainModuleDependencies): DomainModule {
         }
 
         override val reminderManager: BlinklyReminderManager by lazy {
-            BlinklyReminderManagerImpl(
+            createBlinklyReminderManager(
                 alarmManager = dependencies.alarmManager,
                 database = dependencies.database,
                 timeUtils = dependencies.timeUtils,

@@ -53,6 +53,7 @@ class BlinklyExerciseManagerTest : BaseDomainTest() {
 
         // then
         assertThat(events.any { it is ExerciseEvent.Movement }).isTrue()
+        assertThat(events.filterIsInstance<ExerciseEvent.Movement>().first().durationMs).isEqualTo(350L)
         assertThat(events.any { it is ExerciseEvent.Beep }).isTrue()
         job.cancel()
     }

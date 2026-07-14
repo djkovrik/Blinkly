@@ -15,7 +15,7 @@ internal fun blinkScript(settings: BlinklySettings): ExerciseScript =
                 beep()
             }
 
-            Blink(index) every 250.ms
+            Blink(index) every 350.ms
         }
 
         completeExercise()

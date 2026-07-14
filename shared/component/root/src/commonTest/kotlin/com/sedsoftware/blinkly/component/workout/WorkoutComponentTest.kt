@@ -84,6 +84,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
                 block = ExerciseBlock.A,
                 exercise = ExerciseType.BLINK_BREAK,
                 movement = EyeMovement.Blink(count = 2),
+                durationMs = 350L,
             )
         )
         exerciseManager.emit(
@@ -97,6 +98,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
         // then
         assertThat(component.model.value.progress?.percent).isEqualTo(40)
         assertThat(component.model.value.movement).isEqualTo(EyeMovement.Blink(count = 2))
+        assertThat(component.model.value.movementDurationMs).isEqualTo(350L)
         assertThat(component.model.value.movementTrigger).isEqualTo(1)
         assertThat(beeper.beepCount).isEqualTo(1)
     }
@@ -209,6 +211,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
                 block = ExerciseBlock.B,
                 exercise = ExerciseType.PALMING,
                 movement = EyeMovement.CircleClockwise,
+                durationMs = 2_000L,
             )
         )
         testScheduler.advanceUntilIdle()

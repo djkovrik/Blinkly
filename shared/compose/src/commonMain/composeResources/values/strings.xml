@@ -28,6 +28,11 @@
     <string name="error_initial_reminders_clearing">Could not clear initial reminders</string>
     <string name="error_notification_permission_checking">Could not check notification permission</string>
     <string name="error_notification_permission_requesting">Could not request notification permission</string>
+    <string name="error_notification_permission_denied_always">Allow notifications in app settings</string>
+    <string name="error_exact_alarm_permission_checking">Could not check alarms and reminders access</string>
+    <string name="error_exact_alarm_permission_requesting">Could not open alarms and reminders settings</string>
+    <string name="error_exact_alarm_permission_denied">Allow alarms and reminders in system settings</string>
+    <string name="error_reminders_rescheduling">Could not reschedule reminders</string>
     <string name="error_workout_data_loading">Could not update workout progress</string>
     <string name="error_workout_saving">Could not save workout</string>
     <string name="error_sync_auth_failed">Could not sign in for sync</string>
@@ -98,6 +103,10 @@
     <string name="reminders_weekly">Weekly</string>
     <string name="reminders_next">Next</string>
     <string name="reminders_days_every_day">Every day</string>
+    <string name="reminders_days_weekdays">Weekdays</string>
+    <string name="reminders_workday_period">Workday period</string>
+    <string name="reminders_every_minutes">Every %1$d min</string>
+    <string name="reminders_next_at">Next %1$s · %2$s</string>
     <string name="reminders_overview_title">20-20-20 break schedule</string>
     <string name="reminders_overview_count">Active reminders: %1$d</string>
     <string name="reminders_overview_next">Next: %1$s on %2$s</string>
@@ -241,6 +250,7 @@
     <string name="garden_stats_title">Garden stats</string>
     <string name="garden_grown_count">Grown: %1$d of %2$d plants</string>
     <string name="garden_next_tree">Next plant: %1$s in %2$d days</string>
+    <string name="garden_last_tree">This is the last plant in the garden</string>
     <string name="garden_all_grown">All plants are grown</string>
 
     <!-- Main tab -->

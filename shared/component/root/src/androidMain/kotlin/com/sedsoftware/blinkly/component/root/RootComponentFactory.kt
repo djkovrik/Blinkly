@@ -7,6 +7,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.russhwolf.settings.Settings
 import com.sedsoftware.blinkly.alarm.di.AlarmModule
 import com.sedsoftware.blinkly.alarm.di.AlarmModuleDependencies
+import com.sedsoftware.blinkly.alarm.impl.BlinklyExactAlarmPermissionControllerAndroid
 import com.sedsoftware.blinkly.beeper.BeeperWrapper
 import com.sedsoftware.blinkly.beeper.BeeperWrapperFactory
 import com.sedsoftware.blinkly.beeper.di.BeeperModule
@@ -25,6 +26,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
+import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
@@ -63,6 +65,8 @@ fun RootComponentFactory(
             dependencies = object : AlarmModuleDependencies {
                 override val timeUtils: BlinklyTimeUtils = timeUtils
                 override val contentConfigurations: Map<ReminderType, ReminderConfig> = contentConfigurations
+                override val exactAlarmPermissionController =
+                    BlinklyExactAlarmPermissionControllerAndroid(context)
             }
         )
 
@@ -133,6 +137,10 @@ fun RootComponentFactory(
         )
     }
 
+    val syncManager: BlinklySyncManager by lazy {
+        syncModule.createSyncManager(domainModule.reminderManager::rescheduleAll)
+    }
+
     val beeper: BlinklyBeeper by lazy {
         val beeperModule = BeeperModule(
             dependencies = object : BeeperModuleDependencies {
@@ -150,7 +158,7 @@ fun RootComponentFactory(
         dispatchers = dispatchers,
         notifier = notifier,
         settings = settings,
-        syncManager = syncModule.syncManager,
+        syncManager = syncManager,
         timeUtils = timeUtils,
         achievementsWatcher = domainModule.achievementsWatcher,
         calendarWatcher = domainModule.calendarWatcher,

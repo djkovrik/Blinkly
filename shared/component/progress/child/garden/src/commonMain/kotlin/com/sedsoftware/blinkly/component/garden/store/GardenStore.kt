@@ -21,7 +21,7 @@ internal interface GardenStore : Store<Intent, State, Label> {
             currentTree = Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f),
             grownTrees = emptyList(),
             totalTrees = TreeType.entries.size,
-            nextTreeType = TreeType.FRAXINUS_EXCELSIOR,
+            nextTreeType = TreeType.GINKGO_BILOBA,
             daysToNextTree = DEFAULT_DAYS_TO_NEXT_TREE,
         ),
         val selectedType: TreeType? = null,

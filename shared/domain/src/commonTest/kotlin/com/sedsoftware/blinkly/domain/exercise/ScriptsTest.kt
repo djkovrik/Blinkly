@@ -17,6 +17,7 @@ import com.sedsoftware.blinkly.domain.exercise.scripts.nearFarScript
 import com.sedsoftware.blinkly.domain.exercise.scripts.palmingScript
 import com.sedsoftware.blinkly.domain.exercise.scripts.twentyScript
 import com.sedsoftware.blinkly.domain.fakes.FakeData
+import com.sedsoftware.blinkly.domain.model.EyeMovement
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -27,11 +28,12 @@ class ScriptsTest : BaseDomainTest() {
         // given
         // when
         val script = blinkScript(settings)
-        val movementCount = script.nodes.count { it is MovementNode }
+        val movements = script.nodes.filterIsInstance<MovementNode>()
         val beepCount = script.nodes.count { it is BeepNode }
 
         // then
-        assertThat(movementCount).isEqualTo(FakeData.BLINK_BREAK_COUNT)
+        assertThat(movements.size).isEqualTo(FakeData.BLINK_BREAK_COUNT)
+        assertThat(movements.map { it.delay.value }.distinct()).isEqualTo(listOf(350L))
         assertThat(beepCount).isEqualTo(FakeData.BLINK_BREAK_COUNT - 1)
         assertThat(script.nodes.last() is CompleteExerciseNode).isTrue()
     }
@@ -63,6 +65,7 @@ class ScriptsTest : BaseDomainTest() {
 
         // then
         assertThat(movements.size).isEqualTo(expectedMovements)
+        assertThat(movements.map { it.delay.value }.distinct()).isEqualTo(listOf(2_000L))
         assertThat(beepCount).isEqualTo(1)
         assertThat(script.nodes.last() is CompleteExerciseNode).isTrue()
     }
@@ -78,6 +81,17 @@ class ScriptsTest : BaseDomainTest() {
 
         // then
         assertThat(movements.size).isEqualTo(expectedMovements)
+        assertThat(movements.take(4).map { it.movement }).isEqualTo(
+            listOf(
+                EyeMovement.DiagonalTopLeft,
+                EyeMovement.DiagonalBottomRight,
+                EyeMovement.DiagonalTopLeft,
+                EyeMovement.DiagonalBottomRight,
+            )
+        )
+        assertThat(movements.map { it.delay.value }.distinct()).isEqualTo(
+            listOf((FakeData.DIAGONAL_DURATION * 1_000).toLong())
+        )
         assertThat(beepCount).isEqualTo(1)
         assertThat(script.nodes.last() is CompleteBlockNode).isTrue()
     }
@@ -93,6 +107,7 @@ class ScriptsTest : BaseDomainTest() {
 
         // then
         assertThat(movements.size).isEqualTo(expectedMovements)
+        assertThat(movements.map { it.delay.value }.distinct()).isEqualTo(listOf(4_000L))
         assertThat(beepCount).isEqualTo(1)
         assertThat(script.nodes.last() is CompleteExerciseNode).isTrue()
     }

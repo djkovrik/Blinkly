@@ -23,6 +23,7 @@ import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
+import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
@@ -48,6 +49,7 @@ class HomeScreenComponentDefault private constructor(
         calendarWatcher: BlinklyCalendarWatcher,
         highlightsProvider: BlinklyHighlightsProvider,
         reminderManager: BlinklyReminderManager,
+        notifier: BlinklyNotifier,
         treeProgressWatcher: BlinklyTreeProgressWatcher,
         homeScreenOutput: (ComponentOutput) -> Unit,
     ) : this(
@@ -94,6 +96,7 @@ class HomeScreenComponentDefault private constructor(
                 storeFactory = storeFactory,
                 dispatchers = dispatchers,
                 reminderManager = reminderManager,
+                notifier = notifier,
                 remindersTabOutput = componentOutput,
             )
         }

@@ -7,11 +7,15 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
+import com.sedsoftware.blinkly.domain.model.ReminderSchedule
+import com.sedsoftware.blinkly.domain.model.ReminderScheduleConfiguration
 import com.sedsoftware.blinkly.domain.model.ReminderType
+import com.sedsoftware.blinkly.domain.model.ScheduledReminder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.shareIn
@@ -19,9 +23,11 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
 internal class BlinklyReminderManagerImpl(
@@ -42,6 +48,25 @@ internal class BlinklyReminderManagerImpl(
                 replay = 1,
             )
 
+    override fun createdSchedules(): Flow<List<ScheduledReminder>> =
+        combine(
+            database.currentReminderSchedules(),
+            database.currentReminders(),
+        ) { schedules, reminders ->
+            schedules.map { schedule ->
+                ScheduledReminder(
+                    schedule = schedule,
+                    alarms = reminders.filter { reminder -> reminder.scheduleId == schedule.id },
+                )
+            }
+        }
+            .flowOn(dispatchers.io)
+            .shareIn(
+                scope = scope,
+                started = SharingStarted.WhileSubscribed(SUBSCRIPTION_STOP_TIMEOUT),
+                replay = 1,
+            )
+
     override suspend fun scheduleDaily(time: LocalTime) {
         val now = timeUtils.now()
         val timeZone = timeUtils.timeZone()
@@ -54,17 +79,24 @@ internal class BlinklyReminderManagerImpl(
             LocalDateTime(today.date.plus(1, DateTimeUnit.DAY), time)
         }
 
+        val scheduleId = Uuid.random().toString()
         val uuid = Uuid.random().toString()
+
+        val schedule = ReminderSchedule(
+            id = scheduleId,
+            reminderType = ReminderType.TWENTY_X3,
+            configuration = ReminderScheduleConfiguration.Daily(time),
+        )
 
         val reminder = Reminder(
             uuid = uuid,
+            scheduleId = scheduleId,
             date = finalDateTime,
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.DAILY,
-            weekDays = emptyList(),
         )
 
-        database.saveReminder(reminder)
+        database.saveReminderSchedule(schedule, listOf(reminder))
 
         alarmManager.scheduleDaily(
             uuid = uuid,
@@ -88,17 +120,27 @@ internal class BlinklyReminderManagerImpl(
             LocalDateTime(targetDate.plus(FULL_WEEK_DAYS, DateTimeUnit.DAY), time)
         }
 
+        val scheduleId = Uuid.random().toString()
         val uuid = Uuid.random().toString()
+
+        val schedule = ReminderSchedule(
+            id = scheduleId,
+            reminderType = ReminderType.TWENTY_X3,
+            configuration = ReminderScheduleConfiguration.WeeklySingle(
+                time = time,
+                day = dayOfWeek,
+            ),
+        )
 
         val reminder = Reminder(
             uuid = uuid,
+            scheduleId = scheduleId,
             date = finalDateTime,
             type = ReminderType.TWENTY_X3,
             interval = ReminderInterval.WEEKLY,
-            weekDays = listOf(dayOfWeek),
         )
 
-        database.saveReminder(reminder)
+        database.saveReminderSchedule(schedule, listOf(reminder))
 
         alarmManager.scheduleWeekly(
             uuid = uuid,
@@ -109,6 +151,8 @@ internal class BlinklyReminderManagerImpl(
 
     override suspend fun scheduleWeeklyDayPeriod(from: LocalTime, until: LocalTime, intervalMinutes: Int, days: List<DayOfWeek>) {
         if (intervalMinutes <= 0 || days.isEmpty() || from >= until) return
+
+        val normalizedDays = days.distinct().sortedBy(DayOfWeek::ordinal)
 
         val nowInstant = timeUtils.now()
         val timeZone = timeUtils.timeZone()
@@ -131,9 +175,10 @@ internal class BlinklyReminderManagerImpl(
         }
 
         val remindersToSave = mutableListOf<Reminder>()
+        val scheduleId = Uuid.random().toString()
 
         for (reminderTime in reminderTimes) {
-            for (targetDay in days) {
+            for (targetDay in normalizedDays) {
                 val daysToAdd = (targetDay.ordinal - currentLocal.dayOfWeek.ordinal + FULL_WEEK_DAYS) % FULL_WEEK_DAYS
                 var targetDate = currentLocal.date.plus(daysToAdd.toLong(), DateTimeUnit.DAY)
                 var candidate = LocalDateTime(targetDate, reminderTime)
@@ -147,10 +192,10 @@ internal class BlinklyReminderManagerImpl(
 
                 val reminder = Reminder(
                     uuid = uuid,
+                    scheduleId = scheduleId,
                     date = candidate,
                     type = ReminderType.TWENTY_X3,
                     interval = ReminderInterval.WEEKLY,
-                    weekDays = listOf(targetDay)
                 )
 
                 remindersToSave.add(reminder)
@@ -158,7 +203,19 @@ internal class BlinklyReminderManagerImpl(
         }
 
         if (remindersToSave.isNotEmpty()) {
-            database.saveReminders(remindersToSave)
+            database.saveReminderSchedule(
+                schedule = ReminderSchedule(
+                    id = scheduleId,
+                    reminderType = ReminderType.TWENTY_X3,
+                    configuration = ReminderScheduleConfiguration.WorkdayPeriod(
+                        from = from,
+                        until = until,
+                        intervalMinutes = intervalMinutes,
+                        days = normalizedDays,
+                    ),
+                ),
+                reminders = remindersToSave,
+            )
 
             for (reminder in remindersToSave) {
                 alarmManager.scheduleWeekly(
@@ -170,35 +227,71 @@ internal class BlinklyReminderManagerImpl(
         }
     }
 
-    override suspend fun cancel(uuid: String) {
-        alarmManager.cancel(uuid)
-        database.deleteReminder(uuid)
+    override suspend fun cancelSchedule(scheduleId: String) {
+        val reminders = database.remindersBySchedule(scheduleId)
+        reminders.forEach { reminder -> alarmManager.cancel(reminder.uuid) }
+        database.deleteReminderSchedule(scheduleId)
+    }
+
+    override fun canScheduleExactAlarms(): Boolean =
+        alarmManager.canScheduleExactAlarms()
+
+    override fun requestExactAlarmPermission() {
+        alarmManager.requestExactAlarmPermission()
     }
 
     override suspend fun rescheduleAll() {
-        alarmManager.cancelAll()
         val remindersToSchedule = database.currentReminders().first()
+        remindersToSchedule.forEach { reminder -> alarmManager.cancel(reminder.uuid) }
+        val now = timeUtils.now()
+        val timeZone = timeUtils.timeZone()
 
         for (reminder in remindersToSchedule) {
+            val nextOccurrence = reminder.nextOccurrence(now, timeZone)
             if (reminder.interval == ReminderInterval.DAILY) {
                 alarmManager.scheduleDaily(
                     uuid = reminder.uuid,
-                    type = ReminderType.TWENTY_X3,
-                    startingDate = reminder.date,
+                    type = reminder.type,
+                    startingDate = nextOccurrence,
                 )
             } else {
                 alarmManager.scheduleWeekly(
                     uuid = reminder.uuid,
-                    type = ReminderType.TWENTY_X3,
-                    startingDate = reminder.date,
+                    type = reminder.type,
+                    startingDate = nextOccurrence,
                 )
             }
         }
     }
 
     override suspend fun cancelAll() {
-        alarmManager.cancelAll()
+        val remindersToCancel = database.currentReminders().first()
+        remindersToCancel.forEach { reminder -> alarmManager.cancel(reminder.uuid) }
         database.deleteReminders()
+    }
+
+    private fun Reminder.nextOccurrence(now: Instant, timeZone: TimeZone): LocalDateTime {
+        val currentLocal = now.toLocalDateTime(timeZone)
+        val daysToAdd = when (interval) {
+            ReminderInterval.DAILY -> 0
+            ReminderInterval.WEEKLY ->
+                (date.dayOfWeek.ordinal - currentLocal.dayOfWeek.ordinal + FULL_WEEK_DAYS) % FULL_WEEK_DAYS
+        }
+        val candidate = LocalDateTime(
+            date = currentLocal.date.plus(daysToAdd.toLong(), DateTimeUnit.DAY),
+            time = date.time,
+        )
+
+        if (candidate.toInstant(timeZone) > now) return candidate
+
+        val intervalDays = when (interval) {
+            ReminderInterval.DAILY -> 1L
+            ReminderInterval.WEEKLY -> FULL_WEEK_DAYS.toLong()
+        }
+        return LocalDateTime(
+            date = candidate.date.plus(intervalDays, DateTimeUnit.DAY),
+            time = candidate.time,
+        )
     }
 
     private companion object {

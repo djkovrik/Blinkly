@@ -44,6 +44,7 @@ import blinkly.shared.compose.generated.resources.content_description_tree_previ
 import blinkly.shared.compose.generated.resources.garden_all_grown
 import blinkly.shared.compose.generated.resources.garden_collection_title
 import blinkly.shared.compose.generated.resources.garden_current_tree_title
+import blinkly.shared.compose.generated.resources.garden_last_tree
 import blinkly.shared.compose.generated.resources.garden_next_tree
 import blinkly.shared.compose.generated.resources.garden_stats_title
 import blinkly.shared.compose.generated.resources.icon_back
@@ -329,6 +330,9 @@ private fun GardenStatsSection(
     model: GardenComponent.Model,
     modifier: Modifier = Modifier,
 ) {
+    val nextTreeType = model.nextTreeType
+    val daysToNextTree = model.daysToNextTree
+
     BlinklyAppCard(
         contentPadding = BlinklySpacing.CompactCardPadding,
         modifier = modifier,
@@ -344,13 +348,16 @@ private fun GardenStatsSection(
         )
 
         Text(
-            text = model.nextTreeType?.let { nextType ->
-                stringResource(
+            text = when {
+                nextTreeType != null && daysToNextTree != null -> stringResource(
                     resource = Res.string.garden_next_tree,
-                    nextType.asLabel(),
-                    model.daysToNextTree ?: 0,
+                    nextTreeType.asLabel(),
+                    daysToNextTree,
                 )
-            } ?: stringResource(resource = Res.string.garden_all_grown),
+                model.grownTreesCount == model.totalTrees ->
+                    stringResource(resource = Res.string.garden_all_grown)
+                else -> stringResource(resource = Res.string.garden_last_tree)
+            },
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
         )

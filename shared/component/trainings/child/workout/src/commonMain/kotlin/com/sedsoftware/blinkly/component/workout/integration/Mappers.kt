@@ -12,6 +12,7 @@ internal val stateToModel: (WorkoutStore.State) -> WorkoutComponent.Model = { st
         currentExerciseIndex = state.currentExerciseIndex,
         phase = state.phase.toModelPhase(),
         movement = state.movement,
+        movementDurationMs = state.movementDurationMs,
         movementTrigger = state.movementTrigger,
         progress = state.progress?.toModelProgress(),
         timerRemainingSeconds = state.timerRemainingSeconds(),

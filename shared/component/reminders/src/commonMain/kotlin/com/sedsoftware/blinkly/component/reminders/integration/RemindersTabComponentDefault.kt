@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.essenty.lifecycle.doOnResume
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
@@ -14,6 +15,7 @@ import com.sedsoftware.blinkly.component.reminders.store.RemindersStore
 import com.sedsoftware.blinkly.component.reminders.store.RemindersStoreProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
+import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.utils.asValue
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +27,7 @@ class RemindersTabComponentDefault(
     private val storeFactory: StoreFactory,
     private val dispatchers: BlinklyDispatchers,
     private val reminderManager: BlinklyReminderManager,
+    private val notifier: BlinklyNotifier,
     private val remindersTabOutput: (ComponentOutput) -> Unit,
 ) : RemindersTabComponent, ComponentContext by componentContext {
 
@@ -32,7 +35,7 @@ class RemindersTabComponentDefault(
         instanceKeeper.getStore {
             RemindersStoreProvider(
                 storeFactory = storeFactory,
-                manager = RemindersManager(reminderManager),
+                manager = RemindersManager(reminderManager, notifier),
                 mainContext = dispatchers.main,
                 ioContext = dispatchers.io,
             ).create()
@@ -45,8 +48,15 @@ class RemindersTabComponentDefault(
             store.labels.collect { label ->
                 when (label) {
                     is RemindersStore.Label.ErrorCaught -> remindersTabOutput(ComponentOutput.Common.ErrorCaught(label.exception))
+                    is RemindersStore.Label.OpenAddNewReminder -> {
+                        remindersTabOutput(ComponentOutput.Reminders.OpenAddNew)
+                    }
                 }
             }
+        }
+
+        lifecycle.doOnResume {
+            store.accept(RemindersStore.Intent.AppResumed)
         }
 
         lifecycle.doOnDestroy {
@@ -57,11 +67,11 @@ class RemindersTabComponentDefault(
     override val model: Value<Model> = store.asValue().map(stateToModel)
 
     override fun onAddNewClick() {
-        remindersTabOutput(ComponentOutput.Reminders.OpenAddNew)
+        store.accept(RemindersStore.Intent.AddNewReminder)
     }
 
-    override fun onDeleteReminder(uuid: String) {
-        store.accept(RemindersStore.Intent.DeleteReminder(uuid))
+    override fun onDeleteReminder(scheduleId: String) {
+        store.accept(RemindersStore.Intent.DeleteReminder(scheduleId))
     }
 
     override fun onUndoDelete() {

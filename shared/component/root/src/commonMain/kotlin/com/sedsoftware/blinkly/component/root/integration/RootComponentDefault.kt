@@ -106,6 +106,7 @@ class RootComponentDefault private constructor(
                 calendarWatcher = calendarWatcher,
                 highlightsProvider = highlightsProvider,
                 reminderManager = reminderManager,
+                notifier = notifier,
                 treeProgressWatcher = treeProgressWatcher,
                 homeScreenOutput = output,
             )

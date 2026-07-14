@@ -14,6 +14,7 @@ internal val stateToModel: (State) -> Model = { state ->
                     CalendarDay(
                         date = it.date,
                         state = it.state.toComponentState(),
+                        isToday = it.isToday,
                     )
                 }
             }

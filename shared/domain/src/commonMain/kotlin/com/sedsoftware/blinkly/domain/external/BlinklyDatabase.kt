@@ -4,6 +4,7 @@ import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.BlinklyDatabaseSnapshot
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.Reminder
+import com.sedsoftware.blinkly.domain.model.ReminderSchedule
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.flow.Flow
 
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface BlinklyDatabase {
     fun currentCalendar(): Flow<List<Workout>>
     fun currentAchievements(): Flow<List<Achievement>>
+    fun currentReminderSchedules(): Flow<List<ReminderSchedule>>
     fun currentReminders(): Flow<List<Reminder>>
     suspend fun currentSnapshot(): BlinklyDatabaseSnapshot
     suspend fun replaceSnapshot(snapshot: BlinklyDatabaseSnapshot)
@@ -20,8 +22,8 @@ interface BlinklyDatabase {
     suspend fun saveAchievements(achievements: List<Achievement>)
     suspend fun deleteAchievements()
     suspend fun deleteExercises()
-    suspend fun saveReminder(reminder: Reminder)
-    suspend fun saveReminders(reminders: List<Reminder>)
-    suspend fun deleteReminder(uuid: String)
+    suspend fun remindersBySchedule(scheduleId: String): List<Reminder>
+    suspend fun saveReminderSchedule(schedule: ReminderSchedule, reminders: List<Reminder>)
+    suspend fun deleteReminderSchedule(scheduleId: String)
     suspend fun deleteReminders()
 }

@@ -14,11 +14,14 @@ import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
+import com.sedsoftware.blinkly.domain.model.BlinklyDatabaseSnapshot
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
+import com.sedsoftware.blinkly.domain.model.ReminderSchedule
+import com.sedsoftware.blinkly.domain.model.ReminderScheduleConfiguration
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import com.sedsoftware.blinkly.domain.model.Workout
 import dev.mokkery.answering.returns
@@ -32,6 +35,7 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toLocalDateTime
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -130,155 +134,88 @@ class BlinklyDatabaseTest {
     }
 
     @Test
-    fun `when reminder saved then reminders subscription updated`() = runTest(testScheduler) {
-        // given
-        val now = Clock.System.now()
-        val reminder = Reminder(
-            uuid = "test",
-            date = now.toLocalDateTime(TimeZone.UTC),
-            type = ReminderType.TWENTY_X3,
-            interval = ReminderInterval.DAILY,
-            weekDays = listOf(DayOfWeek.MONDAY)
+    fun `schedule configurations and physical alarms round trip`() = runTest(testScheduler) {
+        val schedules = listOf(
+            ReminderSchedule("daily", ReminderType.TWENTY_X3, ReminderScheduleConfiguration.Daily(LocalTime(10, 0))),
+            ReminderSchedule(
+                "weekly",
+                ReminderType.TWENTY_X3,
+                ReminderScheduleConfiguration.WeeklySingle(LocalTime(14, 30), DayOfWeek.WEDNESDAY),
+            ),
+            ReminderSchedule(
+                "period",
+                ReminderType.TWENTY_X3,
+                ReminderScheduleConfiguration.WorkdayPeriod(
+                    LocalTime(9, 0),
+                    LocalTime(18, 0),
+                    20,
+                    listOf(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
+                ),
+            ),
         )
-        var reminders: List<Reminder>? = null
+        val reminders = schedules.mapIndexed { index, schedule -> reminder("alarm-$index", schedule.id) }
 
-        // when
-        val collectJob = launch { database.currentReminders().collect { reminders = it } }
-        database.saveReminder(reminder)
-        testScheduler.advanceUntilIdle()
+        schedules.zip(reminders).forEach { (schedule, reminder) ->
+            database.saveReminderSchedule(schedule, listOf(reminder))
+        }
 
-        // then
-        assertThat(reminders).isNotNull()
-        assertThat(reminders!!).isNotEmpty()
-        assertThat(reminders.first()).isEqualTo(reminder)
-        collectJob.cancel()
+        assertThat(database.currentReminderSchedules().first()).isEqualTo(schedules)
+        assertThat(database.currentReminders().first()).isEqualTo(reminders)
+        assertThat(database.remindersBySchedule("period")).isEqualTo(listOf(reminders.last()))
     }
 
     @Test
-    fun `when reminders saved then reminders subscription updated`() = runTest(testScheduler) {
-        // given
-        val now = Clock.System.now()
-        val uuid1 = "test1"
-        val uuid2 = "test2"
-        val reminder1 = Reminder(
-            uuid = uuid1,
-            date = now.toLocalDateTime(TimeZone.UTC),
-            type = ReminderType.TWENTY_X3,
-            interval = ReminderInterval.DAILY,
-            weekDays = listOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
-        )
-        val reminder2 = Reminder(
-            uuid = uuid2,
-            date = now.toLocalDateTime(TimeZone.UTC),
-            type = ReminderType.TWENTY_X3,
-            interval = ReminderInterval.WEEKLY,
-            weekDays = listOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY)
-        )
-        var reminders: List<Reminder>? = null
+    fun `deleting schedule removes only its parent and children`() = runTest(testScheduler) {
+        val first = ReminderSchedule("first", ReminderType.TWENTY_X3, ReminderScheduleConfiguration.Daily(LocalTime(10, 0)))
+        val second = ReminderSchedule("second", ReminderType.TWENTY_X3, ReminderScheduleConfiguration.Daily(LocalTime(11, 0)))
+        val firstAlarm = reminder("first-alarm", first.id)
+        val secondAlarm = reminder("second-alarm", second.id)
+        database.saveReminderSchedule(first, listOf(firstAlarm))
+        database.saveReminderSchedule(second, listOf(secondAlarm))
 
-        // when
-        val collectJob = launch { database.currentReminders().collect { reminders = it } }
-        database.saveReminders(listOf(reminder1, reminder2))
-        testScheduler.advanceUntilIdle()
+        database.deleteReminderSchedule(first.id)
 
-        // then
-        assertThat(reminders).isNotNull()
-        assertThat(reminders!!).isNotEmpty()
-        assertThat(reminders.size).isEqualTo(2)
-        collectJob.cancel()
+        assertThat(database.currentReminderSchedules().first()).isEqualTo(listOf(second))
+        assertThat(database.currentReminders().first()).isEqualTo(listOf(secondAlarm))
     }
 
     @Test
-    fun `when reminder deleted then subscription updated`() = runTest(testScheduler) {
-        val now = Clock.System.now()
-        val uuid1 = "test1"
-        val uuid2 = "test2"
-        val reminder1 = Reminder(
-            uuid = uuid1,
-            date = now.toLocalDateTime(TimeZone.UTC),
-            type = ReminderType.TWENTY_X3,
-            interval = ReminderInterval.DAILY,
-            weekDays = listOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
+    fun `snapshot includes and replaces schedules with alarms`() = runTest(testScheduler) {
+        val schedule = ReminderSchedule(
+            "period",
+            ReminderType.TWENTY_X3,
+            ReminderScheduleConfiguration.WorkdayPeriod(
+                LocalTime(9, 0),
+                LocalTime(18, 0),
+                20,
+                listOf(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
+            ),
         )
-        val reminder2 = Reminder(
-            uuid = uuid2,
-            date = now.toLocalDateTime(TimeZone.UTC),
-            type = ReminderType.TWENTY_X3,
-            interval = ReminderInterval.WEEKLY,
-            weekDays = listOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY)
-        )
+        val alarms = listOf(reminder("one", schedule.id), reminder("two", schedule.id))
+        val snapshot = BlinklyDatabaseSnapshot(emptyList(), emptyList(), listOf(schedule), alarms)
 
-        var reminders: List<Reminder>? = null
+        database.replaceSnapshot(snapshot)
 
-        // when
-        val collectJob = launch { database.currentReminders().collect { reminders = it } }
-        database.saveReminder(reminder1)
-        testScheduler.advanceUntilIdle()
-        database.saveReminder(reminder2)
-        testScheduler.advanceUntilIdle()
-
-        // then
-        assertThat(reminders).isNotNull()
-        assertThat(reminders!!).isNotEmpty()
-        assertThat(reminders.size).isEqualTo(2)
-        assertThat(reminders.first()).isEqualTo(reminder1)
-        assertThat(reminders.last()).isEqualTo(reminder2)
-
-        // when
-        database.deleteReminder(uuid1)
-        testScheduler.advanceUntilIdle()
-
-        // then
-        assertThat(reminders).isNotEmpty()
-        assertThat(reminders.size).isEqualTo(1)
-        assertThat(reminders.first()).isEqualTo(reminder2)
-
-        collectJob.cancel()
+        assertThat(database.currentSnapshot()).isEqualTo(snapshot)
     }
 
     @Test
-    fun `when all reminders deleted then subscription updated`() = runTest(testScheduler) {
-        // given
-        val now = Clock.System.now()
-        val uuid1 = "test1"
-        val uuid2 = "test2"
-        val reminder1 = Reminder(
-            uuid = uuid1,
-            date = now.toLocalDateTime(TimeZone.UTC),
-            type = ReminderType.TWENTY_X3,
-            interval = ReminderInterval.DAILY,
-            weekDays = listOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
-        )
-        val reminder2 = Reminder(
-            uuid = uuid2,
-            date = now.toLocalDateTime(TimeZone.UTC),
-            type = ReminderType.TWENTY_X3,
-            interval = ReminderInterval.WEEKLY,
-            weekDays = listOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY)
-        )
+    fun `delete reminders clears schedules and alarms`() = runTest(testScheduler) {
+        val schedule = ReminderSchedule("daily", ReminderType.TWENTY_X3, ReminderScheduleConfiguration.Daily(LocalTime(10, 0)))
+        database.saveReminderSchedule(schedule, listOf(reminder("alarm", schedule.id)))
 
-        var reminders: List<Reminder>? = null
-
-        // when
-        val collectJob = launch { database.currentReminders().collect { reminders = it } }
-        database.saveReminder(reminder1)
-        testScheduler.advanceUntilIdle()
-        database.saveReminder(reminder2)
-        testScheduler.advanceUntilIdle()
-
-        // then
-        assertThat(reminders).isNotNull()
-        assertThat(reminders!!).isNotEmpty()
-        assertThat(reminders.size).isEqualTo(2)
-        assertThat(reminders.first()).isEqualTo(reminder1)
-        assertThat(reminders.last()).isEqualTo(reminder2)
-
-        // when
         database.deleteReminders()
-        testScheduler.advanceUntilIdle()
 
-        // then
-        assertThat(reminders).isEmpty()
-        collectJob.cancel()
+        assertThat(database.currentReminderSchedules().first()).isEmpty()
+        assertThat(database.currentReminders().first()).isEmpty()
     }
+
+    private fun reminder(uuid: String, scheduleId: String): Reminder =
+        Reminder(
+            uuid = uuid,
+            scheduleId = scheduleId,
+            date = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+            type = ReminderType.TWENTY_X3,
+            interval = ReminderInterval.WEEKLY,
+        )
 }

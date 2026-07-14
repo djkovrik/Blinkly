@@ -19,8 +19,4 @@ actual fun getBlinklyAlarmManagerImplementation(dependencies: AlarmModuleDepende
         override fun cancel(uuid: String) {
             Logger.i { "BlinklyAlarmManager->cancel $uuid" }
         }
-
-        override fun cancelAll() {
-            Logger.i { "BlinklyAlarmManager->cancelAll" }
-        }
     }

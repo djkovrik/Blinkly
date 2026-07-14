@@ -2,14 +2,14 @@ package com.sedsoftware.blinkly.component.reminders
 
 import com.arkivanov.decompose.value.Value
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 
 interface RemindersTabComponent {
     val model: Value<Model>
 
     fun onAddNewClick()
-    fun onDeleteReminder(uuid: String)
+    fun onDeleteReminder(scheduleId: String)
     fun onUndoDelete()
     fun onDeletedMessageShown()
 
@@ -19,17 +19,19 @@ interface RemindersTabComponent {
     )
 
     data class ReminderItem(
-        val uuid: String,
-        val title: String,
-        val description: String,
-        val time: LocalTime,
-        val nextDate: LocalDate,
-        val interval: Interval,
-        val days: List<DayOfWeek>,
+        val id: String,
+        val nextAt: LocalDateTime,
+        val schedule: Schedule,
     )
 
-    enum class Interval {
-        DAILY,
-        WEEKLY,
+    sealed interface Schedule {
+        data class Daily(val time: LocalTime) : Schedule
+        data class Weekly(val time: LocalTime, val day: DayOfWeek) : Schedule
+        data class WorkdayPeriod(
+            val from: LocalTime,
+            val until: LocalTime,
+            val intervalMinutes: Int,
+            val days: List<DayOfWeek>,
+        ) : Schedule
     }
 }

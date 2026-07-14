@@ -59,6 +59,7 @@ import kotlin.math.sin
 @Composable
 fun BlinklyEyePanel(
     movement: EyeMovement? = null,
+    movementDurationMs: Long? = null,
     modifier: Modifier = Modifier,
     animationTrigger: Any? = movement,
     restState: BlinklyEyeRestState = BlinklyEyeRestState.Open,
@@ -70,7 +71,7 @@ fun BlinklyEyePanel(
     var focusState: EyeFocusState by remember { mutableStateOf(EyeFocusState.None) }
     var pathMovement: EyeMovement? by remember { mutableStateOf(null) }
 
-    LaunchedEffect(animationTrigger, restState) {
+    LaunchedEffect(animationTrigger, movementDurationMs, restState) {
         val currentMovement = movement
         if (currentMovement == null) {
             pathMovement = null
@@ -88,11 +89,10 @@ fun BlinklyEyePanel(
             return@LaunchedEffect
         }
 
-        pathMovement = null
-        pathProgress.snapTo(0f)
-
         when (currentMovement) {
             is EyeMovement.Blink -> {
+                pathMovement = null
+                pathProgress.snapTo(0f)
                 openness.snapTo(OPEN_EYE)
                 offsetX.snapTo(0f)
                 offsetY.snapTo(0f)
@@ -113,6 +113,8 @@ fun BlinklyEyePanel(
             }
 
             EyeMovement.AccommodationClose -> {
+                pathMovement = null
+                pathProgress.snapTo(0f)
                 focusState = EyeFocusState.Close
                 offsetX.snapTo(0f)
                 offsetY.snapTo(0f)
@@ -120,53 +122,30 @@ fun BlinklyEyePanel(
             }
 
             EyeMovement.AccommodationFar -> {
+                pathMovement = null
+                pathProgress.snapTo(0f)
                 focusState = EyeFocusState.Far
                 offsetX.snapTo(0f)
                 offsetY.snapTo(0f)
                 openness.animateToOpen()
             }
 
-            EyeMovement.DiagonalTopLeft -> {
+            EyeMovement.DiagonalTopLeft,
+            EyeMovement.DiagonalBottomRight,
+            EyeMovement.DiagonalTopRight,
+            EyeMovement.DiagonalBottomLeft,
+                -> {
+                val target = currentMovement.diagonalTarget() ?: Offset.Zero
+                pathMovement = null
+                pathProgress.snapTo(0f)
                 focusState = EyeFocusState.None
                 openness.animateToOpen()
                 animateOffsetTo(
                     offsetX = offsetX,
                     offsetY = offsetY,
-                    x = offsetX.value - DIAGONAL_STEP,
-                    y = offsetY.value - DIAGONAL_STEP,
-                )
-            }
-
-            EyeMovement.DiagonalBottomRight -> {
-                focusState = EyeFocusState.None
-                openness.animateToOpen()
-                animateOffsetTo(
-                    offsetX = offsetX,
-                    offsetY = offsetY,
-                    x = offsetX.value + DIAGONAL_STEP,
-                    y = offsetY.value + DIAGONAL_STEP,
-                )
-            }
-
-            EyeMovement.DiagonalTopRight -> {
-                focusState = EyeFocusState.None
-                openness.animateToOpen()
-                animateOffsetTo(
-                    offsetX = offsetX,
-                    offsetY = offsetY,
-                    x = offsetX.value + DIAGONAL_STEP,
-                    y = offsetY.value - DIAGONAL_STEP,
-                )
-            }
-
-            EyeMovement.DiagonalBottomLeft -> {
-                focusState = EyeFocusState.None
-                openness.animateToOpen()
-                animateOffsetTo(
-                    offsetX = offsetX,
-                    offsetY = offsetY,
-                    x = offsetX.value - DIAGONAL_STEP,
-                    y = offsetY.value + DIAGONAL_STEP,
+                    x = target.x,
+                    y = target.y,
+                    durationMillis = movementAnimationDurationMs(movementDurationMs),
                 )
             }
 
@@ -184,12 +163,10 @@ fun BlinklyEyePanel(
                 pathProgress.animateTo(
                     targetValue = 1f,
                     animationSpec = tween(
-                        durationMillis = currentMovement.pathDuration(),
+                        durationMillis = movementAnimationDurationMs(movementDurationMs),
                         easing = LinearEasing,
                     ),
                 )
-                pathMovement = null
-                pathProgress.snapTo(0f)
             }
         }
     }
@@ -211,6 +188,8 @@ enum class BlinklyEyeRestState {
 }
 
 private suspend fun Animatable<Float, *>.animateToOpen() {
+    if (value >= OPEN_EYE) return
+
     animateTo(
         targetValue = OPEN_EYE,
         animationSpec = tween(
@@ -225,13 +204,14 @@ private suspend fun animateOffsetTo(
     offsetY: Animatable<Float, *>,
     x: Float,
     y: Float,
+    durationMillis: Int,
 ) {
     coroutineScope {
         launch {
             offsetX.animateTo(
                 targetValue = x.coerceIn(-MAX_OFFSET, MAX_OFFSET),
                 animationSpec = tween(
-                    durationMillis = DIAGONAL_DURATION_MS,
+                    durationMillis = durationMillis,
                     easing = FastOutSlowInEasing,
                 ),
             )
@@ -241,7 +221,7 @@ private suspend fun animateOffsetTo(
             offsetY.animateTo(
                 targetValue = y.coerceIn(-MAX_OFFSET, MAX_OFFSET),
                 animationSpec = tween(
-                    durationMillis = DIAGONAL_DURATION_MS,
+                    durationMillis = durationMillis,
                     easing = FastOutSlowInEasing,
                 ),
             )
@@ -413,27 +393,36 @@ private fun DrawScope.drawBlinklyEye(
     )
 }
 
-private fun EyeMovement?.pathOffset(progress: Float): Offset {
+internal fun EyeMovement.diagonalTarget(): Offset? =
+    when (this) {
+        EyeMovement.DiagonalTopLeft -> Offset(-DIAGONAL_AMPLITUDE, -DIAGONAL_AMPLITUDE)
+        EyeMovement.DiagonalBottomRight -> Offset(DIAGONAL_AMPLITUDE, DIAGONAL_AMPLITUDE)
+        EyeMovement.DiagonalTopRight -> Offset(DIAGONAL_AMPLITUDE, -DIAGONAL_AMPLITUDE)
+        EyeMovement.DiagonalBottomLeft -> Offset(-DIAGONAL_AMPLITUDE, DIAGONAL_AMPLITUDE)
+        else -> null
+    }
+
+internal fun EyeMovement?.pathOffset(progress: Float): Offset {
     val theta = (progress.coerceIn(0f, 1f) * 2f * PI).toFloat()
 
     return when (this) {
         EyeMovement.CircleClockwise -> Offset(
-            x = sin(theta) * PATH_AMPLITUDE,
-            y = (1f - cos(theta)) * PATH_AMPLITUDE,
+            x = sin(theta) * CIRCLE_AMPLITUDE,
+            y = -cos(theta) * CIRCLE_AMPLITUDE,
         )
 
         EyeMovement.CircleCounterclockwise -> Offset(
-            x = -sin(theta) * PATH_AMPLITUDE,
-            y = (1f - cos(theta)) * PATH_AMPLITUDE,
+            x = -sin(theta) * CIRCLE_AMPLITUDE,
+            y = -cos(theta) * CIRCLE_AMPLITUDE,
         )
 
         EyeMovement.EightClockwise -> Offset(
-            x = sin(theta) * PATH_AMPLITUDE,
+            x = sin(theta) * EIGHT_HORIZONTAL_AMPLITUDE,
             y = -sin(theta * 2f) * EIGHT_VERTICAL_AMPLITUDE,
         )
 
         EyeMovement.EightCounterclockwise -> Offset(
-            x = -sin(theta) * PATH_AMPLITUDE,
+            x = -sin(theta) * EIGHT_HORIZONTAL_AMPLITUDE,
             y = sin(theta * 2f) * EIGHT_VERTICAL_AMPLITUDE,
         )
 
@@ -441,18 +430,11 @@ private fun EyeMovement?.pathOffset(progress: Float): Offset {
     }
 }
 
-private fun EyeMovement.pathDuration(): Int =
-    when (this) {
-        EyeMovement.CircleClockwise,
-        EyeMovement.CircleCounterclockwise,
-            -> CIRCLE_DURATION_MS
-
-        EyeMovement.EightClockwise,
-        EyeMovement.EightCounterclockwise,
-            -> EIGHT_DURATION_MS
-
-        else -> DIAGONAL_DURATION_MS
-    }
+internal fun movementAnimationDurationMs(movementDurationMs: Long?): Int =
+    ((movementDurationMs ?: DEFAULT_MOVEMENT_DURATION_MS) - ANIMATION_SETTLE_DURATION_MS)
+        .coerceAtLeast(MIN_MOVEMENT_ANIMATION_DURATION_MS)
+        .coerceAtMost(Int.MAX_VALUE.toLong())
+        .toInt()
 
 private enum class EyeFocusState {
     None,
@@ -588,8 +570,9 @@ private const val OPEN_EYE = 1f
 private const val CLOSED_EYE = 0f
 private const val CLOSED_THRESHOLD = 0.08f
 private const val MAX_OFFSET = 1f
-private const val DIAGONAL_STEP = 0.7f
-private const val PATH_AMPLITUDE = 0.7f
+private const val DIAGONAL_AMPLITUDE = 0.7f
+private const val CIRCLE_AMPLITUDE = 1f
+private const val EIGHT_HORIZONTAL_AMPLITUDE = 0.7f
 private const val EIGHT_VERTICAL_AMPLITUDE = 0.42f
 private const val OFFSET_SCALE = 0.19f
 private const val EYE_CENTER_Y_FRACTION = 0.46f
@@ -611,9 +594,9 @@ private const val HIGHLIGHT_HEIGHT_FRACTION = 0.32f
 private const val BLINK_CLOSE_DURATION_MS = 90
 private const val BLINK_OPEN_DURATION_MS = 160
 private const val EYE_OPEN_DURATION_MS = 180
-private const val DIAGONAL_DURATION_MS = 1_000
-private const val CIRCLE_DURATION_MS = 2_000
-private const val EIGHT_DURATION_MS = 4_000
+private const val DEFAULT_MOVEMENT_DURATION_MS = 1_000L
+private const val ANIMATION_SETTLE_DURATION_MS = 100L
+private const val MIN_MOVEMENT_ANIMATION_DURATION_MS = 1L
 private const val DARK_SURFACE_LUMINANCE_THRESHOLD = 0.2f
 private const val DARK_OUTLINE_ALPHA = 0.72f
 private const val DARK_IRIS_BLEND_FRACTION = 0.82f

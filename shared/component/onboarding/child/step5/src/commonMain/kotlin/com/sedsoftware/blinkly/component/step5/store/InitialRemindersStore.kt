@@ -18,6 +18,7 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
         data class OnWeekDayToggled(val weekDay: DayOfWeek) : Intent
         data object OnInitialSetupApply : Intent
         data object OnInitialSetupClear : Intent
+        data object AppResumed : Intent
     }
 
     data class State(
@@ -26,11 +27,12 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
         val permissionGranted: Boolean = false,
         val remindFrom: LocalTime = LocalTime(DEFAULT_HOUR_START, 0),
         val remindUntil: LocalTime = LocalTime(DEFAULT_HOUR_END, 0),
-        val remindIntervalMinutes: Int = 20,
+        val remindIntervalMinutes: Int = DEFAULT_REMINDER_INTERVAL,
         val selectedDays: List<DayOfWeek> = DayOfWeek.entries.toList(),
         val createdReminders: List<Reminder> = emptyList(),
         val initialSetupApplied: Boolean = false,
         val isSaving: Boolean = false,
+        val isAwaitingExactAlarmPermission: Boolean = false,
         val validationError: ValidationError? = null,
     )
 
@@ -45,7 +47,8 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
     }
 
     private companion object {
-        const val DEFAULT_HOUR_START = 9
+        const val DEFAULT_HOUR_START = 10
         const val DEFAULT_HOUR_END = 18
+        const val DEFAULT_REMINDER_INTERVAL = 20
     }
 }

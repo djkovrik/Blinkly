@@ -28,6 +28,26 @@ internal class InitialRemindersManager(
             )
         }
 
+    fun prepareExactAlarmPermission(): Result<ExactAlarmPermissionResult> =
+        runCatching {
+            if (reminderManager.canScheduleExactAlarms()) {
+                ExactAlarmPermissionResult.Granted
+            } else {
+                reminderManager.requestExactAlarmPermission()
+                ExactAlarmPermissionResult.Requested
+            }
+        }
+
+    fun isExactAlarmPermissionGranted(): Result<Boolean> =
+        runCatching {
+            reminderManager.canScheduleExactAlarms()
+        }
+
+    suspend fun rescheduleAll(): Result<Unit> =
+        runCatching {
+            reminderManager.rescheduleAll()
+        }
+
     suspend fun clearInitial(): Result<Unit> = runCatching {
         reminderManager.cancelAll()
     }
@@ -41,4 +61,9 @@ internal class InitialRemindersManager(
         runCatching {
             notifier.requestNotificationPermission()
         }
+
+    enum class ExactAlarmPermissionResult {
+        Granted,
+        Requested,
+    }
 }

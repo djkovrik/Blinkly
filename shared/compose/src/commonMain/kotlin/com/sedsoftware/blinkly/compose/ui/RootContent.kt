@@ -19,12 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import blinkly.shared.compose.generated.resources.Res
 import blinkly.shared.compose.generated.resources.error_achievements_loading
+import blinkly.shared.compose.generated.resources.error_exact_alarm_permission_checking
+import blinkly.shared.compose.generated.resources.error_exact_alarm_permission_denied
+import blinkly.shared.compose.generated.resources.error_exact_alarm_permission_requesting
 import blinkly.shared.compose.generated.resources.error_garden_loading
 import blinkly.shared.compose.generated.resources.error_initial_reminders_clearing
 import blinkly.shared.compose.generated.resources.error_initial_reminders_creating
 import blinkly.shared.compose.generated.resources.error_initial_reminders_loading
 import blinkly.shared.compose.generated.resources.error_main_data_loading
 import blinkly.shared.compose.generated.resources.error_notification_permission_checking
+import blinkly.shared.compose.generated.resources.error_notification_permission_denied_always
 import blinkly.shared.compose.generated.resources.error_notification_permission_requesting
 import blinkly.shared.compose.generated.resources.error_preferences_loading
 import blinkly.shared.compose.generated.resources.error_preferences_saving
@@ -33,6 +37,7 @@ import blinkly.shared.compose.generated.resources.error_reminder_creating
 import blinkly.shared.compose.generated.resources.error_reminder_deleting
 import blinkly.shared.compose.generated.resources.error_reminder_restoring
 import blinkly.shared.compose.generated.resources.error_reminders_loading
+import blinkly.shared.compose.generated.resources.error_reminders_rescheduling
 import blinkly.shared.compose.generated.resources.error_sync_auth_failed
 import blinkly.shared.compose.generated.resources.error_sync_conflict_failed
 import blinkly.shared.compose.generated.resources.error_sync_read_failed
@@ -185,6 +190,7 @@ private fun BlinklyNotification.asMessage(): String =
     }
 
 @Composable
+@Suppress("CyclomaticComplexMethod")
 private fun BlinklyError.asMessage(): String =
     stringResource(
         resource = syncMessageResource() ?: when (this) {
@@ -204,6 +210,11 @@ private fun BlinklyError.asMessage(): String =
             is BlinklyError.InitialRemindersClearing -> Res.string.error_initial_reminders_clearing
             is BlinklyError.NotificationPermissionChecking -> Res.string.error_notification_permission_checking
             is BlinklyError.NotificationPermissionRequesting -> Res.string.error_notification_permission_requesting
+            is BlinklyError.NotificationPermissionDeniedAlways -> Res.string.error_notification_permission_denied_always
+            is BlinklyError.ExactAlarmPermissionChecking -> Res.string.error_exact_alarm_permission_checking
+            is BlinklyError.ExactAlarmPermissionRequesting -> Res.string.error_exact_alarm_permission_requesting
+            is BlinklyError.ExactAlarmPermissionDenied -> Res.string.error_exact_alarm_permission_denied
+            is BlinklyError.RemindersRescheduling -> Res.string.error_reminders_rescheduling
             is BlinklyError.WorkoutDataLoading -> Res.string.error_workout_data_loading
             is BlinklyError.WorkoutSaving -> Res.string.error_workout_saving
             is BlinklyError.Unknown -> Res.string.error_unknown

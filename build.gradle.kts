@@ -21,7 +21,7 @@ detekt {
     buildUponDefaultConfig = true
     baseline = file("$projectDir/detekt/baseline.xml")
     config.setFrom(file("$projectDir/detekt/base-config.yml"))
-    source.setFrom(files("$projectDir/shared/"))
+    source.setFrom(files("$projectDir/shared/", "$projectDir/androidApp/"))
 }
 
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {

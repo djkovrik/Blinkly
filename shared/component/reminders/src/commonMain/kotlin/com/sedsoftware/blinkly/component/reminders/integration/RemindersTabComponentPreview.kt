@@ -3,11 +3,11 @@ package com.sedsoftware.blinkly.component.reminders.integration
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent
-import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.Interval
 import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.Model
 import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.ReminderItem
+import com.sedsoftware.blinkly.component.reminders.RemindersTabComponent.Schedule
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 
 class RemindersTabComponentPreview(
@@ -24,7 +24,7 @@ class RemindersTabComponentPreview(
         )
 
     override fun onAddNewClick() = Unit
-    override fun onDeleteReminder(uuid: String) = Unit
+    override fun onDeleteReminder(scheduleId: String) = Unit
     override fun onUndoDelete() = Unit
     override fun onDeletedMessageShown() = Unit
 
@@ -32,22 +32,33 @@ class RemindersTabComponentPreview(
         val defaultReminders: List<ReminderItem> =
             listOf(
                 ReminderItem(
-                    uuid = "daily",
-                    title = "20-20-20",
-                    description = "Look 20 feet away for 20 seconds",
-                    time = LocalTime(hour = 10, minute = 0),
-                    nextDate = LocalDate(year = 2026, month = 6, day = 20),
-                    interval = Interval.DAILY,
-                    days = emptyList(),
+                    id = "daily",
+                    nextAt = LocalDateTime(year = 2026, month = 6, day = 20, hour = 10, minute = 0),
+                    schedule = Schedule.Daily(LocalTime(hour = 10, minute = 0)),
                 ),
                 ReminderItem(
-                    uuid = "weekly",
-                    title = "20-20-20",
-                    description = "Look 20 feet away for 20 seconds",
-                    time = LocalTime(hour = 14, minute = 30),
-                    nextDate = LocalDate(year = 2026, month = 6, day = 22),
-                    interval = Interval.WEEKLY,
-                    days = listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY),
+                    id = "weekly",
+                    nextAt = LocalDateTime(year = 2026, month = 6, day = 22, hour = 14, minute = 30),
+                    schedule = Schedule.Weekly(
+                        time = LocalTime(hour = 14, minute = 30),
+                        day = DayOfWeek.MONDAY,
+                    ),
+                ),
+                ReminderItem(
+                    id = "workday-period",
+                    nextAt = LocalDateTime(year = 2026, month = 6, day = 22, hour = 9, minute = 20),
+                    schedule = Schedule.WorkdayPeriod(
+                        from = LocalTime(hour = 9, minute = 0),
+                        until = LocalTime(hour = 18, minute = 0),
+                        intervalMinutes = 20,
+                        days = listOf(
+                            DayOfWeek.MONDAY,
+                            DayOfWeek.TUESDAY,
+                            DayOfWeek.WEDNESDAY,
+                            DayOfWeek.THURSDAY,
+                            DayOfWeek.FRIDAY,
+                        ),
+                    ),
                 ),
             )
     }

@@ -21,6 +21,7 @@ interface ProgressTabComponent {
     data class CalendarDay(
         val date: LocalDate,
         val state: CalendarDayState,
+        val isToday: Boolean,
     )
 
     enum class CalendarDayState {

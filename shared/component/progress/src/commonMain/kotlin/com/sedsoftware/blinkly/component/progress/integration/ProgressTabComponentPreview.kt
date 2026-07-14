@@ -20,7 +20,8 @@ import kotlinx.datetime.plus
 import kotlin.time.Instant
 
 class ProgressTabComponentPreview(
-    private val calendarWeeks: List<List<CalendarDay?>> = previewCalendarWeeks(),
+    todayState: CalendarDayState = CalendarDayState.EMPTY,
+    private val calendarWeeks: List<List<CalendarDay?>> = previewCalendarWeeks(todayState),
     private val tree: Tree? = Tree(TreeStage.MAGNIFICENT, TreeType.QUERCUS_ROBUR, FULL_PROGRESS),
     private val recentAchievements: List<Achievement?> = previewAchievements(),
 ) : ProgressTabComponent {
@@ -37,7 +38,7 @@ class ProgressTabComponentPreview(
     override fun onGardenClick() = Unit
 }
 
-private fun previewCalendarWeeks(): List<List<CalendarDay?>> {
+private fun previewCalendarWeeks(todayState: CalendarDayState): List<List<CalendarDay?>> {
     val firstDay = LocalDate(year = 2026, month = 3, day = 1)
     val completedDays = setOf(2, 5, 6, 7, 9, 18, 19, 27)
     val perfectDays = setOf(6, 7, 18)
@@ -49,13 +50,20 @@ private fun previewCalendarWeeks(): List<List<CalendarDay?>> {
         repeat(times = 31) { index ->
             val day = index + 1
             val date = firstDay.plus(index, DateTimeUnit.DAY)
-            val state = when (day) {
-                in perfectDays -> CalendarDayState.PERFECT
-                in completedDays -> CalendarDayState.WORKOUT
+            val state = when {
+                day == PREVIEW_TODAY -> todayState
+                day in perfectDays -> CalendarDayState.PERFECT
+                day in completedDays -> CalendarDayState.WORKOUT
                 else -> CalendarDayState.EMPTY
             }
 
-            add(CalendarDay(date = date, state = state))
+            add(
+                CalendarDay(
+                    date = date,
+                    state = state,
+                    isToday = day == PREVIEW_TODAY,
+                )
+            )
         }
 
         while (size % DAYS_IN_WEEK != 0) {
@@ -86,4 +94,5 @@ private fun previewAchievements(): List<Achievement?> =
     )
 
 private const val DAYS_IN_WEEK = 7
+private const val PREVIEW_TODAY = 15
 private const val FULL_PROGRESS = 100f

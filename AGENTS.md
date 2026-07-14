@@ -89,7 +89,7 @@ Top-level component modules:
 - `home` - shell with four tabs; owns tab stack navigation and forwards root-level tab outputs upward
 - `main` - implemented main dashboard tab with MVIKotlin Store, feature-local manager, Compose UI, preview component, and common tests
 - `progress` - progress tab with MVIKotlin Store, progress manager, calendar/garden/achievement summary state, outputs for achievements and garden screens, Compose UI, preview component, and common tests
-- `reminders` - reminders tab with MVIKotlin Store, reminders manager, reminder list/delete/undo state, output for add-new-reminder, Compose UI, preview component, and common tests
+- `reminders` - reminders tab with MVIKotlin Store, logical schedule list/delete/undo state, notification-permission gating before the add-new-reminder output, Compose UI, preview component, and common tests; one Workday Period schedule owns many physical weekly alarms but renders as one list item
 - `sync` - settings-embedded sync component with MVIKotlin Store, Google sign-in bridge, Firestore snapshot data source, sync manager, DTO mappers, preview component, and common tests
 - `trainings` - trainings tab with MVIKotlin Store, trainings manager, exercise block cards, outputs for workout execution, Compose UI, preview component, and common tests
 
@@ -116,6 +116,11 @@ Current implementation notes:
 - `progress`, `reminders`, and `trainings` are the current references for Store-backed tabs that emit root-handled navigation outputs.
 - `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are the current references for Store-backed feature screens that are physically grouped under their owning product area but opened on the root stack.
 - `sync` is the current reference for a reusable Store-backed settings child component that observes an external manager and bridges a Compose-owned Google sign-in result back into component state.
+- Reminder persistence separates logical `ReminderSchedule` parents from physical `Reminder` alarm rows. The logical schedule is the list/delete/undo/sync identity; physical reminders carry `scheduleId` and remain the Alarmee/reschedule unit. Workday Period creates one parent with many weekly children, while onboarding intentionally counts the physical children.
+- Android reminder scheduling uses Alarmee exact scheduling. On Android 12 and newer, both the reminders add flow and onboarding step 5 must obtain the separate `SCHEDULE_EXACT_ALARM` special access before creating physical alarms. Each Store retains an awaiting-permission state, rechecks access after its component resumes, and either creates the pending reminders or reschedules persisted physical alarms after access is granted. Rescheduling must derive each alarm's next future local occurrence from the current `BlinklyTimeUtils.timeZone()` instead of passing an expired stored start date to the platform scheduler.
+- Android `AlarmManager` registrations do not survive device reboot or app replacement. `BlinklyReminderRescheduleReceiver` handles `BOOT_COMPLETED`, `MY_PACKAGE_REPLACED`, and exact-alarm permission grants, uses `goAsync()` for the database-backed work, and calls the shared reminder rescheduler only when exact-alarm access is currently available.
+- Never use Alarmee `cancelAll()` to cancel scheduled Blinkly reminders: on Android it only clears displayed notifications. Load the persisted physical reminders and cancel every alarm by its UUID before deleting or rescheduling their database rows.
+- Exercise movement events carry their DSL cadence through `ExerciseEvent.Movement.durationMs`, the workout Store/model, and `BlinklyEyePanel`. Keep movement timing single-sourced from the script and finish repeating UI animations shortly before the next movement event so the final frame is rendered without cancellation.
 - `step4`, `step5`, `main`, `preferences`, `progress`, `achievements`, `garden`, `reminders`, `newreminder`, `trainings`, `workout`, and `sync` are the current reference implementations for MVIKotlin stores.
 
 ## Architecture Rules
@@ -158,6 +163,10 @@ Apply these rules by default when changing Blinkly code:
 - Route cross-component events upward through `ComponentOutput`; do not let child components manipulate parent navigation directly.
 - Keep dependencies in constructors and root or parent factories; never place dependencies into Decompose navigation configs.
 - When adding or materially changing a shared module, component module, feature screen, or dependency wiring, update this guide in the same change. Keep `Repository Layout`, `Module Map`, `Shared layering`, and `Manual dependency injection` accurate, including new DI modules, external interfaces, root factory wiring, and navigation ownership.
+- When diagnosing a bug or technical problem, proactively propose adding the
+  resulting guidance to this file if the solution reveals a reusable project
+  rule, design principle, or implementation pattern. Do not propose documenting
+  one-off fixes or narrowly specific edge cases.
 - Keep Compose as a rendering layer only. Do not move business logic, navigation decisions, or mutable feature state into composables.
 - Cover Decompose behaviour in `shared/component/root/src/commonTest`, extending `ComponentTest<T>` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
 - Keep `*Default` component implementations as the real runtime wiring for Stores, dependencies, labels, lifecycle, and output routing. Use separate `*Preview` implementations only for Compose previews; they should implement the same public component interface with static `MutableValue` model data and no production dependencies.
@@ -184,9 +193,12 @@ Reference modules:
 - `shared/component/sync/src/commonMain/kotlin/com/sedsoftware/blinkly/component/sync/di/SyncModule.kt`
 - `shared/utils/src/commonMain/kotlin/com/sedsoftware/blinkly/utils/di/UtilsModule.kt`
 
-`RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `SyncModule`, then `DomainModule`, then `RootComponentDefault`.
-`SyncModule` receives the raw database/settings implementations, exposes tracking decorators for app use, and passes `BlinklySyncManager` into `RootComponentDefault` so Preferences can create the nested sync component.
-Sync metadata is split by data type: database writes update `lastLocalDatabaseChangeAt`, settings writes update `lastLocalSettingsChangeAt`, and `lastRemoteUpdatedAt` is the baseline for detecting remote changes. `BlinklySyncManagerImpl` merges database snapshots when both local and remote changed after the baseline, and resolves settings snapshots by their settings-specific timestamp.
+`RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `SyncModule` tracking wrappers, then `DomainModule`, then creates `BlinklySyncManager` with the domain reminder reschedule callback before `RootComponentDefault`.
+On Android, `RootComponentFactory` also supplies `AlarmModule` with the platform `BlinklyExactAlarmPermissionController`, which checks `AlarmManager.canScheduleExactAlarms()` and opens the app-specific exact-alarm settings screen when access is missing.
+The Android boot/package receiver does not create a `RootComponent`. It calls `rescheduleBlinklyReminders`, which builds a focused one-shot graph from the raw database, alarm module, time utilities, dispatchers, and `createBlinklyReminderManager`, then closes its SQLDelight driver after rescheduling.
+`RootComponentDefault` passes `BlinklyNotifier` through `HomeScreenComponentDefault` to the reminders tab so adding a reminder checks or requests notification permission before root navigation opens the add-new-reminder screen.
+`SyncModule` receives the raw database/settings implementations, exposes tracking decorators for app use, and creates `BlinklySyncManager` after `DomainModule` is available so applying changed remote reminder rows can reschedule their physical alarms.
+Sync metadata is split by data type: database writes update `lastLocalDatabaseChangeAt`, settings writes update `lastLocalSettingsChangeAt`, and `lastRemoteUpdatedAt` is the baseline for detecting remote changes. `BlinklySyncManagerImpl` merges database snapshots when both local and remote changed after the baseline, resolves settings snapshots by their settings-specific timestamp, deduplicates reminder schedules by schedule ID and physical reminders by alarm UUID, and reschedules alarms when restored reminder data differs.
 
 Important local rule: configuration objects in Decompose navigation carry only persistent arguments, never dependencies. Dependencies are supplied in child factories.
 
@@ -250,6 +262,12 @@ Local reference patterns:
 - `ProgressTabComponentDefault`, `RemindersTabComponentDefault`, and `TrainingsTabComponentDefault` for Store-backed tab state and root-handled navigation outputs
 
 Keep navigation on the main thread. This matches Decompose guidance.
+
+When a `ChildStack` must use the same transition for UI back actions and the
+system back button, use `handleBackButton = true` with the regular
+`stackAnimation`. Do not add `PredictiveBackParams` unless gesture-driven
+predictive back animation is explicitly required, because it introduces a
+separate animation path that can differ from the configured stack animator.
 
 ### Outputs
 

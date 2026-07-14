@@ -1,30 +1,77 @@
 package com.sedsoftware.blinkly.component.reminders.domain
 
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
-import com.sedsoftware.blinkly.domain.model.Reminder
-import com.sedsoftware.blinkly.domain.model.ReminderInterval
+import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
+import com.sedsoftware.blinkly.domain.model.PermissionResult
+import com.sedsoftware.blinkly.domain.model.ReminderScheduleConfiguration
+import com.sedsoftware.blinkly.domain.model.ScheduledReminder
 import kotlinx.coroutines.flow.Flow
 
 internal class RemindersManager(
     private val reminderManager: BlinklyReminderManager,
+    private val notifier: BlinklyNotifier,
 ) {
 
-    fun observeReminders(): Flow<List<Reminder>> =
-        reminderManager.createdReminders()
+    fun observeReminders(): Flow<List<ScheduledReminder>> =
+        reminderManager.createdSchedules()
 
-    suspend fun deleteReminder(uuid: String): Result<Unit> =
+    fun observePermissionEvents(): Flow<PermissionResult> =
+        notifier.permissionEvents()
+
+    suspend fun isNotificationPermissionGranted(): Result<Boolean> =
         runCatching {
-            reminderManager.cancel(uuid)
+            notifier.isNotificationPermissionGranted()
         }
 
-    suspend fun restoreReminder(reminder: Reminder): Result<Unit> =
+    suspend fun requestNotificationPermission(): Result<Unit> =
         runCatching {
-            when (reminder.interval) {
-                ReminderInterval.DAILY -> reminderManager.scheduleDaily(reminder.date.time)
-                ReminderInterval.WEEKLY -> {
-                    val dayOfWeek = reminder.weekDays.firstOrNull() ?: reminder.date.dayOfWeek
-                    reminderManager.scheduleWeeklySingle(reminder.date.time, dayOfWeek)
-                }
+            notifier.requestNotificationPermission()
+        }
+
+    fun prepareExactAlarmPermission(): Result<ExactAlarmPermissionResult> =
+        runCatching {
+            if (reminderManager.canScheduleExactAlarms()) {
+                ExactAlarmPermissionResult.Granted
+            } else {
+                reminderManager.requestExactAlarmPermission()
+                ExactAlarmPermissionResult.Requested
             }
         }
+
+    fun isExactAlarmPermissionGranted(): Result<Boolean> =
+        runCatching {
+            reminderManager.canScheduleExactAlarms()
+        }
+
+    suspend fun rescheduleAll(): Result<Unit> =
+        runCatching {
+            reminderManager.rescheduleAll()
+        }
+
+    suspend fun deleteReminder(scheduleId: String): Result<Unit> =
+        runCatching {
+            reminderManager.cancelSchedule(scheduleId)
+        }
+
+    suspend fun restoreReminder(reminder: ScheduledReminder): Result<Unit> =
+        runCatching {
+            when (val configuration = reminder.schedule.configuration) {
+                is ReminderScheduleConfiguration.Daily ->
+                    reminderManager.scheduleDaily(configuration.time)
+                is ReminderScheduleConfiguration.WeeklySingle ->
+                    reminderManager.scheduleWeeklySingle(configuration.time, configuration.day)
+                is ReminderScheduleConfiguration.WorkdayPeriod ->
+                    reminderManager.scheduleWeeklyDayPeriod(
+                        from = configuration.from,
+                        until = configuration.until,
+                        intervalMinutes = configuration.intervalMinutes,
+                        days = configuration.days,
+                    )
+            }
+        }
+
+    enum class ExactAlarmPermissionResult {
+        Granted,
+        Requested,
+    }
 }

@@ -6,12 +6,13 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
-import assertk.assertions.isNotZero
 import assertk.assertions.isTrue
 import assertk.assertions.isZero
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.items
+import com.arkivanov.essenty.lifecycle.pause
+import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.onboarding.integration.OnboardingComponentDefault
@@ -30,6 +31,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.delay
@@ -48,10 +50,10 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         listOf(
             Reminder(
                 uuid = "uuid",
+                scheduleId = "schedule",
                 date = LocalDateTime(2026, 3, 8, 12, 34),
                 type = ReminderType.TWENTY_X3,
                 interval = ReminderInterval.DAILY,
-                weekDays = DayOfWeek.entries.toList(),
             )
         )
 
@@ -61,7 +63,10 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
 
     private val reminderManagerMock: BlinklyReminderManager = mock {
         every { createdReminders() } returns remindersFlow
+        every { canScheduleExactAlarms() } returns true
+        every { requestExactAlarmPermission() } returns Unit
         everySuspend { scheduleWeeklyDayPeriod(any(), any(), any(), any()) } returns Unit
+        everySuspend { rescheduleAll() } returns Unit
         everySuspend { cancelAll() } returns Unit
     }
 
@@ -249,6 +254,39 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
     }
 
     @Test
+    fun `when permission is denied always then switch back and emit settings error`() = runTest(testScheduler) {
+        // given
+        val step5 = getStep5Component()
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns false
+        testScheduler.advanceUntilIdle()
+
+        step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+        permissionsFlow.emit(PermissionResult.Denied)
+        testScheduler.advanceUntilIdle()
+
+        step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+        permissionsFlow.emit(PermissionResult.Denied)
+        testScheduler.advanceUntilIdle()
+
+        // when
+        step5.onInitialSetupChoice(true)
+        testScheduler.advanceUntilIdle()
+        permissionsFlow.emit(PermissionResult.DeniedAlways)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        verifySuspend(exactly(3)) { notifierMock.requestNotificationPermission() }
+        assertThat(step5.model.value.showInitialSetup).isFalse()
+        assertThat(
+            componentOutput
+                .filterIsInstance<ComponentOutput.Common.ErrorCaught>()
+                .any { it.throwable is BlinklyError.NotificationPermissionDeniedAlways }
+        ).isTrue()
+    }
+
+    @Test
     fun `when agreed on initial setup and granted permission then show initial setup`() = runTest(testScheduler) {
         // given
         val step5 = getStep5Component()
@@ -393,6 +431,82 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
     }
 
     @Test
+    fun `when exact alarm permission granted after resume then initial reminders created`() = runTest(testScheduler) {
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns true
+        every { reminderManagerMock.canScheduleExactAlarms() } returns false
+        val step5 = getStep5Component()
+        testScheduler.advanceUntilIdle()
+        step5.onInitialSetupChoice(true)
+        step5.onCreateReminders()
+        testScheduler.advanceUntilIdle()
+
+        verify(exactly(1)) { reminderManagerMock.requestExactAlarmPermission() }
+        verifySuspend(exactly(0)) {
+            reminderManagerMock.scheduleWeeklyDayPeriod(any(), any(), any(), any())
+        }
+        assertThat(step5.model.value.isSaving).isTrue()
+
+        lifecycle.pause()
+        every { reminderManagerMock.canScheduleExactAlarms() } returns true
+        lifecycle.resume()
+        testScheduler.advanceUntilIdle()
+
+        verifySuspend(exactly(1)) {
+            reminderManagerMock.scheduleWeeklyDayPeriod(any(), any(), any(), any())
+        }
+        assertThat(step5.model.value.initialSetupApplied).isTrue()
+        assertThat(step5.model.value.isSaving).isFalse()
+    }
+
+    @Test
+    fun `when exact alarm permission denied after resume then initial reminders not created`() = runTest(testScheduler) {
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns true
+        every { reminderManagerMock.canScheduleExactAlarms() } returns false
+        val step5 = getStep5Component()
+        testScheduler.advanceUntilIdle()
+        step5.onInitialSetupChoice(true)
+        step5.onCreateReminders()
+        testScheduler.advanceUntilIdle()
+
+        lifecycle.pause()
+        lifecycle.resume()
+        testScheduler.advanceUntilIdle()
+
+        verifySuspend(exactly(0)) {
+            reminderManagerMock.scheduleWeeklyDayPeriod(any(), any(), any(), any())
+        }
+        assertThat(step5.model.value.isSaving).isFalse()
+        assertThat(
+            componentOutput
+                .filterIsInstance<ComponentOutput.Common.ErrorCaught>()
+                .any { it.throwable is BlinklyError.ExactAlarmPermissionDenied }
+        ).isTrue()
+    }
+
+    @Test
+    fun `when exact alarm permission granted with existing reminders then alarms rescheduled`() = runTest(testScheduler) {
+        everySuspend { notifierMock.isNotificationPermissionGranted() } returns true
+        every { reminderManagerMock.canScheduleExactAlarms() } returns false
+        remindersFlow.value = testReminders
+        val step5 = getStep5Component()
+        testScheduler.advanceUntilIdle()
+        step5.onInitialSetupChoice(true)
+        step5.onCreateReminders()
+        testScheduler.advanceUntilIdle()
+
+        lifecycle.pause()
+        every { reminderManagerMock.canScheduleExactAlarms() } returns true
+        lifecycle.resume()
+        testScheduler.advanceUntilIdle()
+
+        verifySuspend(exactly(1)) { reminderManagerMock.rescheduleAll() }
+        verifySuspend(exactly(0)) {
+            reminderManagerMock.scheduleWeeklyDayPeriod(any(), any(), any(), any())
+        }
+        assertThat(step5.model.value.initialSetupApplied).isTrue()
+    }
+
+    @Test
     fun `when clearing reminders failed then error output emitted`() = runTest(testScheduler) {
         // given
         val exception = IllegalStateException("clear reminders failed")
@@ -409,7 +523,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
     }
 
     @Test
-    fun `when created reminders changed then last step state updated`() = runTest(testScheduler) {
+    fun `when physical reminders changed then onboarding count uses physical flow`() = runTest(testScheduler) {
         // given
         val step5 = getStep5Component()
         with(step5.model.value) {
@@ -422,7 +536,7 @@ class OnboardingComponentTest : ComponentTest<OnboardingComponent>() {
         testScheduler.advanceUntilIdle()
         // then
         with(step5.model.value) {
-            assertThat(createdRemindersCount).isNotZero()
+            assertThat(createdRemindersCount).isEqualTo(testReminders.size)
         }
 
         // when

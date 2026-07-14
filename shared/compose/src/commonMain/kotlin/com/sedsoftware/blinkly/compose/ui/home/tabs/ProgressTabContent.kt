@@ -21,6 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -192,10 +194,37 @@ private fun CalendarDayCell(
         null,
             -> MaterialTheme.colorScheme.onSurface
     }
+    val todayOuterRingColor = MaterialTheme.colorScheme.primary
+    val todayInnerRingColor = MaterialTheme.colorScheme.onPrimary
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
+            .then(
+                if (day?.isToday == true) {
+                    Modifier.drawWithCache {
+                        val outerStrokeWidth = TODAY_OUTER_RING_WIDTH.toPx()
+                        val innerStrokeWidth = TODAY_INNER_RING_WIDTH.toPx()
+                        val cellRadius = size.minDimension / 2f
+
+                        onDrawWithContent {
+                            drawContent()
+                            drawCircle(
+                                color = todayOuterRingColor,
+                                radius = cellRadius - outerStrokeWidth / 2f,
+                                style = Stroke(width = outerStrokeWidth),
+                            )
+                            drawCircle(
+                                color = todayInnerRingColor,
+                                radius = cellRadius - outerStrokeWidth - innerStrokeWidth / 2f,
+                                style = Stroke(width = innerStrokeWidth),
+                            )
+                        }
+                    }
+                } else {
+                    Modifier
+                }
+            )
             .clip(CircleShape)
             .background(backgroundColor),
     ) {
@@ -367,20 +396,52 @@ private fun AchievementPreviewItem(
 @Preview(widthDp = 420, heightDp = 920)
 @Composable
 private fun ProgressTabContentPreviewLight() {
-    BlinklyWidgetPreview {
-        ProgressTabContent(component = ProgressTabComponentPreview())
-    }
+    ProgressTabContentPreview(todayState = CalendarDayState.EMPTY)
 }
 
 @Preview(widthDp = 420, heightDp = 920)
 @Composable
 private fun ProgressTabContentPreviewDark() {
-    BlinklyWidgetPreview(isDarkTheme = true) {
-        ProgressTabContent(component = ProgressTabComponentPreview())
+    ProgressTabContentPreview(todayState = CalendarDayState.EMPTY, isDarkTheme = true)
+}
+
+@Preview(widthDp = 420, heightDp = 920)
+@Composable
+private fun ProgressTabContentPreviewWorkoutLight() {
+    ProgressTabContentPreview(todayState = CalendarDayState.WORKOUT)
+}
+
+@Preview(widthDp = 420, heightDp = 920)
+@Composable
+private fun ProgressTabContentPreviewWorkoutDark() {
+    ProgressTabContentPreview(todayState = CalendarDayState.WORKOUT, isDarkTheme = true)
+}
+
+@Preview(widthDp = 420, heightDp = 920)
+@Composable
+private fun ProgressTabContentPreviewPerfectLight() {
+    ProgressTabContentPreview(todayState = CalendarDayState.PERFECT)
+}
+
+@Preview(widthDp = 420, heightDp = 920)
+@Composable
+private fun ProgressTabContentPreviewPerfectDark() {
+    ProgressTabContentPreview(todayState = CalendarDayState.PERFECT, isDarkTheme = true)
+}
+
+@Composable
+private fun ProgressTabContentPreview(
+    todayState: CalendarDayState,
+    isDarkTheme: Boolean = false,
+) {
+    BlinklyWidgetPreview(isDarkTheme = isDarkTheme) {
+        ProgressTabContent(component = ProgressTabComponentPreview(todayState = todayState))
     }
 }
 
 private const val WORKOUT_DAY_ALPHA = 0.22f
+private val TODAY_OUTER_RING_WIDTH = 2.dp
+private val TODAY_INNER_RING_WIDTH = 1.dp
 private const val TREE_IMAGE_BOX_HEIGHT = 148
 private const val TREE_IMAGE_SIZE = 140
 private const val RECENT_ACHIEVEMENTS_COUNT = 3
