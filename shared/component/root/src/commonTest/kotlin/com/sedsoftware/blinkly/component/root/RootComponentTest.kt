@@ -3,8 +3,10 @@ package com.sedsoftware.blinkly.component.root
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
+import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.router.stack.active
+import com.arkivanov.essenty.backhandler.BackDispatcher
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.home.HomeScreenComponent
@@ -258,20 +260,64 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     }
 
     @Test
-    fun `when root back called from nested screen then navigation stack updated`() = runTest(testScheduler) {
+    fun `when system back pressed from nested screens then root navigation stack is popped`() = runTest(testScheduler) {
         // given
-        completeOnboardingFlow(component)
-        switchTab(HomeScreenTab.PROGRESS)
-        val homeScreenChild = component.childStack.active.instance as RootComponent.Child.HomeScreen
-        val currentTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.ProgressTab
-        currentTabChild.component.onGardenClick()
-        assertThat(component.childStack.active.instance is RootComponent.Child.Garden).isTrue()
+        fakeSettings.onboardingDisplayed = true
+        val backDispatcher = BackDispatcher()
+        val testComponent = createComponent(
+            DefaultComponentContext(
+                lifecycle = lifecycle,
+                backHandler = backDispatcher,
+            )
+        )
+
+        fun homeScreen(): HomeScreenComponent =
+            (testComponent.childStack.active.instance as RootComponent.Child.HomeScreen).component
+
+        homeScreen().run {
+            onTabClick(HomeScreenTab.MAIN)
+            (childStack.active.instance as HomeScreenComponent.Child.MainTab).component.onPreferencesClick()
+        }
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.Preferences).isTrue()
+        assertThat(backDispatcher.back()).isTrue()
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
+
+        homeScreen().run {
+            onTabClick(HomeScreenTab.TRAINING)
+            (childStack.active.instance as HomeScreenComponent.Child.TrainingsTab).component.onBlockAClick()
+        }
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.Workout).isTrue()
+        assertThat(backDispatcher.back()).isTrue()
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
+
+        homeScreen().run {
+            onTabClick(HomeScreenTab.PROGRESS)
+            (childStack.active.instance as HomeScreenComponent.Child.ProgressTab).component.onAchievementsClick()
+        }
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.Achievements).isTrue()
+        assertThat(backDispatcher.back()).isTrue()
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
+
+        homeScreen().run {
+            onTabClick(HomeScreenTab.PROGRESS)
+            (childStack.active.instance as HomeScreenComponent.Child.ProgressTab).component.onGardenClick()
+        }
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.Garden).isTrue()
+        assertThat(backDispatcher.back()).isTrue()
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
+
+        homeScreen().run {
+            onTabClick(HomeScreenTab.REMINDERS)
+            (childStack.active.instance as HomeScreenComponent.Child.RemindersTab).component.onAddNewClick()
+        }
+        testScheduler.advanceUntilIdle()
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.AddNewReminder).isTrue()
 
         // when
-        component.onBack()
+        assertThat(backDispatcher.back()).isTrue()
 
         // then
-        assertThat(component.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
     }
 
     @Test
@@ -352,8 +398,11 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     }
 
     override fun createComponent(): RootComponent =
+        createComponent(DefaultComponentContext(lifecycle))
+
+    private fun createComponent(componentContext: ComponentContext): RootComponent =
         RootComponentDefault(
-            componentContext = DefaultComponentContext(lifecycle),
+            componentContext = componentContext,
             storeFactory = DefaultStoreFactory(),
             beeper = beeperMock,
             dispatchers = testDispatchers,
