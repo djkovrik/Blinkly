@@ -1,10 +1,17 @@
 package com.sedsoftware.blinkly.component.sync.mapper
 
 import com.sedsoftware.blinkly.component.sync.dto.BlinklyRemoteSnapshotDto
+import com.sedsoftware.blinkly.component.sync.dto.ReminderScheduleDto
 import com.sedsoftware.blinkly.component.sync.dto.SettingsDto
+import com.sedsoftware.blinkly.domain.model.Achievement
+import com.sedsoftware.blinkly.domain.model.AchievementLevel
+import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.BlinklyDatabaseSnapshot
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.BlinklySettingsSnapshot
+import com.sedsoftware.blinkly.domain.model.Exercise
+import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.RemoteBlinklySnapshot
 import com.sedsoftware.blinkly.domain.model.Reminder
 import com.sedsoftware.blinkly.domain.model.ReminderInterval
@@ -13,6 +20,7 @@ import com.sedsoftware.blinkly.domain.model.ReminderScheduleConfiguration
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlin.test.Test
@@ -79,6 +87,85 @@ class RemoteSnapshotMappersTest {
         )
 
         assertEquals(snapshot, snapshot.toDto().toDomain())
+    }
+
+    @Test
+    fun `remote snapshot round trips exercises achievements and optional settings values`() {
+        val completedAt = Instant.fromEpochMilliseconds(4)
+        val unlockedAt = Instant.fromEpochMilliseconds(5)
+        val snapshot = RemoteBlinklySnapshot(
+            updatedAt = Instant.fromEpochMilliseconds(6),
+            lastSyncedAt = null,
+            settings = settingsSnapshot().copy(
+                lastTreeProgressCheckDate = LocalDate(2026, 7, 14),
+                displayedHighlights = listOf(1, 3),
+                currentHighlightDate = LocalDate(2026, 7, 15),
+            ),
+            database = BlinklyDatabaseSnapshot(
+                exercises = listOf(Exercise(ExerciseBlock.B, ExerciseType.FIGURE_EIGHT, completedAt)),
+                achievements = listOf(
+                    Achievement(AchievementType.FIRST_SPARK, AchievementLevel.BEGINNER, unlockedAt),
+                    Achievement(AchievementType.THINK_TANK, AchievementLevel.HIDDEN, null),
+                ),
+                reminderSchedules = emptyList(),
+                reminders = emptyList(),
+            ),
+            databaseUpdatedAt = Instant.fromEpochMilliseconds(5),
+            settingsUpdatedAt = Instant.fromEpochMilliseconds(4),
+        )
+
+        assertEquals(snapshot, snapshot.toDto().toDomain())
+    }
+
+    @Test
+    fun `legacy snapshot timestamps fall back to overall update time`() {
+        val updatedAt = Instant.fromEpochMilliseconds(42)
+        val dto = BlinklyRemoteSnapshotDto(
+            schemaVersion = SYNC_SCHEMA_VERSION,
+            updatedAtEpochMillis = updatedAt.toEpochMilliseconds(),
+            databaseUpdatedAtEpochMillis = null,
+            settingsUpdatedAtEpochMillis = null,
+            settings = settingsDto(),
+            reminderSchedules = emptyList(),
+            reminders = emptyList(),
+        )
+
+        val snapshot = dto.toDomain()
+
+        assertEquals(null, snapshot.lastSyncedAt)
+        assertEquals(updatedAt, snapshot.databaseUpdatedAt)
+        assertEquals(updatedAt, snapshot.settingsUpdatedAt)
+    }
+
+    @Test
+    fun `malformed reminder schedules are rejected`() {
+        val weekly = ReminderScheduleDto(
+            id = "weekly",
+            reminderType = ReminderType.TWENTY_X3.name,
+            scheduleType = "WEEKLY_SINGLE",
+            timeFromIso = "14:30",
+            weekDays = emptyList(),
+        )
+        val periodWithoutEnd = ReminderScheduleDto(
+            id = "period-without-end",
+            reminderType = ReminderType.TWENTY_X3.name,
+            scheduleType = "WORKDAY_PERIOD",
+            timeFromIso = "09:00",
+            intervalMinutes = 20,
+            weekDays = listOf(DayOfWeek.MONDAY.name),
+        )
+        val periodWithoutInterval = ReminderScheduleDto(
+            id = "period-without-interval",
+            reminderType = ReminderType.TWENTY_X3.name,
+            scheduleType = "WORKDAY_PERIOD",
+            timeFromIso = "09:00",
+            timeUntilIso = "18:00",
+            weekDays = listOf(DayOfWeek.MONDAY.name),
+        )
+
+        assertFailsWith<IllegalArgumentException> { weekly.toDomain() }
+        assertFailsWith<IllegalArgumentException> { periodWithoutEnd.toDomain() }
+        assertFailsWith<IllegalArgumentException> { periodWithoutInterval.toDomain() }
     }
 
     @Test
