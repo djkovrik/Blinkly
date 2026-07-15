@@ -16,6 +16,8 @@ import com.sedsoftware.blinkly.domain.model.Workout
 import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import com.sedsoftware.blinkly.utils.unwrap
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,16 +41,38 @@ internal class MainTabStoreProvider(
                 dispatch(Action.LoadHighlight)
             },
             executorFactory = coroutineExecutorFactory(mainContext) {
+                var ctaRefreshJob: Job? = null
+
                 onAction<Action.ObserveCalendar> {
                     launch {
                         manager.calendar
                             .catch { publish(Label.ErrorCaught(it.asBlinklyError(::mainDataLoadingError))) }
                             .collect { calendar ->
                                 dispatch(Msg.CalendarUpdated(calendar))
+                                ctaRefreshJob?.cancel()
+                                ctaRefreshJob = null
                                 unwrap(
                                     result = withContext(ioContext) { manager.calculateData(calendar) },
                                     onSuccess = { data ->
                                         dispatch(Msg.DataUpdated(data))
+                                        ctaRefreshJob = data.ctaRefreshAfter?.let { refreshAfter ->
+                                            launch {
+                                                delay(refreshAfter)
+                                                ctaRefreshJob = null
+                                                val currentCalendar = state().calendar
+                                                unwrap(
+                                                    result = withContext(ioContext) {
+                                                        manager.calculateData(currentCalendar)
+                                                    },
+                                                    onSuccess = { refreshedData ->
+                                                        dispatch(Msg.DataUpdated(refreshedData))
+                                                    },
+                                                    onError = { throwable ->
+                                                        publish(Label.ErrorCaught(mainDataLoadingError(throwable)))
+                                                    }
+                                                )
+                                            }
+                                        }
                                     },
                                     onError = { throwable ->
                                         publish(Label.ErrorCaught(mainDataLoadingError(throwable)))

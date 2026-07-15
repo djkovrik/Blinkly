@@ -1,5 +1,7 @@
 package com.sedsoftware.blinkly.component.main.domain.model
 
+import kotlin.time.Duration
+
 internal data class MainTabData(
     val greetingPeriod: GreetingPeriod,
     val restMinutesToday: Int,
@@ -9,4 +11,5 @@ internal data class MainTabData(
     val dailyProgressPercent: Int,
     val treeGrowthStreakDays: Int,
     val ctaState: MainCtaState,
+    val ctaRefreshAfter: Duration?,
 )

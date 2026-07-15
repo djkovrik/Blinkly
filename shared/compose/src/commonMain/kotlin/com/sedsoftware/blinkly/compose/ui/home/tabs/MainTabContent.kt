@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
 import blinkly.shared.compose.generated.resources.Res
 import blinkly.shared.compose.generated.resources.content_description_settings
-import blinkly.shared.compose.generated.resources.cta_start
 import blinkly.shared.compose.generated.resources.icon_settings
 import blinkly.shared.compose.generated.resources.info_activities
 import blinkly.shared.compose.generated.resources.info_activities_breaks
@@ -53,9 +52,11 @@ import com.sedsoftware.blinkly.component.main.domain.model.GreetingPeriod
 import com.sedsoftware.blinkly.component.main.domain.model.MainCtaState
 import com.sedsoftware.blinkly.component.main.integration.MainTabComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
+import com.sedsoftware.blinkly.compose.ui.extension.asActionLabel
 import com.sedsoftware.blinkly.compose.ui.extension.asDescription
 import com.sedsoftware.blinkly.compose.ui.extension.asLabel
 import com.sedsoftware.blinkly.compose.ui.extension.asTitle
+import com.sedsoftware.blinkly.compose.ui.extension.isActionable
 import com.sedsoftware.blinkly.compose.ui.extension.shimmering
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.Tree
@@ -155,12 +156,13 @@ private fun FirstCardTreeGrowth(
             pressedElevation = 1.dp,
         ),
         onClick = onCtaClick,
+        enabled = model.ctaState.isActionable(),
         modifier = modifier,
     ) {
         FirstCardTreeGrowthContent(
             title = model.ctaState.asTitle(),
             description = model.ctaState.asDescription(),
-            cta = stringResource(resource = Res.string.cta_start).uppercase(),
+            cta = model.ctaState.asActionLabel().uppercase(),
             modifier = Modifier.padding(all = 16.dp),
         )
     }

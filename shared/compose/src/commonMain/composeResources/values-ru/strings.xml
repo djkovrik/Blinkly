@@ -278,6 +278,10 @@
     <string name="cta_morning_warmup_desc">Короткая разминка поможет снизить напряжение во время работы</string>
     <string name="cta_work_break">Вашим глазам нужен короткий отдых</string>
     <string name="cta_work_break_desc">Посмотрите вдаль всего на 20 секунд</string>
+    <string name="cta_break_cooldown">Глаза только что отдохнули</string>
+    <string name="cta_break_cooldown_desc">Дайте им немного времени перед следующим перерывом</string>
+    <string name="cta_repeat_break">Готовы сделать ещё один перерыв?</string>
+    <string name="cta_repeat_break_desc">Посмотрите вдаль 20 секунд, чтобы выполнить цель на сегодня</string>
     <string name="cta_afternoon_warm_up">Пора немного размять глаза</string>
     <string name="cta_afternoon_warm_up_desc">Несколько простых упражнений помогут снять напряжение</string>
     <string name="cta_evening_relax">Время расслабить глаза</string>
@@ -286,6 +290,8 @@
     <string name="cta_day_closing_desc">Ваши глаза уже получили достаточно отдыха</string>
     <string name="cta_perfect_day">Сегодня вы отлично позаботились о своих глазах</string>
     <string name="cta_perfect_day_desc">Ваше дерево стало ещё сильнее 🌳</string>
+    <string name="cta_idle">Пока глазам достаточно отдыха</string>
+    <string name="cta_idle_desc">Мы предложим следующее упражнение, когда придёт время</string>
     <string name="cta_start">Начать</string>
     <string name="cta_repeat">Повторить</string>
 
