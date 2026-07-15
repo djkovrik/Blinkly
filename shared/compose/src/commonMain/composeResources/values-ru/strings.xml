@@ -8,7 +8,7 @@
     <string name="common_ok">ОК</string>
     <string name="common_cancel">Отмена</string>
     <string name="error_unknown">Что-то пошло не так</string>
-    <string name="notification_achievement_unlocked">Получено достижение: %1$s</string>
+    <string name="notification_achievement_unlocked">Получено достижение</string>
     <string name="error_main_data_loading">Не удалось обновить главный экран</string>
     <string name="error_progress_data_loading">Не удалось загрузить прогресс</string>
     <string name="error_trainings_data_loading">Не удалось загрузить тренировки</string>

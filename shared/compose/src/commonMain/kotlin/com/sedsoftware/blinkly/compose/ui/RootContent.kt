@@ -63,6 +63,7 @@ import com.sedsoftware.blinkly.compose.ui.home.HomeScreenContent
 import com.sedsoftware.blinkly.compose.ui.newreminder.AddNewReminderContent
 import com.sedsoftware.blinkly.compose.ui.onboarding.OnboardingContent
 import com.sedsoftware.blinkly.compose.ui.preferences.PreferencesContent
+import com.sedsoftware.blinkly.compose.ui.extension.asImage
 import com.sedsoftware.blinkly.compose.ui.extension.asTitle
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklySnackbar
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklySnackbarType
@@ -98,15 +99,10 @@ fun RootContent(
         }
 
         snackbarEvents.firstOrNull()?.let { event ->
-            val message = event.asMessage()
+            val visuals = event.asVisuals()
 
-            LaunchedEffect(event, message) {
-                snackbarHostState.showSnackbar(
-                    BlinklySnackbarVisuals(
-                        message = message,
-                        type = event.type,
-                    )
-                )
+            LaunchedEffect(event, visuals) {
+                snackbarHostState.showSnackbar(visuals)
 
                 if (snackbarEvents.firstOrNull() === event) {
                     snackbarEvents.removeAt(0)
@@ -152,32 +148,27 @@ fun RootContent(
 }
 
 private sealed class SnackbarEvent {
+    data class Error(val error: BlinklyError) : SnackbarEvent()
 
-    abstract val type: BlinklySnackbarType
-
-    data class Error(val error: BlinklyError) : SnackbarEvent() {
-        override val type: BlinklySnackbarType = BlinklySnackbarType.ERROR
-    }
-
-    data class Notification(val notification: BlinklyNotification) : SnackbarEvent() {
-        override val type: BlinklySnackbarType = BlinklySnackbarType.NOTIFICATION
-    }
+    data class Notification(val notification: BlinklyNotification) : SnackbarEvent()
 }
 
 @Composable
-private fun SnackbarEvent.asMessage(): String =
+private fun SnackbarEvent.asVisuals(): BlinklySnackbarVisuals =
     when (this) {
-        is SnackbarEvent.Error -> error.asMessage()
-        is SnackbarEvent.Notification -> notification.asMessage()
-    }
-
-@Composable
-private fun BlinklyNotification.asMessage(): String =
-    when (this) {
-        is BlinklyNotification.AchievementUnlocked -> stringResource(
-            Res.string.notification_achievement_unlocked,
-            type.asTitle(),
+        is SnackbarEvent.Error -> BlinklySnackbarVisuals(
+            message = error.asMessage(),
+            type = BlinklySnackbarType.ERROR,
         )
+
+        is SnackbarEvent.Notification -> when (val notification = notification) {
+            is BlinklyNotification.AchievementUnlocked -> BlinklySnackbarVisuals(
+                message = notification.type.asTitle(),
+                type = BlinklySnackbarType.ACHIEVEMENT,
+                title = stringResource(Res.string.notification_achievement_unlocked),
+                icon = notification.type.asImage(),
+            )
+        }
     }
 
 @Composable
