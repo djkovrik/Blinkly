@@ -78,8 +78,7 @@ internal class WorkoutStoreProvider(
                     when (state().phase) {
                         Phase.INTRO -> {
                             exerciseManager.startBlock(block)
-                            dispatch(Msg.ExerciseStarted)
-                            exerciseManager.startNextExercise()
+                            dispatch(Msg.ExerciseReady)
                         }
 
                         Phase.READY -> {
@@ -110,6 +109,14 @@ internal class WorkoutStoreProvider(
             },
             reducer = { msg ->
                 when (msg) {
+                    Msg.ExerciseReady -> copy(
+                        phase = Phase.READY,
+                        movement = null,
+                        movementDurationMs = null,
+                        progress = null,
+                        timerElapsedSeconds = null,
+                    )
+
                     Msg.ExerciseStarted -> copy(
                         phase = Phase.RUNNING,
                         movement = null,
@@ -172,6 +179,7 @@ internal class WorkoutStoreProvider(
     }
 
     sealed interface Msg {
+        data object ExerciseReady : Msg
         data object ExerciseStarted : Msg
         data object ExercisePaused : Msg
         data object ExerciseResumed : Msg

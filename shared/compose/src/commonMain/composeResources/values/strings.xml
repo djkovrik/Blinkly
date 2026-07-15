@@ -498,6 +498,7 @@
     <string name="workout_intro_label">Workout block</string>
     <string name="workout_exercise_counter">Exercise %1$d of %2$d</string>
     <string name="workout_ready_label">Ready when you are</string>
+    <string name="workout_ready_hint">Read the instructions, then start when you’re ready.</string>
     <string name="workout_running_label">In progress</string>
     <string name="workout_paused_label">Paused</string>
     <string name="workout_completed_title">Training complete</string>
