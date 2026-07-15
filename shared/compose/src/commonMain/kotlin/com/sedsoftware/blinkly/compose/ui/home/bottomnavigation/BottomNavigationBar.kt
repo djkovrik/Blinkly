@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import blinkly.shared.compose.generated.resources.Res
 import blinkly.shared.compose.generated.resources.tab_main
 import blinkly.shared.compose.generated.resources.tab_name_main
@@ -135,7 +136,7 @@ private fun BottomNavigationBarItem(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(vertical = 4.dp),
         ) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -155,7 +156,10 @@ private fun BottomNavigationBarItem(
                 Text(
                     text = stringResource(resource = tab.labelRes),
                     color = contentColor,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                    ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -241,20 +245,52 @@ private fun BottomNavigationBarPreviewDark() {
     }
 }
 
+@Preview(locale = "ru")
+@Composable
+private fun BottomNavigationBarPreviewRuLight() {
+    BlinklyWidgetPreview {
+        BottomNavigationBarPreviewContent()
+    }
+}
+
+@Preview(locale = "ru")
+@Composable
+private fun BottomNavigationBarPreviewRuDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
+        BottomNavigationBarPreviewContent()
+    }
+}
+
+
 @Composable
 private fun BottomNavigationBarPreviewContent() {
-    var activeTab: HomeScreenTab by remember { mutableStateOf(HomeScreenTab.MAIN) }
-
     Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.background)
             .width(width = 420.dp),
     ) {
-        Spacer(modifier = Modifier.height(height = 24.dp))
+        BottomNavigationBar(
+            activeTab = HomeScreenTab.MAIN,
+            onTabClick = {},
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         BottomNavigationBar(
-            activeTab = activeTab,
-            onTabClick = { activeTab = it },
+            activeTab = HomeScreenTab.TRAINING,
+            onTabClick = {},
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        BottomNavigationBar(
+            activeTab = HomeScreenTab.PROGRESS,
+            onTabClick = {},
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        BottomNavigationBar(
+            activeTab = HomeScreenTab.REMINDERS,
+            onTabClick = {},
             modifier = Modifier.fillMaxWidth(),
         )
     }
