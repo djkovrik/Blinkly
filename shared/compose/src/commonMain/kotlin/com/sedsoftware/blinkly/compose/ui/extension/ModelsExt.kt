@@ -98,14 +98,22 @@ import blinkly.shared.compose.generated.resources.block_c_desc
 import blinkly.shared.compose.generated.resources.block_c_title
 import blinkly.shared.compose.generated.resources.cta_afternoon_warm_up
 import blinkly.shared.compose.generated.resources.cta_afternoon_warm_up_desc
+import blinkly.shared.compose.generated.resources.cta_break_cooldown
+import blinkly.shared.compose.generated.resources.cta_break_cooldown_desc
 import blinkly.shared.compose.generated.resources.cta_day_closing
 import blinkly.shared.compose.generated.resources.cta_day_closing_desc
 import blinkly.shared.compose.generated.resources.cta_evening_relax
 import blinkly.shared.compose.generated.resources.cta_evening_relax_desc
+import blinkly.shared.compose.generated.resources.cta_idle
+import blinkly.shared.compose.generated.resources.cta_idle_desc
 import blinkly.shared.compose.generated.resources.cta_morning_warmup
 import blinkly.shared.compose.generated.resources.cta_morning_warmup_desc
 import blinkly.shared.compose.generated.resources.cta_perfect_day
 import blinkly.shared.compose.generated.resources.cta_perfect_day_desc
+import blinkly.shared.compose.generated.resources.cta_repeat
+import blinkly.shared.compose.generated.resources.cta_repeat_break
+import blinkly.shared.compose.generated.resources.cta_repeat_break_desc
+import blinkly.shared.compose.generated.resources.cta_start
 import blinkly.shared.compose.generated.resources.cta_work_break
 import blinkly.shared.compose.generated.resources.cta_work_break_desc
 import blinkly.shared.compose.generated.resources.exercise_blink_break
@@ -517,25 +525,62 @@ fun GreetingPeriod.asLabel(): String =
 @Composable
 fun MainCtaState.asTitle(): String =
     when (this) {
-        MainCtaState.MorningWarmUp,
-        MainCtaState.Idle -> stringResource(Res.string.cta_morning_warmup)
+        MainCtaState.MorningWarmUp -> stringResource(Res.string.cta_morning_warmup)
         MainCtaState.WorkBreakDue -> stringResource(Res.string.cta_work_break)
+        MainCtaState.BreakCooldown -> stringResource(Res.string.cta_break_cooldown)
+        MainCtaState.RepeatBreakDue -> stringResource(Res.string.cta_repeat_break)
         MainCtaState.AfternoonWarmUp -> stringResource(Res.string.cta_afternoon_warm_up)
         MainCtaState.EveningRelax -> stringResource(Res.string.cta_evening_relax)
         MainCtaState.DayClosing -> stringResource(Res.string.cta_day_closing)
         MainCtaState.PerfectDay -> stringResource(Res.string.cta_perfect_day)
+        MainCtaState.Idle -> stringResource(Res.string.cta_idle)
     }
 
 @Composable
 fun MainCtaState.asDescription(): String =
     when (this) {
-        MainCtaState.MorningWarmUp,
-        MainCtaState.Idle -> stringResource(Res.string.cta_morning_warmup_desc)
+        MainCtaState.MorningWarmUp -> stringResource(Res.string.cta_morning_warmup_desc)
         MainCtaState.WorkBreakDue -> stringResource(Res.string.cta_work_break_desc)
+        MainCtaState.BreakCooldown -> stringResource(Res.string.cta_break_cooldown_desc)
+        MainCtaState.RepeatBreakDue -> stringResource(Res.string.cta_repeat_break_desc)
         MainCtaState.AfternoonWarmUp -> stringResource(Res.string.cta_afternoon_warm_up_desc)
         MainCtaState.EveningRelax -> stringResource(Res.string.cta_evening_relax_desc)
         MainCtaState.DayClosing -> stringResource(Res.string.cta_day_closing_desc)
         MainCtaState.PerfectDay -> stringResource(Res.string.cta_perfect_day_desc)
+        MainCtaState.Idle -> stringResource(Res.string.cta_idle_desc)
+    }
+
+@Composable
+fun MainCtaState.asActionLabel(): String =
+    when (this) {
+        MainCtaState.MorningWarmUp,
+        MainCtaState.WorkBreakDue,
+        MainCtaState.AfternoonWarmUp,
+        MainCtaState.EveningRelax,
+            -> stringResource(Res.string.cta_start)
+
+        MainCtaState.RepeatBreakDue -> stringResource(Res.string.cta_repeat)
+        MainCtaState.BreakCooldown,
+        MainCtaState.DayClosing,
+        MainCtaState.PerfectDay,
+        MainCtaState.Idle,
+            -> ""
+    }
+
+fun MainCtaState.isActionable(): Boolean =
+    when (this) {
+        MainCtaState.MorningWarmUp,
+        MainCtaState.WorkBreakDue,
+        MainCtaState.RepeatBreakDue,
+        MainCtaState.AfternoonWarmUp,
+        MainCtaState.EveningRelax,
+            -> true
+
+        MainCtaState.BreakCooldown,
+        MainCtaState.DayClosing,
+        MainCtaState.PerfectDay,
+        MainCtaState.Idle,
+            -> false
     }
 
 @Composable

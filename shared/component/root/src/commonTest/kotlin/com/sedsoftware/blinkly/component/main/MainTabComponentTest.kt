@@ -38,6 +38,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -233,6 +234,44 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
     }
 
     @Test
+    fun `when evening break was recent then CTA stays in cooldown and does not navigate`() = runTest(testScheduler) {
+        // given
+        timeUtils.current = instantAt(hour = 19, minute = 55)
+        calendarFlow.value = listOf(
+            Workout(exercises = completedBlocksWithBreak(hour = 19, minute = 49))
+        )
+
+        // when
+        testScheduler.runCurrent()
+        component.onPrimaryCtaClick()
+
+        // then
+        assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.BreakCooldown)
+        assertThat(componentOutput.any { it is ComponentOutput.Trainings.OpenExerciseBlock }).isFalse()
+    }
+
+    @Test
+    fun `when evening break cooldown elapses then CTA automatically repeats twenty x3`() = runTest(testScheduler) {
+        // given
+        timeUtils.current = instantAt(hour = 19, minute = 55)
+        calendarFlow.value = listOf(
+            Workout(exercises = completedBlocksWithBreak(hour = 19, minute = 49))
+        )
+        testScheduler.runCurrent()
+        assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.BreakCooldown)
+
+        // when
+        timeUtils.current = instantAt(hour = 20, minute = 9)
+        testScheduler.advanceTimeBy(14.minutes.inWholeMilliseconds)
+        testScheduler.runCurrent()
+        component.onPrimaryCtaClick()
+
+        // then
+        assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.RepeatBreakDue)
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+    }
+
+    @Test
     fun `when late evening then CTA closes the day and does not navigate`() = runTest(testScheduler) {
         // given
         timeUtils.current = instantAt(hour = 22, minute = 30)
@@ -323,6 +362,17 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
             exercise(ExerciseBlock.B, ExerciseType.PALMING, hour = 18, minute = 10),
             exercise(ExerciseBlock.C, ExerciseType.TWENTY_X3, hour = 11, minute = 0),
             exercise(ExerciseBlock.C, ExerciseType.TWENTY_X3, hour = 15, minute = 0),
+        )
+
+    private fun completedBlocksWithBreak(hour: Int, minute: Int): List<Exercise> =
+        listOf(
+            exercise(ExerciseBlock.A, ExerciseType.BLINK_BREAK, hour = 9, minute = 0),
+            exercise(ExerciseBlock.A, ExerciseType.NEAR_FAR_FOCUS, hour = 9, minute = 5),
+            exercise(ExerciseBlock.A, ExerciseType.DIAGONAL_GAZES, hour = 9, minute = 10),
+            exercise(ExerciseBlock.B, ExerciseType.FIGURE_EIGHT, hour = 18, minute = 0),
+            exercise(ExerciseBlock.B, ExerciseType.CLOCK_ROLLS, hour = 18, minute = 5),
+            exercise(ExerciseBlock.B, ExerciseType.PALMING, hour = 18, minute = 10),
+            exercise(ExerciseBlock.C, ExerciseType.TWENTY_X3, hour = hour, minute = minute),
         )
 
     private fun exercise(

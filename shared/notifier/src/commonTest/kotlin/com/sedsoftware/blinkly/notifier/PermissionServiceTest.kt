@@ -24,7 +24,7 @@ class PermissionServiceTest {
 
     private val testScheduler: TestCoroutineScheduler = TestCoroutineScheduler()
     private val dispatcher: TestDispatcher = StandardTestDispatcher(testScheduler)
-    private val controllerGranted = createPermissionControllerMock(setOf(Permission.REMOTE_NOTIFICATION))
+    private val controllerGranted = AlreadyGrantedPermissionsController()
     private val controllerDenied = createPermissionControllerMock()
 
     @Test
@@ -40,6 +40,7 @@ class PermissionServiceTest {
         testScheduler.advanceUntilIdle()
         // then
         assertThat(events).contains(PermissionResult.Granted)
+        assertThat(controllerGranted.providePermissionCalled).isFalse()
         // when
         val granted = service.isGranted(Permission.REMOTE_NOTIFICATION)
         // then
@@ -98,4 +99,18 @@ class PermissionServiceTest {
 
             override fun openAppSettings() = Unit
         }
+
+    private class AlreadyGrantedPermissionsController : PermissionsControllerMock() {
+        var providePermissionCalled: Boolean = false
+
+        override suspend fun providePermission(permission: Permission) {
+            providePermissionCalled = true
+        }
+
+        override suspend fun isPermissionGranted(permission: Permission): Boolean = true
+
+        override suspend fun getPermissionState(permission: Permission): PermissionState = PermissionState.Granted
+
+        override fun openAppSettings() = Unit
+    }
 }

@@ -3,12 +3,14 @@ package com.sedsoftware.blinkly.component.preferences
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import assertk.assertions.isTrue
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.preferences.integration.PreferencesComponentDefault
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
+import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.BlinklySyncState
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
@@ -53,17 +55,62 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
 
         // when
         component.onBlinkBreakCountChanged(80)
+        component.onNearFarFocusCountChanged(12)
         component.onNearFarFocusDurationChanged(6.5f)
+        component.onDiagonalGazesCountChanged(7)
+        component.onDiagonalGazesDurationChanged(4f)
+        component.onFigureEightCountChanged(11)
+        component.onClockRollsEachSideChanged(6)
         component.onPalmingDurationChanged(180)
         testScheduler.advanceUntilIdle()
 
         // then
         assertThat(settings.blinkBreakCount).isEqualTo(80)
+        assertThat(settings.nearFarFocusCount).isEqualTo(12)
         assertThat(settings.nearFarFocusDuration).isEqualTo(6.5f)
+        assertThat(settings.diagonalGazesCount).isEqualTo(7)
+        assertThat(settings.diagonalGazesDuration).isEqualTo(4f)
+        assertThat(settings.figureEightCount).isEqualTo(11)
+        assertThat(settings.clockRollsEachSide).isEqualTo(6)
         assertThat(settings.palmingDuration).isEqualTo(180)
         assertThat(component.model.value.blinkBreakCount).isEqualTo(80)
+        assertThat(component.model.value.nearFarFocusCount).isEqualTo(12)
         assertThat(component.model.value.nearFarFocusDuration).isEqualTo(6.5f)
+        assertThat(component.model.value.diagonalGazesCount).isEqualTo(7)
+        assertThat(component.model.value.diagonalGazesDuration).isEqualTo(4f)
+        assertThat(component.model.value.figureEightCount).isEqualTo(11)
+        assertThat(component.model.value.clockRollsEachSide).isEqualTo(6)
         assertThat(component.model.value.palmingDuration).isEqualTo(180)
+    }
+
+    @Test
+    fun `when preferences changed during loading then loaded values do not overwrite edits`() = runTest(testScheduler) {
+        // when
+        component.onBlinkBreakCountChanged(80)
+        component.onNearFarFocusCountChanged(12)
+        component.onNearFarFocusDurationChanged(6.5f)
+        component.onDiagonalGazesCountChanged(7)
+        component.onDiagonalGazesDurationChanged(4f)
+        component.onFigureEightCountChanged(11)
+        component.onClockRollsEachSideChanged(6)
+        component.onPalmingDurationChanged(180)
+        component.onThemeStateChanged(ThemeState.DARK)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(component.model.value).isEqualTo(
+            PreferencesComponent.Model(
+                blinkBreakCount = 80,
+                nearFarFocusCount = 12,
+                nearFarFocusDuration = 6.5f,
+                diagonalGazesCount = 7,
+                diagonalGazesDuration = 4f,
+                figureEightCount = 11,
+                clockRollsEachSide = 6,
+                palmingDuration = 180,
+                themeState = ThemeState.DARK,
+            )
+        )
     }
 
     @Test
@@ -87,12 +134,55 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
         testScheduler.advanceUntilIdle()
 
         // when
+        component.onDiagonalGazesCountChanged(0)
         component.onDiagonalGazesDurationChanged(0f)
         testScheduler.advanceUntilIdle()
 
         // then
+        assertThat(settings.diagonalGazesCount).isEqualTo(1)
         assertThat(settings.diagonalGazesDuration).isEqualTo(0.5f)
+        assertThat(component.model.value.diagonalGazesCount).isEqualTo(1)
         assertThat(component.model.value.diagonalGazesDuration).isEqualTo(0.5f)
+    }
+
+    @Test
+    fun `when loading preferences fails then component emits loading error`() = runTest(testScheduler) {
+        // given
+        val failure = IllegalStateException("load failed")
+        val throwingSettings = object : BlinklySettings by settings {
+            override var blinkBreakCount: Int
+                get() = throw failure
+                set(@Suppress("UNUSED_PARAMETER") value) = Unit
+        }
+        PreferencesComponentDefault(
+            componentContext = DefaultComponentContext(lifecycle),
+            storeFactory = DefaultStoreFactory(),
+            dispatchers = testDispatchers,
+            settings = throwingSettings,
+            syncManager = syncManager,
+            preferencesOutput = { componentOutput.add(it) },
+        )
+
+        // when
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.PreferencesLoading>(failure)).isTrue()
+    }
+
+    @Test
+    fun `when saving preference fails then component emits saving error`() = runTest(testScheduler) {
+        // given
+        testScheduler.advanceUntilIdle()
+        val failure = IllegalStateException("save failed")
+        settings.blinkBreakCountSaveFailure = failure
+
+        // when
+        component.onBlinkBreakCountChanged(80)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.PreferencesSaving>(failure)).isTrue()
     }
 
     @Test
@@ -115,7 +205,13 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
         )
 
     private class FakeSettings : BlinklySettings {
+        var blinkBreakCountSaveFailure: Throwable? = null
+
         override var blinkBreakCount: Int = 60
+            set(value) {
+                blinkBreakCountSaveFailure?.let { throw it }
+                field = value
+            }
         override var nearFarFocusCount: Int = 10
         override var nearFarFocusDuration: Float = 5f
         override var diagonalGazesCount: Int = 5

@@ -58,6 +58,7 @@ internal class MainTabManager(
             .filter { it.completedAt.asLocalDate(timeZone) == today }
         val twentyX3Count = exercisesToday.count { it.type == ExerciseType.TWENTY_X3 }
         val palmingCount = exercisesToday.count { it.type == ExerciseType.PALMING }
+        val ctaData = exercisesToday.calculateCtaData(localTime, timeZone)
 
         MainTabData(
             greetingPeriod = localTime.toGreetingPeriod(),
@@ -67,7 +68,8 @@ internal class MainTabManager(
             palmingToday = palmingCount,
             dailyProgressPercent = exercisesToday.calculateDailyProgressPercent(),
             treeGrowthStreakDays = calendar.calculateGrowthStreakDays(today),
-            ctaState = exercisesToday.calculateCtaState(localTime, timeZone),
+            ctaState = ctaData.state,
+            ctaRefreshAfter = ctaData.refreshAfter,
         )
     }
 
@@ -78,25 +80,58 @@ internal class MainTabManager(
             else -> GreetingPeriod.EVENING
         }
 
-    private fun List<Exercise>.calculateCtaState(currentTime: LocalTime, timeZone: TimeZone): MainCtaState {
+    private fun List<Exercise>.calculateCtaData(currentTime: LocalTime, timeZone: TimeZone): CtaData {
         val blockACompleted = isBlockACompleted()
         val blockBCompleted = isBlockBCompleted()
         val twentyX3Count = count { it.type == ExerciseType.TWENTY_X3 }
         val hasActivity = isNotEmpty()
         val lastTwentyX3 = filter { it.type == ExerciseType.TWENTY_X3 }.maxByOrNull { it.completedAt }
         val lastTwentyX3Time = lastTwentyX3?.completedAt?.toLocalDateTime(timeZone)?.time
+        val timeSinceLastTwentyX3 = lastTwentyX3Time?.let { currentTime.durationSince(it) }
+        val twentyX3BreakDue = timeSinceLastTwentyX3 == null || timeSinceLastTwentyX3 >= WORK_BREAK_THRESHOLD
+        val eveningCtaState = calculateEveningCtaState(
+            currentTime = currentTime,
+            blockBCompleted = blockBCompleted,
+            twentyX3Count = twentyX3Count,
+            twentyX3BreakDue = twentyX3BreakDue,
+        )
 
-        return when {
+        val state = when {
             blockACompleted && blockBCompleted && twentyX3Count >= MIN_TWENTY_X3_DAILY -> MainCtaState.PerfectDay
             currentTime >= LATE_EVENING_START -> MainCtaState.DayClosing
             currentTime.hour in MORNING_CTA_HOUR_START..MORNING_CTA_HOUR_END && !hasActivity -> MainCtaState.MorningWarmUp
             currentTime >= AFTERNOON_START && !blockACompleted && twentyX3Count > 0 -> MainCtaState.AfternoonWarmUp
-            currentTime in EVENING_START..<LATE_EVENING_START && !blockBCompleted -> MainCtaState.EveningRelax
+            eveningCtaState != null -> eveningCtaState
             currentTime.hour in WORK_HOUR_START..WORK_HOUR_END && twentyX3Count < MIN_TWENTY_X3_DAILY &&
-                (lastTwentyX3Time == null || currentTime.durationSince(lastTwentyX3Time) >= WORK_BREAK_THRESHOLD) -> {
+                twentyX3BreakDue -> {
                 MainCtaState.WorkBreakDue
             }
             else -> MainCtaState.Idle
+        }
+
+        val refreshAfter = if (state == MainCtaState.BreakCooldown && timeSinceLastTwentyX3 != null) {
+            WORK_BREAK_THRESHOLD - timeSinceLastTwentyX3
+        } else {
+            null
+        }
+
+        return CtaData(state = state, refreshAfter = refreshAfter)
+    }
+
+    private fun calculateEveningCtaState(
+        currentTime: LocalTime,
+        blockBCompleted: Boolean,
+        twentyX3Count: Int,
+        twentyX3BreakDue: Boolean,
+    ): MainCtaState? {
+        if (currentTime !in EVENING_START..<LATE_EVENING_START) return null
+
+        return when {
+            !blockBCompleted -> MainCtaState.EveningRelax
+            twentyX3Count >= MIN_TWENTY_X3_DAILY -> null
+            !twentyX3BreakDue -> MainCtaState.BreakCooldown
+            twentyX3Count > 0 -> MainCtaState.RepeatBreakDue
+            else -> MainCtaState.WorkBreakDue
         }
     }
 
@@ -165,6 +200,11 @@ internal class MainTabManager(
     }
 
     private companion object {
+        data class CtaData(
+            val state: MainCtaState,
+            val refreshAfter: Duration?,
+        )
+
         val BLOCK_A_TYPES: Set<ExerciseType> = setOf(
             ExerciseType.BLINK_BREAK,
             ExerciseType.NEAR_FAR_FOCUS,

@@ -11,7 +11,7 @@
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
     <string name="error_unknown">Something went wrong</string>
-    <string name="notification_achievement_unlocked">Achievement unlocked: %1$s</string>
+    <string name="notification_achievement_unlocked">Achievement unlocked</string>
     <string name="error_main_data_loading">Could not update the main screen</string>
     <string name="error_progress_data_loading">Could not load your progress</string>
     <string name="error_trainings_data_loading">Could not load trainings</string>
@@ -281,6 +281,10 @@
     <string name="cta_morning_warmup_desc">A short exercise can help reduce eye strain during the day</string>
     <string name="cta_work_break">Your eyes need a short break</string>
     <string name="cta_work_break_desc">Look into the distance for just 20 seconds</string>
+    <string name="cta_break_cooldown">Your eyes have just had a break</string>
+    <string name="cta_break_cooldown_desc">Give them a little time before the next one</string>
+    <string name="cta_repeat_break">Ready for one more eye break?</string>
+    <string name="cta_repeat_break_desc">Look into the distance for 20 seconds to complete today’s goal</string>
     <string name="cta_afternoon_warm_up">Time to stretch your eyes a little</string>
     <string name="cta_afternoon_warm_up_desc">A few simple exercises can help relieve eye strain</string>
     <string name="cta_evening_relax">Time to relax your eyes</string>
@@ -289,6 +293,8 @@
     <string name="cta_day_closing_desc">Your eyes have already had enough rest for today</string>
     <string name="cta_perfect_day">You took great care of your eyes today</string>
     <string name="cta_perfect_day_desc">Your tree has grown even stronger 🌳</string>
+    <string name="cta_idle">Your eyes are all set for now</string>
+    <string name="cta_idle_desc">We’ll suggest the next exercise when it’s time</string>
     <string name="cta_start">Start</string>
     <string name="cta_repeat">Repeat</string>
 
@@ -492,6 +498,7 @@
     <string name="workout_intro_label">Workout block</string>
     <string name="workout_exercise_counter">Exercise %1$d of %2$d</string>
     <string name="workout_ready_label">Ready when you are</string>
+    <string name="workout_ready_hint">Read the instructions, then start when you’re ready.</string>
     <string name="workout_running_label">In progress</string>
     <string name="workout_paused_label">Paused</string>
     <string name="workout_completed_title">Training complete</string>

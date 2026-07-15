@@ -6,6 +6,10 @@ import assertk.assertions.isTrue
 import com.sedsoftware.blinkly.domain.fakes.FakeData
 import com.sedsoftware.blinkly.domain.base.BaseAchievementTest
 import com.sedsoftware.blinkly.domain.achievement.UnlockableAchievement
+import com.sedsoftware.blinkly.domain.model.Exercise
+import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.ExerciseType
+import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -29,6 +33,24 @@ internal class ThinkTankTest : BaseAchievementTest() {
         val calendar = FakeData.getThinkTankWorkoutIncorrect(now)
         // when
         val unlocked = achievement.unlocked(emptyAchievements, calendar)
+        // then
+        assertThat(unlocked).isFalse()
+    }
+
+    @Test
+    fun `when ten exercises repeat consecutively then not unlocked`() = runTest {
+        // given
+        val calendar = listOf(
+            Workout(
+                exercises = List(10) {
+                    Exercise(ExerciseBlock.A, ExerciseType.BLINK_BREAK, now)
+                }
+            )
+        )
+
+        // when
+        val unlocked = achievement.unlocked(emptyAchievements, calendar)
+
         // then
         assertThat(unlocked).isFalse()
     }

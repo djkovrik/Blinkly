@@ -63,6 +63,7 @@ import blinkly.shared.compose.generated.resources.workout_intro_label
 import blinkly.shared.compose.generated.resources.workout_pause
 import blinkly.shared.compose.generated.resources.workout_paused_label
 import blinkly.shared.compose.generated.resources.workout_progress_label
+import blinkly.shared.compose.generated.resources.workout_ready_hint
 import blinkly.shared.compose.generated.resources.workout_ready_label
 import blinkly.shared.compose.generated.resources.workout_resume
 import blinkly.shared.compose.generated.resources.workout_running_label
@@ -393,14 +394,28 @@ private fun WorkoutControls(
     modifier: Modifier = Modifier,
 ) {
     when (phase) {
-        WorkoutComponent.Phase.READY -> BlinklyButton(
-            text = stringResource(resource = Res.string.workout_start_exercise),
-            textColor = MaterialTheme.colorScheme.onPrimary,
-            buttonColor = MaterialTheme.colorScheme.primary,
-            buttonHeight = 52.dp,
-            onClick = onStartClick,
+        WorkoutComponent.Phase.READY -> Column(
+            verticalArrangement = Arrangement.spacedBy(space = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier.fillMaxWidth(),
-        )
+        ) {
+            Text(
+                text = stringResource(resource = Res.string.workout_ready_hint),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            BlinklyButton(
+                text = stringResource(resource = Res.string.workout_start_exercise),
+                textColor = MaterialTheme.colorScheme.onPrimary,
+                buttonColor = MaterialTheme.colorScheme.primary,
+                buttonHeight = 52.dp,
+                onClick = onStartClick,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
 
         WorkoutComponent.Phase.RUNNING -> BlinklyButton(
             text = stringResource(resource = Res.string.workout_pause),
@@ -669,6 +684,30 @@ private fun WorkoutIntroPreview() {
 private fun WorkoutIntroPreviewDark() {
     BlinklyWidgetPreview(isDarkTheme = true) {
         WorkoutContent(component = WorkoutComponentPreview())
+    }
+}
+
+@Preview(widthDp = 390, heightDp = 780)
+@Composable
+private fun WorkoutReadyPreview() {
+    BlinklyWidgetPreview {
+        WorkoutContent(
+            component = WorkoutComponentPreview(
+                phase = WorkoutComponent.Phase.READY,
+            )
+        )
+    }
+}
+
+@Preview(widthDp = 390, heightDp = 780)
+@Composable
+private fun WorkoutReadyPreviewDark() {
+    BlinklyWidgetPreview(isDarkTheme = true) {
+        WorkoutContent(
+            component = WorkoutComponentPreview(
+                phase = WorkoutComponent.Phase.READY,
+            )
+        )
     }
 }
 

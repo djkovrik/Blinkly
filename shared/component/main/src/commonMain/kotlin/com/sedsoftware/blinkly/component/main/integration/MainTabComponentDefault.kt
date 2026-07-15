@@ -91,7 +91,11 @@ class MainTabComponentDefault(
                 -> mainTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.A))
 
             MainCtaState.EveningRelax -> mainTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.B))
-            MainCtaState.WorkBreakDue -> mainTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+            MainCtaState.WorkBreakDue,
+            MainCtaState.RepeatBreakDue,
+                -> mainTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+
+            MainCtaState.BreakCooldown,
             MainCtaState.DayClosing,
             MainCtaState.PerfectDay,
             MainCtaState.Idle,

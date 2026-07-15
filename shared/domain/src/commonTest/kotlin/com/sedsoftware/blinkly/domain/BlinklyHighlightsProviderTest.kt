@@ -103,6 +103,50 @@ class BlinklyHighlightsProviderTest : BaseDomainTest() {
     }
 
     @Test
+    fun `when every highlight was displayed then next highlight still generated`() = runTest(testScheduler) {
+        // given
+        repeat(50) { provider.forceNextHighlight() }
+
+        // when
+        val highlight = provider.forceNextHighlight()
+
+        // then
+        assertThat(highlight is HighlightOfTheDay.Tip || highlight is HighlightOfTheDay.Fact).isTrue()
+        assertThat(settings.displayedHighlights.size).isEqualTo(51)
+    }
+
+    @Test
+    fun `when saved highlight is a fact then provider restores the fact`() = runTest(testScheduler) {
+        // given
+        every { timeUtils.now() } returns now
+        settings.currentHighlightDate = now.asLocalDate(timeUtils.timeZone())
+        settings.displayedHighlights = listOf(31)
+
+        // when
+        val highlight = provider.get()
+
+        // then
+        assertThat(highlight).isEqualTo(HighlightOfTheDay.Fact(31))
+    }
+
+    @Test
+    fun `when saved highlight index is absent or invalid then provider falls back to first tip`() =
+        runTest(testScheduler) {
+            // given
+            every { timeUtils.now() } returns now
+            settings.currentHighlightDate = now.asLocalDate(timeUtils.timeZone())
+
+            // when
+            val absentHighlight = provider.get()
+            settings.displayedHighlights = listOf(999)
+            val invalidHighlight = provider.get()
+
+            // then
+            assertThat(absentHighlight).isEqualTo(HighlightOfTheDay.Tip(1))
+            assertThat(invalidHighlight).isEqualTo(HighlightOfTheDay.Tip(1))
+        }
+
+    @Test
     fun `when reset requested then highlights sequence restarts again`() = runTest(testScheduler) {
         // given
         every { timeUtils.now() } returns yesterday

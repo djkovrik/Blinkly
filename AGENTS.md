@@ -113,6 +113,7 @@ Current screen hierarchy:
 Current implementation notes:
 - Component work is materially implemented across root navigation, onboarding, home tabs, root-pushed feature screens, Compose bindings, previews, and common component tests.
 - `main` is the current reference for a Store-backed tab component with domain-derived dashboard state, one-off error labels, a Compose screen, preview-only component implementation, and common component tests.
+- The main CTA keeps actionable and informational states distinct. After blocks A and B and one daily 20-20-20 break, it shows a non-actionable cooldown until 20 minutes have elapsed, then offers a repeat of block C until the 22:30 day-closing boundary; non-actionable states render without an action label.
 - `progress`, `reminders`, and `trainings` are the current references for Store-backed tabs that emit root-handled navigation outputs.
 - `preferences`, `achievements`, `garden`, `newreminder`, and `workout` are the current references for Store-backed feature screens that are physically grouped under their owning product area but opened on the root stack.
 - `sync` is the current reference for a reusable Store-backed settings child component that observes an external manager and bridges a Compose-owned Google sign-in result back into component state.
@@ -121,6 +122,7 @@ Current implementation notes:
 - Android `AlarmManager` registrations do not survive device reboot or app replacement. `BlinklyReminderRescheduleReceiver` handles `BOOT_COMPLETED`, `MY_PACKAGE_REPLACED`, and exact-alarm permission grants, uses `goAsync()` for the database-backed work, and calls the shared reminder rescheduler only when exact-alarm access is currently available.
 - Never use Alarmee `cancelAll()` to cancel scheduled Blinkly reminders: on Android it only clears displayed notifications. Load the persisted physical reminders and cancel every alarm by its UUID before deleting or rescheduling their database rows.
 - Exercise movement events carry their DSL cadence through `ExerciseEvent.Movement.durationMs`, the workout Store/model, and `BlinklyEyePanel`. Keep movement timing single-sourced from the script and finish repeating UI animations shortly before the next movement event so the final frame is rendered without cancellation.
+- Workout execution uses the same manual `READY` gate before every exercise, including the first one. Starting a block initializes the exercise manager and shows the first exercise instructions; only the explicit Start exercise action may call `startNextExercise()` and enter `RUNNING`.
 - `step4`, `step5`, `main`, `preferences`, `progress`, `achievements`, `garden`, `reminders`, `newreminder`, `trainings`, `workout`, and `sync` are the current reference implementations for MVIKotlin stores.
 
 ## Architecture Rules
@@ -168,6 +170,7 @@ Apply these rules by default when changing Blinkly code:
   rule, design principle, or implementation pattern. Do not propose documenting
   one-off fixes or narrowly specific edge cases.
 - Keep Compose as a rendering layer only. Do not move business logic, navigation decisions, or mutable feature state into composables.
+- Cover time-driven CTA state machines with boundary and completion-combination tests, and keep displayed action labels, enabled semantics, and component outputs consistent for every state.
 - Cover Decompose behaviour in `shared/component/root/src/commonTest`, extending `ComponentTest<T>` with `DefaultComponentContext(lifecycle)`, `testDispatchers`, navigation assertions on `childStack`, and `model.value` assertions for Store-backed components.
 - Keep `*Default` component implementations as the real runtime wiring for Stores, dependencies, labels, lifecycle, and output routing. Use separate `*Preview` implementations only for Compose previews; they should implement the same public component interface with static `MutableValue` model data and no production dependencies.
 

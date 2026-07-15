@@ -53,22 +53,63 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     }
 
     @Test
-    fun `when start clicked from intro then block starts and first exercise runs`() = runTest(testScheduler) {
+    fun `when start clicked from intro then block starts and first exercise waits for manual start`() = runTest(testScheduler) {
         // when
         component.onStartClick()
         testScheduler.advanceUntilIdle()
 
         // then
         assertThat(exerciseManager.startedBlocks).contains(ExerciseBlock.A)
+        assertThat(exerciseManager.startNextCount).isEqualTo(0)
+        assertThat(component.model.value.phase).isEqualTo(WorkoutComponent.Phase.READY)
+        assertThat(component.model.value.currentExercise).isEqualTo(ExerciseType.BLINK_BREAK)
+        assertThat(component.model.value.movement).isNull()
+        assertThat(component.model.value.progress).isNull()
+        assertThat(component.model.value.timerRemainingSeconds).isNull()
+    }
+
+    @Test
+    fun `when start clicked from ready then first exercise runs`() = runTest(testScheduler) {
+        // given
+        component.onStartClick()
+        testScheduler.advanceUntilIdle()
+
+        // when
+        component.onStartClick()
+        testScheduler.advanceUntilIdle()
+
+        // then
         assertThat(exerciseManager.startNextCount).isEqualTo(1)
         assertThat(component.model.value.phase).isEqualTo(WorkoutComponent.Phase.RUNNING)
         assertThat(component.model.value.currentExercise).isEqualTo(ExerciseType.BLINK_BREAK)
     }
 
     @Test
+    fun `when any block starts then its first exercise waits for manual start`() = runTest(testScheduler) {
+        val cases = listOf(
+            ExerciseBlock.A to ExerciseType.BLINK_BREAK,
+            ExerciseBlock.B to ExerciseType.FIGURE_EIGHT,
+            ExerciseBlock.C to ExerciseType.TWENTY_X3,
+        )
+
+        cases.forEach { (block, firstExercise) ->
+            val manager = FakeExerciseManager()
+            val testComponent = createComponent(block = block, manager = manager)
+
+            testComponent.onStartClick()
+            testScheduler.advanceUntilIdle()
+
+            assertThat(manager.startedBlocks).contains(block)
+            assertThat(manager.startNextCount).isEqualTo(0)
+            assertThat(testComponent.model.value.phase).isEqualTo(WorkoutComponent.Phase.READY)
+            assertThat(testComponent.model.value.currentExercise).isEqualTo(firstExercise)
+        }
+    }
+
+    @Test
     fun `when manager emits exercise events then model and beeper are updated`() = runTest(testScheduler) {
         // given
-        component.onStartClick()
+        startFirstExercise()
         testScheduler.advanceUntilIdle()
 
         // when
@@ -107,7 +148,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     fun `when timer tick arrives then timer is derived from progress`() = runTest(testScheduler) {
         // given
         val testComponent = createComponent(block = ExerciseBlock.C)
-        testComponent.onStartClick()
+        startFirstExercise(testComponent)
         testScheduler.advanceUntilIdle()
 
         // when
@@ -134,7 +175,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     @Test
     fun `when exercise completes then next exercise waits for manual start`() = runTest(testScheduler) {
         // given
-        component.onStartClick()
+        startFirstExercise()
         testScheduler.advanceUntilIdle()
 
         // when
@@ -163,7 +204,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     @Test
     fun `when block completes then final screen is shown and finish closes screen`() = runTest(testScheduler) {
         // given
-        component.onStartClick()
+        startFirstExercise()
         testScheduler.advanceUntilIdle()
 
         // when
@@ -179,7 +220,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     @Test
     fun `when pause and resume clicked then manager and model are updated`() = runTest(testScheduler) {
         // given
-        component.onStartClick()
+        startFirstExercise()
         testScheduler.advanceUntilIdle()
 
         // when
@@ -202,7 +243,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     @Test
     fun `when event belongs to another block then it is ignored`() = runTest(testScheduler) {
         // given
-        component.onStartClick()
+        startFirstExercise()
         testScheduler.advanceUntilIdle()
 
         // when
@@ -240,7 +281,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     fun `when saving workout fails then component publishes saving error output`() = runTest(testScheduler) {
         // given
         val exception = IllegalStateException("save failed")
-        component.onStartClick()
+        startFirstExercise()
         testScheduler.advanceUntilIdle()
 
         // when
@@ -313,6 +354,11 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
             beeper = beeper,
             workoutOutput = { componentOutput.add(it) },
         )
+
+    private fun startFirstExercise(component: WorkoutComponent = this.component) {
+        component.onStartClick()
+        component.onStartClick()
+    }
 
     private class FakeExerciseManager(
         eventsOverride: Flow<ExerciseEvent>? = null,
