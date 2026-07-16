@@ -137,6 +137,13 @@ internal class RemindersStoreProvider(
                 }
 
                 onIntent<Intent.AppResumed> {
+                    manager.refreshReminders(state().reminders).fold(
+                        onSuccess = { dispatch(Msg.RemindersUpdated(it)) },
+                        onFailure = {
+                            publish(Label.ErrorCaught(it.asBlinklyError(BlinklyError::RemindersLoading)))
+                        },
+                    )
+
                     if (!state().isAwaitingExactAlarmPermission) return@onIntent
 
                     dispatch(Msg.ExactAlarmPermissionRequestFinished)

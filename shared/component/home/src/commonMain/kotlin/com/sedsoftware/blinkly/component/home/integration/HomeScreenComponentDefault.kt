@@ -97,6 +97,7 @@ class HomeScreenComponentDefault private constructor(
                 dispatchers = dispatchers,
                 reminderManager = reminderManager,
                 notifier = notifier,
+                timeUtils = timeUtils,
                 remindersTabOutput = componentOutput,
             )
         }

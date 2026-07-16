@@ -270,9 +270,9 @@
     <string name="stage_mature">Взрослое</string>
     <string name="stage_magnificent">Величественное</string>
 
-    <string name="greetings_morning">Доброе утро 👋</string>
-    <string name="greetings_afternoon">Добрый день ☕</string>
-    <string name="greetings_evening">Добрый вечер 🌙</string>
+    <string name="greetings_morning">Доброе утро!</string>
+    <string name="greetings_afternoon">Добрый день!</string>
+    <string name="greetings_evening">Добрый вечер!</string>
 
     <string name="cta_morning_warmup">Начните день с заботы о глазах</string>
     <string name="cta_morning_warmup_desc">Короткая разминка поможет снизить напряжение во время работы</string>
@@ -286,10 +286,10 @@
     <string name="cta_afternoon_warm_up_desc">Несколько простых упражнений помогут снять напряжение</string>
     <string name="cta_evening_relax">Время расслабить глаза</string>
     <string name="cta_evening_relax_desc">Спокойный вечерний комплекс для снятия напряжения</string>
-    <string name="cta_day_closing">Отличная работа сегодня 😎</string>
+    <string name="cta_day_closing">Отличная работа сегодня</string>
     <string name="cta_day_closing_desc">Ваши глаза уже получили достаточно отдыха</string>
     <string name="cta_perfect_day">Сегодня вы отлично позаботились о своих глазах</string>
-    <string name="cta_perfect_day_desc">Ваше дерево стало ещё сильнее 🌳</string>
+    <string name="cta_perfect_day_desc">Ваше дерево стало ещё сильнее</string>
     <string name="cta_idle">Пока глазам достаточно отдыха</string>
     <string name="cta_idle_desc">Мы предложим следующее упражнение, когда придёт время</string>
     <string name="cta_start">Начать</string>
@@ -309,7 +309,6 @@
     <string name="progress_tree_title">Дерево роста</string>
     <string name="progress_tree_level">Уровень %1$d: %2$s</string>
     <string name="progress_achievements_title">Достижения</string>
-    <string name="progress_achievement_unknown">Тайное достижение</string>
 
     <!-- Тренировки и упражнения -->
     <string name="block_a">Блок А</string>
@@ -339,7 +338,7 @@
     <string name="exercise_blink_break">Моргание</string>
     <string name="exercise_blink_break_desc">Моргайте быстро и мягко. Это увлажняет слезную плёнку и снимает сухость. (За экраном вы моргаете реже - это упражнение всё исправляет!)</string>
     <string name="exercise_near_far_focus">Близко-далеко</string>
-    <string name="exercise_near_far_focus_desc">Держите большой палец в 15 см от носа. Сфокусируйтесь на нём. Затем переведите взгляд на что-то далёкое (в окно или на другой конец комнаты). Задерживайтесь на пару секунд.</string>
+    <string name="exercise_near_far_focus_desc">Держите большой палец в 15 см от носа. Сфокусируйтесь на нём. Затем переведите взгляд на что-то далёкое (в окно или на другой конец комнаты). Задерживайтесь на несколько секунд.</string>
     <string name="exercise_diagonal_gazes">Диагонали</string>
     <string name="exercise_diagonal_gazes_desc">Голова неподвижна. Посмотрите вверх-влево, затем вниз-вправо. Повторите в другую сторону: вверх-вправо, затем вниз-влево.</string>
     <string name="exercise_figure_eight">Восьмёрка</string>

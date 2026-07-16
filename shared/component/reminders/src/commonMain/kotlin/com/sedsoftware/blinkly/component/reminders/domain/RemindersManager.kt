@@ -2,18 +2,27 @@ package com.sedsoftware.blinkly.component.reminders.domain
 
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
+import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.ReminderScheduleConfiguration
 import com.sedsoftware.blinkly.domain.model.ScheduledReminder
+import com.sedsoftware.blinkly.domain.model.nextOccurrence
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 internal class RemindersManager(
     private val reminderManager: BlinklyReminderManager,
     private val notifier: BlinklyNotifier,
+    private val timeUtils: BlinklyTimeUtils,
 ) {
 
     fun observeReminders(): Flow<List<ScheduledReminder>> =
-        reminderManager.createdSchedules()
+        reminderManager.createdSchedules().map(::withNextOccurrences)
+
+    fun refreshReminders(reminders: List<ScheduledReminder>): Result<List<ScheduledReminder>> =
+        runCatching {
+            withNextOccurrences(reminders)
+        }
 
     fun observePermissionEvents(): Flow<PermissionResult> =
         notifier.permissionEvents()
@@ -69,6 +78,19 @@ internal class RemindersManager(
                     )
             }
         }
+
+    private fun withNextOccurrences(reminders: List<ScheduledReminder>): List<ScheduledReminder> {
+        val now = timeUtils.now()
+        val timeZone = timeUtils.timeZone()
+
+        return reminders.map { scheduledReminder ->
+            scheduledReminder.copy(
+                alarms = scheduledReminder.alarms.map { reminder ->
+                    reminder.copy(date = reminder.nextOccurrence(now, timeZone))
+                }
+            )
+        }
+    }
 
     enum class ExactAlarmPermissionResult {
         Granted,

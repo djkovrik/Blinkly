@@ -16,6 +16,7 @@ import com.sedsoftware.blinkly.component.reminders.store.RemindersStoreProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
+import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.utils.asValue
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +29,7 @@ class RemindersTabComponentDefault(
     private val dispatchers: BlinklyDispatchers,
     private val reminderManager: BlinklyReminderManager,
     private val notifier: BlinklyNotifier,
+    private val timeUtils: BlinklyTimeUtils,
     private val remindersTabOutput: (ComponentOutput) -> Unit,
 ) : RemindersTabComponent, ComponentContext by componentContext {
 
@@ -35,7 +37,7 @@ class RemindersTabComponentDefault(
         instanceKeeper.getStore {
             RemindersStoreProvider(
                 storeFactory = storeFactory,
-                manager = RemindersManager(reminderManager, notifier),
+                manager = RemindersManager(reminderManager, notifier, timeUtils),
                 mainContext = dispatchers.main,
                 ioContext = dispatchers.io,
             ).create()

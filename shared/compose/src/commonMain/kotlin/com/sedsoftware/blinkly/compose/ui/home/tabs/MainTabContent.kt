@@ -114,7 +114,7 @@ fun MainTabContent(
             FirstCardTreeGrowth(
                 model = model,
                 onCtaClick = component::onPrimaryCtaClick,
-                modifier = Modifier,
+                modifier = Modifier.fillMaxWidth(),
             )
 
             SecondCardTreeGrowth(
@@ -163,7 +163,9 @@ private fun FirstCardTreeGrowth(
             title = model.ctaState.asTitle(),
             description = model.ctaState.asDescription(),
             cta = model.ctaState.asActionLabel().uppercase(),
-            modifier = Modifier.padding(all = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(all = 16.dp),
         )
     }
 }

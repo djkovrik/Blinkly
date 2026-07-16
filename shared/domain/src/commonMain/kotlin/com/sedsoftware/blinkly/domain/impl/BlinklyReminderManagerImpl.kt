@@ -11,6 +11,7 @@ import com.sedsoftware.blinkly.domain.model.ReminderSchedule
 import com.sedsoftware.blinkly.domain.model.ReminderScheduleConfiguration
 import com.sedsoftware.blinkly.domain.model.ReminderType
 import com.sedsoftware.blinkly.domain.model.ScheduledReminder
+import com.sedsoftware.blinkly.domain.model.nextOccurrence
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
@@ -23,11 +24,9 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
 internal class BlinklyReminderManagerImpl(
@@ -268,30 +267,6 @@ internal class BlinklyReminderManagerImpl(
         val remindersToCancel = database.currentReminders().first()
         remindersToCancel.forEach { reminder -> alarmManager.cancel(reminder.uuid) }
         database.deleteReminders()
-    }
-
-    private fun Reminder.nextOccurrence(now: Instant, timeZone: TimeZone): LocalDateTime {
-        val currentLocal = now.toLocalDateTime(timeZone)
-        val daysToAdd = when (interval) {
-            ReminderInterval.DAILY -> 0
-            ReminderInterval.WEEKLY ->
-                (date.dayOfWeek.ordinal - currentLocal.dayOfWeek.ordinal + FULL_WEEK_DAYS) % FULL_WEEK_DAYS
-        }
-        val candidate = LocalDateTime(
-            date = currentLocal.date.plus(daysToAdd.toLong(), DateTimeUnit.DAY),
-            time = date.time,
-        )
-
-        if (candidate.toInstant(timeZone) > now) return candidate
-
-        val intervalDays = when (interval) {
-            ReminderInterval.DAILY -> 1L
-            ReminderInterval.WEEKLY -> FULL_WEEK_DAYS.toLong()
-        }
-        return LocalDateTime(
-            date = candidate.date.plus(intervalDays, DateTimeUnit.DAY),
-            time = candidate.time,
-        )
     }
 
     private companion object {
