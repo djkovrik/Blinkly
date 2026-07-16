@@ -338,7 +338,7 @@
     <string name="exercise_blink_break">Моргание</string>
     <string name="exercise_blink_break_desc">Моргайте быстро и мягко. Это увлажняет слезную плёнку и снимает сухость. (За экраном вы моргаете реже - это упражнение всё исправляет!)</string>
     <string name="exercise_near_far_focus">Близко-далеко</string>
-    <string name="exercise_near_far_focus_desc">Держите большой палец в 15 см от носа. Сфокусируйтесь на нём. Затем переведите взгляд на что-то далёкое (в окно или на другой конец комнаты). Задерживайтесь на пару секунд.</string>
+    <string name="exercise_near_far_focus_desc">Держите большой палец в 15 см от носа. Сфокусируйтесь на нём. Затем переведите взгляд на что-то далёкое (в окно или на другой конец комнаты). Задерживайтесь на несколько секунд.</string>
     <string name="exercise_diagonal_gazes">Диагонали</string>
     <string name="exercise_diagonal_gazes_desc">Голова неподвижна. Посмотрите вверх-влево, затем вниз-вправо. Повторите в другую сторону: вверх-вправо, затем вниз-влево.</string>
     <string name="exercise_figure_eight">Восьмёрка</string>
