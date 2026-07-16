@@ -14,6 +14,7 @@ import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.reminders.integration.RemindersTabComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
+import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
@@ -33,12 +34,16 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlin.test.Test
+import kotlin.time.Instant
 
 class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
 
     private val reminderManager: FakeReminderManager = FakeReminderManager()
     private val notifier: FakeNotifier = FakeNotifier()
+    private val timeUtils: FakeTimeUtils = FakeTimeUtils()
 
     @Test
     fun `workday period with many alarms maps to one sorted item`() = runTest(testScheduler) {
@@ -103,6 +108,30 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
             .isEqualTo(RemindersTabComponent.Schedule.Daily(LocalTime(10, 0)))
         assertThat(component.model.value.reminders.last().schedule)
             .isEqualTo(RemindersTabComponent.Schedule.Weekly(LocalTime(14, 30), DayOfWeek.MONDAY))
+    }
+
+    @Test
+    fun `resume advances a passed daily reminder to its next occurrence`() = runTest(testScheduler) {
+        timeUtils.current = LocalDateTime(2026, 7, 16, 15, 30).toInstant(TimeZone.UTC)
+        reminderManager.schedules.value = listOf(
+            scheduled(
+                id = "daily",
+                configuration = ReminderScheduleConfiguration.Daily(LocalTime(15, 32)),
+                dates = listOf(LocalDateTime(2026, 7, 16, 15, 32)),
+            )
+        )
+        testScheduler.advanceUntilIdle()
+
+        assertThat(component.model.value.reminders.single().nextAt)
+            .isEqualTo(LocalDateTime(2026, 7, 16, 15, 32))
+
+        lifecycle.pause()
+        timeUtils.current = LocalDateTime(2026, 7, 16, 15, 33).toInstant(TimeZone.UTC)
+        lifecycle.resume()
+        testScheduler.advanceUntilIdle()
+
+        assertThat(component.model.value.reminders.single().nextAt)
+            .isEqualTo(LocalDateTime(2026, 7, 17, 15, 32))
     }
 
     @Test
@@ -307,6 +336,7 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
             dispatchers = testDispatchers,
             reminderManager = reminderManager,
             notifier = notifier,
+            timeUtils = timeUtils,
             remindersTabOutput = { componentOutput.add(it) },
         )
 
@@ -342,6 +372,13 @@ class RemindersTabComponentTest : ComponentTest<RemindersTabComponent>() {
         override suspend fun requestNotificationPermission() { requestCount += 1 }
         override suspend fun achievementUnlocked(type: AchievementType) = Unit
         override fun unlockedAchievements(): Flow<AchievementType> = MutableSharedFlow()
+    }
+
+    private class FakeTimeUtils : BlinklyTimeUtils {
+        var current: Instant = LocalDateTime(2026, 7, 14, 0, 0).toInstant(TimeZone.UTC)
+
+        override fun now(): Instant = current
+        override fun timeZone(): TimeZone = TimeZone.UTC
     }
 
     private data class PeriodCall(

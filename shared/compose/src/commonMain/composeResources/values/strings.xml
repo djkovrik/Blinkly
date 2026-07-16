@@ -273,9 +273,9 @@
     <string name="stage_mature">Mature</string>
     <string name="stage_magnificent">Magnificent</string>
 
-    <string name="greetings_morning">Good morning 👋</string>
-    <string name="greetings_afternoon">Good afternoon ☕</string>
-    <string name="greetings_evening">Good evening 🌙</string>
+    <string name="greetings_morning">Good morning!</string>
+    <string name="greetings_afternoon">Good afternoon!</string>
+    <string name="greetings_evening">Good evening!</string>
 
     <string name="cta_morning_warmup">Start your day with eye care</string>
     <string name="cta_morning_warmup_desc">A short exercise can help reduce eye strain during the day</string>
@@ -289,10 +289,10 @@
     <string name="cta_afternoon_warm_up_desc">A few simple exercises can help relieve eye strain</string>
     <string name="cta_evening_relax">Time to relax your eyes</string>
     <string name="cta_evening_relax_desc">A calming evening routine to release tension</string>
-    <string name="cta_day_closing">Great job today 😎</string>
+    <string name="cta_day_closing">Great job today</string>
     <string name="cta_day_closing_desc">Your eyes have already had enough rest for today</string>
     <string name="cta_perfect_day">You took great care of your eyes today</string>
-    <string name="cta_perfect_day_desc">Your tree has grown even stronger 🌳</string>
+    <string name="cta_perfect_day_desc">Your tree has grown even stronger</string>
     <string name="cta_idle">Your eyes are all set for now</string>
     <string name="cta_idle_desc">We’ll suggest the next exercise when it’s time</string>
     <string name="cta_start">Start</string>

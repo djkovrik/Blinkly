@@ -55,7 +55,6 @@ import com.sedsoftware.blinkly.component.progress.ProgressTabComponent.CalendarD
 import com.sedsoftware.blinkly.component.progress.ProgressTabComponent.CalendarDayState
 import com.sedsoftware.blinkly.component.progress.integration.ProgressTabComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
-import com.sedsoftware.blinkly.compose.ui.extension.asDescription
 import com.sedsoftware.blinkly.compose.ui.extension.asImage
 import com.sedsoftware.blinkly.compose.ui.extension.asLabel
 import com.sedsoftware.blinkly.compose.ui.extension.asTitle
@@ -357,8 +356,8 @@ private fun AchievementPreviewItem(
     achievement: Achievement?,
     modifier: Modifier = Modifier,
 ) {
-    val title = achievement?.type?.asTitle()
-    val description = achievement?.type?.asDescription()
+    val isLocked = achievement == null
+    val label = achievement?.type?.asTitle()
         ?: stringResource(resource = Res.string.content_description_locked_achievement)
 
     Column(
@@ -368,30 +367,23 @@ private fun AchievementPreviewItem(
     ) {
         Image(
             painter = painterResource(resource = achievement?.type?.asImage() ?: Res.drawable.achievement_unknown),
-            contentDescription = title ?: description,
+            contentDescription = label,
             modifier = Modifier.size(size = 60.dp),
         )
 
-        if (title != null) {
-            Text(
-                text = title,
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-
         Text(
-            text = description,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = if (achievement == null) {
+            text = label,
+            color = if (isLocked) {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+            style = if (isLocked) {
                 MaterialTheme.typography.bodyMedium
             } else {
-                MaterialTheme.typography.bodySmall
+                MaterialTheme.typography.titleSmall
             },
+            fontWeight = if (isLocked) null else FontWeight.SemiBold,
             textAlign = TextAlign.Center,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
