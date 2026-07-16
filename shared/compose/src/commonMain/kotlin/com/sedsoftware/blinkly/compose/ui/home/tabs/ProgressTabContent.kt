@@ -37,7 +37,6 @@ import blinkly.shared.compose.generated.resources.Res
 import blinkly.shared.compose.generated.resources.achievement_unknown
 import blinkly.shared.compose.generated.resources.content_description_locked_achievement
 import blinkly.shared.compose.generated.resources.content_description_tree_preview
-import blinkly.shared.compose.generated.resources.progress_achievement_unknown
 import blinkly.shared.compose.generated.resources.progress_achievements_title
 import blinkly.shared.compose.generated.resources.progress_calendar_title
 import blinkly.shared.compose.generated.resources.progress_title
@@ -358,8 +357,9 @@ private fun AchievementPreviewItem(
     achievement: Achievement?,
     modifier: Modifier = Modifier,
 ) {
-    val title = achievement?.type?.asTitle() ?: stringResource(resource = Res.string.progress_achievement_unknown)
-    val subtitle = achievement?.type?.asDescription() ?: stringResource(resource = Res.string.content_description_locked_achievement)
+    val title = achievement?.type?.asTitle()
+    val description = achievement?.type?.asDescription()
+        ?: stringResource(resource = Res.string.content_description_locked_achievement)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -368,24 +368,30 @@ private fun AchievementPreviewItem(
     ) {
         Image(
             painter = painterResource(resource = achievement?.type?.asImage() ?: Res.drawable.achievement_unknown),
-            contentDescription = title,
+            contentDescription = title ?: description,
             modifier = Modifier.size(size = 60.dp),
         )
 
-        Text(
-            text = title,
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
+        if (title != null) {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
 
         Text(
-            text = subtitle,
+            text = description,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
+            style = if (achievement == null) {
+                MaterialTheme.typography.bodyMedium
+            } else {
+                MaterialTheme.typography.bodySmall
+            },
             textAlign = TextAlign.Center,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
@@ -396,13 +402,20 @@ private fun AchievementPreviewItem(
 @Preview(widthDp = 420, heightDp = 920)
 @Composable
 private fun ProgressTabContentPreviewLight() {
-    ProgressTabContentPreview(todayState = CalendarDayState.EMPTY)
+    ProgressTabContentPreview(
+        todayState = CalendarDayState.EMPTY,
+        showLockedAchievements = true,
+    )
 }
 
 @Preview(widthDp = 420, heightDp = 920)
 @Composable
 private fun ProgressTabContentPreviewDark() {
-    ProgressTabContentPreview(todayState = CalendarDayState.EMPTY, isDarkTheme = true)
+    ProgressTabContentPreview(
+        todayState = CalendarDayState.EMPTY,
+        showLockedAchievements = true,
+        isDarkTheme = true,
+    )
 }
 
 @Preview(widthDp = 420, heightDp = 920)
@@ -432,10 +445,20 @@ private fun ProgressTabContentPreviewPerfectDark() {
 @Composable
 private fun ProgressTabContentPreview(
     todayState: CalendarDayState,
+    showLockedAchievements: Boolean = false,
     isDarkTheme: Boolean = false,
 ) {
     BlinklyWidgetPreview(isDarkTheme = isDarkTheme) {
-        ProgressTabContent(component = ProgressTabComponentPreview(todayState = todayState))
+        val component = if (showLockedAchievements) {
+            ProgressTabComponentPreview(
+                todayState = todayState,
+                recentAchievements = List(size = RECENT_ACHIEVEMENTS_COUNT) { null },
+            )
+        } else {
+            ProgressTabComponentPreview(todayState = todayState)
+        }
+
+        ProgressTabContent(component = component)
     }
 }
 

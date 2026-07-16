@@ -309,7 +309,6 @@
     <string name="progress_tree_title">Дерево роста</string>
     <string name="progress_tree_level">Уровень %1$d: %2$s</string>
     <string name="progress_achievements_title">Достижения</string>
-    <string name="progress_achievement_unknown">Тайное достижение</string>
 
     <!-- Тренировки и упражнения -->
     <string name="block_a">Блок А</string>
