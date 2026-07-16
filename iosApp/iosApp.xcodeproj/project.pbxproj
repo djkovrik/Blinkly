@@ -28,6 +28,10 @@
 		A93A953A29CC810C00F8E227 /* iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosApp.swift; sourceTree = "<group>"; };
 		A93A953E29CC810D00F8E227 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A93A954129CC810D00F8E227 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		B1A000012FFA71000000AD01 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		B1A000022FFA71000000AD02 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		B1A000032FFA71000000AD03 /* update_skad_ids.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = update_skad_ids.sh; sourceTree = "<group>"; };
+		B1A000042FFA71000000AD04 /* verify_ads_configuration.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = verify_ads_configuration.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,11 +48,23 @@
 		A93A952E29CC810C00F8E227 = {
 			isa = PBXGroup;
 			children = (
+				B1A000052FFA71000000AD05 /* Configuration */,
+				B1A000032FFA71000000AD03 /* update_skad_ids.sh */,
+				B1A000042FFA71000000AD04 /* verify_ads_configuration.sh */,
 				A516EB4A2F6DB13A0040FD0E /* Localizable.strings */,
 				A93A953929CC810C00F8E227 /* iosApp */,
 				A93A953829CC810C00F8E227 /* Products */,
 				C4127409AE3703430489E7BC /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		B1A000052FFA71000000AD05 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				B1A000012FFA71000000AD01 /* Debug.xcconfig */,
+				B1A000022FFA71000000AD02 /* Release.xcconfig */,
+			);
+			path = Configuration;
 			sourceTree = "<group>";
 		};
 		A93A953829CC810C00F8E227 /* Products */ = {
@@ -98,6 +114,7 @@
 				A9D80A052AAB5CDE006C8738 /* ShellScript */,
 				A93A953329CC810C00F8E227 /* Sources */,
 				A93A953429CC810C00F8E227 /* Frameworks */,
+				B1A000062FFA71000000AD06 /* Prepare Yandex Ads */,
 				A93A953529CC810C00F8E227 /* Resources */,
 			);
 			buildRules = (
@@ -176,6 +193,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :shared:compose:embedAndSignAppleFrameworkForXcode";
+		};
+		B1A000062FFA71000000AD06 /* Prepare Yandex Ads */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/iosApp/Info.plist",
+			);
+			name = "Prepare Yandex Ads";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${SRCROOT}/verify_ads_configuration.sh\"\nbash \"${SRCROOT}/update_skad_ids.sh\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -319,6 +355,7 @@
 		};
 		A93A954629CC810D00F8E227 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B1A000012FFA71000000AD01 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -336,7 +373,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				"OTHER_LDFLAGS[arch=*]" = "-lsqlite3";
+				"OTHER_LDFLAGS[arch=*]" = "$(inherited) -lsqlite3";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sedsoftware.blinkly.iosApp;
 				PRODUCT_NAME = Blinkly;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -347,6 +384,7 @@
 		};
 		A93A954729CC810D00F8E227 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B1A000022FFA71000000AD02 /* Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -363,7 +401,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				"OTHER_LDFLAGS[arch=*]" = "-lsqlite3";
+				"OTHER_LDFLAGS[arch=*]" = "$(inherited) -lsqlite3";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sedsoftware.blinkly.iosApp;
 				PRODUCT_NAME = Blinkly;
 				SWIFT_EMIT_LOC_STRINGS = YES;

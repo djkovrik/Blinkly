@@ -45,6 +45,7 @@ junit4 = "4.13.2"
 kmpauth = "2.5.0-alpha01"
 gitlive-firebase = "2.4.0"
 google-services = "4.5.0"
+yandex-ads = "8.1.0"
 
 [libraries]
 
@@ -82,6 +83,7 @@ ark-decompose-extensions = { module = "com.arkivanov.decompose:extensions-compos
 ark-essenty = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
 
 lib-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+lib-yandex-mobileads-compose = { module = "com.yandex.ads.multiplatform:mobileads-compose", version.ref = "yandex-ads" }
 lib-alarmee = { group = "io.github.tweener", name = "alarmee", version.ref = "alarmee" }
 lib-moko-permissions = { group = "dev.icerock.moko", name = "permissions", version.ref = "moko-permissions" }
 lib-moko-permissions-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "moko-permissions" }

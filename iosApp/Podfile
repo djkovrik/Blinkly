@@ -1,0 +1,7 @@
+source 'https://cdn.cocoapods.org/'
+
+platform :ios, '16.2'
+
+target 'iosApp' do
+  pod 'YandexMobileAds', '8.1.0'
+end

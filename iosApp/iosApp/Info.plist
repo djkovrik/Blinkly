@@ -10,6 +10,12 @@
 	<string>38221976818-2ajd25hrjgvmkb7uvlkitdehnehcht4a.apps.googleusercontent.com</string>
 	<key>GIDServerClientID</key>
 	<string>38221976818-8l1vpr8cee88mfi524122j8apjs3866i.apps.googleusercontent.com</string>
+	<key>BlinklyAchievementsAdUnitId</key>
+	<string>$(BLINKLY_ACHIEVEMENTS_AD_UNIT_ID)</string>
+	<key>BlinklyGardenAdUnitId</key>
+	<string>$(BLINKLY_GARDEN_AD_UNIT_ID)</string>
+	<key>BlinklyAdsBuildType</key>
+	<string>$(BLINKLY_ADS_BUILD_TYPE)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

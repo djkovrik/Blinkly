@@ -1,5 +1,8 @@
 package com.sedsoftware.blinkly.compose.ui.garden
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -26,10 +30,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -51,7 +59,11 @@ import blinkly.shared.compose.generated.resources.icon_back
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.sedsoftware.blinkly.component.garden.GardenComponent
 import com.sedsoftware.blinkly.component.garden.integration.GardenComponentPreview
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdPlacement
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
+import com.sedsoftware.blinkly.compose.ui.ads.BlinklyAdaptiveInlineBanner
+import com.sedsoftware.blinkly.compose.ui.ads.BlinklyAdsPreviewHost
+import com.sedsoftware.blinkly.compose.ui.extension.alsoIf
 import com.sedsoftware.blinkly.compose.ui.extension.asImage
 import com.sedsoftware.blinkly.compose.ui.extension.asLabel
 import com.sedsoftware.blinkly.compose.ui.extension.clickableOnce
@@ -73,6 +85,9 @@ fun GardenContent(
     modifier: Modifier = Modifier,
 ) {
     val model: GardenComponent.Model by component.model.subscribeAsState()
+    // LazyColumn disposes off-screen items, so retain the expanded slot height at screen scope.
+    var expandedAdHeightPx by remember(component) { mutableIntStateOf(0) }
+    val expandedAdMinHeight = with(LocalDensity.current) { expandedAdHeightPx.toDp() }
 
     Scaffold(
         topBar = {
@@ -125,12 +140,37 @@ fun GardenContent(
                     model = model,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = BlinklySpacing.ScreenHorizontal)
-                        .padding(bottom = 24.dp),
+                        .padding(horizontal = BlinklySpacing.ScreenHorizontal),
                 )
             }
 
-            if (model.grownTrees.isNotEmpty()) {
+            if (shouldPlaceGardenAd(model.grownTrees.size)) {
+                item(
+                    key = "ad_garden_after_stats",
+                    contentType = "ad",
+                ) {
+                    BlinklyAdaptiveInlineBanner(
+                        placement = BlinklyAdPlacement.GARDEN,
+                        modifier = Modifier
+                            .heightIn(min = expandedAdMinHeight)
+                            .alsoIf(
+                                condition = expandedAdHeightPx == 0,
+                                other = Modifier.animateContentSize(
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessMediumLow,
+                                    ),
+                                    finishedListener = { initialSize, targetSize ->
+                                        if (targetSize.height > initialSize.height) {
+                                            expandedAdHeightPx = targetSize.height
+                                        }
+                                    },
+                                ),
+                            )
+                            .padding(vertical = 8.dp),
+                    )
+                }
+
                 item(
                     key = "garden_header",
                     contentType = "header",
@@ -421,7 +461,9 @@ private fun TreeImage(
 @Composable
 private fun GardenContentPreviewLight() {
     BlinklyWidgetPreview {
-        GardenContent(component = GardenComponentPreview())
+        BlinklyAdsPreviewHost {
+            GardenContent(component = GardenComponentPreview())
+        }
     }
 }
 
@@ -429,7 +471,9 @@ private fun GardenContentPreviewLight() {
 @Composable
 private fun GardenContentPreviewDark() {
     BlinklyWidgetPreview(isDarkTheme = true) {
-        GardenContent(component = GardenComponentPreview())
+        BlinklyAdsPreviewHost {
+            GardenContent(component = GardenComponentPreview())
+        }
     }
 }
 
@@ -461,3 +505,5 @@ private fun GardenTreeDetailsSheetPreviewDark() {
 
 private const val HUNDRED_PERCENT = 100f
 private const val PROGRESS_TRACK_ALPHA = 0.24f
+
+internal fun shouldPlaceGardenAd(grownTreeCount: Int): Boolean = grownTreeCount > 0

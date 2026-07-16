@@ -1,0 +1,5 @@
+#include? "../Pods/Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"
+
+BLINKLY_ACHIEVEMENTS_AD_UNIT_ID = R-M-19603838-1
+BLINKLY_GARDEN_AD_UNIT_ID = R-M-19603838-2
+BLINKLY_ADS_BUILD_TYPE = RELEASE

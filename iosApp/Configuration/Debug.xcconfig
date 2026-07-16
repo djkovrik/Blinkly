@@ -1,0 +1,5 @@
+#include? "../Pods/Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"
+
+BLINKLY_ACHIEVEMENTS_AD_UNIT_ID = demo-banner-yandex
+BLINKLY_GARDEN_AD_UNIT_ID = demo-banner-yandex
+BLINKLY_ADS_BUILD_TYPE = DEBUG

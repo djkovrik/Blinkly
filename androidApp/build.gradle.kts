@@ -1,5 +1,11 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+val demoAdUnitId = "demo-banner-yandex"
+val releaseAchievementsAdUnitId = "R-M-19603758-1"
+val releaseGardenAdUnitId = "R-M-19603758-2"
+
+fun quotedBuildConfigValue(value: String): String = "\"$value\""
+
 plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.android)
@@ -21,10 +27,67 @@ android {
         versionName = "1.0.0"
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField(
+                type = "String",
+                name = "BLINKLY_ACHIEVEMENTS_AD_UNIT_ID",
+                value = quotedBuildConfigValue(demoAdUnitId),
+            )
+            buildConfigField(
+                type = "String",
+                name = "BLINKLY_GARDEN_AD_UNIT_ID",
+                value = quotedBuildConfigValue(demoAdUnitId),
+            )
+        }
+        release {
+            buildConfigField(
+                type = "String",
+                name = "BLINKLY_ACHIEVEMENTS_AD_UNIT_ID",
+                value = quotedBuildConfigValue(releaseAchievementsAdUnitId),
+            )
+            buildConfigField(
+                type = "String",
+                name = "BLINKLY_GARDEN_AD_UNIT_ID",
+                value = quotedBuildConfigValue(releaseGardenAdUnitId),
+            )
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+}
+
+val verifyReleaseAdsConfiguration by tasks.registering {
+    group = "verification"
+    description = "Verifies that enabled release ad placements use production Yandex ad unit IDs."
+    inputs.properties(
+        "achievementsAdUnitId" to releaseAchievementsAdUnitId,
+        "gardenAdUnitId" to releaseGardenAdUnitId,
+    )
+
+    doLast {
+        val configuredAdUnitIds = mapOf(
+            "Achievements" to inputs.properties.getValue("achievementsAdUnitId").toString(),
+            "Garden" to inputs.properties.getValue("gardenAdUnitId").toString(),
+        )
+
+        configuredAdUnitIds.forEach { (placement, adUnitId) ->
+            check(adUnitId.isNotBlank()) { "$placement release ad unit ID is blank" }
+            check(adUnitId != "demo-banner-yandex") { "$placement release ad unit ID uses the Yandex demo value" }
+            check(adUnitId.startsWith("R-M-")) { "$placement release ad unit ID is not a Yandex production ID" }
+        }
+    }
+}
+
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    dependsOn(verifyReleaseAdsConfiguration)
 }
 
 kotlin {
