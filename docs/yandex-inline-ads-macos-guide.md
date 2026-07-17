@@ -21,18 +21,22 @@ ATT/IDFA, GDPR/CMP flow и персонализированная реклама
 
 Нужны:
 
-- актуальная стабильная Xcode с iOS Simulator;
+- Xcode 16.4 или новее с iOS Simulator;
 - Xcode Command Line Tools;
 - JDK 21;
 - Homebrew;
 - CocoaPods;
 - Git.
 
+Yandex Mobile Ads SDK 8.1.0 требует Xcode 16.4 или новее. На Xcode 16.2 Intel Simulator доходит до линковки, но падает на отсутствующем Swift runtime symbol `_swift_coroFrameAlloc` из `YandexMobileAds[x86_64]`.
+Xcode 16.4, в свою очередь, требует macOS 15.3 или новее. Если конкретная Intel-модель Mac официально не поддерживает macOS Sequoia, используй поддерживаемый Mac или macOS CI runner; установка только более новой Xcode на macOS Sonoma проблему не решит.
+
 Сначала установи Xcode из App Store или Apple Developer, запусти её один раз и дождись установки дополнительных компонентов. Затем выполни:
 
 ```bash
 xcodebuild -version
 xcode-select -p
+sw_vers
 git --version
 java -version
 brew --version
@@ -81,11 +85,13 @@ pod --version
 Замени путь в первой команде на фактический путь к клону:
 
 ```bash
-cd "$HOME/Projects/Blinkly"
+cd "$HOME/StudioProjects/Blinkly"
 export BLINKLY_ROOT="$PWD"
 export LOG_DIR="${TMPDIR:-/tmp}"
 export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 export PATH="$JAVA_HOME/bin:$PATH"
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 ```
 
 Проверь, что это корень нужного репозитория:
@@ -123,15 +129,15 @@ run_logged() {
   shift
 
   "$@" >"$log" 2>&1
-  local status=$?
+  local exit_code=$?
 
-  echo "exit code: $status"
-  if [ "$status" -ne 0 ]; then
+  echo "exit code: $exit_code"
+  if [ "$exit_code" -ne 0 ]; then
     echo "--- last 200 lines: $log ---"
     tail -n 200 "$log"
   fi
 
-  return "$status"
+  return "$exit_code"
 }
 ```
 
@@ -166,6 +172,22 @@ run_logged \
 ```
 
 ## 4. Установить iOS pods
+
+`Podfile` должен линковать не только Yandex, но и нативные SDK, которые не поставляются транзитивно через Kotlin-библиотеки GitLive/KMPAuth:
+
+```ruby
+platform :ios, '16.2'
+use_frameworks! :linkage => :static
+
+target 'iosApp' do
+  pod 'FirebaseAuth', '11.8.0'
+  pod 'FirebaseFirestore', '11.8.0'
+  pod 'GoogleSignIn'
+  pod 'YandexMobileAds', '8.1.0'
+end
+```
+
+Не заменяй static linkage на динамический `use_frameworks!`. Глобальный `use_modular_headers!` здесь также не подходит: с текущим Firestore/gRPC он приводит к отсутствующему private `gRPC-Core.modulemap`.
 
 Первичная установка с обновлением spec repository:
 
@@ -211,7 +233,7 @@ open "$BLINKLY_ROOT/iosApp/iosApp.xcworkspace"
 В новом окне Terminal снова задай переменные, если они не сохранены:
 
 ```bash
-cd "$HOME/Projects/Blinkly"
+cd "$HOME/StudioProjects/Blinkly"
 export BLINKLY_ROOT="$PWD"
 export LOG_DIR="${TMPDIR:-/tmp}"
 export SCHEME="iosApp"
@@ -237,7 +259,7 @@ xcrun simctl list devices available
 Выбери точное имя из списка, например:
 
 ```bash
-export SIMULATOR_NAME="iPhone 16 Pro"
+export SIMULATOR_NAME="iPhone 16"
 ```
 
 Версия модели здесь не принципиальна. Важно использовать существующее имя и iOS 16.2 или новее.
@@ -690,6 +712,24 @@ open iosApp.xcworkspace
 
 Убедись, что открыт `.xcworkspace`, а не `.xcodeproj`.
 
+### `_swift_coroFrameAlloc` при линковке Intel Simulator
+
+Проверь версию Xcode:
+
+```bash
+xcodebuild -version
+```
+
+Для Yandex Mobile Ads SDK 8.1.0 нужен Xcode 16.4 или новее. Xcode 16.2 не содержит требуемый Swift runtime symbol для x86_64-среза SDK. Xcode 16.4 требует macOS 15.3+, поэтому сначала проверь, что Mac официально поддерживает macOS Sequoia. После обновления macOS и Xcode снова выбери Xcode через `xcode-select`, затем повтори шаги 4, 7 и 8. Если модель Mac не поддерживает Sequoia, перенеси iOS build на поддерживаемый Mac или CI runner.
+
+### CocoaPods падает с `Unicode Normalization not appropriate for ASCII-8BIT`
+
+```bash
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+pod install --repo-update
+```
+
 ### Pods повреждены или версия не обновилась
 
 Эти команды удаляют только генерируемые CocoaPods artifacts:
@@ -752,13 +792,15 @@ echo
 Когда инструменты уже установлены, минимальная последовательность выглядит так:
 
 ```bash
-cd "$HOME/Projects/Blinkly"
+cd "$HOME/StudioProjects/Blinkly"
 export BLINKLY_ROOT="$PWD"
 export LOG_DIR="${TMPDIR:-/tmp}"
 export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 export PATH="$JAVA_HOME/bin:$PATH"
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 export SCHEME="iosApp"
-export SIMULATOR_NAME="iPhone 16 Pro"
+export SIMULATOR_NAME="iPhone 16"
 export DERIVED_DATA="$BLINKLY_ROOT/iosApp/build/DerivedData"
 
 ./gradlew -q verifyYandexAdsVersions \
