@@ -197,6 +197,8 @@ end
 
 Не заменяй static linkage на динамический `use_frameworks!`. Глобальный `use_modular_headers!` здесь также не подходит: с текущим Firestore/gRPC он приводит к отсутствующему private `gRPC-Core.modulemap`.
 
+Наличие Firebase pods и `GoogleService-Info.plist` само по себе не конфигурирует default Firebase app. Swift `@main` entry point обязан вызвать `FirebaseApp.configure()` до создания `MainKt.MainViewController()`: Compose controller строит root dependency graph, который обращается к `Firebase.auth`. При обратном порядке приложение собирается, но сразу падает при запуске с `FirebaseAuth/Auth.swift: Fatal error: The default FirebaseApp instance must be configured`.
+
 Первичная установка с обновлением spec repository:
 
 ```bash
