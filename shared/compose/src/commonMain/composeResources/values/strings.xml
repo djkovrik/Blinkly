@@ -245,7 +245,7 @@
     <string name="achievements_hidden_description">Hidden achievement description</string>
 
     <!-- Garden -->
-    <string name="garden_current_tree_title">Your current tree</string>
+    <string name="garden_current_tree_title">Current tree</string>
     <string name="garden_collection_title">Garden</string>
     <string name="garden_stats_title">Garden stats</string>
     <string name="garden_grown_count">Grown: %1$d of %2$d plants</string>
