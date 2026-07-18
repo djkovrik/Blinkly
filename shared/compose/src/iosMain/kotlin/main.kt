@@ -6,6 +6,10 @@ import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.sedsoftware.blinkly.component.root.RootComponent
 import com.sedsoftware.blinkly.component.root.RootComponentFactory
 import com.sedsoftware.blinkly.compose.auth.initializeBlinklyGoogleAuth
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdPlacement
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdsBuildType
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdsConfiguration
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdsPlatform
 import com.sedsoftware.blinkly.compose.ui.RootContent
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
@@ -41,10 +45,30 @@ fun MainViewController(): UIViewController {
     return ComposeUIViewController {
         RootContent(
             component = rootComponent,
+            adsConfiguration = getAdsConfiguration(),
             onSystemBarsAppearanceChanged = { SystemBarsAppearanceChanged(it) },
         )
     }
 }
+
+private fun getAdsConfiguration(): BlinklyAdsConfiguration =
+    BlinklyAdsConfiguration(
+        achievementsAdUnitId = infoPlistString("BlinklyAchievementsAdUnitId"),
+        gardenAdUnitId = infoPlistString("BlinklyGardenAdUnitId"),
+        enabledPlacements = BlinklyAdPlacement.entries.toSet(),
+        privacyReady = true,
+        platform = BlinklyAdsPlatform.IOS,
+        buildType = when (infoPlistString("BlinklyAdsBuildType")) {
+            "RELEASE" -> BlinklyAdsBuildType.RELEASE
+            else -> BlinklyAdsBuildType.DEBUG
+        },
+        appVersion = infoPlistString("CFBundleShortVersionString").orEmpty(),
+    )
+
+private fun infoPlistString(key: String): String? =
+    (NSBundle.mainBundle.objectForInfoDictionaryKey(key) as? String)
+        ?.trim()
+        ?.takeIf(String::isNotEmpty)
 
 private fun initializeGoogleAuth() {
     val serverId = NSBundle.mainBundle.objectForInfoDictionaryKey("GIDServerClientID") as? String

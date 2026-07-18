@@ -55,7 +55,10 @@ import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.s
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.sedsoftware.blinkly.component.root.RootComponent
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdEvent
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdsConfiguration
 import com.sedsoftware.blinkly.compose.theme.BlinklyAppTheme
+import com.sedsoftware.blinkly.compose.ui.ads.BlinklyAdsHost
 import com.sedsoftware.blinkly.compose.ui.achievements.AchievementsContent
 import com.sedsoftware.blinkly.compose.ui.exercises.WorkoutContent
 import com.sedsoftware.blinkly.compose.ui.garden.GardenContent
@@ -79,70 +82,77 @@ import org.jetbrains.compose.resources.stringResource
 fun RootContent(
     component: RootComponent,
     modifier: Modifier = Modifier,
+    adsConfiguration: BlinklyAdsConfiguration = BlinklyAdsConfiguration.Disabled,
+    onAdEvent: (BlinklyAdEvent) -> Unit = {},
     onSystemBarsAppearanceChanged: @Composable (useDarkIcons: Boolean) -> Unit = {},
 ) {
     val themeState by component.themeState.subscribeAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbarEvents = remember(component) { mutableStateListOf<SnackbarEvent>() }
 
-    BlinklyAppTheme(
-        onSystemBarsAppearanceChanged = onSystemBarsAppearanceChanged,
-        themeState = themeState,
+    BlinklyAdsHost(
+        configuration = adsConfiguration,
+        onAdEvent = onAdEvent,
     ) {
-        LaunchedEffect(component) {
-            merge(
-                component.errors.map(SnackbarEvent::Error),
-                component.notifications.map(SnackbarEvent::Notification),
-            ).collect { event ->
-                snackbarEvents.add(event)
-            }
-        }
-
-        snackbarEvents.firstOrNull()?.let { event ->
-            val visuals = event.asVisuals()
-
-            LaunchedEffect(event, visuals) {
-                snackbarHostState.showSnackbar(visuals)
-
-                if (snackbarEvents.firstOrNull() === event) {
-                    snackbarEvents.removeAt(0)
-                }
-            }
-        }
-
-        Box(
-            modifier = modifier
-                .windowInsetsPadding(WindowInsets.safeDrawing)
-                .padding(16.dp)
-                .fillMaxSize(),
+        BlinklyAppTheme(
+            onSystemBarsAppearanceChanged = onSystemBarsAppearanceChanged,
+            themeState = themeState,
         ) {
-            ChildStack(
-                stack = component.childStack,
-                animation = stackAnimation(
-                    animator = fade() + scale(),
-                ),
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                when (val child = it.instance) {
-                    is RootComponent.Child.Onboarding -> OnboardingContent(child.component)
-                    is RootComponent.Child.HomeScreen -> HomeScreenContent(child.component)
-                    is RootComponent.Child.Preferences -> PreferencesContent(child.component)
-                    is RootComponent.Child.Workout -> WorkoutContent(child.component)
-                    is RootComponent.Child.Achievements -> AchievementsContent(child.component)
-                    is RootComponent.Child.Garden -> GardenContent(child.component)
-                    is RootComponent.Child.AddNewReminder -> AddNewReminderContent(child.component)
+            LaunchedEffect(component) {
+                merge(
+                    component.errors.map(SnackbarEvent::Error),
+                    component.notifications.map(SnackbarEvent::Notification),
+                ).collect { event ->
+                    snackbarEvents.add(event)
                 }
             }
 
-            SnackbarHost(
-                hostState = snackbarHostState,
-                snackbar = { snackbarData ->
-                    BlinklySnackbar(snackbarData = snackbarData)
-                },
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .fillMaxWidth(),
-            )
+            snackbarEvents.firstOrNull()?.let { event ->
+                val visuals = event.asVisuals()
+
+                LaunchedEffect(event, visuals) {
+                    snackbarHostState.showSnackbar(visuals)
+
+                    if (snackbarEvents.firstOrNull() === event) {
+                        snackbarEvents.removeAt(0)
+                    }
+                }
+            }
+
+            Box(
+                modifier = modifier
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
+                    .padding(16.dp)
+                    .fillMaxSize(),
+            ) {
+                ChildStack(
+                    stack = component.childStack,
+                    animation = stackAnimation(
+                        animator = fade() + scale(),
+                    ),
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    when (val child = it.instance) {
+                        is RootComponent.Child.Onboarding -> OnboardingContent(child.component)
+                        is RootComponent.Child.HomeScreen -> HomeScreenContent(child.component)
+                        is RootComponent.Child.Preferences -> PreferencesContent(child.component)
+                        is RootComponent.Child.Workout -> WorkoutContent(child.component)
+                        is RootComponent.Child.Achievements -> AchievementsContent(child.component)
+                        is RootComponent.Child.Garden -> GardenContent(child.component)
+                        is RootComponent.Child.AddNewReminder -> AddNewReminderContent(child.component)
+                    }
+                }
+
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    snackbar = { snackbarData ->
+                        BlinklySnackbar(snackbarData = snackbarData)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth(),
+                )
+            }
         }
     }
 }

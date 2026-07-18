@@ -41,6 +41,34 @@ tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configure
     exclude("**/build/**")
 }
 
+val verifyYandexAdsVersions by tasks.registering {
+    group = "verification"
+    description = "Verifies that the Yandex Mobile Ads CocoaPod matches the Gradle version catalog."
+
+    val podfile = layout.projectDirectory.file("iosApp/Podfile")
+    val expectedVersion = libs.versions.yandex.ads.get()
+    inputs.file(podfile)
+    inputs.property("expectedVersion", expectedVersion)
+
+    doLast {
+        val podfileText = inputs.files.singleFile.readText()
+        val configuredVersion = inputs.properties.getValue("expectedVersion").toString()
+        val podVersion = Regex("""pod\s+['\"]YandexMobileAds['\"]\s*,\s*['\"]([^'\"]+)['\"]""")
+            .find(podfileText)
+            ?.groupValues
+            ?.get(1)
+            ?: error("YandexMobileAds version is missing from iosApp/Podfile")
+
+        check(podVersion == configuredVersion) {
+            "Yandex Mobile Ads versions differ: libs.versions.toml=$configuredVersion, Podfile=$podVersion"
+        }
+    }
+}
+
+tasks.matching { it.name == "check" }.configureEach {
+    dependsOn(verifyYandexAdsVersions)
+}
+
 kover {
     reports {
         filters {

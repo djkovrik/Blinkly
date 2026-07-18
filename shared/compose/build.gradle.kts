@@ -145,6 +145,7 @@ kotlin {
             api(libs.compose.ui.tooling.preview)
             api(libs.compose.material3)
             implementation(libs.lib.kermit)
+            implementation(libs.lib.yandex.mobileads.compose)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
 

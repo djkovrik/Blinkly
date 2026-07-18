@@ -15,6 +15,10 @@ import androidx.core.view.WindowCompat
 import com.arkivanov.decompose.defaultComponentContext
 import com.sedsoftware.blinkly.component.root.RootComponentFactory
 import com.sedsoftware.blinkly.compose.auth.initializeBlinklyGoogleAuth
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdPlacement
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdsBuildType
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdsConfiguration
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdsPlatform
 import com.sedsoftware.blinkly.compose.ui.RootContent
 import dev.icerock.moko.permissions.PermissionsController
 
@@ -56,6 +60,7 @@ class AppActivity : ComponentActivity() {
         setContent {
             RootContent(
                 component = rootComponent,
+                adsConfiguration = getAdsConfiguration(),
                 onSystemBarsAppearanceChanged = { SystemBarsAppearanceChanged(it) },
             )
         }
@@ -64,6 +69,17 @@ class AppActivity : ComponentActivity() {
     private companion object {
         const val ANIMATION_DURATION = 250L
     }
+
+    private fun getAdsConfiguration(): BlinklyAdsConfiguration =
+        BlinklyAdsConfiguration(
+            achievementsAdUnitId = BuildConfig.BLINKLY_ACHIEVEMENTS_AD_UNIT_ID,
+            gardenAdUnitId = BuildConfig.BLINKLY_GARDEN_AD_UNIT_ID,
+            enabledPlacements = BlinklyAdPlacement.entries.toSet(),
+            privacyReady = true,
+            platform = BlinklyAdsPlatform.ANDROID,
+            buildType = if (BuildConfig.DEBUG) BlinklyAdsBuildType.DEBUG else BlinklyAdsBuildType.RELEASE,
+            appVersion = BuildConfig.VERSION_NAME,
+        )
 }
 
 @Composable

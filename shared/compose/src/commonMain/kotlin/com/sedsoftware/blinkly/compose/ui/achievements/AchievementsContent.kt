@@ -2,6 +2,9 @@
 
 package com.sedsoftware.blinkly.compose.ui.achievements
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -35,10 +39,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -62,6 +70,9 @@ import com.sedsoftware.blinkly.component.achievements.AchievementsComponent
 import com.sedsoftware.blinkly.component.achievements.AchievementsComponent.AchievementItem
 import com.sedsoftware.blinkly.component.achievements.integration.AchievementsComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
+import com.sedsoftware.blinkly.compose.ads.BlinklyAdPlacement
+import com.sedsoftware.blinkly.compose.ui.ads.BlinklyAdaptiveInlineBanner
+import com.sedsoftware.blinkly.compose.ui.ads.BlinklyAdsPreviewHost
 import com.sedsoftware.blinkly.compose.ui.extension.alsoIf
 import com.sedsoftware.blinkly.compose.ui.extension.asDescription
 import com.sedsoftware.blinkly.compose.ui.extension.asImage
@@ -85,6 +96,9 @@ fun AchievementsContent(
     modifier: Modifier = Modifier,
 ) {
     val model: AchievementsComponent.Model by component.model.subscribeAsState()
+    // LazyColumn disposes off-screen items, so retain the expanded slot height at screen scope.
+    var expandedAdHeightPx by remember(component) { mutableIntStateOf(0) }
+    val expandedAdMinHeight = with(LocalDensity.current) { expandedAdHeightPx.toDp() }
 
     Scaffold(
         topBar = {
@@ -144,6 +158,34 @@ fun AchievementsContent(
                         onClick = { component.onAchievementClick(achievement.type) },
                         modifier = Modifier.padding(horizontal = BlinklySpacing.ScreenHorizontal),
                     )
+                }
+
+                if (shouldPlaceAchievementsAdAfter(section.level)) {
+                    item(
+                        key = "ad_achievements_after_beginner",
+                        contentType = "ad",
+                    ) {
+                        BlinklyAdaptiveInlineBanner(
+                            placement = BlinklyAdPlacement.ACHIEVEMENTS,
+                            modifier = Modifier
+                                .heightIn(min = expandedAdMinHeight)
+                                .alsoIf(
+                                    condition = expandedAdHeightPx == 0,
+                                    other = Modifier.animateContentSize(
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioNoBouncy,
+                                            stiffness = Spring.StiffnessMediumLow,
+                                        ),
+                                        finishedListener = { initialSize, targetSize ->
+                                            if (targetSize.height > initialSize.height) {
+                                                expandedAdHeightPx = targetSize.height
+                                            }
+                                        },
+                                    ),
+                                )
+                                .padding(top = 14.dp, bottom = 6.dp),
+                        )
+                    }
                 }
             }
         }
@@ -394,11 +436,16 @@ private fun Instant.asUserTimeZoneDateTime(timeZone: TimeZone): String {
 
 private fun Int.twoDigits(): String = toString().padStart(length = 2, padChar = '0')
 
+internal fun shouldPlaceAchievementsAdAfter(level: AchievementLevel): Boolean =
+    level == AchievementLevel.BEGINNER
+
 @Preview(widthDp = 420, heightDp = 1060)
 @Composable
 private fun AchievementsContentPreviewLight() {
     BlinklyWidgetPreview {
-        AchievementsContent(component = AchievementsComponentPreview())
+        BlinklyAdsPreviewHost {
+            AchievementsContent(component = AchievementsComponentPreview())
+        }
     }
 }
 
@@ -406,7 +453,9 @@ private fun AchievementsContentPreviewLight() {
 @Composable
 private fun AchievementsContentPreviewDark() {
     BlinklyWidgetPreview(isDarkTheme = true) {
-        AchievementsContent(component = AchievementsComponentPreview())
+        BlinklyAdsPreviewHost {
+            AchievementsContent(component = AchievementsComponentPreview())
+        }
     }
 }
 
