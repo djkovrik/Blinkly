@@ -21,27 +21,35 @@ ATT/IDFA, GDPR/CMP flow и персонализированная реклама
 
 Нужны:
 
-- Xcode 16.4 или новее с iOS Simulator;
+- на Apple Silicon: Xcode 16.4 или новее с iOS Simulator;
+- на Intel Mac для сборки Simulator `x86_64`: Xcode 26.1.1 или новее;
 - Xcode Command Line Tools;
 - JDK 21;
 - Homebrew;
 - CocoaPods;
 - Git.
 
-Yandex Mobile Ads SDK 8.1.0 требует Xcode 16.4 или новее. На Xcode 16.2 Intel Simulator доходит до линковки, но падает на отсутствующем Swift runtime symbol `_swift_coroFrameAlloc` из `YandexMobileAds[x86_64]`.
-Xcode 16.4, в свою очередь, требует macOS 15.3 или новее. Если конкретная Intel-модель Mac официально не поддерживает macOS Sequoia, используй поддерживаемый Mac или macOS CI runner; установка только более новой Xcode на macOS Sonoma проблему не решит.
+Официальная документация Yandex Mobile Ads SDK 8.1.0 указывает Xcode 16.4 или новее. Однако это требование не гарантирует сборку Intel Simulator: на macOS 15.7.7 с Xcode 16.4, Swift 6.1.2 и iOS SDK 18.5 финальная линковка `YandexMobileAds[x86_64]` падает на отсутствующем Swift runtime symbol `_swift_coroFrameAlloc`. Та же проблема для Xcode 16.4 описана в [Swift issue #84402](https://github.com/swiftlang/swift/issues/84402); там подтверждено, что Xcode 26.1.1 её устраняет.
+
+Поэтому для Blinkly считай Xcode 26.1.1 или новее рабочим требованием для Intel Simulator. Xcode 16.4 остаётся официальным минимумом Yandex и может использоваться на Apple Silicon, но для `x86_64` его недостаточно. Если Intel Mac не может установить совместимую версию Xcode/macOS, собирай iOS target на поддерживаемом Mac или macOS CI runner.
 
 Сначала установи Xcode из App Store или Apple Developer, запусти её один раз и дождись установки дополнительных компонентов. Затем выполни:
 
 ```bash
 xcodebuild -version
 xcode-select -p
+xcrun swiftc --version
+xcrun --sdk iphonesimulator --show-sdk-version
 sw_vers
+uname -m
 git --version
 java -version
 brew --version
 pod --version
+df -h "$HOME"
 ```
+
+Перед чистой сборкой держи не менее 10 ГБ свободного места. Полная статическая сборка Firebase/Firestore/gRPC, Kotlin/Native и Yandex на Intel создаёт несколько гигабайт `DerivedData`; установка новой Xcode и Simulator runtime требует дополнительного места.
 
 Если Command Line Tools указывают не на полную Xcode:
 
@@ -205,7 +213,19 @@ run_logged \
 test -d Pods
 test -f Podfile.lock
 test -d iosApp.xcworkspace
+cmp -s Podfile.lock Pods/Manifest.lock
 ```
+
+На Intel дополнительно проверь, что CocoaPods действительно скопировал бинарный `x86_64`-срез, а не только структуру framework:
+
+```bash
+export YANDEX_SIMULATOR_BINARY="$BLINKLY_ROOT/iosApp/Pods/YandexMobileAds/YandexMobileAds.xcframework/ios-arm64_x86_64-simulator/YandexMobileAds.framework/YandexMobileAds"
+
+test -f "$YANDEX_SIMULATOR_BINARY"
+file "$YANDEX_SIMULATOR_BINARY"
+```
+
+В выводе `file` должна присутствовать архитектура `x86_64`. Пустой `YandexMobileAds.framework` без одноимённого бинарника позже проявится как `ld: framework 'YandexMobileAds' not found`.
 
 Проверь зафиксированную версию SDK:
 
@@ -321,6 +341,8 @@ xcrun simctl bootstatus "$SIMULATOR_NAME" -b
 ```bash
 export DERIVED_DATA="$BLINKLY_ROOT/iosApp/build/DerivedData"
 
+df -h "$BLINKLY_ROOT"
+
 run_logged \
   "$LOG_DIR/blinkly-xcode-simulator-debug.log" \
   xcodebuild \
@@ -334,6 +356,21 @@ run_logged \
 ```
 
 Ожидается `exit code: 0`.
+
+Если перед сборкой свободного места меньше 10 ГБ, сначала измерь генерируемые каталоги:
+
+```bash
+du -sh "$DERIVED_DATA" "$HOME/.gradle/caches" 2>/dev/null || true
+```
+
+Старый `DerivedData` можно безопасно пересоздать, но удаляй только проверенный точный путь:
+
+```bash
+test "$DERIVED_DATA" = "$BLINKLY_ROOT/iosApp/build/DerivedData" && \
+  rm -rf "$DERIVED_DATA"
+```
+
+Не удаляй весь `~/.gradle`: при необходимости удаляй только кэш конкретной старой версии Gradle, которая не совпадает с `distributionUrl` в `gradle/wrapper/gradle-wrapper.properties`.
 
 Во время этой сборки Xcode build phase `Prepare Yandex Ads`:
 
@@ -350,7 +387,10 @@ run_logged \
 ```bash
 export SIMULATOR_APP="$DERIVED_DATA/Build/Products/Debug-iphonesimulator/Blinkly.app"
 test -d "$SIMULATOR_APP"
+test -x "$SIMULATOR_APP/Blinkly"
 ```
+
+Проверки нужны обе: после linker failure Xcode может оставить частичный каталог `Blinkly.app` без исполняемого файла. Такой bundle нельзя передавать в `simctl install`.
 
 Установка и запуск:
 
@@ -714,13 +754,24 @@ open iosApp.xcworkspace
 
 ### `_swift_coroFrameAlloc` при линковке Intel Simulator
 
-Проверь версию Xcode:
+Проверь архитектуру Mac, Xcode, Swift toolchain и iOS SDK:
 
 ```bash
+uname -m
 xcodebuild -version
+xcrun swiftc --version
+xcrun --sdk iphonesimulator --show-sdk-version
 ```
 
-Для Yandex Mobile Ads SDK 8.1.0 нужен Xcode 16.4 или новее. Xcode 16.2 не содержит требуемый Swift runtime symbol для x86_64-среза SDK. Xcode 16.4 требует macOS 15.3+, поэтому сначала проверь, что Mac официально поддерживает macOS Sequoia. После обновления macOS и Xcode снова выбери Xcode через `xcode-select`, затем повтори шаги 4, 7 и 8. Если модель Mac не поддерживает Sequoia, перенеси iOS build на поддерживаемый Mac или CI runner.
+Для `YandexMobileAds` 8.1.0 на Intel не останавливайся на официальном минимуме Xcode 16.4. Фактически проверенная комбинация Xcode 16.4 + Swift 6.1.2 не содержит `_swift_coroFrameAlloc`, требуемый `YandexMobileAds[x86_64]`, и завершается `xcodebuild` exit code 65. Для Blinkly на Intel используй Xcode 26.1.1 или новее, затем снова выбери её и выполни первичную настройку:
+
+```bash
+sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+sudo xcodebuild -license accept
+sudo xcodebuild -runFirstLaunch
+```
+
+После обновления повтори шаги 4, 7 и 8. Не добавляй самодельную реализацию `_swift_coroFrameAlloc` и не подмешивай Swift runtime из другой Xcode: это внутренний ABI Swift и такой linker shim небезопасен. Если установить Xcode 26.1.1+ нельзя, перенеси iOS build на поддерживаемый Mac или macOS CI runner.
 
 ### CocoaPods падает с `Unicode Normalization not appropriate for ASCII-8BIT`
 
@@ -732,7 +783,23 @@ pod install --repo-update
 
 ### Pods повреждены или версия не обновилась
 
-Эти команды удаляют только генерируемые CocoaPods artifacts:
+Сначала проверь, существует ли бинарник SDK внутри framework:
+
+```bash
+export YANDEX_SIMULATOR_BINARY="$BLINKLY_ROOT/iosApp/Pods/YandexMobileAds/YandexMobileAds.xcframework/ios-arm64_x86_64-simulator/YandexMobileAds.framework/YandexMobileAds"
+test -f "$YANDEX_SIMULATOR_BINARY"
+```
+
+Если каталог framework есть, а бинарника нет, удали только повреждённую генерируемую копию pod и восстанови её:
+
+```bash
+cd "$BLINKLY_ROOT/iosApp"
+rm -rf Pods/YandexMobileAds
+pod install
+test -f "$YANDEX_SIMULATOR_BINARY"
+```
+
+Если локальный CocoaPods cache тоже повреждён или версия действительно должна обновиться, используй полную переустановку. Эти команды удаляют только генерируемые CocoaPods artifacts:
 
 ```bash
 cd "$BLINKLY_ROOT/iosApp"
@@ -803,18 +870,32 @@ export SCHEME="iosApp"
 export SIMULATOR_NAME="iPhone 16"
 export DERIVED_DATA="$BLINKLY_ROOT/iosApp/build/DerivedData"
 
+uname -m
+xcodebuild -version
+xcrun swiftc --version
+df -h "$BLINKLY_ROOT"
+
 ./gradlew -q verifyYandexAdsVersions \
   >"$LOG_DIR/blinkly-verify-yandex-versions.log" 2>&1
 echo "version check exit code: $?"
 
-./gradlew -q :shared:compose:compileKotlinIosSimulatorArm64 \
-  >"$LOG_DIR/blinkly-ios-kotlin-compile.log" 2>&1
+if [ "$(uname -m)" = "x86_64" ]; then
+  ./gradlew -q :shared:compose:compileKotlinIosX64 \
+    >"$LOG_DIR/blinkly-ios-kotlin-compile.log" 2>&1
+else
+  ./gradlew -q :shared:compose:compileKotlinIosSimulatorArm64 \
+    >"$LOG_DIR/blinkly-ios-kotlin-compile.log" 2>&1
+fi
 echo "Kotlin compile exit code: $?"
 
 cd "$BLINKLY_ROOT/iosApp"
 pod install --repo-update \
   >"$LOG_DIR/blinkly-pod-install.log" 2>&1
 echo "pod install exit code: $?"
+
+if [ "$(uname -m)" = "x86_64" ]; then
+  test -f "Pods/YandexMobileAds/YandexMobileAds.xcframework/ios-arm64_x86_64-simulator/YandexMobileAds.framework/YandexMobileAds" || exit 1
+fi
 
 open iosApp.xcworkspace
 
@@ -826,12 +907,18 @@ xcodebuild \
   -derivedDataPath "$DERIVED_DATA" \
   build \
   >"$LOG_DIR/blinkly-xcode-simulator-debug.log" 2>&1
-echo "Xcode build exit code: $?"
+xcode_exit_code=$?
+echo "Xcode build exit code: $xcode_exit_code"
+if [ "$xcode_exit_code" -ne 0 ]; then
+  tail -n 200 "$LOG_DIR/blinkly-xcode-simulator-debug.log"
+  exit "$xcode_exit_code"
+fi
 
 xcrun simctl boot "$SIMULATOR_NAME" 2>/dev/null || true
 xcrun simctl bootstatus "$SIMULATOR_NAME" -b
-xcrun simctl install booted \
-  "$DERIVED_DATA/Build/Products/Debug-iphonesimulator/Blinkly.app"
+export SIMULATOR_APP="$DERIVED_DATA/Build/Products/Debug-iphonesimulator/Blinkly.app"
+test -x "$SIMULATOR_APP/Blinkly" || exit 1
+xcrun simctl install booted "$SIMULATOR_APP"
 xcrun simctl launch booted com.sedsoftware.blinkly.iosApp
 ```
 
@@ -848,3 +935,4 @@ tail -n 200 "$LOG_DIR/ИМЯ-ФАЙЛА.log"
 - [Yandex SKAdNetwork configuration](https://ads.yandex.com/helpcenter/en/dev/ios/skadnetwork)
 - [CocoaPods: using a Podfile](https://guides.cocoapods.org/using/using-cocoapods.html)
 - [Apple: downloading and installing additional Xcode components](https://developer.apple.com/documentation/xcode/downloading-and-installing-additional-xcode-components)
+- [Swift issue #84402: `_swift_coroFrameAlloc` with Xcode 16.4 and Xcode 26](https://github.com/swiftlang/swift/issues/84402)
