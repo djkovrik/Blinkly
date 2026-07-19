@@ -439,7 +439,7 @@ private fun Int.twoDigits(): String = toString().padStart(length = 2, padChar = 
 internal fun shouldPlaceAchievementsAdAfter(level: AchievementLevel): Boolean =
     level == AchievementLevel.BEGINNER
 
-@Preview(widthDp = 420, heightDp = 1060)
+@Preview(widthDp = 420, heightDp = 1200)
 @Composable
 private fun AchievementsContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -449,7 +449,7 @@ private fun AchievementsContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 1060)
+@Preview(widthDp = 420, heightDp = 1200)
 @Composable
 private fun AchievementsContentPreviewDark() {
     BlinklyWidgetPreview(isDarkTheme = true) {

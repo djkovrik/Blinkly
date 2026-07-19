@@ -457,7 +457,7 @@ private fun TreeImage(
     }
 }
 
-@Preview(widthDp = 420, heightDp = 900)
+@Preview(widthDp = 420, heightDp = 1000)
 @Composable
 private fun GardenContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -467,7 +467,7 @@ private fun GardenContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 900)
+@Preview(widthDp = 420, heightDp = 1000)
 @Composable
 private fun GardenContentPreviewDark() {
     BlinklyWidgetPreview(isDarkTheme = true) {

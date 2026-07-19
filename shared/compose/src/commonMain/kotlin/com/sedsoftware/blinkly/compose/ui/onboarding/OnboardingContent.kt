@@ -2,8 +2,11 @@ package com.sedsoftware.blinkly.compose.ui.onboarding
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,12 +41,16 @@ fun OnboardingContent(
 
     val animatedScrollValue: Float by animateFloatAsState(targetValue = activeIndex.toFloat())
 
-    Box {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.safeDrawing),
+    ) {
         ChildStack(
             stack = component.childStack,
             // Keep button and system back navigation on the same slide animation path.
             animation = stackAnimation(animator = slide()),
-            modifier = modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
         ) {
             when (val child = it.instance) {
                 is OnboardingComponent.Child.Step1 -> OnboardingContentStep1(child.component)

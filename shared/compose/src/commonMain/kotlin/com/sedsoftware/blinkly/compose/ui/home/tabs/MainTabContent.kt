@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -58,6 +57,7 @@ import com.sedsoftware.blinkly.compose.ui.extension.asLabel
 import com.sedsoftware.blinkly.compose.ui.extension.asTitle
 import com.sedsoftware.blinkly.compose.ui.extension.isActionable
 import com.sedsoftware.blinkly.compose.ui.extension.shimmering
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.Tree
 import com.sedsoftware.blinkly.domain.model.TreeStage
@@ -95,7 +95,7 @@ fun MainTabContent(
                 }
             )
         },
-        modifier = modifier.systemBarsPadding()
+        modifier = modifier,
     ) { paddingValues ->
         Column(
             verticalArrangement = Arrangement.spacedBy(space = 16.dp),
@@ -103,6 +103,7 @@ fun MainTabContent(
                 .padding(paddingValues = paddingValues)
                 .fillMaxSize()
                 .verticalScroll(state = rememberScrollState())
+                .padding(horizontal = BlinklySpacing.ScreenHorizontal)
         ) {
             Text(
                 text = model.greetingPeriod.asLabel(),
