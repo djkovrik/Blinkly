@@ -37,6 +37,69 @@ Implemented feature areas:
 * Local Blinkly skill sources: `.ai/skills/mvikotlin`, `.ai/skills/decompose`, `.ai/skills/decompose-component-tests`
 * Treat the repository copies as the source of truth; avoid keeping duplicate global Codex skill copies for normal Blinkly work
 
+### Build and run the iOS app
+
+The iOS host has native CocoaPods dependencies, including Yandex Mobile Ads,
+Firebase, and Google Sign-In. Always build the `iosApp` scheme from
+`iosApp/iosApp.xcworkspace`, not from `iosApp/iosApp.xcodeproj`; the project file
+alone does not include the Pods build graph.
+
+Prepare the workspace after cloning or changing `Podfile`/`Podfile.lock`:
+
+```bash
+cd iosApp
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+pod install
+open iosApp.xcworkspace
+```
+
+In Xcode, select the `iosApp` scheme and an iOS Simulator, then use Run. This is
+the recommended interactive workflow. Android Studio may generate an Xcode
+Application run configuration backed by `iosApp.xcodeproj`; if its build command
+does not explicitly use `iosApp.xcworkspace`, it will miss the pods and should
+not be used for this target. Use Xcode or the workspace-based CLI flow instead.
+
+For a terminal build and simulator installation, first inspect the installed
+runtimes and available devices:
+
+```bash
+xcrun simctl list runtimes
+xcrun simctl list devices available
+```
+
+The device list contains entries in the form
+`iPhone 16e (99861C8A-3735-4F68-9230-88824D34F6A6) (Shutdown)`. The UUID inside
+parentheses is the `simulator-udid`. Choose a device with an iOS runtime of 16.2
+or newer, then run from the repository root:
+
+```bash
+export SIMULATOR_ID="<simulator-udid>"
+export DERIVED_DATA="$PWD/iosApp/build/DerivedData"
+
+xcrun simctl boot "$SIMULATOR_ID" 2>/dev/null || true
+xcrun simctl bootstatus "$SIMULATOR_ID" -b
+
+xcodebuild \
+  -workspace iosApp/iosApp.xcworkspace \
+  -scheme iosApp \
+  -configuration Debug \
+  -sdk iphonesimulator \
+  -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
+  -derivedDataPath "$DERIVED_DATA" \
+  build
+
+xcrun simctl install \
+  "$SIMULATOR_ID" \
+  "$DERIVED_DATA/Build/Products/Debug-iphonesimulator/Blinkly.app"
+
+xcrun simctl launch "$SIMULATOR_ID" com.sedsoftware.blinkly.iosApp
+```
+
+See [the macOS/Yandex iOS guide](docs/yandex-inline-ads-macos-guide.md) for the
+required Xcode versions, Gradle preflight, troubleshooting, device builds, and
+Release Archive checks.
+
 ### Component references
 * Root and home navigation: `shared/component/root`, `shared/component/home`
 * Onboarding flow: `shared/component/onboarding`, `shared/component/onboarding/child/step1` ... `step5`

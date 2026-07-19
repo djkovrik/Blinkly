@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -105,7 +104,7 @@ fun PreferencesContent(
                 },
             )
         },
-        modifier = modifier.systemBarsPadding(),
+        modifier = modifier,
     ) { paddingValues ->
         Column(
             verticalArrangement = Arrangement.spacedBy(space = 16.dp),
@@ -409,7 +408,7 @@ private fun Float.asDisplayValue(): String {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 1020)
+@Preview(widthDp = 420, heightDp = 1200)
 @Composable
 private fun PreferencesContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -420,7 +419,7 @@ private fun PreferencesContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 1020)
+@Preview(widthDp = 420, heightDp = 1200)
 @Composable
 private fun PreferencesContentPreviewDark() {
     BlinklyWidgetPreview(isDarkTheme = true) {

@@ -242,7 +242,7 @@
     <string name="achievements_hidden_description">Скрытое описание достижения</string>
 
     <!-- Garden -->
-    <string name="garden_current_tree_title">Ваше текущее дерево</string>
+    <string name="garden_current_tree_title">Текущее дерево</string>
     <string name="garden_collection_title">Сад</string>
     <string name="garden_stats_title">Статистика сада</string>
     <string name="garden_grown_count">Выращено: %1$d из %2$d растений</string>
