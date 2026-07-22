@@ -1,0 +1,238 @@
+name: Publish Android release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing SemVer tag to retry, for example v0.1.0
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      release_tag:
+        description: Existing SemVer tag to publish
+        required: true
+        type: string
+      changelog_en:
+        description: English Google Play release notes
+        required: true
+        type: string
+      changelog_ru:
+        description: Russian Google Play release notes
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: google-play-internal-${{ inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build and publish signed AAB
+    runs-on: ubuntu-latest
+    environment: google-play-internal
+    steps:
+      - name: Check out release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.release_tag || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Validate release source and version
+        id: version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+          RELEASE_ACTOR: ${{ github.actor }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+          RELEASE_EVENT: ${{ github.event_name }}
+          RELEASE_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$RELEASE_ACTOR" != "$REPOSITORY_OWNER" ]]; then
+            echo "Only the repository owner can publish Android releases." >&2
+            exit 1
+          fi
+          if [[ "$RELEASE_EVENT" == "workflow_dispatch" && "$RELEASE_REF" != "refs/heads/master" ]]; then
+            echo "Manual release retries must be started from master." >&2
+            exit 1
+          fi
+          if [[ ! "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Release tag must use stable SemVer format vMAJOR.MINOR.PATCH." >&2
+            exit 1
+          fi
+
+          major="${BASH_REMATCH[1]}"
+          minor="${BASH_REMATCH[2]}"
+          patch="${BASH_REMATCH[3]}"
+          if (( minor > 999 || patch > 999 )); then
+            echo "SemVer minor and patch components must not exceed 999." >&2
+            exit 1
+          fi
+
+          git fetch --no-tags origin master
+          release_commit="$(git rev-list -n 1 "$RELEASE_TAG")"
+          if ! git merge-base --is-ancestor "$release_commit" origin/master; then
+            echo "Tag $RELEASE_TAG does not point to a commit reachable from master." >&2
+            exit 1
+          fi
+
+          version_name="${RELEASE_TAG#v}"
+          version_code=$((major * 1000000 + minor * 1000 + patch))
+          if (( version_code < 1 || version_code > 2100000000 )); then
+            echo "Calculated versionCode $version_code is outside the Google Play range." >&2
+            exit 1
+          fi
+
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "version_name=$version_name" >> "$GITHUB_OUTPUT"
+          echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare localized release notes
+        id: notes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
+          CHANGELOG_EN: ${{ inputs.changelog_en }}
+          CHANGELOG_RU: ${{ inputs.changelog_ru }}
+        run: |
+          set -euo pipefail
+
+          notes_dir="$RUNNER_TEMP/google-play-release-notes"
+          mkdir -p "$notes_dir"
+
+          if [[ -n "$CHANGELOG_EN" || -n "$CHANGELOG_RU" ]]; then
+            if [[ -z "${CHANGELOG_EN//[[:space:]]/}" || -z "${CHANGELOG_RU//[[:space:]]/}" ]]; then
+              echo "Both localized changelogs must contain text." >&2
+              exit 1
+            fi
+            printf '%s\n' "$CHANGELOG_EN" > "$notes_dir/whatsnew-en-US"
+            printf '%s\n' "$CHANGELOG_RU" > "$notes_dir/whatsnew-ru-RU"
+          else
+            if ! gh release download "$RELEASE_TAG" \
+              --dir "$notes_dir" \
+              --pattern 'whatsnew-en-US' \
+              --pattern 'whatsnew-ru-RU'; then
+              echo "A direct tag publication requires a matching GitHub prerelease with both whatsnew assets." >&2
+              exit 1
+            fi
+          fi
+
+          if (( $(wc -m < "$notes_dir/whatsnew-en-US") > 501 || $(wc -m < "$notes_dir/whatsnew-ru-RU") > 501 )); then
+            echo "Google Play release notes must not exceed 500 characters per locale." >&2
+            exit 1
+          fi
+
+          echo "directory=$notes_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-disabled: true
+
+      - name: Decode upload keystore
+        id: keystore
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+
+          : "${ANDROID_KEYSTORE_BASE64:?ANDROID_KEYSTORE_BASE64 is not configured}"
+          : "${ANDROID_KEYSTORE_PASSWORD:?ANDROID_KEYSTORE_PASSWORD is not configured}"
+          : "${ANDROID_KEY_ALIAS:?ANDROID_KEY_ALIAS is not configured}"
+          : "${ANDROID_KEY_PASSWORD:?ANDROID_KEY_PASSWORD is not configured}"
+          : "${GOOGLE_PLAY_SERVICE_ACCOUNT_JSON:?GOOGLE_PLAY_SERVICE_ACCOUNT_JSON is not configured}"
+
+          keystore_path="$RUNNER_TEMP/blinkly-upload.jks"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$keystore_path"
+          chmod 600 "$keystore_path"
+          echo "path=$keystore_path" >> "$GITHUB_OUTPUT"
+
+      - name: Build signed release bundle
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ steps.keystore.outputs.path }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          VERSION_NAME: ${{ steps.version.outputs.version_name }}
+          VERSION_CODE: ${{ steps.version.outputs.version_code }}
+        run: |
+          set -euo pipefail
+
+          build_log="$RUNNER_TEMP/android-release-build.log"
+          if ! ./gradlew -q :androidApp:bundleRelease \
+            -PblinklyVersionName="$VERSION_NAME" \
+            -PblinklyVersionCode="$VERSION_CODE" \
+            >"$build_log" 2>&1; then
+            tail -n 200 "$build_log" >&2
+            exit 1
+          fi
+
+      - name: Locate release artifacts
+        id: artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          bundle_path="androidApp/build/outputs/bundle/release/androidApp-release.aab"
+          mapping_path="androidApp/build/outputs/mapping/release/mapping.txt"
+          symbols_path="androidApp/build/outputs/native-debug-symbols/release/native-debug-symbols.zip"
+
+          [[ -f "$bundle_path" ]] || { echo "Signed AAB not found at $bundle_path" >&2; exit 1; }
+          [[ -f "$mapping_path" ]] || { echo "R8 mapping file not found at $mapping_path" >&2; exit 1; }
+
+          echo "bundle=$bundle_path" >> "$GITHUB_OUTPUT"
+          echo "mapping=$mapping_path" >> "$GITHUB_OUTPUT"
+          if [[ -f "$symbols_path" ]]; then
+            echo "symbols=$symbols_path" >> "$GITHUB_OUTPUT"
+          else
+            echo "symbols=" >> "$GITHUB_OUTPUT"
+            echo "No separate native debug symbols archive was generated; available symbols remain embedded in the AAB."
+          fi
+
+      - name: Upload release with native debug symbols
+        if: steps.artifacts.outputs.symbols != ''
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.sedsoftware.blinkly
+          releaseFiles: ${{ steps.artifacts.outputs.bundle }}
+          tracks: internal
+          status: completed
+          releaseName: ${{ steps.version.outputs.release_tag }}
+          whatsNewDirectory: ${{ steps.notes.outputs.directory }}
+          mappingFile: ${{ steps.artifacts.outputs.mapping }}
+          debugSymbols: ${{ steps.artifacts.outputs.symbols }}
+
+      - name: Upload release without a separate native symbols archive
+        if: steps.artifacts.outputs.symbols == ''
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.sedsoftware.blinkly
+          releaseFiles: ${{ steps.artifacts.outputs.bundle }}
+          tracks: internal
+          status: completed
+          releaseName: ${{ steps.version.outputs.release_tag }}
+          whatsNewDirectory: ${{ steps.notes.outputs.directory }}
+          mappingFile: ${{ steps.artifacts.outputs.mapping }}

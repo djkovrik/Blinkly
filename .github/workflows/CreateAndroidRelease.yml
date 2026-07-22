@@ -1,0 +1,188 @@
+name: Create Android release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: SemVer component to increment
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      changelog_en:
+        description: English release notes (up to 500 characters)
+        required: true
+        type: string
+      changelog_ru:
+        description: Russian release notes (up to 500 characters)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: create-android-release
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    name: Authorize release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require the repository owner on master
+        env:
+          RELEASE_ACTOR: ${{ github.actor }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+          RELEASE_REF: ${{ github.ref }}
+        run: |
+          if [[ "$RELEASE_ACTOR" != "$REPOSITORY_OWNER" ]]; then
+            echo "Only the repository owner can create releases." >&2
+            exit 1
+          fi
+          if [[ "$RELEASE_REF" != "refs/heads/master" ]]; then
+            echo "Android releases must be created from master." >&2
+            exit 1
+          fi
+
+  prepare:
+    name: Create SemVer tag
+    needs: authorize
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      release_tag: ${{ steps.version.outputs.release_tag }}
+      version_name: ${{ steps.version.outputs.version_name }}
+      version_code: ${{ steps.version.outputs.version_code }}
+    steps:
+      - name: Check out master with tags
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Calculate next version
+        id: version
+        shell: bash
+        env:
+          VERSION_BUMP: ${{ inputs.version_bump }}
+          CHANGELOG_EN: ${{ inputs.changelog_en }}
+          CHANGELOG_RU: ${{ inputs.changelog_ru }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${CHANGELOG_EN//[[:space:]]/}" || -z "${CHANGELOG_RU//[[:space:]]/}" ]]; then
+            echo "Both localized changelogs must contain text." >&2
+            exit 1
+          fi
+          if (( ${#CHANGELOG_EN} > 500 || ${#CHANGELOG_RU} > 500 )); then
+            echo "Google Play release notes must not exceed 500 characters per locale." >&2
+            exit 1
+          fi
+
+          latest_tag=""
+          while IFS= read -r candidate; do
+            if [[ "$candidate" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+              candidate_commit="$(git rev-list -n 1 "$candidate")"
+              if git merge-base --is-ancestor "$candidate_commit" HEAD; then
+                latest_tag="$candidate"
+                break
+              fi
+            fi
+          done < <(git tag --list 'v*' --sort=-version:refname)
+
+          if [[ -z "$latest_tag" ]]; then
+            major=0
+            minor=1
+            patch=0
+          else
+            current_version="${latest_tag#v}"
+            IFS='.' read -r major minor patch <<< "$current_version"
+            case "$VERSION_BUMP" in
+              patch)
+                ((patch += 1))
+                ;;
+              minor)
+                ((minor += 1))
+                patch=0
+                ;;
+              major)
+                ((major += 1))
+                minor=0
+                patch=0
+                ;;
+              *)
+                echo "Unsupported version bump: $VERSION_BUMP" >&2
+                exit 1
+                ;;
+            esac
+          fi
+
+          if (( minor > 999 || patch > 999 )); then
+            echo "SemVer minor and patch components must not exceed 999." >&2
+            exit 1
+          fi
+
+          version_name="${major}.${minor}.${patch}"
+          release_tag="v${version_name}"
+          version_code=$((major * 1000000 + minor * 1000 + patch))
+
+          if (( version_code < 1 || version_code > 2100000000 )); then
+            echo "Calculated versionCode $version_code is outside the Google Play range." >&2
+            exit 1
+          fi
+          if git rev-parse --verify --quiet "refs/tags/$release_tag" >/dev/null; then
+            echo "Tag $release_tag already exists." >&2
+            exit 1
+          fi
+
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+          echo "version_name=$version_name" >> "$GITHUB_OUTPUT"
+          echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+          echo "Next Android release: $release_tag (versionCode $version_code)"
+
+      - name: Create tag and GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
+          CHANGELOG_EN: ${{ inputs.changelog_en }}
+          CHANGELOG_RU: ${{ inputs.changelog_ru }}
+        run: |
+          set -euo pipefail
+
+          notes_dir="$RUNNER_TEMP/google-play-release-notes"
+          mkdir -p "$notes_dir"
+          printf '%s\n' "$CHANGELOG_EN" > "$notes_dir/whatsnew-en-US"
+          printf '%s\n' "$CHANGELOG_RU" > "$notes_dir/whatsnew-ru-RU"
+          {
+            printf '## English\n\n%s\n\n' "$CHANGELOG_EN"
+            printf '## Russian\n\n%s\n' "$CHANGELOG_RU"
+          } > "$notes_dir/release-body.md"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag --annotate "$RELEASE_TAG" --message "Blinkly $RELEASE_TAG"
+          git push origin "refs/tags/$RELEASE_TAG"
+
+          gh release create "$RELEASE_TAG" \
+            "$notes_dir/whatsnew-en-US" \
+            "$notes_dir/whatsnew-ru-RU" \
+            --verify-tag \
+            --prerelease \
+            --title "Blinkly $RELEASE_TAG" \
+            --notes-file "$notes_dir/release-body.md"
+
+  publish:
+    name: Publish to Google Play internal testing
+    needs: prepare
+    permissions:
+      contents: read
+    uses: ./.github/workflows/PublishAndroidRelease.yml
+    with:
+      release_tag: ${{ needs.prepare.outputs.release_tag }}
+      changelog_en: ${{ inputs.changelog_en }}
+      changelog_ru: ${{ inputs.changelog_ru }}
+    secrets: inherit

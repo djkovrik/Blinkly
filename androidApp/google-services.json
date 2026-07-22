@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "38221976818-rn4ktleh1k84045cqa3hgm7hqf9fr4vs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sedsoftware.blinkly",
+            "certificate_hash": "916f4bc6c389c775d399023353adfb4d42440a93"
+          }
+        },
+        {
           "client_id": "38221976818-8l1vpr8cee88mfi524122j8apjs3866i.apps.googleusercontent.com",
           "client_type": 3
         }
