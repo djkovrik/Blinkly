@@ -518,6 +518,32 @@ When modifying existing code:
 - keep new modules symmetric with existing `component/*` modules
 - avoid introducing Android-only logic into common component or domain code
 
+## Android release automation
+
+Android releases use stable SemVer tags in the form `vMAJOR.MINOR.PATCH`.
+`.github/workflows/CreateAndroidRelease.yml` is the owner-only manual entry
+point on `master`; it creates the next patch, minor, or major tag and stores
+English and Russian Google Play release notes on a GitHub prerelease.
+`.github/workflows/PublishAndroidRelease.yml` is the reusable/tag-triggered
+publisher for the Google Play `internal` track.
+
+The Android build receives the tag-derived values through
+`-PblinklyVersionName` and `-PblinklyVersionCode`. Version codes use
+`major * 1_000_000 + minor * 1_000 + patch`; minor and patch components must
+remain below 1000. Release signing is configured only when all four
+`ANDROID_KEYSTORE_PATH`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, and
+`ANDROID_KEY_PASSWORD` environment variables are present, so ordinary local
+release builds may remain unsigned.
+
+Release builds enable R8 and resource shrinking and must keep producing
+`androidApp/build/outputs/mapping/release/mapping.txt` for Play Console.
+`ndk.debugSymbolLevel` is `SYMBOL_TABLE`; AGP embeds every symbol it can obtain
+in the AAB and the publishing workflow uploads a separate
+`native-debug-symbols.zip` when one is generated. Prebuilt dependency `.so`
+files may already be stripped, in which case no useful symbols can be
+reconstructed locally and the Play Console native-symbol recommendation is
+informational.
+
 ## Reference URLs
 
 Official references used for this guide:
