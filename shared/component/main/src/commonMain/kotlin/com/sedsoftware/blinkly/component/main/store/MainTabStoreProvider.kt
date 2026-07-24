@@ -82,6 +82,41 @@ internal class MainTabStoreProvider(
                     }
                 }
 
+                onIntent<Intent.AppResumed> {
+                    ctaRefreshJob?.cancel()
+                    ctaRefreshJob = null
+                    launch {
+                        val currentCalendar = state().calendar
+                        unwrap(
+                            result = withContext(ioContext) { manager.calculateData(currentCalendar) },
+                            onSuccess = { data ->
+                                dispatch(Msg.DataUpdated(data))
+                                ctaRefreshJob = data.ctaRefreshAfter?.let { refreshAfter ->
+                                    launch {
+                                        delay(refreshAfter)
+                                        ctaRefreshJob = null
+                                        val latestCalendar = state().calendar
+                                        unwrap(
+                                            result = withContext(ioContext) {
+                                                manager.calculateData(latestCalendar)
+                                            },
+                                            onSuccess = { refreshedData ->
+                                                dispatch(Msg.DataUpdated(refreshedData))
+                                            },
+                                            onError = { throwable ->
+                                                publish(Label.ErrorCaught(mainDataLoadingError(throwable)))
+                                            }
+                                        )
+                                    }
+                                }
+                            },
+                            onError = { throwable ->
+                                publish(Label.ErrorCaught(mainDataLoadingError(throwable)))
+                            }
+                        )
+                    }
+                }
+
                 onAction<Action.ObserveTree> {
                     launch {
                         manager.tree

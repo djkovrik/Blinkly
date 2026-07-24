@@ -12,7 +12,9 @@ import com.sedsoftware.blinkly.domain.model.Workout
 
 internal interface MainTabStore : Store<Intent, State, Label> {
 
-    sealed interface Intent
+    sealed interface Intent {
+        data object AppResumed : Intent
+    }
 
     data class State(
         val calendar: List<Workout> = emptyList(),

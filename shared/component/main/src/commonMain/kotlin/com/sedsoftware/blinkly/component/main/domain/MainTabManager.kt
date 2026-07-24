@@ -109,7 +109,14 @@ internal class MainTabManager(
             else -> MainCtaState.Idle
         }
 
-        val refreshAfter = if (state == MainCtaState.BreakCooldown && timeSinceLastTwentyX3 != null) {
+        val waitsForNextWorkBreak = state == MainCtaState.Idle &&
+            currentTime.hour in WORK_HOUR_START..WORK_HOUR_END &&
+            twentyX3Count < MIN_TWENTY_X3_DAILY &&
+            !twentyX3BreakDue
+        val refreshAfter = if (
+            (state == MainCtaState.BreakCooldown || waitsForNextWorkBreak) &&
+            timeSinceLastTwentyX3 != null
+        ) {
             WORK_BREAK_THRESHOLD - timeSinceLastTwentyX3
         } else {
             null

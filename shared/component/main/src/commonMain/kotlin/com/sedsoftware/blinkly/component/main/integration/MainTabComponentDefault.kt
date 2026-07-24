@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.essenty.lifecycle.doOnResume
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
@@ -68,6 +69,10 @@ class MainTabComponentDefault(
         }
 
         store.init()
+
+        lifecycle.doOnResume {
+            store.accept(MainTabStore.Intent.AppResumed)
+        }
 
         lifecycle.doOnDestroy {
             scope.cancel()

@@ -7,6 +7,8 @@ import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.essenty.lifecycle.pause
+import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.main.domain.model.GreetingPeriod
@@ -135,6 +137,53 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
         // then
         assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.WorkBreakDue)
         assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+    }
+
+    @Test
+    fun `when recent work break cooldown elapses then idle CTA automatically becomes due`() = runTest(testScheduler) {
+        // given
+        timeUtils.current = instantAt(hour = 12, minute = 0)
+        calendarFlow.value = listOf(
+            Workout(
+                exercises = listOf(
+                    exercise(ExerciseBlock.C, ExerciseType.TWENTY_X3, hour = 11, minute = 50),
+                )
+            )
+        )
+        testScheduler.runCurrent()
+        assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.Idle)
+
+        // when
+        timeUtils.current = instantAt(hour = 12, minute = 10)
+        testScheduler.advanceTimeBy(10.minutes.inWholeMilliseconds)
+        testScheduler.runCurrent()
+
+        // then
+        assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.WorkBreakDue)
+    }
+
+    @Test
+    fun `when app resumes after work break cooldown then idle CTA becomes due`() = runTest(testScheduler) {
+        // given
+        timeUtils.current = instantAt(hour = 12, minute = 0)
+        calendarFlow.value = listOf(
+            Workout(
+                exercises = listOf(
+                    exercise(ExerciseBlock.C, ExerciseType.TWENTY_X3, hour = 11, minute = 50),
+                )
+            )
+        )
+        testScheduler.runCurrent()
+        assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.Idle)
+
+        // when
+        lifecycle.pause()
+        timeUtils.current = instantAt(hour = 12, minute = 15)
+        lifecycle.resume()
+        testScheduler.runCurrent()
+
+        // then
+        assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.WorkBreakDue)
     }
 
     @Test
