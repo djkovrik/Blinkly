@@ -2,7 +2,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.window.ComposeUIViewController
 import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.arkivanov.essenty.lifecycle.ApplicationLifecycle
 import com.sedsoftware.blinkly.component.root.RootComponent
 import com.sedsoftware.blinkly.component.root.RootComponentFactory
 import com.sedsoftware.blinkly.compose.auth.initializeBlinklyGoogleAuth
@@ -21,8 +21,8 @@ import platform.UIKit.UIStatusBarStyleLightContent
 import platform.UIKit.UIViewController
 import platform.UIKit.setStatusBarStyle
 
-private val lifecycle: LifecycleRegistry by lazy {
-    LifecycleRegistry()
+private val lifecycle: ApplicationLifecycle by lazy {
+    ApplicationLifecycle()
 }
 
 private val permissionsController: PermissionsController by lazy {

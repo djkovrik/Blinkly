@@ -100,6 +100,13 @@ internal class WorkoutStoreProvider(
                     }
                 }
 
+                onIntent<Intent.AppPaused> {
+                    if (state().phase == Phase.RUNNING) {
+                        exerciseManager.pause()
+                        dispatch(Msg.ExercisePaused)
+                    }
+                }
+
                 onIntent<Intent.ResumeClicked> {
                     if (state().phase == Phase.PAUSED) {
                         exerciseManager.resume()

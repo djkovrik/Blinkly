@@ -36,6 +36,7 @@ import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
+import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
@@ -80,6 +81,7 @@ class RootComponentDefault private constructor(
         beeper: BlinklyBeeper,
         dispatchers: BlinklyDispatchers,
         notifier: BlinklyNotifier,
+        screenAwakeController: BlinklyScreenAwakeController,
         settings: BlinklySettings,
         syncManager: BlinklySyncManager,
         timeUtils: BlinklyTimeUtils,
@@ -122,6 +124,7 @@ class RootComponentDefault private constructor(
                 block = block,
                 exerciseManager = exerciseManager,
                 beeper = beeper,
+                screenAwakeController = screenAwakeController,
                 workoutOutput = output,
             )
         },

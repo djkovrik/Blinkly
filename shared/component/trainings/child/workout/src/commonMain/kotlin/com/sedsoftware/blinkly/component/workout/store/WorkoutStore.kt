@@ -12,6 +12,7 @@ internal interface WorkoutStore : Store<WorkoutStore.Intent, WorkoutStore.State,
         data object StartClicked : Intent
         data object PauseClicked : Intent
         data object ResumeClicked : Intent
+        data object AppPaused : Intent
     }
 
     data class State(
