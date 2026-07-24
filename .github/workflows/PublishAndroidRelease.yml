@@ -221,7 +221,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.sedsoftware.blinkly
           releaseFiles: ${{ steps.artifacts.outputs.bundle }}
-          tracks: internal
+          tracks: alpha
           status: completed
           releaseName: ${{ steps.version.outputs.release_tag }}
           whatsNewDirectory: ${{ steps.notes.outputs.directory }}
@@ -235,7 +235,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.sedsoftware.blinkly
           releaseFiles: ${{ steps.artifacts.outputs.bundle }}
-          tracks: internal
+          tracks: alpha
           status: completed
           releaseName: ${{ steps.version.outputs.release_tag }}
           whatsNewDirectory: ${{ steps.notes.outputs.directory }}
