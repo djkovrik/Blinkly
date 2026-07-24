@@ -4,6 +4,7 @@ import android.view.Window
 import android.view.WindowManager
 import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
 
+@Suppress("FunctionNaming")
 fun BlinklyScreenAwakeControllerFactory(window: Window): BlinklyScreenAwakeController =
     BlinklyScreenAwakeControllerAndroid(window)
 

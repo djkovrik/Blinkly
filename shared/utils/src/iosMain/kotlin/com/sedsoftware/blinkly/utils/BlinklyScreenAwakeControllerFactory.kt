@@ -3,6 +3,7 @@ package com.sedsoftware.blinkly.utils
 import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
 import platform.UIKit.UIApplication
 
+@Suppress("FunctionNaming")
 fun BlinklyScreenAwakeControllerFactory(): BlinklyScreenAwakeController =
     BlinklyScreenAwakeControllerIos()
 
