@@ -16,6 +16,7 @@ import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.workout.integration.WorkoutComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
+import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
@@ -33,6 +34,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
 
     private var exerciseManager: FakeExerciseManager = FakeExerciseManager()
     private var beeper: FakeBeeper = FakeBeeper()
+    private var screenAwakeController: FakeScreenAwakeController = FakeScreenAwakeController()
 
     @Test
     fun `when component created then intro model contains selected block exercises`() = runTest(testScheduler) {
@@ -241,6 +243,67 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     }
 
     @Test
+    fun `when app backgrounds during exercise then screen mode is disabled and workout stays paused after return`() =
+        runTest(testScheduler) {
+            // given
+            startFirstExercise()
+            testScheduler.advanceUntilIdle()
+            assertThat(screenAwakeController.enableCount).isEqualTo(1)
+
+            // when
+            lifecycle.pause()
+            testScheduler.advanceUntilIdle()
+
+            // then
+            assertThat(screenAwakeController.disableCount).isEqualTo(1)
+            assertThat(exerciseManager.pauseCount).isEqualTo(1)
+            assertThat(component.model.value.phase).isEqualTo(WorkoutComponent.Phase.PAUSED)
+
+            // when
+            lifecycle.resume()
+            testScheduler.advanceUntilIdle()
+
+            // then
+            assertThat(screenAwakeController.enableCount).isEqualTo(2)
+            assertThat(exerciseManager.resumeCount).isEqualTo(0)
+            assertThat(component.model.value.phase).isEqualTo(WorkoutComponent.Phase.PAUSED)
+        }
+
+    @Test
+    fun `when app backgrounds outside running phase then manager is not paused`() = runTest(testScheduler) {
+        // when intro
+        lifecycle.pause()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(exerciseManager.pauseCount).isEqualTo(0)
+        assertThat(component.model.value.phase).isEqualTo(WorkoutComponent.Phase.INTRO)
+
+        // when ready
+        lifecycle.resume()
+        component.onStartClick()
+        testScheduler.advanceUntilIdle()
+        lifecycle.pause()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(exerciseManager.pauseCount).isEqualTo(0)
+        assertThat(component.model.value.phase).isEqualTo(WorkoutComponent.Phase.READY)
+
+        // when already paused
+        lifecycle.resume()
+        component.onStartClick()
+        component.onPauseClick()
+        testScheduler.advanceUntilIdle()
+        lifecycle.pause()
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(exerciseManager.pauseCount).isEqualTo(1)
+        assertThat(component.model.value.phase).isEqualTo(WorkoutComponent.Phase.PAUSED)
+    }
+
+    @Test
     fun `when event belongs to another block then it is ignored`() = runTest(testScheduler) {
         // given
         startFirstExercise()
@@ -313,10 +376,12 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
         val localLifecycle = LifecycleRegistry()
         val localManager = FakeExerciseManager()
         val localBeeper = FakeBeeper()
+        val localScreenAwakeController = FakeScreenAwakeController()
         createComponent(
             lifecycle = localLifecycle,
             manager = localManager,
             beeper = localBeeper,
+            screenAwakeController = localScreenAwakeController,
         )
         localLifecycle.create()
         localLifecycle.resume()
@@ -329,6 +394,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
         // then
         assertThat(localManager.stopCount).isEqualTo(1)
         assertThat(localBeeper.releaseCount).isEqualTo(0)
+        assertThat(localScreenAwakeController.disableCount).isEqualTo(2)
     }
 
     override fun createComponent(): WorkoutComponent =
@@ -337,6 +403,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
             lifecycle = lifecycle,
             manager = exerciseManager,
             beeper = beeper,
+            screenAwakeController = screenAwakeController,
         )
 
     private fun createComponent(
@@ -344,6 +411,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
         lifecycle: LifecycleRegistry = this.lifecycle,
         manager: FakeExerciseManager = exerciseManager,
         beeper: FakeBeeper = this.beeper,
+        screenAwakeController: FakeScreenAwakeController = this.screenAwakeController,
     ): WorkoutComponent =
         WorkoutComponentDefault(
             componentContext = DefaultComponentContext(lifecycle),
@@ -352,6 +420,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
             block = block,
             exerciseManager = manager,
             beeper = beeper,
+            screenAwakeController = screenAwakeController,
             workoutOutput = { componentOutput.add(it) },
         )
 
@@ -413,6 +482,19 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
 
         override fun release() {
             releaseCount++
+        }
+    }
+
+    private class FakeScreenAwakeController : BlinklyScreenAwakeController {
+        var enableCount: Int = 0
+        var disableCount: Int = 0
+
+        override fun enable() {
+            enableCount++
+        }
+
+        override fun disable() {
+            disableCount++
         }
     }
 }

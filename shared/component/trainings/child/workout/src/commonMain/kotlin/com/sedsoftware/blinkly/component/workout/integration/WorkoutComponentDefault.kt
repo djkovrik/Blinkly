@@ -4,6 +4,8 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.essenty.lifecycle.doOnPause
+import com.arkivanov.essenty.lifecycle.doOnResume
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
@@ -14,6 +16,7 @@ import com.sedsoftware.blinkly.component.workout.store.WorkoutStoreProvider
 import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
+import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.utils.asValue
@@ -30,6 +33,7 @@ class WorkoutComponentDefault(
     private val block: ExerciseBlock,
     private val exerciseManager: BlinklyExerciseManager,
     private val beeper: BlinklyBeeper,
+    private val screenAwakeController: BlinklyScreenAwakeController,
     private val workoutOutput: (ComponentOutput) -> Unit,
 ) : WorkoutComponent, ComponentContext by componentContext {
 
@@ -59,7 +63,17 @@ class WorkoutComponentDefault(
 
         store.init()
 
+        lifecycle.doOnResume {
+            screenAwakeController.enable()
+        }
+
+        lifecycle.doOnPause {
+            screenAwakeController.disable()
+            store.accept(WorkoutStore.Intent.AppPaused)
+        }
+
         lifecycle.doOnDestroy {
+            screenAwakeController.disable()
             exerciseManager.stop()
             scope.cancel()
         }

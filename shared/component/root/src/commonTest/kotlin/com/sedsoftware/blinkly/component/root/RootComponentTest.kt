@@ -21,6 +21,7 @@ import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
+import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
@@ -60,6 +61,10 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         every { permissionEvents() } returns emptyFlow()
         everySuspend { isNotificationPermissionGranted() } returns true
         everySuspend { requestNotificationPermission() } returns Unit
+    }
+    private val screenAwakeControllerMock: BlinklyScreenAwakeController = mock {
+        every { enable() } returns Unit
+        every { disable() } returns Unit
     }
     private val fakeSettings = FakeSettings()
     private val syncManager: FakeBlinklySyncManager = FakeBlinklySyncManager()
@@ -407,6 +412,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
             beeper = beeperMock,
             dispatchers = testDispatchers,
             notifier = notifierMock,
+            screenAwakeController = screenAwakeControllerMock,
             settings = fakeSettings,
             syncManager = syncManager,
             timeUtils = timeUtilsMock,

@@ -23,6 +23,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
+import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
@@ -33,6 +34,7 @@ import com.sedsoftware.blinkly.notifier.di.NotifierModuleDependencies
 import com.sedsoftware.blinkly.settings.SharedSettingsFactory
 import com.sedsoftware.blinkly.settings.di.SettingsModule
 import com.sedsoftware.blinkly.settings.di.SettingsModuleDependencies
+import com.sedsoftware.blinkly.utils.BlinklyScreenAwakeControllerFactory
 import com.sedsoftware.blinkly.utils.di.UtilsModule
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
@@ -146,12 +148,17 @@ fun RootComponentFactory(
         beeperModule.beeper
     }
 
+    val screenAwakeController: BlinklyScreenAwakeController by lazy {
+        BlinklyScreenAwakeControllerFactory()
+    }
+
     return RootComponentDefault(
         componentContext = componentContext,
         storeFactory = DefaultStoreFactory(),
         beeper = beeper,
         dispatchers = dispatchers,
         notifier = notifier,
+        screenAwakeController = screenAwakeController,
         settings = settings,
         syncManager = syncManager,
         timeUtils = timeUtils,

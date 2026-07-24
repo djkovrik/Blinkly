@@ -76,7 +76,7 @@ repository copy first and remove or refresh the global copy immediately after.
 - `shared/notifier` - notification permissions and notification API implementation
 - `shared/settings` - settings storage through Multiplatform Settings
 - `shared/component/sync` - Google/Firebase-backed account sync, remote snapshot DTOs, conflict handling, and sync metadata tracking wrappers
-- `shared/utils` - utility code, preview helpers, and Store helpers
+- `shared/utils` - utility code, preview helpers, Store helpers, and platform screen-awake control
 
 ## Module Map
 
@@ -100,7 +100,7 @@ Nested component modules:
 - `progress/child/achievements` - achievements screen opened on the root stack from the progress tab; has MVIKotlin Store, Compose UI, preview component, and common tests
 - `progress/child/garden` - garden screen opened on the root stack from the progress tab; has MVIKotlin Store, Compose UI, preview component, and common tests
 - `reminders/child/newreminder` - add-new-reminder screen opened on the root stack from the reminders tab; has MVIKotlin Store, manager, Compose UI, preview component, and common tests
-- `trainings/child/workout` - workout execution screen opened on the root stack from the trainings tab or main CTA; has MVIKotlin Store, beeper feedback, Compose UI, preview component, and common tests
+- `trainings/child/workout` - workout execution screen opened on the root stack from the trainings tab or main CTA; has MVIKotlin Store, beeper feedback, lifecycle-owned screen-awake control, Compose UI, preview component, and common tests
 
 Current screen hierarchy:
 - `RootComponentDefault` starts with `Onboarding` when onboarding has not been completed, otherwise `HomeScreen`.
@@ -126,6 +126,7 @@ Current implementation notes:
 - Exercise movement events carry their DSL cadence through `ExerciseEvent.Movement.durationMs`, the workout Store/model, and `BlinklyEyePanel`. Keep movement timing single-sourced from the script and finish repeating UI animations shortly before the next movement event so the final frame is rendered without cancellation.
 - Yandex advertising is configured at the Android/iOS entry points and exposed only through a safe-disabled Compose `CompositionLocal`; it is not component or Store state. Both Achievements and Garden use contextual adaptive inline banners as regular lazy-list items. Android removes `AD_ID`, iOS does not request ATT/IDFA, and ad requests must contain only the platform-specific `adUnitId`, never Blinkly health, workout, reminder, account, achievement, garden, or sync data. The iOS `Podfile` must link YandexMobileAds together with the native FirebaseAuth, FirebaseFirestore, and GoogleSignIn SDKs required by GitLive/KMPAuth, using `use_frameworks! :linkage => :static`; do not replace this with dynamic linkage or global `use_modular_headers!`. Yandex documents Xcode 16.4 as the minimum for YandexMobileAds 8.1.0, but the Intel Simulator `x86_64` slice requires Xcode 26.1.1 or newer in practice because Xcode 16.4 lacks `_swift_coroFrameAlloc`; Intel Macs that cannot install that toolchain must use a supported Mac or macOS CI runner for iOS builds.
 - Workout execution uses the same manual `READY` gate before every exercise, including the first one. Starting a block initializes the exercise manager and shows the first exercise instructions; only the explicit Start exercise action may call `startNextExercise()` and enter `RUNNING`.
+- `WorkoutComponentDefault` owns screen-awake state through its lifecycle: enable it while the workout screen is resumed, disable it on pause or destroy, and pause a `RUNNING` exercise when the app backgrounds. Returning to the app re-enables screen-awake mode but leaves the workout in `PAUSED` until the user explicitly resumes it.
 - `step4`, `step5`, `main`, `preferences`, `progress`, `achievements`, `garden`, `reminders`, `newreminder`, `trainings`, `workout`, and `sync` are the current reference implementations for MVIKotlin stores.
 
 ## Architecture Rules
@@ -201,9 +202,9 @@ Reference modules:
 - `shared/component/sync/src/commonMain/kotlin/com/sedsoftware/blinkly/component/sync/di/SyncModule.kt`
 - `shared/utils/src/commonMain/kotlin/com/sedsoftware/blinkly/utils/di/UtilsModule.kt`
 
-`RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), then `SyncModule` tracking wrappers, then `DomainModule`, then creates `BlinklySyncManager` with the domain reminder reschedule callback before `RootComponentDefault`.
-On iOS, the Swift `@main` app must call `FirebaseApp.configure()` before creating `MainKt.MainViewController()`. The Compose controller lazily creates `RootComponentFactory`, whose sync graph constructs `FirebaseBlinklyAuthService` and accesses the default `Firebase.auth`; reversing this order causes an immediate FirebaseAuth fatal error at launch. Keep `GoogleService-Info.plist` in the iOS app target resources.
-On Android, `RootComponentFactory` also supplies `AlarmModule` with the platform `BlinklyExactAlarmPermissionController`, which checks `AlarmManager.canScheduleExactAlarms()` and opens the app-specific exact-alarm settings screen when access is missing.
+`RootComponentFactory` is the composition root on both platforms. It builds dispatchers, utils, platform modules (`alarm`, `database`, `notifier`, `settings`, `beeper`), and the platform `BlinklyScreenAwakeController`, then `SyncModule` tracking wrappers, then `DomainModule`, then creates `BlinklySyncManager` with the domain reminder reschedule callback before `RootComponentDefault`.
+On iOS, the Swift `@main` app must call `FirebaseApp.configure()` before creating `MainKt.MainViewController()`. The Compose controller lazily creates `RootComponentFactory`, whose sync graph constructs `FirebaseBlinklyAuthService` and accesses the default `Firebase.auth`; reversing this order causes an immediate FirebaseAuth fatal error at launch. Keep `GoogleService-Info.plist` in the iOS app target resources. Use Essenty `ApplicationLifecycle` for the root `ComponentContext` so UIKit active/background notifications reach child components.
+On Android, `RootComponentFactory` also supplies `AlarmModule` with the platform `BlinklyExactAlarmPermissionController`, which checks `AlarmManager.canScheduleExactAlarms()` and opens the app-specific exact-alarm settings screen when access is missing. The activity also passes its `Window` to the utils screen-awake factory; keep the application `Context` for the remaining long-lived modules.
 The Android boot/package receiver does not create a `RootComponent`. It calls `rescheduleBlinklyReminders`, which builds a focused one-shot graph from the raw database, alarm module, time utilities, dispatchers, and `createBlinklyReminderManager`, then closes its SQLDelight driver after rescheduling.
 `RootComponentDefault` passes `BlinklyNotifier` through `HomeScreenComponentDefault` to the reminders tab so adding a reminder checks or requests notification permission before root navigation opens the add-new-reminder screen.
 `SyncModule` receives the raw database/settings implementations, exposes tracking decorators for app use, and creates `BlinklySyncManager` after `DomainModule` is available so applying changed remote reminder rows can reschedule their physical alarms.

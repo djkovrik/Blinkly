@@ -55,6 +55,7 @@ class AppActivity : ComponentActivity() {
             contentConfigurations = getNotificationConfigurations(),
             permissionsController = permissionsController,
             context = applicationContext,
+            window = window,
         )
 
         setContent {
