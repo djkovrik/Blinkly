@@ -527,6 +527,9 @@ point on `master`; it creates the next patch, minor, or major tag and stores
 English and Russian Google Play release notes on a GitHub prerelease.
 `.github/workflows/PublishAndroidRelease.yml` is the reusable/tag-triggered
 publisher for the Google Play `internal` track.
+Manual changelog inputs use literal `\n` sequences for line breaks; workflows
+decode them before validating the 500-character Play limit and creating the
+localized release-note files.
 
 The Android build receives the tag-derived values through
 `-PblinklyVersionName` and `-PblinklyVersionCode`. Version codes use
