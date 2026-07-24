@@ -239,7 +239,7 @@ class BlinklyReminderManagerTest : BaseDomainTest() {
 
         override suspend fun saveExercise(exercise: Exercise) = Unit
         override suspend fun saveExercises(exercises: List<Exercise>) = Unit
-        override suspend fun unlockAchievement(achievement: Achievement) = Unit
+        override suspend fun unlockAchievement(achievement: Achievement): Boolean = true
         override suspend fun saveAchievements(achievements: List<Achievement>) = Unit
         override suspend fun deleteAchievements() = Unit
         override suspend fun deleteExercises() = Unit

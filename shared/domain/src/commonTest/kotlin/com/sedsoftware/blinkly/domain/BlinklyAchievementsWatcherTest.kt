@@ -17,6 +17,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -32,7 +33,7 @@ class BlinklyAchievementsWatcherTest : BaseDomainTest() {
         everySuspend { currentCalendar() } returns calendarFlow
         everySuspend { saveExercise(any()) } returns Unit
         everySuspend { currentAchievements() } returns achievementsFlow
-        everySuspend { unlockAchievement(any()) } returns Unit
+        everySuspend { unlockAchievement(any()) } returns true
     }
 
     private val watcher: BlinklyAchievementsWatcher = BlinklyAchievementsWatcherImpl(
@@ -164,6 +165,39 @@ class BlinklyAchievementsWatcherTest : BaseDomainTest() {
         // then
         assertThat(achievements.size).isEqualTo(AchievementType.entries.size)
         assertThat(achievements).contains(achievement)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `when achievement already persisted then should not unlock or notify again`() = runTest(testScheduler) {
+        // given
+        val achievement = Achievement(AchievementType.FIRST_SPARK, AchievementLevel.BEGINNER, now)
+        achievementsFlow.value = listOf(achievement)
+        calendarFlow.value = listOf(FakeData.getSingleExerciseWorkout(now))
+
+        // when
+        val collectJob = launch { watcher.achievements.collect {} }
+        testScheduler.advanceUntilIdle()
+
+        // then
+        verifySuspend(exactly(0)) { database.unlockAchievement(any()) }
+        verifySuspend(exactly(0)) { notifier.achievementUnlocked(any()) }
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `when persistence rejects duplicate unlock then should not notify`() = runTest(testScheduler) {
+        // given
+        everySuspend { database.unlockAchievement(any()) } returns false
+        calendarFlow.value = listOf(FakeData.getSingleExerciseWorkout(now))
+
+        // when
+        val collectJob = launch { watcher.achievements.collect {} }
+        testScheduler.advanceUntilIdle()
+
+        // then
+        verifySuspend(exactly(1)) { database.unlockAchievement(any()) }
+        verifySuspend(exactly(0)) { notifier.achievementUnlocked(any()) }
         collectJob.cancel()
     }
 }

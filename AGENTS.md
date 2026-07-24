@@ -391,7 +391,11 @@ When adding a new user-visible error context, add the `BlinklyError` type and ma
 
 App-wide informational events use `BlinklyNotification` from `shared/domain/src/commonMain/kotlin/com/sedsoftware/blinkly/domain/model/BlinklyNotification.kt`.
 Components may route them upward as `ComponentOutput.Common.NotificationReceived`; `RootComponentDefault` emits them through `RootComponent.notifications`.
-Achievement unlock events originate when `BlinklyAchievementsWatcherImpl` calls `BlinklyNotifier.achievementUnlocked` after saving, so restored or initially loaded achievements do not produce stale success messages.
+Achievement unlock events originate only when the database atomically accepts a new achievement row.
+`BlinklyDatabase.unlockAchievement` returns whether `INSERT OR IGNORE` inserted the row, and
+`BlinklyAchievementsWatcherImpl` calls `BlinklyNotifier.achievementUnlocked` only for `true`.
+Also prefilter the current database emission before evaluating unlock rules. This keeps restored,
+initially loaded, raced, or repeated achievement checks from producing duplicate success messages.
 `RootContent` queues errors and notifications in one top snackbar host, using error colors for failures and `secondaryContainer` colors for neutral success notifications.
 
 ## Compose Conventions

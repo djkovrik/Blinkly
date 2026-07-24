@@ -142,11 +142,10 @@ internal class BlinklyDatabaseImpl(
         }
     }
 
-    override suspend fun unlockAchievement(achievement: Achievement) {
+    override suspend fun unlockAchievement(achievement: Achievement): Boolean =
         withContext(dispatchers.io) {
             insertAchievement(achievement)
         }
-    }
 
     override suspend fun saveAchievements(achievements: List<Achievement>) {
         withContext(dispatchers.io) {
@@ -209,13 +208,12 @@ internal class BlinklyDatabaseImpl(
         )
     }
 
-    private fun insertAchievement(achievement: Achievement) {
+    private fun insertAchievement(achievement: Achievement): Boolean =
         queries.insertAchievement(
             type = achievement.type,
             level = achievement.level,
             unlockedAt = achievement.unlockedAt,
-        )
-    }
+        ).value > 0L
 
     private fun insertReminder(reminder: Reminder) {
         queries.insertReminder(
