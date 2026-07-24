@@ -47,10 +47,12 @@ internal class TrackingBlinklyDatabase(
         markChanged()
     }
 
-    override suspend fun unlockAchievement(achievement: Achievement) {
-        delegate.unlockAchievement(achievement)
-        markChanged()
-    }
+    override suspend fun unlockAchievement(achievement: Achievement): Boolean =
+        delegate.unlockAchievement(achievement).also { inserted ->
+            if (inserted) {
+                markChanged()
+            }
+        }
 
     override suspend fun saveAchievements(achievements: List<Achievement>) {
         delegate.saveAchievements(achievements)

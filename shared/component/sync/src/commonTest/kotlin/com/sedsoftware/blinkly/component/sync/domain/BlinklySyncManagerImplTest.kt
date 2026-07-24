@@ -440,8 +440,9 @@ class BlinklySyncManagerImplTest {
             snapshot = snapshot.copy(exercises = snapshot.exercises + exercises)
         }
 
-        override suspend fun unlockAchievement(achievement: Achievement) {
+        override suspend fun unlockAchievement(achievement: Achievement): Boolean {
             snapshot = snapshot.copy(achievements = snapshot.achievements + achievement)
+            return true
         }
 
         override suspend fun saveAchievements(achievements: List<Achievement>) {

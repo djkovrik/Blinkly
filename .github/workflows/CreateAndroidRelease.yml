@@ -12,11 +12,11 @@ on:
           - minor
           - major
       changelog_en:
-        description: English release notes (up to 500 characters)
+        description: 'English release notes; use \n for line breaks (up to 500 characters)'
         required: true
         type: string
       changelog_ru:
-        description: Russian release notes (up to 500 characters)
+        description: 'Russian release notes; use \n for line breaks (up to 500 characters)'
         required: true
         type: string
 
@@ -72,6 +72,11 @@ jobs:
           CHANGELOG_RU: ${{ inputs.changelog_ru }}
         run: |
           set -euo pipefail
+
+          # GitHub renders workflow_dispatch string inputs as single-line fields.
+          # Decode only literal \n sequences; leave all other backslashes intact.
+          CHANGELOG_EN="${CHANGELOG_EN//\\n/$'\n'}"
+          CHANGELOG_RU="${CHANGELOG_RU//\\n/$'\n'}"
 
           if [[ -z "${CHANGELOG_EN//[[:space:]]/}" || -z "${CHANGELOG_RU//[[:space:]]/}" ]]; then
             echo "Both localized changelogs must contain text." >&2
@@ -152,6 +157,9 @@ jobs:
           CHANGELOG_RU: ${{ inputs.changelog_ru }}
         run: |
           set -euo pipefail
+
+          CHANGELOG_EN="${CHANGELOG_EN//\\n/$'\n'}"
+          CHANGELOG_RU="${CHANGELOG_RU//\\n/$'\n'}"
 
           notes_dir="$RUNNER_TEMP/google-play-release-notes"
           mkdir -p "$notes_dir"

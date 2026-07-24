@@ -134,6 +134,22 @@ class BlinklyDatabaseTest {
     }
 
     @Test
+    fun `when achievement already saved then duplicate unlock is rejected`() = runTest(testScheduler) {
+        // given
+        val first = Achievement(AchievementType.FIRST_SPARK, AchievementLevel.BEGINNER, Clock.System.now())
+
+        // when
+        val firstInserted = database.unlockAchievement(first)
+        val duplicateInserted = database.unlockAchievement(first)
+        val achievements = database.currentAchievements().first()
+
+        // then
+        assertThat(firstInserted).isEqualTo(true)
+        assertThat(duplicateInserted).isEqualTo(false)
+        assertThat(achievements).isEqualTo(listOf(first))
+    }
+
+    @Test
     fun `schedule configurations and physical alarms round trip`() = runTest(testScheduler) {
         val schedules = listOf(
             ReminderSchedule("daily", ReminderType.TWENTY_X3, ReminderScheduleConfiguration.Daily(LocalTime(10, 0))),

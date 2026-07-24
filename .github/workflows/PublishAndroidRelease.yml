@@ -109,6 +109,10 @@ jobs:
           notes_dir="$RUNNER_TEMP/google-play-release-notes"
           mkdir -p "$notes_dir"
 
+          # Normalize web-form changelogs before validation and file creation.
+          CHANGELOG_EN="${CHANGELOG_EN//\\n/$'\n'}"
+          CHANGELOG_RU="${CHANGELOG_RU//\\n/$'\n'}"
+
           if [[ -n "$CHANGELOG_EN" || -n "$CHANGELOG_RU" ]]; then
             if [[ -z "${CHANGELOG_EN//[[:space:]]/}" || -z "${CHANGELOG_RU//[[:space:]]/}" ]]; then
               echo "Both localized changelogs must contain text." >&2

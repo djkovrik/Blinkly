@@ -112,21 +112,29 @@ internal class BlinklyAchievementsWatcherImpl(
         achievements: List<Achievement>,
         calendar: List<Workout>,
     ) {
+        val unlockedTypes = achievements
+            .asSequence()
+            .filter { it.unlockedAt != null }
+            .mapTo(mutableSetOf()) { it.type }
+
         instances.forEach { instance ->
-            if (instance.unlocked(achievements, calendar) && !isAchievementUnlocked(instance.type)) {
-                saveUnlockedAchievement(instance.type)
-                notifyAboutUnlockedAchievement(instance.type)
+            if (instance.type !in unlockedTypes && instance.unlocked(achievements, calendar)) {
+                val inserted = saveUnlockedAchievement(instance.type)
+                if (inserted) {
+                    unlockedTypes += instance.type
+                    notifyAboutUnlockedAchievement(instance.type)
+                }
             }
         }
     }
 
-    private suspend fun saveUnlockedAchievement(achievementType: AchievementType) {
+    private suspend fun saveUnlockedAchievement(achievementType: AchievementType): Boolean {
         val achievement = Achievement(
             type = achievementType,
             level = achievementType.getLevel(),
             unlockedAt = timeUtils.now(),
         )
-        database.unlockAchievement(achievement)
+        return database.unlockAchievement(achievement)
     }
 
     private fun refreshYinYangState(calendar: List<Workout>) {
@@ -141,12 +149,6 @@ internal class BlinklyAchievementsWatcherImpl(
 
     private suspend fun notifyAboutUnlockedAchievement(achievementType: AchievementType) {
         notifier.achievementUnlocked(achievementType)
-    }
-
-    private fun isAchievementUnlocked(achievementType: AchievementType): Boolean {
-        return _currentAchievements.value.any { achievement ->
-            achievement.type == achievementType && achievement.unlockedAt != null
-        }
     }
 
     private fun buildFullAchievementsList(unlockedAchievements: List<Achievement>): List<Achievement> {

@@ -18,7 +18,7 @@ interface BlinklyDatabase {
     suspend fun replaceSnapshot(snapshot: BlinklyDatabaseSnapshot)
     suspend fun saveExercise(exercise: Exercise)
     suspend fun saveExercises(exercises: List<Exercise>)
-    suspend fun unlockAchievement(achievement: Achievement)
+    suspend fun unlockAchievement(achievement: Achievement): Boolean
     suspend fun saveAchievements(achievements: List<Achievement>)
     suspend fun deleteAchievements()
     suspend fun deleteExercises()

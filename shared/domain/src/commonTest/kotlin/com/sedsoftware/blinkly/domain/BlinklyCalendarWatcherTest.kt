@@ -25,7 +25,7 @@ class BlinklyCalendarWatcherTest : BaseDomainTest() {
         everySuspend { currentCalendar() } returns calendarFlow
         everySuspend { saveExercise(any()) } returns Unit
         everySuspend { currentAchievements() } returns MutableStateFlow(emptyList())
-        everySuspend { unlockAchievement(any()) } returns Unit
+        everySuspend { unlockAchievement(any()) } returns true
     }
 
     private val watcher: BlinklyCalendarWatcher = BlinklyCalendarWatcherImpl(database, testDispatchers)
