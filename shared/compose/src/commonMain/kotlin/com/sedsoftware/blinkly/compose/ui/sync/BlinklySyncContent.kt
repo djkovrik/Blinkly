@@ -42,6 +42,8 @@ import com.sedsoftware.blinkly.component.sync.auth.toBlinklyUser
 import com.sedsoftware.blinkly.component.sync.integration.BlinklySyncComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import dev.gitlive.firebase.auth.FirebaseUser
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.ExperimentalTime
@@ -203,7 +205,7 @@ private fun BlinklySyncComponent.Model.statusText(): String =
         is BlinklySyncComponent.Status.Synced ->
             stringResource(
                 resource = Res.string.sync_status_last_synced,
-                currentStatus.at.asSyncDate(),
+                currentStatus.at.asSyncDate(timeZone = TimeZone.currentSystemDefault()),
             )
 
         is BlinklySyncComponent.Status.Failed ->
@@ -211,8 +213,9 @@ private fun BlinklySyncComponent.Model.statusText(): String =
     }
 
 @OptIn(ExperimentalTime::class)
-private fun Instant.asSyncDate(): String =
-    toString()
+internal fun Instant.asSyncDate(timeZone: TimeZone): String =
+    toLocalDateTime(timeZone)
+        .toString()
         .substringBefore(".")
         .replace(oldChar = 'T', newChar = ' ')
 
