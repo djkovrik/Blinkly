@@ -42,6 +42,8 @@ import com.sedsoftware.blinkly.component.sync.auth.toBlinklyUser
 import com.sedsoftware.blinkly.component.sync.integration.BlinklySyncComponentPreview
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import dev.gitlive.firebase.auth.FirebaseUser
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.ExperimentalTime
@@ -52,6 +54,7 @@ fun BlinklySyncContent(
     component: BlinklySyncComponent,
     modifier: Modifier = Modifier,
     enableGoogleSignInContainer: Boolean = true,
+    syncTimeZone: TimeZone = TimeZone.currentSystemDefault(),
 ) {
     val model: BlinklySyncComponent.Model by component.model.subscribeAsState()
 
@@ -82,7 +85,7 @@ fun BlinklySyncContent(
                     )
 
                     Text(
-                        text = model.statusText(),
+                        text = model.statusText(timeZone = syncTimeZone),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall,
                     )
@@ -192,7 +195,7 @@ private fun SyncActionButton(
 
 @Composable
 @OptIn(ExperimentalTime::class)
-private fun BlinklySyncComponent.Model.statusText(): String =
+private fun BlinklySyncComponent.Model.statusText(timeZone: TimeZone): String =
     when (val currentStatus = status) {
         BlinklySyncComponent.Status.NotSynced ->
             stringResource(resource = Res.string.sync_status_not_synced)
@@ -203,7 +206,7 @@ private fun BlinklySyncComponent.Model.statusText(): String =
         is BlinklySyncComponent.Status.Synced ->
             stringResource(
                 resource = Res.string.sync_status_last_synced,
-                currentStatus.at.asSyncDate(),
+                currentStatus.at.asSyncDate(timeZone = timeZone),
             )
 
         is BlinklySyncComponent.Status.Failed ->
@@ -211,8 +214,9 @@ private fun BlinklySyncComponent.Model.statusText(): String =
     }
 
 @OptIn(ExperimentalTime::class)
-private fun Instant.asSyncDate(): String =
-    toString()
+internal fun Instant.asSyncDate(timeZone: TimeZone): String =
+    toLocalDateTime(timeZone)
+        .toString()
         .substringBefore(".")
         .replace(oldChar = 'T', newChar = ' ')
 
@@ -234,7 +238,9 @@ private fun BlinklySyncContentPreviewDark() {
 
 @OptIn(ExperimentalTime::class)
 @Composable
-private fun BlinklySyncContentPreviewBoard() {
+private fun BlinklySyncContentPreviewBoard(
+    syncTimeZone: TimeZone = TimeZone.UTC,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(space = 12.dp),
         modifier = Modifier.padding(all = 16.dp),
@@ -242,11 +248,13 @@ private fun BlinklySyncContentPreviewBoard() {
         BlinklySyncContent(
             component = BlinklySyncComponentPreview(),
             enableGoogleSignInContainer = false,
+            syncTimeZone = syncTimeZone,
         )
 
         BlinklySyncContent(
             component = BlinklySyncComponentPreview(isAuthorized = true),
             enableGoogleSignInContainer = false,
+            syncTimeZone = syncTimeZone,
         )
 
         BlinklySyncContent(
@@ -255,6 +263,7 @@ private fun BlinklySyncContentPreviewBoard() {
                 isSyncing = true,
             ),
             enableGoogleSignInContainer = false,
+            syncTimeZone = syncTimeZone,
         )
 
         BlinklySyncContent(
@@ -263,6 +272,7 @@ private fun BlinklySyncContentPreviewBoard() {
                 lastSyncedAt = Instant.fromEpochMilliseconds(epochMilliseconds = 1_725_369_600_000L),
             ),
             enableGoogleSignInContainer = false,
+            syncTimeZone = syncTimeZone,
         )
 
         BlinklySyncContent(
@@ -271,6 +281,7 @@ private fun BlinklySyncContentPreviewBoard() {
                 status = BlinklySyncComponent.Status.Failed(message = null),
             ),
             enableGoogleSignInContainer = false,
+            syncTimeZone = syncTimeZone,
         )
     }
 }
