@@ -20,7 +20,7 @@ class YinYangTest : BaseAchievementTest() {
     fun `when calendar and achievements match logic then unlocked`() = runTest {
         // given
         _lightThemeIndex = 1
-        _darkThemeIndex = 2
+        _darkThemeIndex = 1
         // when
         val unlocked = achievement.unlocked(emptyAchievements, emptyCalendar)
         // then

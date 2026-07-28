@@ -102,6 +102,8 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
             timeUtils = timeUtils,
             achievementsWatcher = object : BlinklyAchievementsWatcher {
                 override val achievements: Flow<List<Achievement>> = flowOf(emptyList())
+
+                override fun onThemeResolved(isDark: Boolean) = Unit
             },
             calendarWatcher = object : BlinklyCalendarWatcher {
                 override val calendar: Flow<List<Workout>> = flowOf(emptyList())

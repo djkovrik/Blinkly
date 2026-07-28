@@ -76,6 +76,7 @@ internal class BlinklyAchievementsWatcherImpl(
     private val instances: List<UnlockableAchievement> = registerAchievements()
     private val scope: CoroutineScope = CoroutineScope(dispatchers.io + SupervisorJob())
     private val _currentAchievements = MutableStateFlow<List<Achievement>>(emptyList())
+    private val resolvedThemeIsDark = MutableStateFlow<Boolean?>(null)
 
     private val lightThemeWorkoutIndex: () -> Int
         get() = { settings.lightThemeWorkoutIndex }
@@ -108,6 +109,10 @@ internal class BlinklyAchievementsWatcherImpl(
     override val achievements: Flow<List<Achievement>>
         get() = achievementsFlow
 
+    override fun onThemeResolved(isDark: Boolean) {
+        resolvedThemeIsDark.value = isDark
+    }
+
     private suspend fun checkIfUnlocked(
         achievements: List<Achievement>,
         calendar: List<Workout>,
@@ -138,12 +143,18 @@ internal class BlinklyAchievementsWatcherImpl(
     }
 
     private fun refreshYinYangState(calendar: List<Workout>) {
-        if (settings.lightThemeWorkoutIndex == 0 && settings.themeState == ThemeState.LIGHT) {
-            settings.lightThemeWorkoutIndex = calendar.size
+        val resolvedTheme = resolvedThemeIsDark.value
+            ?.let { isDark -> if (isDark) ThemeState.DARK else ThemeState.LIGHT }
+            ?: settings.themeState.takeUnless { it == ThemeState.SYSTEM }
+            ?: return
+        val completedExerciseCount = calendar.sumOf { workout -> workout.exercises.size }
+
+        if (settings.lightThemeWorkoutIndex == 0 && resolvedTheme == ThemeState.LIGHT) {
+            settings.lightThemeWorkoutIndex = completedExerciseCount
         }
 
-        if (settings.darkThemeWorkoutIndex == 0 && settings.themeState == ThemeState.DARK) {
-            settings.darkThemeWorkoutIndex = calendar.size
+        if (settings.darkThemeWorkoutIndex == 0 && resolvedTheme == ThemeState.DARK) {
+            settings.darkThemeWorkoutIndex = completedExerciseCount
         }
     }
 

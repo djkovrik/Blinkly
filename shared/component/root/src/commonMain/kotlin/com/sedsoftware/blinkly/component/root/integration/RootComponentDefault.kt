@@ -71,6 +71,7 @@ class RootComponentDefault private constructor(
     private val addNewReminderComponent: (ComponentContext, (ComponentOutput) -> Unit) -> AddNewReminderComponent,
     private val achievements: Flow<List<Achievement>>,
     private val achievementUnlockEvents: Flow<AchievementType>,
+    private val onThemeResolved: (Boolean) -> Unit,
     mainDispatcher: CoroutineDispatcher,
     private val releaseBeeper: () -> Unit,
 ) : RootComponent, ComponentContext by componentContext {
@@ -145,6 +146,7 @@ class RootComponentDefault private constructor(
         },
         achievements = achievementsWatcher.achievements,
         achievementUnlockEvents = notifier.unlockedAchievements(),
+        onThemeResolved = achievementsWatcher::onThemeResolved,
         mainDispatcher = dispatchers.main,
         releaseBeeper = beeper::release,
     )
@@ -188,6 +190,10 @@ class RootComponentDefault private constructor(
     override val themeState: Value<ThemeState> = themeStateValue
     override val errors = errorEvents.asSharedFlow()
     override val notifications = notificationEvents.asSharedFlow()
+
+    override fun onThemeResolved(isDark: Boolean) {
+        onThemeResolved.invoke(isDark)
+    }
 
     override fun onBack() {
         navigation.pop()

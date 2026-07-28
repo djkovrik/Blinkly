@@ -7,6 +7,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import com.sedsoftware.blinkly.domain.model.ThemeState
 
@@ -91,6 +92,7 @@ internal val LocalThemeIsDark = compositionLocalOf { true }
 @Composable
 internal fun BlinklyAppTheme(
     onSystemBarsAppearanceChanged: @Composable (useDarkIcons: Boolean) -> Unit,
+    onThemeResolved: (isDark: Boolean) -> Unit = {},
     themeState: ThemeState = ThemeState.SYSTEM,
     isSystemDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
@@ -99,6 +101,10 @@ internal fun BlinklyAppTheme(
         ThemeState.SYSTEM -> isSystemDarkTheme
         ThemeState.LIGHT -> false
         ThemeState.DARK -> true
+    }
+
+    LaunchedEffect(isDark) {
+        onThemeResolved(isDark)
     }
 
     CompositionLocalProvider(

@@ -19,6 +19,6 @@ internal class YinYang(
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
         val lightIndex = lightThemeCompleted.invoke()
         val darkIndex = darkThemeCompleted.invoke()
-        return lightIndex != 0 && darkIndex != 0 && lightIndex != darkIndex
+        return lightIndex > 0 && darkIndex > 0
     }
 }
