@@ -14,7 +14,9 @@ internal class ThinkTank : UnlockableAchievement {
     override val type: AchievementType = AchievementType.THINK_TANK
 
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
-        val allExercises = calendar.flatMap { it.exercises }
+        val allExercises = calendar
+            .flatMap { it.exercises }
+            .sortedBy { it.completedAt }
 
         if (allExercises.size < ACHIEVEMENT_THRESHOLD) return false
 

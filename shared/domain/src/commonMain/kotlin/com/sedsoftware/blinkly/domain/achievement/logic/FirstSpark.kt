@@ -14,6 +14,6 @@ internal class FirstSpark : UnlockableAchievement {
     override val type: AchievementType = AchievementType.FIRST_SPARK
 
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
-        return calendar.isNotEmpty()
+        return calendar.any { workout -> workout.exercises.isNotEmpty() }
     }
 }

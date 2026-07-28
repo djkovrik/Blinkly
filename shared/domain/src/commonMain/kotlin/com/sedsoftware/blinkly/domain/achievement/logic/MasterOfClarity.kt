@@ -15,6 +15,7 @@ internal class MasterOfClarity : UnlockableAchievement {
 
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
         val unlockedTypes = achievements
+            .filter { it.unlockedAt != null }
             .map { it.type }
             .toSet()
 

@@ -17,14 +17,15 @@ internal class NightOwl(
 
     override val type: AchievementType = AchievementType.NIGHT_OWL
 
-    private val requiredHours: Set<Int> = setOf(23, 0, 1)
-
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
         return calendar.any { workout ->
-            workout.exercises.isNotEmpty() && workout.exercises.all { exercise ->
-                val hour = exercise.completedAt.hour(timeZone)
-                requiredHours.contains(hour)
+            workout.exercises.any { exercise ->
+                exercise.completedAt.hour(timeZone) >= EARLIEST_LATE_HOUR
             }
         }
+    }
+
+    private companion object {
+        const val EARLIEST_LATE_HOUR = 23
     }
 }

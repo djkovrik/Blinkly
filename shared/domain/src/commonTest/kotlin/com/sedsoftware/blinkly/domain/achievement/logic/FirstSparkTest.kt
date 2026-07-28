@@ -34,4 +34,16 @@ internal class FirstSparkTest : BaseAchievementTest() {
         // then
         assertThat(unlocked).isFalse()
     }
+
+    @Test
+    fun `when calendar contains only an empty workout then not unlocked`() = runTest {
+        // given
+        val calendar = listOf(Workout(emptyList()))
+
+        // when
+        val unlocked = achievement.unlocked(emptyAchievements, calendar)
+
+        // then
+        assertThat(unlocked).isFalse()
+    }
 }

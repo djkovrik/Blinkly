@@ -10,13 +10,16 @@ import com.sedsoftware.blinkly.domain.model.ExerciseType
  * Achievement #4
  * Clockwise - Do the "Clock" eye rolls 5 times
  */
-internal class Clockwise : UnlockableAchievement {
+internal class Clockwise(
+    private val clockRollsEachSide: Int,
+) : UnlockableAchievement {
 
     override val type: AchievementType = AchievementType.CLOCKWISE
 
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
         val count = calendar.flatMap { it.exercises }.count { it.type == ExerciseType.CLOCK_ROLLS }
-        return count >= ACHIEVEMENT_THRESHOLD
+        val result = count * clockRollsEachSide
+        return result >= ACHIEVEMENT_THRESHOLD
     }
 
     private companion object {

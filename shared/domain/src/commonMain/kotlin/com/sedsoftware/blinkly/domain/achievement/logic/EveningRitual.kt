@@ -22,17 +22,17 @@ internal class EveningRitual : UnlockableAchievement {
     )
 
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
-        val completeBlockACount = calendar.count { workout ->
-            val completedTypesInBlockA = workout.exercises
-                .filter { it.block == ExerciseBlock.B }
-                .map { it.type }
-                .toSet()
-
-            completedTypesInBlockA.containsAll(requiredExercises)
+        val completeBlockBCount = calendar.sumOf { workout ->
+            requiredExercises.minOf { requiredType ->
+                workout.exercises.count { exercise ->
+                    exercise.block == ExerciseBlock.B && exercise.type == requiredType
+                }
+            }
         }
 
-        return completeBlockACount >= ACHIEVEMENT_THRESHOLD
+        return completeBlockBCount >= ACHIEVEMENT_THRESHOLD
     }
+
     private companion object {
         const val ACHIEVEMENT_THRESHOLD = 10
     }
