@@ -21,6 +21,11 @@ kotlin {
                 implementation(libs.kotlinx.serialization.json)
             }
         }
+        androidMain {
+            dependencies {
+                implementation(project.dependencies.platform(libs.lib.firebase.bom))
+            }
+        }
     }
 
     compilerOptions {
