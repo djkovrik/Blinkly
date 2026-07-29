@@ -40,15 +40,7 @@ fun BeeperWrapperFactory(context: Context): BeeperWrapper {
         }
 
         private fun preloadRaw(): Int {
-            val resId = appContext.resources.getIdentifier(
-                beepFileName,
-                "raw",
-                appContext.packageName,
-            )
-
-            if (resId == 0) return 0
-
-            return soundPool.load(appContext, resId, 1).also { soundId ->
+            return soundPool.load(appContext, R.raw.beep, 1).also { soundId ->
                 soundIds[beepFileName] = soundId
             }
         }
