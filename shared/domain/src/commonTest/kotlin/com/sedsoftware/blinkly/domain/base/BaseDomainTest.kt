@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
-import kotlin.time.Clock
 import kotlin.time.Instant
 
 abstract class BaseDomainTest {
@@ -28,8 +27,7 @@ abstract class BaseDomainTest {
             override val io: CoroutineDispatcher = StandardTestDispatcher(testScheduler)
         }
 
-    protected val now: Instant
-        get() = Clock.System.now()
+    protected val now: Instant = Instant.parse("2024-01-15T12:00:00Z")
 
     protected val yesterday: Instant
         get() = now.minus(1, DateTimeUnit.DAY, TimeZone.UTC)
