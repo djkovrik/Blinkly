@@ -47,4 +47,20 @@ internal class MasterOfClarityTest : BaseAchievementTest() {
         // then
         assertThat(unlocked).isFalse()
     }
+
+    @Test
+    fun `when a required achievement exists but is locked then not unlocked`() = runTest {
+        // given
+        val achievements = FakeData.getFullAchievementsList(now)
+            .filter { it.type != AchievementType.MASTER_OF_CLARITY }
+            .map { item ->
+                if (item.type == AchievementType.TIMELESS_GAZE) item.copy(unlockedAt = null) else item
+            }
+
+        // when
+        val unlocked = achievement.unlocked(achievements, emptyCalendar)
+
+        // then
+        assertThat(unlocked).isFalse()
+    }
 }

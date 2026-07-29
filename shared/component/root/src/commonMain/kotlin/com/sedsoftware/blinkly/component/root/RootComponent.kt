@@ -22,6 +22,8 @@ interface RootComponent : BackHandlerOwner {
     val errors: SharedFlow<BlinklyError>
     val notifications: SharedFlow<BlinklyNotification>
 
+    fun onThemeResolved(isDark: Boolean)
+
     fun onBack()
 
     sealed class Child {

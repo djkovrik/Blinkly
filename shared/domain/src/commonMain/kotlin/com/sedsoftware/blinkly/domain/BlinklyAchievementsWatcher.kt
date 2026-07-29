@@ -5,4 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface BlinklyAchievementsWatcher {
     val achievements: Flow<List<Achievement>>
+
+    fun onThemeResolved(isDark: Boolean)
 }

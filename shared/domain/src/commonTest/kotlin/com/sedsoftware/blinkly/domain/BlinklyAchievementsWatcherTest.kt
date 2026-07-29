@@ -134,7 +134,7 @@ class BlinklyAchievementsWatcherTest : BaseDomainTest() {
         )
 
         settings.lightThemeWorkoutIndex = 1
-        settings.darkThemeWorkoutIndex = 2
+        settings.darkThemeWorkoutIndex = 1
 
         // when
         val collectJob = launch { watcher.achievements.collect {} }
@@ -151,6 +151,35 @@ class BlinklyAchievementsWatcherTest : BaseDomainTest() {
         settings.darkThemeWorkoutIndex = 0
         collectJob.cancel()
     }
+
+    @Test
+    fun `when exercises completed in system light and dark themes on same day then should unlock Yin Yang`() =
+        runTest(testScheduler) {
+            // given
+            val firstWorkout = FakeData.getSingleExerciseWorkout(now)
+            val secondWorkout = Workout(FakeData.getWorkoutDayFull(now).exercises.take(2))
+            settings.themeState = ThemeState.SYSTEM
+            settings.lightThemeWorkoutIndex = 0
+            settings.darkThemeWorkoutIndex = 0
+            watcher.onThemeResolved(isDark = false)
+
+            val collectJob = launch { watcher.achievements.collect {} }
+            calendarFlow.emit(listOf(firstWorkout))
+            testScheduler.advanceUntilIdle()
+
+            assertThat(settings.lightThemeWorkoutIndex).isEqualTo(1)
+
+            // when
+            watcher.onThemeResolved(isDark = true)
+            calendarFlow.emit(listOf(secondWorkout))
+            testScheduler.advanceUntilIdle()
+
+            // then
+            assertThat(settings.darkThemeWorkoutIndex).isEqualTo(2)
+            verifySuspend { notifier.achievementUnlocked(AchievementType.YIN_YANG) }
+
+            collectJob.cancel()
+        }
 
     @Test
     fun `when achievement unlocked then should update resulting flow`() = runTest(testScheduler) {

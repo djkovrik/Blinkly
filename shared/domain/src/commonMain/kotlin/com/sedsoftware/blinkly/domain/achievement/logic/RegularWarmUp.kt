@@ -22,13 +22,12 @@ internal class RegularWarmUp : UnlockableAchievement {
     )
 
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
-        val completeBlockACount = calendar.count { workout ->
-            val completedTypesInBlockA = workout.exercises
-                .filter { it.block == ExerciseBlock.A }
-                .map { it.type }
-                .toSet()
-
-            completedTypesInBlockA.containsAll(requiredExercises)
+        val completeBlockACount = calendar.sumOf { workout ->
+            requiredExercises.minOf { requiredType ->
+                workout.exercises.count { exercise ->
+                    exercise.block == ExerciseBlock.A && exercise.type == requiredType
+                }
+            }
         }
 
         return completeBlockACount >= ACHIEVEMENT_THRESHOLD

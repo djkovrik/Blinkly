@@ -37,6 +37,8 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode.Companion.exactly
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -74,6 +76,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     }
     private val achievementsWatcherMock: BlinklyAchievementsWatcher = mock {
         every { achievements } returns emptyFlow()
+        every { onThemeResolved(any()) } returns Unit
     }
     private val calendarWatcherMock: BlinklyCalendarWatcher = mock {
         every { calendar } returns emptyFlow()
@@ -133,6 +136,16 @@ class RootComponentTest : ComponentTest<RootComponent>() {
 
         // then
         assertThat(testComponent.themeState.value).isEqualTo(ThemeState.DARK)
+    }
+
+    @Test
+    fun `when actual theme resolved then achievements watcher is updated`() = runTest(testScheduler) {
+        // given
+        // when
+        component.onThemeResolved(isDark = true)
+
+        // then
+        verify(exactly(1)) { achievementsWatcherMock.onThemeResolved(isDark = true) }
     }
 
     @Test

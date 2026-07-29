@@ -172,6 +172,8 @@ class AchievementsComponentTest : ComponentTest<AchievementsComponent>() {
         val testComponent = createComponent(
             watcher = object : BlinklyAchievementsWatcher {
                 override val achievements: Flow<List<Achievement>> = flow { throw exception }
+
+                override fun onThemeResolved(isDark: Boolean) = Unit
             }
         )
 
@@ -187,6 +189,8 @@ class AchievementsComponentTest : ComponentTest<AchievementsComponent>() {
         createComponent(
             watcher = object : BlinklyAchievementsWatcher {
                 override val achievements: Flow<List<Achievement>> = achievementsFlow
+
+                override fun onThemeResolved(isDark: Boolean) = Unit
             }
         )
 

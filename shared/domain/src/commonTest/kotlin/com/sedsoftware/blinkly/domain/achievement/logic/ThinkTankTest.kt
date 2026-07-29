@@ -12,6 +12,7 @@ import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 internal class ThinkTankTest : BaseAchievementTest() {
 
@@ -53,5 +54,25 @@ internal class ThinkTankTest : BaseAchievementTest() {
 
         // then
         assertThat(unlocked).isFalse()
+    }
+
+    @Test
+    fun `when storage order differs from completion order then completion order is used`() = runTest {
+        // given
+        val chronological = List(10) { index ->
+            Exercise(
+                ExerciseBlock.A,
+                if (index % 2 == 0) ExerciseType.BLINK_BREAK else ExerciseType.NEAR_FAR_FOCUS,
+                now + index.seconds,
+            )
+        }
+        val storageOrdered = chronological.sortedBy { it.type.index }
+        val calendar = listOf(Workout(storageOrdered))
+
+        // when
+        val unlocked = achievement.unlocked(emptyAchievements, calendar)
+
+        // then
+        assertThat(unlocked).isTrue()
     }
 }

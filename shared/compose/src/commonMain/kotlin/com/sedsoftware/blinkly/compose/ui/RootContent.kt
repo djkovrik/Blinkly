@@ -100,6 +100,7 @@ fun RootContent(
     ) {
         BlinklyAppTheme(
             onSystemBarsAppearanceChanged = onSystemBarsAppearanceChanged,
+            onThemeResolved = component::onThemeResolved,
             themeState = themeState,
         ) {
             LaunchedEffect(component) {

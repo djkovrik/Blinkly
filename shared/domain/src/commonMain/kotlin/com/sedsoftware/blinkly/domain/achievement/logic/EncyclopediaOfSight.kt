@@ -24,11 +24,16 @@ internal class EncyclopediaOfSight : UnlockableAchievement {
 
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
         val unlockedTypes = achievements
+            .filter { it.unlockedAt != null }
             .map { it.type }
             .toSet()
 
         val requiredTypes = AchievementType.entries
-            .filter { requiredLevels.contains(it.getLevel()) }
+            .filter { type ->
+                requiredLevels.contains(type.getLevel()) &&
+                    type != AchievementType.ENCYCLOPEDIA_OF_SIGHT &&
+                    type != AchievementType.MASTER_OF_CLARITY
+            }
             .toSet()
 
         return unlockedTypes.containsAll(requiredTypes)

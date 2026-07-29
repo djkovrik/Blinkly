@@ -5,6 +5,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
@@ -175,6 +176,8 @@ kotlin {
             implementation(libs.lib.kmpauth.google)
             implementation(libs.lib.kmpauth.firebase)
             implementation(libs.lib.kmpauth.uihelper)
+            implementation(libs.lib.firebase.app)
+            implementation(libs.lib.firebase.auth)
         }
 
         commonTest.dependencies {
@@ -184,6 +187,7 @@ kotlin {
         }
 
         androidMain.dependencies {
+            implementation(project.dependencies.platform(libs.lib.firebase.bom))
             implementation(libs.kotlinx.coroutines.android)
         }
 
@@ -246,4 +250,17 @@ tasks.matching {
         it.name.startsWith("verifyPaparazzi")
 }.configureEach {
     dependsOn(generateComposablePreviewPaparazziTests)
+}
+
+tasks.matching {
+    it.name == "testDebugUnitTest" ||
+        it.name == "testReleaseUnitTest" ||
+        it.name.startsWith("recordPaparazzi") ||
+        it.name.startsWith("verifyPaparazzi")
+}.configureEach {
+    notCompatibleWithConfigurationCache("Paparazzi on AGP 9 legacy variants captures non-serializable variant state")
+}
+
+tasks.withType<Test>().configureEach {
+    reports.html.required.set(false)
 }

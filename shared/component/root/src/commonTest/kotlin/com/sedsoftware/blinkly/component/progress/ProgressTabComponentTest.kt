@@ -148,6 +148,8 @@ class ProgressTabComponentTest : ComponentTest<ProgressTabComponent>() {
             },
             achievementsWatcher = object : BlinklyAchievementsWatcher {
                 override val achievements: Flow<List<Achievement>> = achievementsFlow
+
+                override fun onThemeResolved(isDark: Boolean) = Unit
             },
             treeProgressWatcher = object : BlinklyTreeProgressWatcher {
                 override val tree: Flow<Tree> = treeFlow

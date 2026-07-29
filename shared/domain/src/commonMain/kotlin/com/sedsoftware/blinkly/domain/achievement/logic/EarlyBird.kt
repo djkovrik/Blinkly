@@ -17,14 +17,15 @@ internal class EarlyBird(
 
     override val type: AchievementType = AchievementType.EARLY_BIRD
 
-    private val requiredHours: Set<Int> = setOf(5, 6, 7)
-
     override fun unlocked(achievements: List<Achievement>, calendar: List<Workout>): Boolean {
         return calendar.any { workout ->
-            workout.exercises.isNotEmpty() && workout.exercises.all { exercise ->
-                val hour = exercise.completedAt.hour(timeZone)
-                requiredHours.contains(hour)
+            workout.exercises.any { exercise ->
+                exercise.completedAt.hour(timeZone) < LATEST_EARLY_HOUR
             }
         }
+    }
+
+    private companion object {
+        const val LATEST_EARLY_HOUR = 8
     }
 }
