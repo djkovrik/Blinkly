@@ -1,4 +1,33 @@
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+abstract class VerifyReleaseAudioResourcesTask : DefaultTask() {
+
+    @get:InputFile
+    abstract val shrinkReport: RegularFileProperty
+
+    @TaskAction
+    fun verifyResources() {
+        val reportFile = shrinkReport.get().asFile
+        check(reportFile.isFile) {
+            "Release resource shrink report was not generated at ${reportFile.absolutePath}"
+        }
+
+        val reportLines = reportFile.readLines()
+        listOf("beep", "ding").forEach { resourceName ->
+            val resourceLines = reportLines.filter { line -> line.contains("raw:$resourceName:") }
+            check(resourceLines.isNotEmpty()) {
+                "Release resource shrink report does not contain raw/$resourceName"
+            }
+            check(resourceLines.none { line -> line.contains("is not reachable") }) {
+                "Release resource shrinking removed raw/$resourceName"
+            }
+        }
+    }
+}
 
 val demoAdUnitId = "demo-banner-yandex"
 val releaseAchievementsAdUnitId = "R-M-19603758-1"
@@ -137,8 +166,19 @@ val verifyReleaseAdsConfiguration by tasks.registering {
     }
 }
 
+val verifyReleaseAudioResources by tasks.registering(VerifyReleaseAudioResourcesTask::class) {
+    group = "verification"
+    description = "Verifies that release resource shrinking keeps Blinkly audio resources."
+    dependsOn("minifyReleaseWithR8")
+    shrinkReport.set(layout.buildDirectory.file("outputs/mapping/release/resources.txt"))
+}
+
 tasks.matching { it.name == "preReleaseBuild" }.configureEach {
     dependsOn(verifyReleaseAdsConfiguration)
+}
+
+tasks.matching { it.name == "assembleRelease" || it.name == "bundleRelease" }.configureEach {
+    finalizedBy(verifyReleaseAudioResources)
 }
 
 kotlin {

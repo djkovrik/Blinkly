@@ -556,6 +556,14 @@ files may already be stripped, in which case no useful symbols can be
 reconstructed locally and the Play Console native-symbol recommendation is
 informational.
 
+AGP 9 uses integrated R8 resource shrinking and can remove resources that are
+loaded only by string name. Prefer direct `R` references such as
+`R.raw.beep`. When an external API requires a resource name, as Alarmee does
+for notification-channel sounds, add a uniquely named `res/raw` keep file with
+an explicit `tools:keep` entry. Keep critical dynamically loaded resources in
+the release verification contract; `assembleRelease` and `bundleRelease` must
+fail when `outputs/mapping/release/resources.txt` marks one unreachable.
+
 ## Reference URLs
 
 Official references used for this guide:
