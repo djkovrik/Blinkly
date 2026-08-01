@@ -82,9 +82,14 @@ jobs:
 
       - name: Test shared iOS modules and link Compose framework
         run: |
+          # CocoaPods-dependent test executables are covered by Android common
+          # tests and the Xcode workspace build below.
           if ! ./gradlew -q \
             iosSimulatorArm64Test \
             :shared:compose:linkDebugFrameworkIosSimulatorArm64 \
+            -x :shared:component:sync:iosSimulatorArm64Test \
+            -x :shared:component:root:iosSimulatorArm64Test \
+            -x :shared:compose:iosSimulatorArm64Test \
             > "$RUNNER_TEMP/ios-gradle.log" 2>&1; then
             tail -n 200 "$RUNNER_TEMP/ios-gradle.log"
             exit 1
