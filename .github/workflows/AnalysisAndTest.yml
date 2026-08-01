@@ -43,3 +43,72 @@ jobs:
             shared/compose/build/reports/paparazzi
             shared/compose/build/paparazzi/failures
           if-no-files-found: ignore
+
+  ios:
+    name: Test and link iOS
+    runs-on: macos-15
+    env:
+      # Yandex Mobile Ads 8.1.0 requires a newer toolchain for its Intel
+      # Simulator slice; use the same Xcode version as the native reference CI.
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        with:
+          lfs: true
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - uses: gradle/gradle-build-action@v3
+        with:
+          cache-disabled: true
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Verify Xcode and iOS Simulator SDK
+        run: |
+          xcodebuild -version
+          xcrun --sdk iphonesimulator --show-sdk-version
+          test -d "$(xcrun --sdk iphonesimulator --show-sdk-path)/System/Library/Frameworks/_LocationEssentials.framework"
+
+      - name: Resolve native iOS SDKs
+        working-directory: iosApp
+        run: pod install --repo-update
+
+      - name: Test shared iOS modules and link Compose framework
+        run: |
+          # CocoaPods-dependent test executables are covered by Android common
+          # tests and the Xcode workspace build below.
+          if ! ./gradlew -q \
+            iosSimulatorArm64Test \
+            :shared:compose:linkDebugFrameworkIosSimulatorArm64 \
+            -x :shared:component:sync:iosSimulatorArm64Test \
+            -x :shared:component:root:iosSimulatorArm64Test \
+            -x :shared:compose:iosSimulatorArm64Test \
+            > "$RUNNER_TEMP/ios-gradle.log" 2>&1; then
+            tail -n 200 "$RUNNER_TEMP/ios-gradle.log"
+            exit 1
+          fi
+
+      - name: Build iOS workspace
+        run: |
+          xcodebuild \
+            -workspace iosApp/iosApp.xcworkspace \
+            -scheme iosApp \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Upload iOS test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-reports
+          path: shared/**/build/reports/tests
+          if-no-files-found: ignore
