@@ -29,14 +29,14 @@ permissions:
   contents: read
 
 concurrency:
-  group: google-play-internal-${{ inputs.release_tag || github.ref_name }}
+  group: google-play-production-${{ inputs.release_tag || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   publish:
     name: Build and publish signed AAB
     runs-on: ubuntu-latest
-    environment: google-play-internal
+    environment: google-play-production
     steps:
       - name: Check out release tag
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -125,7 +125,7 @@ jobs:
               --dir "$notes_dir" \
               --pattern 'whatsnew-en-US' \
               --pattern 'whatsnew-ru-RU'; then
-              echo "A direct tag publication requires a matching GitHub prerelease with both whatsnew assets." >&2
+              echo "A direct tag publication requires a matching GitHub release with both whatsnew assets." >&2
               exit 1
             fi
           fi
@@ -221,7 +221,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.sedsoftware.blinkly
           releaseFiles: ${{ steps.artifacts.outputs.bundle }}
-          tracks: alpha
+          tracks: production
           status: completed
           releaseName: ${{ steps.version.outputs.release_tag }}
           whatsNewDirectory: ${{ steps.notes.outputs.directory }}
@@ -235,7 +235,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.sedsoftware.blinkly
           releaseFiles: ${{ steps.artifacts.outputs.bundle }}
-          tracks: alpha
+          tracks: production
           status: completed
           releaseName: ${{ steps.version.outputs.release_tag }}
           whatsNewDirectory: ${{ steps.notes.outputs.directory }}

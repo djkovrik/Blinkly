@@ -148,7 +148,7 @@ jobs:
           echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
           echo "Next Android release: $release_tag (versionCode $version_code)"
 
-      - name: Create tag and GitHub prerelease
+      - name: Create tag and GitHub release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -179,12 +179,11 @@ jobs:
             "$notes_dir/whatsnew-en-US" \
             "$notes_dir/whatsnew-ru-RU" \
             --verify-tag \
-            --prerelease \
             --title "Blinkly $RELEASE_TAG" \
             --notes-file "$notes_dir/release-body.md"
 
   publish:
-    name: Publish to Google Play internal testing
+    name: Publish to Google Play production
     needs: prepare
     permissions:
       contents: read

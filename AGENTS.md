@@ -533,9 +533,9 @@ When modifying existing code:
 Android releases use stable SemVer tags in the form `vMAJOR.MINOR.PATCH`.
 `.github/workflows/CreateAndroidRelease.yml` is the owner-only manual entry
 point on `master`; it creates the next patch, minor, or major tag and stores
-English and Russian Google Play release notes on a GitHub prerelease.
+English and Russian Google Play release notes on a GitHub release.
 `.github/workflows/PublishAndroidRelease.yml` is the reusable/tag-triggered
-publisher for the Google Play `internal` track.
+publisher for the Google Play `production` track.
 Manual changelog inputs use literal `\n` sequences for line breaks; workflows
 decode them before validating the 500-character Play limit and creating the
 localized release-note files.
