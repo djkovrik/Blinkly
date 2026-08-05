@@ -65,6 +65,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.kover)
 }
 
@@ -189,6 +190,9 @@ dependencies {
     implementation(project(":shared:component:root"))
     implementation(project(":shared:compose"))
     implementation(project(":shared:domain"))
+
+    implementation(platform(libs.lib.firebase.bom))
+    implementation(libs.android.firebase.crashlytics)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.splash)

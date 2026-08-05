@@ -107,3 +107,6 @@ Release Archive checks.
 * Nested feature components: `shared/component/main/child/preferences`, `shared/component/progress/child/achievements`, `shared/component/progress/child/garden`, `shared/component/reminders/child/newreminder`, `shared/component/trainings/child/workout`
 * Shared Compose screens: `shared/compose/src/commonMain/kotlin/com/sedsoftware/blinkly/compose/ui`
 * Common component tests: `shared/component/root/src/commonTest/kotlin/com/sedsoftware/blinkly/component`
+
+### Used resources
+* Icons from [Grand Iconic](https://www.flaticon.com/authors/grand-iconic)

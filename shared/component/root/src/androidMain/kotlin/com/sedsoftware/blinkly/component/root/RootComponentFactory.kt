@@ -14,6 +14,7 @@ import com.sedsoftware.blinkly.beeper.BeeperWrapperFactory
 import com.sedsoftware.blinkly.beeper.di.BeeperModule
 import com.sedsoftware.blinkly.beeper.di.BeeperModuleDependencies
 import com.sedsoftware.blinkly.component.root.integration.RootComponentDefault
+import com.sedsoftware.blinkly.crashlytics.di.CrashlyticsModule
 import com.sedsoftware.blinkly.component.sync.di.SyncModule
 import com.sedsoftware.blinkly.component.sync.di.SyncModuleDependencies
 import com.sedsoftware.blinkly.database.BlinklyDatabaseDriverFactory
@@ -23,6 +24,7 @@ import com.sedsoftware.blinkly.domain.di.DomainModule
 import com.sedsoftware.blinkly.domain.di.DomainModuleDependencies
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
+import com.sedsoftware.blinkly.domain.external.BlinklyCrashReporter
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
@@ -62,6 +64,10 @@ fun RootComponentFactory(
     val timeUtils: BlinklyTimeUtils by lazy {
         val utilsModule = UtilsModule()
         utilsModule.timeUtils
+    }
+
+    val crashReporter: BlinklyCrashReporter by lazy {
+        CrashlyticsModule().crashReporter
     }
 
     val alarmManager: BlinklyAlarmManager by lazy {
@@ -163,6 +169,7 @@ fun RootComponentFactory(
         componentContext = componentContext,
         storeFactory = DefaultStoreFactory(),
         beeper = beeper,
+        crashReporter = crashReporter,
         dispatchers = dispatchers,
         notifier = notifier,
         screenAwakeController = screenAwakeController,

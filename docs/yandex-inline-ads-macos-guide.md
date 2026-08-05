@@ -189,6 +189,7 @@ use_frameworks! :linkage => :static
 
 target 'iosApp' do
   pod 'FirebaseAuth', '11.8.0'
+  pod 'FirebaseCrashlytics', '11.8.0'
   pod 'FirebaseFirestore', '11.8.0'
   pod 'GoogleSignIn'
   pod 'YandexMobileAds', '8.1.0'

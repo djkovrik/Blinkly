@@ -20,6 +20,7 @@ import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
+import com.sedsoftware.blinkly.domain.external.BlinklyCrashReporter
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
@@ -56,6 +57,9 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private val beeperMock: BlinklyBeeper = mock {
         every { beep() } returns Unit
         every { release() } returns Unit
+    }
+    private val crashReporterMock: BlinklyCrashReporter = mock {
+        every { recordException(any()) } returns Unit
     }
     private val unlockedAchievementsFlow = MutableSharedFlow<AchievementType>()
     private val notifierMock: BlinklyNotifier = mock {
@@ -355,6 +359,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         // then
         assertThat(component.childStack.active.instance::class).isEqualTo(before)
         assertThat(errors.any { it is BlinklyError.NotificationPermissionChecking && it.cause === exception }).isTrue()
+        verify(exactly(1)) { crashReporterMock.recordException(exception) }
         collectJob.cancel()
     }
 
@@ -423,6 +428,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
             componentContext = componentContext,
             storeFactory = DefaultStoreFactory(),
             beeper = beeperMock,
+            crashReporter = crashReporterMock,
             dispatchers = testDispatchers,
             notifier = notifierMock,
             screenAwakeController = screenAwakeControllerMock,

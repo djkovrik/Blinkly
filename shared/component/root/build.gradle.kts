@@ -8,6 +8,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:domain"))
+                implementation(project(":shared:crashlytics"))
                 implementation(project(":shared:alarm"))
                 implementation(project(":shared:database"))
                 implementation(project(":shared:notifier"))
