@@ -34,6 +34,7 @@ import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
+import com.sedsoftware.blinkly.domain.external.BlinklyCrashReporter
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
@@ -71,6 +72,7 @@ class RootComponentDefault private constructor(
     private val addNewReminderComponent: (ComponentContext, (ComponentOutput) -> Unit) -> AddNewReminderComponent,
     private val achievements: Flow<List<Achievement>>,
     private val achievementUnlockEvents: Flow<AchievementType>,
+    private val crashReporter: BlinklyCrashReporter,
     private val onThemeResolved: (Boolean) -> Unit,
     mainDispatcher: CoroutineDispatcher,
     private val releaseBeeper: () -> Unit,
@@ -80,6 +82,7 @@ class RootComponentDefault private constructor(
         componentContext: ComponentContext,
         storeFactory: StoreFactory,
         beeper: BlinklyBeeper,
+        crashReporter: BlinklyCrashReporter,
         dispatchers: BlinklyDispatchers,
         notifier: BlinklyNotifier,
         screenAwakeController: BlinklyScreenAwakeController,
@@ -146,6 +149,7 @@ class RootComponentDefault private constructor(
         },
         achievements = achievementsWatcher.achievements,
         achievementUnlockEvents = notifier.unlockedAchievements(),
+        crashReporter = crashReporter,
         onThemeResolved = achievementsWatcher::onThemeResolved,
         mainDispatcher = dispatchers.main,
         releaseBeeper = beeper::release,
@@ -265,6 +269,7 @@ class RootComponentDefault private constructor(
                 val cause = error.cause ?: error
 
                 Logger.e(cause) { "Blinkly error caught: ${error.message}" }
+                crashReporter.recordException(cause)
                 errorEvents.tryEmit(error)
             }
 

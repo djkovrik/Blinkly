@@ -46,6 +46,7 @@ kmpauth = "2.5.0-alpha01"
 gitlive-firebase = "2.5.0"
 firebase-bom = "33.15.0"
 google-services = "4.5.0"
+firebase-crashlytics-plugin = "3.0.7"
 yandex-ads = "8.1.0"
 
 [libraries]
@@ -106,7 +107,9 @@ lib-kmpauth-uihelper = { module = "io.github.mirzemehdi:kmpauth-uihelper", versi
 lib-firebase-app = { module = "dev.gitlive:firebase-app", version.ref = "gitlive-firebase" }
 lib-firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "gitlive-firebase" }
 lib-firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "gitlive-firebase" }
+lib-firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "gitlive-firebase" }
 lib-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+android-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 
 test-kotlin = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
@@ -124,6 +127,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-kmp-library = { id = "com.android.library", version.ref = "agp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }

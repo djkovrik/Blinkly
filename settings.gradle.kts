@@ -31,6 +31,7 @@ dependencyResolutionManagement {
 include(
     ":androidApp",
     ":shared:compose",
+    ":shared:crashlytics",
     ":shared:alarm",
     ":shared:database",
     ":shared:domain",

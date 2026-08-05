@@ -87,6 +87,7 @@ jobs:
           if ! ./gradlew -q \
             iosSimulatorArm64Test \
             :shared:compose:linkDebugFrameworkIosSimulatorArm64 \
+            -x :shared:crashlytics:iosSimulatorArm64Test \
             -x :shared:component:sync:iosSimulatorArm64Test \
             -x :shared:component:root:iosSimulatorArm64Test \
             -x :shared:compose:iosSimulatorArm64Test \
