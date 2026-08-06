@@ -23,10 +23,39 @@ import androidx.compose.ui.unit.dp
 internal object BlinklySpacing {
     val ScreenHorizontal: Dp = 16.dp
     val ScreenVertical: Dp = 8.dp
+    val ScreenContentVertical: Dp = 24.dp
     val SectionGap: Dp = 16.dp
+    val HeaderGap: Dp = 8.dp
     val ItemGap: Dp = 10.dp
     val CardPadding: Dp = 16.dp
     val CompactCardPadding: Dp = 12.dp
+}
+
+@Composable
+internal fun BlinklyScreenHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.HeaderGap),
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Text(
+            text = title,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+        )
+
+        if (subtitle != null) {
+            Text(
+                text = subtitle,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
+    }
 }
 
 @Composable
