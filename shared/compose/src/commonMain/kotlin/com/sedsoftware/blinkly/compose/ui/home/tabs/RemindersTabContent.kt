@@ -26,7 +26,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -73,6 +72,7 @@ import com.sedsoftware.blinkly.compose.ui.extension.asLabel
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyAppCard
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyButton
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyMetricRow
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyScreenHeader
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.extension.toHumanReadableString
 import com.sedsoftware.blinkly.utils.PreviewContent
@@ -111,16 +111,6 @@ fun RemindersTabContent(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(resource = Res.string.reminders_title),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                }
-            )
-        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -148,23 +138,44 @@ fun RemindersTabContent(
                 .fillMaxSize(),
         ) {
             if (model.reminders.isEmpty()) {
-                EmptyReminders(
-                    onCreateClick = component::onAddNewClick,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(all = 24.dp),
-                )
+                Column(modifier = Modifier.fillMaxSize()) {
+                    BlinklyScreenHeader(
+                        title = stringResource(resource = Res.string.reminders_title),
+                        modifier = Modifier.padding(
+                            horizontal = BlinklySpacing.ScreenHorizontal,
+                            vertical = BlinklySpacing.ScreenContentVertical,
+                        ),
+                    )
+
+                    Box(modifier = Modifier.weight(weight = 1f)) {
+                        EmptyReminders(
+                            onCreateClick = component::onAddNewClick,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(all = BlinklySpacing.ScreenContentVertical),
+                        )
+                    }
+                }
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(space = BlinklySpacing.ItemGap),
                     contentPadding = PaddingValues(
                         start = BlinklySpacing.ScreenHorizontal,
-                        top = BlinklySpacing.ScreenVertical,
+                        top = BlinklySpacing.ScreenContentVertical,
                         end = BlinklySpacing.ScreenHorizontal,
-                        bottom = 24.dp,
+                        bottom = BlinklySpacing.ScreenContentVertical,
                     ),
                     modifier = Modifier.fillMaxSize(),
                 ) {
+                    item(contentType = "screen-header") {
+                        BlinklyScreenHeader(
+                            title = stringResource(resource = Res.string.reminders_title),
+                            modifier = Modifier.padding(
+                                bottom = BlinklySpacing.SectionGap - BlinklySpacing.ItemGap,
+                            ),
+                        )
+                    }
+
                     item {
                         RemindersOverview(
                             reminders = model.reminders,
@@ -480,6 +491,14 @@ private fun LocalDate.asShortDate(): String =
 @Preview(widthDp = 440, heightDp = 560)
 @Composable
 private fun RemindersTabContentPreviewLight() {
+    BlinklyWidgetPreview {
+        RemindersPreviewContent()
+    }
+}
+
+@Preview(widthDp = 440, heightDp = 560, locale = "ru")
+@Composable
+private fun RemindersTabContentPreviewRuLight() {
     BlinklyWidgetPreview {
         RemindersPreviewContent()
     }

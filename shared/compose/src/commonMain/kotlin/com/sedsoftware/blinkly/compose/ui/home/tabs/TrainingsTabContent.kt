@@ -54,6 +54,7 @@ import com.sedsoftware.blinkly.component.trainings.integration.TrainingsTabCompo
 import com.sedsoftware.blinkly.compose.theme.BlinklyWidgetPreview
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyAppCard
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyButton
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyScreenHeader
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import org.jetbrains.compose.resources.painterResource
@@ -71,9 +72,15 @@ fun TrainingsTabContent(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(state = rememberScrollState())
-            .padding(horizontal = BlinklySpacing.ScreenHorizontal, vertical = 24.dp)
+            .padding(
+                horizontal = BlinklySpacing.ScreenHorizontal,
+                vertical = BlinklySpacing.ScreenContentVertical,
+            )
     ) {
-        TrainingsHeader()
+        BlinklyScreenHeader(
+            title = stringResource(resource = Res.string.trainings_title),
+            subtitle = stringResource(resource = Res.string.trainings_subtitle),
+        )
 
         model.cards.forEachIndexed { index, card ->
             TrainingCatalogCard(
@@ -89,29 +96,6 @@ fun TrainingsTabContent(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
-    }
-}
-
-@Composable
-private fun TrainingsHeader(
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(space = 8.dp),
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = stringResource(resource = Res.string.trainings_title),
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold,
-        )
-
-        Text(
-            text = stringResource(resource = Res.string.trainings_subtitle),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyLarge,
-        )
     }
 }
 
@@ -336,6 +320,16 @@ private data class TrainingColors(
 @Composable
 @Preview(widthDp = 420, heightDp = 800)
 private fun TrainingsTabContentPreviewLight() {
+    BlinklyWidgetPreview {
+        TrainingsTabContent(
+            component = TrainingsTabComponentPreview(),
+        )
+    }
+}
+
+@Composable
+@Preview(widthDp = 420, heightDp = 800, locale = "ru")
+private fun TrainingsTabContentPreviewRuLight() {
     BlinklyWidgetPreview {
         TrainingsTabContent(
             component = TrainingsTabComponentPreview(),

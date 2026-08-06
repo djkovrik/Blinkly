@@ -61,6 +61,7 @@ import com.sedsoftware.blinkly.compose.ui.extension.asTitle
 import com.sedsoftware.blinkly.compose.ui.extension.clickableOnce
 import com.sedsoftware.blinkly.compose.ui.extension.shimmering
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklyAppCard
+import com.sedsoftware.blinkly.compose.ui.widget.BlinklyScreenHeader
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklySectionTitle
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.model.Achievement
@@ -81,14 +82,10 @@ fun ProgressTabContent(
             .fillMaxSize()
             .verticalScroll(state = rememberScrollState())
             .padding(horizontal = BlinklySpacing.ScreenHorizontal)
-            .padding(top = 28.dp, bottom = 20.dp),
+            .padding(vertical = BlinklySpacing.ScreenContentVertical),
     ) {
-        Text(
-            text = stringResource(resource = Res.string.progress_title),
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth(),
+        BlinklyScreenHeader(
+            title = stringResource(resource = Res.string.progress_title),
         )
 
         CalendarSection(
@@ -394,6 +391,15 @@ private fun AchievementPreviewItem(
 @Preview(widthDp = 420, heightDp = 920)
 @Composable
 private fun ProgressTabContentPreviewLight() {
+    ProgressTabContentPreview(
+        todayState = CalendarDayState.EMPTY,
+        showLockedAchievements = true,
+    )
+}
+
+@Preview(widthDp = 420, heightDp = 920, locale = "ru")
+@Composable
+private fun ProgressTabContentPreviewRuLight() {
     ProgressTabContentPreview(
         todayState = CalendarDayState.EMPTY,
         showLockedAchievements = true,
