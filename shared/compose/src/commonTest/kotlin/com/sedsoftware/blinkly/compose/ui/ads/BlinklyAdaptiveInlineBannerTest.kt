@@ -1,6 +1,7 @@
 package com.sedsoftware.blinkly.compose.ui.ads
 
 import com.sedsoftware.blinkly.compose.ads.BlinklyAdLoadFailure
+import com.yandex.mobile.ads.kmp.common.AdRequestError
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -23,10 +24,19 @@ class BlinklyAdaptiveInlineBannerTest {
     }
 
     @Test
-    fun `load failures are normalized without logging raw sdk data`() {
-        assertEquals(BlinklyAdLoadFailure.NO_FILL, normalizeLoadFailure("No fill"))
-        assertEquals(BlinklyAdLoadFailure.NETWORK, normalizeLoadFailure("Network connection failed"))
-        assertEquals(BlinklyAdLoadFailure.INTERNAL, normalizeLoadFailure("SDK internal error"))
-        assertEquals(BlinklyAdLoadFailure.UNKNOWN, normalizeLoadFailure("Something else"))
+    fun `load failures use stable sdk codes without exposing raw descriptions`() {
+        assertEquals(BlinklyAdLoadFailure.INVALID_REQUEST, mapLoadFailure(error(AdRequestError.Code.INVALID_REQUEST)))
+        assertEquals(BlinklyAdLoadFailure.NO_FILL, mapLoadFailure(error(AdRequestError.Code.NO_FILL)))
+        assertEquals(BlinklyAdLoadFailure.NETWORK, mapLoadFailure(error(AdRequestError.Code.NETWORK_ERROR)))
+        assertEquals(BlinklyAdLoadFailure.INTERNAL, mapLoadFailure(error(AdRequestError.Code.INTERNAL_ERROR)))
+        assertEquals(BlinklyAdLoadFailure.SYSTEM, mapLoadFailure(error(AdRequestError.Code.SYSTEM_ERROR)))
+        assertEquals(BlinklyAdLoadFailure.UNKNOWN, mapLoadFailure(error(AdRequestError.Code.UNKNOWN_ERROR)))
+        assertEquals(BlinklyAdLoadFailure.UNKNOWN, mapLoadFailure(error(code = 999)))
     }
+
+    private fun error(code: Int): AdRequestError = AdRequestError(
+        code = code,
+        description = "raw sdk description must not drive diagnostics",
+        adUnitId = "must-not-be-logged",
+    )
 }

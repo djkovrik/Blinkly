@@ -22,6 +22,7 @@ import com.yandex.mobile.ads.kmp.banner.BannerAdSize
 import com.yandex.mobile.ads.kmp.banner.BannerEvents
 import com.yandex.mobile.ads.kmp.banner.rememberBannerAdState
 import com.yandex.mobile.ads.kmp.common.AdRequest
+import com.yandex.mobile.ads.kmp.common.AdRequestError
 import kotlin.math.roundToInt
 
 @Composable
@@ -69,7 +70,8 @@ private fun BlinklyLoadedAdaptiveInlineBanner(
                     eventListener(
                         BlinklyAdEvent.LoadFailed(
                             placement = placement,
-                            reason = normalizeLoadFailure(error.description),
+                            reason = mapLoadFailure(error),
+                            sdkErrorCode = error.code,
                         )
                     )
                 },
@@ -128,16 +130,16 @@ internal fun calculateInlineBannerDimensions(
         maxHeight = maxHeightDp.roundToInt().coerceIn(1, MAX_INLINE_HEIGHT_DP.toInt()),
     )
 
-internal fun normalizeLoadFailure(description: String): BlinklyAdLoadFailure {
-    val normalized = description.lowercase()
-    return when {
-        "no fill" in normalized || "no_fill" in normalized -> BlinklyAdLoadFailure.NO_FILL
-        "network" in normalized || "offline" in normalized || "connection" in normalized ->
-            BlinklyAdLoadFailure.NETWORK
-        "internal" in normalized || "sdk" in normalized -> BlinklyAdLoadFailure.INTERNAL
+internal fun mapLoadFailure(error: AdRequestError): BlinklyAdLoadFailure =
+    when (error.code) {
+        AdRequestError.Code.INVALID_REQUEST -> BlinklyAdLoadFailure.INVALID_REQUEST
+        AdRequestError.Code.NO_FILL -> BlinklyAdLoadFailure.NO_FILL
+        AdRequestError.Code.NETWORK_ERROR -> BlinklyAdLoadFailure.NETWORK
+        AdRequestError.Code.INTERNAL_ERROR -> BlinklyAdLoadFailure.INTERNAL
+        AdRequestError.Code.SYSTEM_ERROR -> BlinklyAdLoadFailure.SYSTEM
+        AdRequestError.Code.UNKNOWN_ERROR -> BlinklyAdLoadFailure.UNKNOWN
         else -> BlinklyAdLoadFailure.UNKNOWN
     }
-}
 
 private const val MAX_INLINE_HEIGHT_DP = 160f
 private const val PREVIEW_HEIGHT_DP = 96
