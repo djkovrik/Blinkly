@@ -1,8 +1,50 @@
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+abstract class VerifyReleaseAdsConfigurationTask : DefaultTask() {
+
+    @get:Input
+    abstract val androidAdsApplicationId: Property<String>
+
+    @get:Input
+    abstract val adUnitIds: MapProperty<String, String>
+
+    @get:Input
+    abstract val formats: MapProperty<String, String>
+
+    @TaskAction
+    fun verifyConfiguration() {
+        val expectedApplicationId = androidAdsApplicationId.get()
+        val configuredAdUnitIds = adUnitIds.get()
+        val configuredFormats = formats.get()
+        val expectedAdUnitPattern = Regex("^R-M-${Regex.escape(expectedApplicationId)}-[0-9]+$")
+
+        configuredAdUnitIds.forEach { (placement, adUnitId) ->
+            check(configuredFormats[placement] == BlinklyAdFormat.BANNER.name) {
+                "$placement must use a Yandex Banner ad unit because Blinkly renders BannerAdSize.Inline"
+            }
+            check(adUnitId != DEMO_AD_UNIT_ID) {
+                "$placement release ad unit ID uses the Yandex demo value"
+            }
+            check(expectedAdUnitPattern.matches(adUnitId)) {
+                "$placement release ad unit ID must belong to Android Yandex app $expectedApplicationId"
+            }
+        }
+        check(configuredAdUnitIds.values.distinct().size == configuredAdUnitIds.size) {
+            "Each Android release ad placement must use a distinct Yandex ad unit ID"
+        }
+    }
+
+    private companion object {
+        const val DEMO_AD_UNIT_ID = "demo-banner-yandex"
+    }
+}
 
 abstract class VerifyReleaseAudioResourcesTask : DefaultTask() {
 
@@ -30,8 +72,32 @@ abstract class VerifyReleaseAudioResourcesTask : DefaultTask() {
 }
 
 val demoAdUnitId = "demo-banner-yandex"
-val releaseAchievementsAdUnitId = "R-M-19603758-1"
-val releaseGardenAdUnitId = "R-M-19603758-2"
+val androidYandexAdsApplicationId = "19603758"
+
+enum class BlinklyAdFormat {
+    BANNER,
+}
+
+data class BlinklyReleaseAdUnit(
+    val placement: String,
+    val adUnitId: String,
+    val format: BlinklyAdFormat,
+)
+
+val releaseAdUnits = listOf(
+    BlinklyReleaseAdUnit(
+        placement = "Achievements",
+        adUnitId = "R-M-19603758-4",
+        format = BlinklyAdFormat.BANNER,
+    ),
+    BlinklyReleaseAdUnit(
+        placement = "Garden",
+        adUnitId = "R-M-19603758-3",
+        format = BlinklyAdFormat.BANNER,
+    ),
+)
+val releaseAchievementsAdUnitId = releaseAdUnits.single { it.placement == "Achievements" }.adUnitId
+val releaseGardenAdUnitId = releaseAdUnits.single { it.placement == "Garden" }.adUnitId
 
 val blinklyVersionName = providers.gradleProperty("blinklyVersionName")
     .getOrElse("1.0.0")
@@ -145,26 +211,12 @@ android {
     }
 }
 
-val verifyReleaseAdsConfiguration by tasks.registering {
+val verifyReleaseAdsConfiguration by tasks.registering(VerifyReleaseAdsConfigurationTask::class) {
     group = "verification"
-    description = "Verifies that enabled release ad placements use production Yandex ad unit IDs."
-    inputs.properties(
-        "achievementsAdUnitId" to releaseAchievementsAdUnitId,
-        "gardenAdUnitId" to releaseGardenAdUnitId,
-    )
-
-    doLast {
-        val configuredAdUnitIds = mapOf(
-            "Achievements" to inputs.properties.getValue("achievementsAdUnitId").toString(),
-            "Garden" to inputs.properties.getValue("gardenAdUnitId").toString(),
-        )
-
-        configuredAdUnitIds.forEach { (placement, adUnitId) ->
-            check(adUnitId.isNotBlank()) { "$placement release ad unit ID is blank" }
-            check(adUnitId != "demo-banner-yandex") { "$placement release ad unit ID uses the Yandex demo value" }
-            check(adUnitId.startsWith("R-M-")) { "$placement release ad unit ID is not a Yandex production ID" }
-        }
-    }
+    description = "Verifies the Android release Yandex banner inventory."
+    androidAdsApplicationId.set(androidYandexAdsApplicationId)
+    adUnitIds.set(releaseAdUnits.associate { it.placement to it.adUnitId })
+    formats.set(releaseAdUnits.associate { it.placement to it.format.name })
 }
 
 val verifyReleaseAudioResources by tasks.registering(VerifyReleaseAudioResourcesTask::class) {

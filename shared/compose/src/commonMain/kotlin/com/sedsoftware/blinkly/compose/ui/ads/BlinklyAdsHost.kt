@@ -41,10 +41,12 @@ internal fun BlinklyAdsHost(
     LaunchedEffect(configuration) {
         if (!configuration.hasLoadablePlacement()) return@LaunchedEffect
 
+        eventListener(BlinklyAdEvent.InitializationStarted)
         runCatching {
             BlinklyAdsRuntime.initialize()
         }.onSuccess {
             sdkReady = true
+            eventListener(BlinklyAdEvent.Initialized)
         }.onFailure { throwable ->
             Logger.e(throwable) { "Yandex Ads SDK initialization failed" }
             eventListener(BlinklyAdEvent.InitializationFailed)
@@ -110,11 +112,15 @@ private fun logBlinklyAdEvent(
         "appVersion=${configuration.appVersion}"
 
     when (event) {
+        BlinklyAdEvent.InitializationStarted -> Logger.i { "ad_sdk_initialization_started: $dimensions" }
+        BlinklyAdEvent.Initialized -> Logger.i { "ad_sdk_initialized: $dimensions" }
         BlinklyAdEvent.InitializationFailed -> Logger.w { "ad_sdk_initialization_failed: $dimensions" }
-        is BlinklyAdEvent.RequestStarted -> Logger.d { "ad_request_started: $dimensions" }
-        is BlinklyAdEvent.Loaded -> Logger.d { "ad_loaded: $dimensions" }
-        is BlinklyAdEvent.LoadFailed -> Logger.w { "ad_load_failed(${event.reason.name.lowercase()}): $dimensions" }
-        is BlinklyAdEvent.Impression -> Logger.d { "ad_impression: $dimensions" }
+        is BlinklyAdEvent.RequestStarted -> Logger.i { "ad_request_started: $dimensions" }
+        is BlinklyAdEvent.Loaded -> Logger.i { "ad_loaded: $dimensions" }
+        is BlinklyAdEvent.LoadFailed -> Logger.w {
+            "ad_load_failed(reason=${event.reason.name.lowercase()}, sdkCode=${event.sdkErrorCode}): $dimensions"
+        }
+        is BlinklyAdEvent.Impression -> Logger.i { "ad_impression: $dimensions" }
         is BlinklyAdEvent.Clicked -> Logger.d { "ad_clicked: $dimensions" }
     }
 }

@@ -55,6 +55,14 @@ data class BlinklyAdsConfiguration(
 sealed interface BlinklyAdEvent {
     val placement: BlinklyAdPlacement?
 
+    data object InitializationStarted : BlinklyAdEvent {
+        override val placement: BlinklyAdPlacement? = null
+    }
+
+    data object Initialized : BlinklyAdEvent {
+        override val placement: BlinklyAdPlacement? = null
+    }
+
     data object InitializationFailed : BlinklyAdEvent {
         override val placement: BlinklyAdPlacement? = null
     }
@@ -66,6 +74,7 @@ sealed interface BlinklyAdEvent {
     data class LoadFailed(
         override val placement: BlinklyAdPlacement,
         val reason: BlinklyAdLoadFailure,
+        val sdkErrorCode: Int,
     ) : BlinklyAdEvent
 
     data class Impression(override val placement: BlinklyAdPlacement) : BlinklyAdEvent
@@ -74,8 +83,10 @@ sealed interface BlinklyAdEvent {
 }
 
 enum class BlinklyAdLoadFailure {
+    INVALID_REQUEST,
     NO_FILL,
     NETWORK,
     INTERNAL,
+    SYSTEM,
     UNKNOWN,
 }
