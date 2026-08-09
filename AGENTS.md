@@ -551,6 +551,16 @@ remain below 1000. Release signing is configured only when all four
 `ANDROID_KEY_PASSWORD` environment variables are present, so ordinary local
 release builds may remain unsigned.
 
+Google Services and Crashlytics exchange the `GoogleServicesTask` type across
+their Gradle plugin boundary. Keep both plugin aliases in the root
+`build.gradle.kts` with `apply(false)` so they share the root plugin classpath,
+and apply both plugins in `androidApp`, with Google Services before
+Crashlytics. Declaring only Crashlytics at the root while leaving Google
+Services module-local can make Crashlytics report the misleading
+`Google-Services plugin not found` error even when
+`processReleaseGoogleServices` exists and succeeds. Fix this by aligning the
+plugin classpaths, never by disabling release mapping-file upload.
+
 Release builds enable R8 and resource shrinking and must keep producing
 `androidApp/build/outputs/mapping/release/mapping.txt` for Play Console.
 `ndk.debugSymbolLevel` is `SYMBOL_TABLE`; AGP embeds every symbol it can obtain
