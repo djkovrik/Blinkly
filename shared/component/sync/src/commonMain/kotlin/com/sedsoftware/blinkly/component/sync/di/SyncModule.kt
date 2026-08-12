@@ -32,16 +32,16 @@ interface SyncModuleDependencies {
 @Suppress("FunctionName")
 fun SyncModule(dependencies: SyncModuleDependencies): SyncModule =
     object : SyncModule {
+        private val scope: CoroutineScope by lazy {
+            CoroutineScope(dependencies.dispatchers.main)
+        }
+
         override val authService: BlinklyAuthService by lazy {
-            FirebaseBlinklyAuthService()
+            FirebaseBlinklyAuthService(scope = scope)
         }
 
         override val remoteSyncDataSource: BlinklyRemoteSyncDataSource by lazy {
             FirestoreSyncDataSource()
-        }
-
-        private val scope: CoroutineScope by lazy {
-            CoroutineScope(dependencies.dispatchers.main)
         }
 
         override fun createSyncManager(rescheduleReminders: suspend () -> Unit): BlinklySyncManager =

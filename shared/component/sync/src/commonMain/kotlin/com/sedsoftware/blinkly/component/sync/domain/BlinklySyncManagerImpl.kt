@@ -55,7 +55,7 @@ class BlinklySyncManagerImpl(
                 scope = scope,
                 started = SharingStarted.Eagerly,
                 initialValue = BlinklySyncState(
-                    isAuthorized = false,
+                    isAuthorized = authService.currentUser.value != null,
                     isSyncing = false,
                     lastSyncedAt = settings.lastSyncedAt,
                     error = null,
