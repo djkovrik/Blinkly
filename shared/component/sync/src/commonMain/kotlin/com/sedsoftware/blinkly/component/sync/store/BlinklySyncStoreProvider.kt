@@ -27,7 +27,7 @@ internal class BlinklySyncStoreProvider(
         object : BlinklySyncStore,
             com.arkivanov.mvikotlin.core.store.Store<Intent, State, Label> by storeFactory.create<Intent, Action, Msg, State, Label>(
                 name = "BlinklySyncStore",
-                initialState = State(),
+                initialState = syncManager.state.value.toStoreState(),
                 autoInit = autoInit,
                 bootstrapper = coroutineBootstrapper(mainContext) {
                     dispatch(Action.ObserveSyncState)
@@ -106,3 +106,11 @@ internal class BlinklySyncStoreProvider(
             }
     }
 }
+
+private fun BlinklySyncState.toStoreState(): State =
+    State(
+        isAuthorized = isAuthorized,
+        isSyncing = isSyncing,
+        lastSyncedAt = lastSyncedAt,
+        error = error,
+    )

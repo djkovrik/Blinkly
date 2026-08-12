@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import blinkly.shared.compose.generated.resources.Res
@@ -95,6 +99,12 @@ fun OnboardingContentStep4(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp)
+                .clip(MaterialTheme.shapes.medium)
+                .toggleable(
+                    value = model.checkboxSelected,
+                    role = Role.Checkbox,
+                    onValueChange = component::onCheckboxSelect,
+                )
         ) {
             Row(
                 horizontalArrangement = Arrangement.Start,
@@ -103,7 +113,8 @@ fun OnboardingContentStep4(
             ) {
                 Checkbox(
                     checked = model.checkboxSelected,
-                    onCheckedChange = component::onCheckboxSelect,
+                    onCheckedChange = null,
+                    modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp),
                 )
 
                 Text(

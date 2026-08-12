@@ -25,6 +25,7 @@ import com.sedsoftware.blinkly.domain.model.Workout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
@@ -44,6 +45,13 @@ class BlinklySyncManagerImplTest {
     private val remoteDataSource: FakeRemoteSyncDataSource = FakeRemoteSyncDataSource()
     private val timeUtils: FakeTimeUtils = FakeTimeUtils(now = instant(50))
     private var rescheduleCount: Int = 0
+
+    @Test
+    fun `when persisted user exists then initial state is authorized`() = runTest {
+        val manager = createManager(backgroundScope)
+
+        assertEquals(true, manager.state.value.isAuthorized)
+    }
 
     @Test
     fun `when remote snapshot is missing then local snapshot is uploaded`() = runTest {
@@ -389,7 +397,7 @@ class BlinklySyncManagerImplTest {
     private class FakeBlinklyAuthService(user: BlinklyUser?) : BlinklyAuthService {
         private val userFlow: MutableStateFlow<BlinklyUser?> = MutableStateFlow(user)
 
-        override val currentUser: Flow<BlinklyUser?> = userFlow
+        override val currentUser: StateFlow<BlinklyUser?> = userFlow
 
         override suspend fun completeGoogleSignIn(user: BlinklyUser): Result<BlinklyUser> {
             userFlow.value = user

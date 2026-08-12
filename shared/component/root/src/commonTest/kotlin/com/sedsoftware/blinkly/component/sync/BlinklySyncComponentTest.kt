@@ -46,6 +46,15 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
     }
 
     @Test
+    fun `when component is reopened with authorized state then it immediately asks to sync`() = runTest(testScheduler) {
+        syncManager.emit(isAuthorized = true, lastSyncedAt = null)
+
+        val reopenedComponent = createSyncComponent(syncManager)
+
+        assertThat(reopenedComponent.model.value.buttonMode).isEqualTo(BlinklySyncComponent.ButtonMode.Sync)
+    }
+
+    @Test
     fun `when authorized with last sync then model shows synced status`() = runTest(testScheduler) {
         // given
         val syncedAt = Instant.fromEpochMilliseconds(1_000)
@@ -127,6 +136,9 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
     }
 
     override fun createComponent(): BlinklySyncComponent =
+        createSyncComponent(syncManager)
+
+    private fun createSyncComponent(syncManager: BlinklySyncManager): BlinklySyncComponent =
         BlinklySyncComponentDefault(
             componentContext = DefaultComponentContext(lifecycle),
             storeFactory = DefaultStoreFactory(),
