@@ -27,9 +27,11 @@ import blinkly.shared.compose.generated.resources.content_description_sync
 import blinkly.shared.compose.generated.resources.ic_google
 import blinkly.shared.compose.generated.resources.ic_sync
 import blinkly.shared.compose.generated.resources.sync_button_syncing
+import blinkly.shared.compose.generated.resources.sync_button_restoring
 import blinkly.shared.compose.generated.resources.sync_button_sync_now
 import blinkly.shared.compose.generated.resources.sync_sign_in_google
 import blinkly.shared.compose.generated.resources.sync_status_failed
+import blinkly.shared.compose.generated.resources.sync_status_restoring
 import blinkly.shared.compose.generated.resources.sync_status_last_synced
 import blinkly.shared.compose.generated.resources.sync_status_not_synced
 import blinkly.shared.compose.generated.resources.sync_status_syncing
@@ -140,8 +142,10 @@ private fun SyncActionButton(
     modifier: Modifier = Modifier,
 ) {
     val isSigningIn = model.buttonMode == BlinklySyncComponent.ButtonMode.SignIn
+    val isRestoring = model.buttonMode == BlinklySyncComponent.ButtonMode.Restoring
     val isSyncing = model.isSyncing
     val text = when {
+        isRestoring -> stringResource(resource = Res.string.sync_button_restoring)
         isSyncing -> stringResource(resource = Res.string.sync_button_syncing)
         isSigningIn -> stringResource(resource = Res.string.sync_sign_in_google)
         else -> stringResource(resource = Res.string.sync_button_sync_now)
@@ -149,7 +153,7 @@ private fun SyncActionButton(
 
     Button(
         onClick = onClick,
-        enabled = !isSyncing,
+        enabled = !isSyncing && !isRestoring,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -197,6 +201,9 @@ private fun SyncActionButton(
 @OptIn(ExperimentalTime::class)
 private fun BlinklySyncComponent.Model.statusText(timeZone: TimeZone): String =
     when (val currentStatus = status) {
+        BlinklySyncComponent.Status.Restoring ->
+            stringResource(resource = Res.string.sync_status_restoring)
+
         BlinklySyncComponent.Status.NotSynced ->
             stringResource(resource = Res.string.sync_status_not_synced)
 
@@ -220,7 +227,7 @@ internal fun Instant.asSyncDate(timeZone: TimeZone): String =
         .substringBefore(".")
         .replace(oldChar = 'T', newChar = ' ')
 
-@Preview(widthDp = 420, heightDp = 760)
+@Preview(widthDp = 420, heightDp = 920)
 @Composable
 private fun BlinklySyncContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -228,7 +235,7 @@ private fun BlinklySyncContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 760, uiMode = 32)
+@Preview(widthDp = 420, heightDp = 920, uiMode = 32)
 @Composable
 private fun BlinklySyncContentPreviewDark() {
     BlinklyWidgetPreview(isDarkTheme = true) {
@@ -245,6 +252,12 @@ private fun BlinklySyncContentPreviewBoard(
         verticalArrangement = Arrangement.spacedBy(space = 12.dp),
         modifier = Modifier.padding(all = 16.dp),
     ) {
+        BlinklySyncContent(
+            component = BlinklySyncComponentPreview(isRestoring = true),
+            enableGoogleSignInContainer = false,
+            syncTimeZone = syncTimeZone,
+        )
+
         BlinklySyncContent(
             component = BlinklySyncComponentPreview(),
             enableGoogleSignInContainer = false,

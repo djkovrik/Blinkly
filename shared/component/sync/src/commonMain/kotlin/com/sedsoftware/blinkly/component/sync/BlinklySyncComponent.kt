@@ -21,11 +21,13 @@ interface BlinklySyncComponent {
     )
 
     enum class ButtonMode {
+        Restoring,
         SignIn,
         Sync,
     }
 
     sealed interface Status {
+        data object Restoring : Status
         data object NotSynced : Status
         data object Syncing : Status
         data class Synced(val at: Instant) : Status

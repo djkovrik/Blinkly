@@ -9,6 +9,7 @@ import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementLevel
 import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.BlinklyDatabaseSnapshot
+import com.sedsoftware.blinkly.domain.model.BlinklyAuthSession
 import com.sedsoftware.blinkly.domain.model.BlinklySettingsSnapshot
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import com.sedsoftware.blinkly.domain.model.Exercise
@@ -39,7 +40,7 @@ import kotlin.time.Instant
 class BlinklySyncManagerImplTest {
 
     private val user: BlinklyUser = BlinklyUser(id = "user-id", displayName = "User", email = "user@example.com")
-    private val authService: FakeBlinklyAuthService = FakeBlinklyAuthService(user)
+    private val authService: FakeBlinklyAuthService = FakeBlinklyAuthService(BlinklyAuthSession.SignedIn(user))
     private val database: FakeBlinklyDatabase = FakeBlinklyDatabase()
     private val settings: FakeBlinklySettings = FakeBlinklySettings()
     private val remoteDataSource: FakeRemoteSyncDataSource = FakeRemoteSyncDataSource()
@@ -51,6 +52,44 @@ class BlinklySyncManagerImplTest {
         val manager = createManager(backgroundScope)
 
         assertEquals(true, manager.state.value.isAuthorized)
+        assertEquals(BlinklyAuthSession.SignedIn(user), manager.state.value.authSession)
+    }
+
+    @Test
+    fun `when listener restores persisted user then manager becomes authorized`() = runTest {
+        val restoringAuth = FakeBlinklyAuthService(BlinklyAuthSession.Restoring)
+        val manager = createManager(backgroundScope, restoringAuth)
+        testScheduler.runCurrent()
+
+        assertEquals(BlinklyAuthSession.Restoring, manager.state.value.authSession)
+
+        restoringAuth.emit(BlinklyAuthSession.SignedIn(user))
+        testScheduler.runCurrent()
+
+        assertEquals(BlinklyAuthSession.SignedIn(user), manager.state.value.authSession)
+    }
+
+    @Test
+    fun `when listener confirms no persisted user then manager becomes signed out`() = runTest {
+        val restoringAuth = FakeBlinklyAuthService(BlinklyAuthSession.Restoring)
+        val manager = createManager(backgroundScope, restoringAuth)
+        testScheduler.runCurrent()
+
+        restoringAuth.emit(BlinklyAuthSession.SignedOut)
+        testScheduler.runCurrent()
+
+        assertEquals(BlinklyAuthSession.SignedOut, manager.state.value.authSession)
+    }
+
+    @Test
+    fun `when app data is cleared then listener moves authorized manager to signed out`() = runTest {
+        val manager = createManager(backgroundScope)
+        testScheduler.runCurrent()
+
+        authService.emit(BlinklyAuthSession.SignedOut)
+        testScheduler.runCurrent()
+
+        assertEquals(BlinklyAuthSession.SignedOut, manager.state.value.authSession)
     }
 
     @Test
@@ -295,7 +334,10 @@ class BlinklySyncManagerImplTest {
         assertEquals(baseline, settings.lastRemoteUpdatedAt)
     }
 
-    private fun createManager(scope: CoroutineScope): BlinklySyncManagerImpl =
+    private fun createManager(
+        scope: CoroutineScope,
+        authService: BlinklyAuthService = this.authService,
+    ): BlinklySyncManagerImpl =
         BlinklySyncManagerImpl(
             authService = authService,
             database = database,
@@ -394,19 +436,23 @@ class BlinklySyncManagerImplTest {
     private fun instant(minute: Int): Instant =
         Instant.fromEpochMilliseconds(minute * 60_000L)
 
-    private class FakeBlinklyAuthService(user: BlinklyUser?) : BlinklyAuthService {
-        private val userFlow: MutableStateFlow<BlinklyUser?> = MutableStateFlow(user)
+    private class FakeBlinklyAuthService(initialSession: BlinklyAuthSession) : BlinklyAuthService {
+        private val sessionFlow: MutableStateFlow<BlinklyAuthSession> = MutableStateFlow(initialSession)
 
-        override val currentUser: StateFlow<BlinklyUser?> = userFlow
+        override val session: StateFlow<BlinklyAuthSession> = sessionFlow
 
         override suspend fun completeGoogleSignIn(user: BlinklyUser): Result<BlinklyUser> {
-            userFlow.value = user
+            sessionFlow.value = BlinklyAuthSession.SignedIn(user)
             return Result.success(user)
         }
 
         override suspend fun signOut(): Result<Unit> {
-            userFlow.value = null
+            sessionFlow.value = BlinklyAuthSession.SignedOut
             return Result.success(Unit)
+        }
+
+        fun emit(session: BlinklyAuthSession) {
+            sessionFlow.value = session
         }
     }
 

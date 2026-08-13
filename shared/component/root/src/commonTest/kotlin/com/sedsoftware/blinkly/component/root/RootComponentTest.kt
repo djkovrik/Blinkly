@@ -30,6 +30,7 @@ import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.BlinklyNotification
 import com.sedsoftware.blinkly.domain.model.BlinklySyncState
+import com.sedsoftware.blinkly.domain.model.BlinklyAuthSession
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import com.sedsoftware.blinkly.domain.model.ThemeState
 import dev.mokkery.answering.returns
@@ -468,7 +469,7 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     private class FakeBlinklySyncManager : BlinklySyncManager {
         override val state: StateFlow<BlinklySyncState> = MutableStateFlow(
             BlinklySyncState(
-                isAuthorized = false,
+                authSession = BlinklyAuthSession.SignedOut,
                 isSyncing = false,
                 lastSyncedAt = null,
                 error = null,
