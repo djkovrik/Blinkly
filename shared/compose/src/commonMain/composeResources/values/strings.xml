@@ -488,8 +488,10 @@
     <string name="sync_sign_in_google">Sign in with Google</string>
     <string name="sync_button_sync_now">Sync now</string>
     <string name="sync_button_syncing">Syncing...</string>
+    <string name="sync_button_restoring">Restoring account...</string>
     <string name="sync_status_not_synced">Not synced yet</string>
     <string name="sync_status_syncing">Syncing...</string>
+    <string name="sync_status_restoring">Restoring your account...</string>
     <string name="sync_status_last_synced">Last synced: %1$s</string>
     <string name="sync_status_failed">Could not sync</string>
 

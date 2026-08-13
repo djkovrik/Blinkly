@@ -2,6 +2,7 @@ package com.sedsoftware.blinkly.component.sync.store
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.BlinklyAuthSession
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import kotlin.time.Instant
 
@@ -14,7 +15,7 @@ internal interface BlinklySyncStore : Store<BlinklySyncStore.Intent, BlinklySync
     }
 
     data class State(
-        val isAuthorized: Boolean = false,
+        val authSession: BlinklyAuthSession = BlinklyAuthSession.Restoring,
         val isSyncing: Boolean = false,
         val lastSyncedAt: Instant? = null,
         val error: BlinklyError? = null,

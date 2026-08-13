@@ -12,6 +12,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.BlinklySyncState
+import com.sedsoftware.blinkly.domain.model.BlinklyAuthSession
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ThemeState
@@ -235,7 +236,7 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
     private class FakeBlinklySyncManager : BlinklySyncManager {
         override val state: StateFlow<BlinklySyncState> = MutableStateFlow(
             BlinklySyncState(
-                isAuthorized = false,
+                authSession = BlinklyAuthSession.SignedOut,
                 isSyncing = false,
                 lastSyncedAt = null,
                 error = null,

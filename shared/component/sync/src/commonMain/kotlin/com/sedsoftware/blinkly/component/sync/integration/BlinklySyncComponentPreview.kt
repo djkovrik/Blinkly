@@ -11,6 +11,7 @@ import kotlin.time.Instant
 @OptIn(ExperimentalTime::class)
 class BlinklySyncComponentPreview(
     isAuthorized: Boolean = false,
+    isRestoring: Boolean = false,
     isSyncing: Boolean = false,
     lastSyncedAt: Instant? = null,
     status: BlinklySyncComponent.Status? = null,
@@ -21,15 +22,16 @@ class BlinklySyncComponentPreview(
             isAuthorized = isAuthorized,
             isSyncing = isSyncing,
             status = status ?: when {
+                isRestoring -> BlinklySyncComponent.Status.Restoring
                 isSyncing -> BlinklySyncComponent.Status.Syncing
                 lastSyncedAt != null -> BlinklySyncComponent.Status.Synced(lastSyncedAt)
                 else -> BlinklySyncComponent.Status.NotSynced
             },
             lastSyncedAt = lastSyncedAt,
-            buttonMode = if (isAuthorized) {
-                BlinklySyncComponent.ButtonMode.Sync
-            } else {
-                BlinklySyncComponent.ButtonMode.SignIn
+            buttonMode = when {
+                isRestoring -> BlinklySyncComponent.ButtonMode.Restoring
+                isAuthorized -> BlinklySyncComponent.ButtonMode.Sync
+                else -> BlinklySyncComponent.ButtonMode.SignIn
             },
         )
     )

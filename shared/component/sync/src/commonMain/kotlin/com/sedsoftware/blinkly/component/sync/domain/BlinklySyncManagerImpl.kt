@@ -8,6 +8,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.BlinklyDatabaseSnapshot
+import com.sedsoftware.blinkly.domain.model.BlinklyAuthSession
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.BlinklySettingsSnapshot
 import com.sedsoftware.blinkly.domain.model.BlinklySyncState
@@ -42,10 +43,10 @@ class BlinklySyncManagerImpl(
     private val operationState: MutableStateFlow<OperationState> = MutableStateFlow(OperationState())
 
     override val state: StateFlow<BlinklySyncState> =
-        authService.currentUser
-            .combine(operationState) { user, operation ->
+        authService.session
+            .combine(operationState) { authSession, operation ->
                 BlinklySyncState(
-                    isAuthorized = user != null,
+                    authSession = authSession,
                     isSyncing = operation.isSyncing,
                     lastSyncedAt = settings.lastSyncedAt,
                     error = operation.error,
@@ -55,7 +56,7 @@ class BlinklySyncManagerImpl(
                 scope = scope,
                 started = SharingStarted.Eagerly,
                 initialValue = BlinklySyncState(
-                    isAuthorized = authService.currentUser.value != null,
+                    authSession = authService.session.value,
                     isSyncing = false,
                     lastSyncedAt = settings.lastSyncedAt,
                     error = null,
@@ -71,9 +72,8 @@ class BlinklySyncManagerImpl(
     }
 
     override suspend fun syncNow() {
-        val user = authService
-            .currentUser
-            .first()
+        val session = authService.session.first { it !is BlinklyAuthSession.Restoring }
+        val user = (session as? BlinklyAuthSession.SignedIn)?.user
             ?: throw BlinklyError.SyncAuthFailed(IllegalStateException("No authorized user"))
 
         syncNow(user)

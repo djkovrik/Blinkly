@@ -485,8 +485,10 @@
     <string name="sync_sign_in_google">Войти через Google</string>
     <string name="sync_button_sync_now">Синхронизировать</string>
     <string name="sync_button_syncing">Синхронизация...</string>
+    <string name="sync_button_restoring">Восстановление аккаунта...</string>
     <string name="sync_status_not_synced">Не синхронизировано</string>
     <string name="sync_status_syncing">Синхронизация...</string>
+    <string name="sync_status_restoring">Восстанавливаем аккаунт...</string>
     <string name="sync_status_last_synced">Последняя синхронизация: %1$s</string>
     <string name="sync_status_failed">Не удалось синхронизировать</string>
 

@@ -9,6 +9,7 @@ import com.sedsoftware.blinkly.component.sync.store.BlinklySyncStore.Label
 import com.sedsoftware.blinkly.component.sync.store.BlinklySyncStore.State
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.BlinklyAuthSession
 import com.sedsoftware.blinkly.domain.model.BlinklySyncState
 import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
@@ -46,7 +47,7 @@ internal class BlinklySyncStoreProvider(
                     }
 
                     onIntent<Intent.PrimaryButtonClicked> {
-                        if (state().isAuthorized) {
+                        if (state().authSession is BlinklyAuthSession.SignedIn) {
                             launch {
                                 runCatching { syncManager.syncNow() }
                                     .onFailure { throwable ->
@@ -92,7 +93,7 @@ internal class BlinklySyncStoreProvider(
             when (msg) {
                 is Msg.SyncStateChanged ->
                     copy(
-                        isAuthorized = msg.state.isAuthorized,
+                        authSession = msg.state.authSession,
                         isSyncing = msg.state.isSyncing,
                         lastSyncedAt = msg.state.lastSyncedAt,
                         error = msg.state.error,
@@ -109,7 +110,7 @@ internal class BlinklySyncStoreProvider(
 
 private fun BlinklySyncState.toStoreState(): State =
     State(
-        isAuthorized = isAuthorized,
+        authSession = authSession,
         isSyncing = isSyncing,
         lastSyncedAt = lastSyncedAt,
         error = error,

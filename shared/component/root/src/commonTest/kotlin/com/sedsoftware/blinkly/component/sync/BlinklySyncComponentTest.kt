@@ -9,6 +9,7 @@ import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.sync.integration.BlinklySyncComponentDefault
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.BlinklyAuthSession
 import com.sedsoftware.blinkly.domain.model.BlinklySyncState
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,14 +20,22 @@ import kotlin.time.Instant
 
 class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
 
+    private val user = BlinklyUser(id = "user", displayName = null, email = null)
     private val syncManager: FakeBlinklySyncManager = FakeBlinklySyncManager()
 
     @Test
-    fun `when unauthenticated then model asks to sign in`() = runTest(testScheduler) {
-        // when
+    fun `when auth is restoring then model disables sign in`() = runTest(testScheduler) {
         testScheduler.advanceUntilIdle()
 
-        // then
+        assertThat(component.model.value.buttonMode).isEqualTo(BlinklySyncComponent.ButtonMode.Restoring)
+        assertThat(component.model.value.status).isEqualTo(BlinklySyncComponent.Status.Restoring)
+    }
+
+    @Test
+    fun `when restoring resolves signed out then model asks to sign in`() = runTest(testScheduler) {
+        syncManager.emit(authSession = BlinklyAuthSession.SignedOut)
+        testScheduler.advanceUntilIdle()
+
         assertThat(component.model.value.buttonMode).isEqualTo(BlinklySyncComponent.ButtonMode.SignIn)
         assertThat(component.model.value.status).isEqualTo(BlinklySyncComponent.Status.NotSynced)
     }
@@ -37,7 +46,7 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
         testScheduler.advanceUntilIdle()
 
         // when
-        syncManager.emit(isAuthorized = true, lastSyncedAt = null)
+        syncManager.emit(authSession = BlinklyAuthSession.SignedIn(user), lastSyncedAt = null)
         testScheduler.advanceUntilIdle()
 
         // then
@@ -47,7 +56,7 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
 
     @Test
     fun `when component is reopened with authorized state then it immediately asks to sync`() = runTest(testScheduler) {
-        syncManager.emit(isAuthorized = true, lastSyncedAt = null)
+        syncManager.emit(authSession = BlinklyAuthSession.SignedIn(user), lastSyncedAt = null)
 
         val reopenedComponent = createSyncComponent(syncManager)
 
@@ -61,7 +70,7 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
         testScheduler.advanceUntilIdle()
 
         // when
-        syncManager.emit(isAuthorized = true, lastSyncedAt = syncedAt)
+        syncManager.emit(authSession = BlinklyAuthSession.SignedIn(user), lastSyncedAt = syncedAt)
         testScheduler.advanceUntilIdle()
 
         // then
@@ -105,7 +114,7 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
         val syncedAt = Instant.fromEpochMilliseconds(3_000)
         syncManager.nextSyncAt = syncedAt
         testScheduler.advanceUntilIdle()
-        syncManager.emit(isAuthorized = true)
+        syncManager.emit(authSession = BlinklyAuthSession.SignedIn(user))
         testScheduler.advanceUntilIdle()
 
         // when
@@ -123,7 +132,7 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
         val exception = IllegalStateException("sync failed")
         syncManager.nextSyncFailure = exception
         testScheduler.advanceUntilIdle()
-        syncManager.emit(isAuthorized = true)
+        syncManager.emit(authSession = BlinklyAuthSession.SignedIn(user))
         testScheduler.advanceUntilIdle()
 
         // when
@@ -150,7 +159,7 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
     private class FakeBlinklySyncManager : BlinklySyncManager {
         private val stateFlow: MutableStateFlow<BlinklySyncState> = MutableStateFlow(
             BlinklySyncState(
-                isAuthorized = false,
+                authSession = BlinklyAuthSession.Restoring,
                 isSyncing = false,
                 lastSyncedAt = null,
                 error = null,
@@ -175,13 +184,13 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
         }
 
         fun emit(
-            isAuthorized: Boolean,
+            authSession: BlinklyAuthSession,
             isSyncing: Boolean = false,
             lastSyncedAt: Instant? = null,
             error: BlinklyError? = null,
         ) {
             stateFlow.value = BlinklySyncState(
-                isAuthorized = isAuthorized,
+                authSession = authSession,
                 isSyncing = isSyncing,
                 lastSyncedAt = lastSyncedAt,
                 error = error,
@@ -191,7 +200,7 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
         private fun sync(successUser: BlinklyUser?) {
             val failure = nextSyncFailure
             stateFlow.value = stateFlow.value.copy(
-                isAuthorized = stateFlow.value.isAuthorized || successUser != null,
+                authSession = successUser?.let(BlinklyAuthSession::SignedIn) ?: stateFlow.value.authSession,
                 isSyncing = true,
                 error = null,
             )
@@ -202,11 +211,14 @@ class BlinklySyncComponentTest : ComponentTest<BlinklySyncComponent>() {
             }
 
             stateFlow.value = stateFlow.value.copy(
-                isAuthorized = true,
+                authSession = BlinklyAuthSession.SignedIn(
+                    successUser ?: (stateFlow.value.authSession as BlinklyAuthSession.SignedIn).user
+                ),
                 isSyncing = false,
                 lastSyncedAt = nextSyncAt,
                 error = null,
             )
         }
+
     }
 }
