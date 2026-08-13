@@ -227,7 +227,7 @@ internal fun Instant.asSyncDate(timeZone: TimeZone): String =
         .substringBefore(".")
         .replace(oldChar = 'T', newChar = ' ')
 
-@Preview(widthDp = 420, heightDp = 760)
+@Preview(widthDp = 420, heightDp = 920)
 @Composable
 private fun BlinklySyncContentPreviewLight() {
     BlinklyWidgetPreview {
@@ -235,7 +235,7 @@ private fun BlinklySyncContentPreviewLight() {
     }
 }
 
-@Preview(widthDp = 420, heightDp = 760, uiMode = 32)
+@Preview(widthDp = 420, heightDp = 920, uiMode = 32)
 @Composable
 private fun BlinklySyncContentPreviewDark() {
     BlinklyWidgetPreview(isDarkTheme = true) {
