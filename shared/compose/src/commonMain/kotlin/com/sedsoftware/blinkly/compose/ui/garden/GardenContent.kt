@@ -144,33 +144,33 @@ fun GardenContent(
                 )
             }
 
-            if (shouldPlaceGardenAd(model.grownTrees.size)) {
-                item(
-                    key = "ad_garden_after_stats",
-                    contentType = "ad",
-                ) {
-                    BlinklyAdaptiveInlineBanner(
-                        placement = BlinklyAdPlacement.GARDEN,
-                        modifier = Modifier
-                            .heightIn(min = expandedAdMinHeight)
-                            .alsoIf(
-                                condition = expandedAdHeightPx == 0,
-                                other = Modifier.animateContentSize(
-                                    animationSpec = spring(
-                                        dampingRatio = Spring.DampingRatioNoBouncy,
-                                        stiffness = Spring.StiffnessMediumLow,
-                                    ),
-                                    finishedListener = { initialSize, targetSize ->
-                                        if (targetSize.height > initialSize.height) {
-                                            expandedAdHeightPx = targetSize.height
-                                        }
-                                    },
+            item(
+                key = "ad_garden_after_stats",
+                contentType = "ad",
+            ) {
+                BlinklyAdaptiveInlineBanner(
+                    placement = BlinklyAdPlacement.GARDEN,
+                    modifier = Modifier
+                        .heightIn(min = expandedAdMinHeight)
+                        .alsoIf(
+                            condition = expandedAdHeightPx == 0,
+                            other = Modifier.animateContentSize(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMediumLow,
                                 ),
-                            )
-                            .padding(vertical = 8.dp),
-                    )
-                }
+                                finishedListener = { initialSize, targetSize ->
+                                    if (targetSize.height > initialSize.height) {
+                                        expandedAdHeightPx = targetSize.height
+                                    }
+                                },
+                            ),
+                        )
+                        .padding(vertical = 8.dp),
+                )
+            }
 
+            if (model.grownTrees.isNotEmpty()) {
                 item(
                     key = "garden_header",
                     contentType = "header",
@@ -394,8 +394,10 @@ private fun GardenStatsSection(
                     nextTreeType.asLabel(),
                     daysToNextTree,
                 )
+
                 model.grownTreesCount == model.totalTrees ->
                     stringResource(resource = Res.string.garden_all_grown)
+
                 else -> stringResource(resource = Res.string.garden_last_tree)
             },
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -505,5 +507,3 @@ private fun GardenTreeDetailsSheetPreviewDark() {
 
 private const val HUNDRED_PERCENT = 100f
 private const val PROGRESS_TRACK_ALPHA = 0.24f
-
-internal fun shouldPlaceGardenAd(grownTreeCount: Int): Boolean = grownTreeCount > 0
