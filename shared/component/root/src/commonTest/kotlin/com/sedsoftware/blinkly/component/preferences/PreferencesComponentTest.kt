@@ -8,9 +8,11 @@ import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.preferences.integration.PreferencesComponentDefault
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import com.sedsoftware.blinkly.domain.model.BlinklySyncState
 import com.sedsoftware.blinkly.domain.model.BlinklyAuthSession
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
@@ -27,6 +29,7 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
 
     private val settings: FakeSettings = FakeSettings()
     private val syncManager: FakeBlinklySyncManager = FakeBlinklySyncManager()
+    private val analytics = FakeAnalytics()
 
     @Test
     fun `when component created then model contains settings values`() = runTest(testScheduler) {
@@ -130,6 +133,18 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
     }
 
     @Test
+    fun `when analytics changed then local setting reporter and model are updated`() = runTest(testScheduler) {
+        testScheduler.advanceUntilIdle()
+
+        component.onAnalyticsEnabledChanged(false)
+        testScheduler.advanceUntilIdle()
+
+        assertThat(settings.analyticsEnabled).isEqualTo(false)
+        assertThat(component.model.value.analyticsEnabled).isEqualTo(false)
+        assertThat(analytics.enabledChanges).isEqualTo(listOf(false))
+    }
+
+    @Test
     fun `when invalid low value selected then value is clamped`() = runTest(testScheduler) {
         // given
         testScheduler.advanceUntilIdle()
@@ -161,6 +176,7 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
             dispatchers = testDispatchers,
             settings = throwingSettings,
             syncManager = syncManager,
+            analytics = analytics,
             preferencesOutput = { componentOutput.add(it) },
         )
 
@@ -202,11 +218,14 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
             dispatchers = testDispatchers,
             settings = settings,
             syncManager = syncManager,
+            analytics = analytics,
             preferencesOutput = { componentOutput.add(it) },
         )
 
     private class FakeSettings : BlinklySettings {
         var blinkBreakCountSaveFailure: Throwable? = null
+
+        override var analyticsEnabled: Boolean = true
 
         override var blinkBreakCount: Int = 60
             set(value) {
@@ -231,6 +250,16 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
         override var lastLocalSettingsChangeAt: Instant? = null
         override var lastSyncedAt: Instant? = null
         override var lastRemoteUpdatedAt: Instant? = null
+    }
+
+    private class FakeAnalytics : BlinklyAnalytics {
+        val enabledChanges = mutableListOf<Boolean>()
+
+        override fun report(event: BlinklyAnalyticsEvent) = Unit
+
+        override fun setEnabled(enabled: Boolean) {
+            enabledChanges += enabled
+        }
     }
 
     private class FakeBlinklySyncManager : BlinklySyncManager {

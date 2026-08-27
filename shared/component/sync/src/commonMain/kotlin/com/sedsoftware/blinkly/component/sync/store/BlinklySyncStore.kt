@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.BlinklyAuthSession
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import kotlin.time.Instant
 
 internal interface BlinklySyncStore : Store<BlinklySyncStore.Intent, BlinklySyncStore.State, BlinklySyncStore.Label> {
@@ -12,6 +13,7 @@ internal interface BlinklySyncStore : Store<BlinklySyncStore.Intent, BlinklySync
         data object PrimaryButtonClicked : Intent
         data class GoogleSignInCompleted(val user: BlinklyUser) : Intent
         data class GoogleSignInFailed(val throwable: Throwable) : Intent
+        data object GoogleSignInCancelled : Intent
     }
 
     data class State(
@@ -23,5 +25,6 @@ internal interface BlinklySyncStore : Store<BlinklySyncStore.Intent, BlinklySync
 
     sealed interface Label {
         data class ErrorCaught(val exception: BlinklyError) : Label
+        data class SyncActionFinished(val result: BlinklyAnalyticsEvent.SyncResult) : Label
     }
 }

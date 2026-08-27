@@ -11,6 +11,12 @@ internal class TrackingBlinklySettings(
     private val timeUtils: BlinklyTimeUtils,
 ) : BlinklySettings {
 
+    override var analyticsEnabled: Boolean
+        get() = delegate.analyticsEnabled
+        set(value) {
+            delegate.analyticsEnabled = value
+        }
+
     override var blinkBreakCount: Int
         get() = delegate.blinkBreakCount
         set(value) = setTracked { delegate.blinkBreakCount = value }

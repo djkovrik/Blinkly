@@ -14,5 +14,6 @@ internal val stateToModel: (State) -> Model = {
         clockRollsEachSide = it.clockRollsEachSide,
         palmingDuration = it.palmingDuration,
         themeState = it.themeState,
+        analyticsEnabled = it.analyticsEnabled,
     )
 }

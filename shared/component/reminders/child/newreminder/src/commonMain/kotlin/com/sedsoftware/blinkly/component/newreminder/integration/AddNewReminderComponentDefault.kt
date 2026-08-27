@@ -14,8 +14,11 @@ import com.sedsoftware.blinkly.component.newreminder.domain.AddNewReminderManage
 import com.sedsoftware.blinkly.component.newreminder.store.AddNewReminderStore
 import com.sedsoftware.blinkly.component.newreminder.store.AddNewReminderStoreProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
+import com.sedsoftware.blinkly.domain.NoOpBlinklyAnalytics
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import com.sedsoftware.blinkly.utils.asValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -28,6 +31,7 @@ class AddNewReminderComponentDefault(
     private val storeFactory: StoreFactory,
     private val dispatchers: BlinklyDispatchers,
     private val reminderManager: BlinklyReminderManager,
+    private val analytics: BlinklyAnalytics = NoOpBlinklyAnalytics,
     private val addNewReminderOutput: (ComponentOutput) -> Unit,
 ) : AddNewReminderComponent, ComponentContext by componentContext {
 
@@ -47,7 +51,10 @@ class AddNewReminderComponentDefault(
         scope.launch {
             store.labels.collect { label ->
                 when (label) {
-                    is AddNewReminderStore.Label.ReminderCreated -> addNewReminderOutput(ComponentOutput.Common.BackPressed)
+                    is AddNewReminderStore.Label.ReminderCreated -> {
+                        analytics.report(BlinklyAnalyticsEvent.ReminderCreated(label.type.toAnalyticsKind()))
+                        addNewReminderOutput(ComponentOutput.Common.BackPressed)
+                    }
                     is AddNewReminderStore.Label.ErrorCaught -> addNewReminderOutput(ComponentOutput.Common.ErrorCaught(label.exception))
                 }
             }
@@ -104,3 +111,14 @@ class AddNewReminderComponentDefault(
         store.accept(AddNewReminderStore.Intent.ValidationMessageShown)
     }
 }
+
+private fun com.sedsoftware.blinkly.component.newreminder.domain.model.ReminderScheduleType.toAnalyticsKind():
+    BlinklyAnalyticsEvent.ReminderKind =
+    when (this) {
+        com.sedsoftware.blinkly.component.newreminder.domain.model.ReminderScheduleType.DAILY ->
+            BlinklyAnalyticsEvent.ReminderKind.DAILY
+        com.sedsoftware.blinkly.component.newreminder.domain.model.ReminderScheduleType.WEEKLY_SINGLE ->
+            BlinklyAnalyticsEvent.ReminderKind.WEEKLY
+        com.sedsoftware.blinkly.component.newreminder.domain.model.ReminderScheduleType.WEEKLY_DAY_PERIOD ->
+            BlinklyAnalyticsEvent.ReminderKind.WORKDAY_PERIOD
+    }

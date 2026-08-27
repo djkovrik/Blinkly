@@ -21,9 +21,12 @@ import com.sedsoftware.blinkly.component.step4.integration.OnboardingStep4Compon
 import com.sedsoftware.blinkly.component.step5.OnboardingStep5Component
 import com.sedsoftware.blinkly.component.step5.integration.OnboardingStep5ComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
+import com.sedsoftware.blinkly.domain.NoOpBlinklyAnalytics
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.serialization.Serializable
@@ -31,6 +34,7 @@ import kotlinx.serialization.Serializable
 class OnboardingComponentDefault private constructor(
     private val componentContext: ComponentContext,
     private val dispatchers: BlinklyDispatchers,
+    private val analytics: BlinklyAnalytics,
     private val onboardingOutput: (ComponentOutput) -> Unit,
     private val onboardingStep1: (ComponentContext, (ComponentOutput) -> Unit) -> OnboardingStep1Component,
     private val onboardingStep2: (ComponentContext, (ComponentOutput) -> Unit) -> OnboardingStep2Component,
@@ -45,9 +49,11 @@ class OnboardingComponentDefault private constructor(
         reminderManager: BlinklyReminderManager,
         notifier: BlinklyNotifier,
         dispatchers: BlinklyDispatchers,
+        analytics: BlinklyAnalytics = NoOpBlinklyAnalytics,
         onboardingOutput: (ComponentOutput) -> Unit,
     ) : this(
         dispatchers = dispatchers,
+        analytics = analytics,
         componentContext = componentContext,
         onboardingOutput = onboardingOutput,
         onboardingStep1 = { childContext, output ->
@@ -63,7 +69,15 @@ class OnboardingComponentDefault private constructor(
             OnboardingStep4ComponentDefault(childContext, storeFactory, dispatchers, output)
         },
         onboardingStep5 = { childContext, output ->
-            OnboardingStep5ComponentDefault(childContext, storeFactory, dispatchers, reminderManager, notifier,output)
+            OnboardingStep5ComponentDefault(
+                childContext,
+                storeFactory,
+                dispatchers,
+                reminderManager,
+                notifier,
+                analytics,
+                output,
+            )
         },
     )
 
@@ -114,7 +128,12 @@ class OnboardingComponentDefault private constructor(
             is ComponentOutput.Onboarding.GoToStep2 -> navigation.push(Config.Step2)
             is ComponentOutput.Onboarding.GoToStep3 -> navigation.push(Config.Step3)
             is ComponentOutput.Onboarding.GoToStep4 -> navigation.push(Config.Step4)
-            is ComponentOutput.Onboarding.GoToStep5 -> navigation.push(Config.Step5)
+            is ComponentOutput.Onboarding.GoToStep5 -> {
+                analytics.report(
+                    BlinklyAnalyticsEvent.ReminderFlowOpened(BlinklyAnalyticsEvent.ReminderSource.ONBOARDING)
+                )
+                navigation.push(Config.Step5)
+            }
             is ComponentOutput.Onboarding.GoBack -> navigation.pop()
             else -> onboardingOutput(output)
         }

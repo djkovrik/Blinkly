@@ -19,6 +19,7 @@ interface PreferencesComponent {
     fun onClockRollsEachSideChanged(value: Int)
     fun onPalmingDurationChanged(value: Int)
     fun onThemeStateChanged(value: ThemeState)
+    fun onAnalyticsEnabledChanged(value: Boolean)
 
     data class Model(
         val blinkBreakCount: Int,
@@ -30,5 +31,6 @@ interface PreferencesComponent {
         val clockRollsEachSide: Int,
         val palmingDuration: Int,
         val themeState: ThemeState,
+        val analyticsEnabled: Boolean = true,
     )
 }

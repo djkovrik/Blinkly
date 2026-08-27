@@ -23,6 +23,7 @@ import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.Exercise
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.TrainingSource
 import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.ThemeState
@@ -116,7 +117,7 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
 
         // then
         assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.MorningWarmUp)
-        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.A))
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.A, TrainingSource.MAIN))
     }
 
     @Test
@@ -137,7 +138,7 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
 
         // then
         assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.WorkBreakDue)
-        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C, TrainingSource.MAIN))
     }
 
     @Test
@@ -199,7 +200,7 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
 
         // then
         assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.WorkBreakDue)
-        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C, TrainingSource.MAIN))
     }
 
     @Test
@@ -223,7 +224,7 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
         // then
         assertThat(component.model.value.greetingPeriod).isEqualTo(GreetingPeriod.DAY)
         assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.WorkBreakDue)
-        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C, TrainingSource.MAIN))
     }
 
     @Test
@@ -244,7 +245,7 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
 
         // then
         assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.AfternoonWarmUp)
-        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.A))
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.A, TrainingSource.MAIN))
     }
 
     @Test
@@ -265,7 +266,7 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
 
         // then
         assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.EveningRelax)
-        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.B))
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.B, TrainingSource.MAIN))
     }
 
     @Test
@@ -280,7 +281,7 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
 
         // then
         assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.EveningRelax)
-        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.B))
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.B, TrainingSource.MAIN))
     }
 
     @Test
@@ -318,7 +319,7 @@ class MainTabComponentTest : ComponentTest<MainTabComponent>() {
 
         // then
         assertThat(component.model.value.ctaState).isEqualTo(MainCtaState.RepeatBreakDue)
-        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+        assertThat(componentOutput).contains(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C, TrainingSource.MAIN))
     }
 
     @Test

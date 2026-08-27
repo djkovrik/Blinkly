@@ -18,6 +18,8 @@ import com.sedsoftware.blinkly.component.reminders.integration.RemindersTabCompo
 import com.sedsoftware.blinkly.component.trainings.TrainingsTabComponent
 import com.sedsoftware.blinkly.component.trainings.integration.TrainingsTabComponentDefault
 import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
+import com.sedsoftware.blinkly.domain.NoOpBlinklyAnalytics
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
@@ -27,11 +29,13 @@ import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import kotlinx.serialization.Serializable
 
 @Suppress("LongParameterList")
 class HomeScreenComponentDefault private constructor(
     private val componentContext: ComponentContext,
+    private val analytics: BlinklyAnalytics,
     private val homeScreenOutput: (ComponentOutput) -> Unit,
     private val mainTabComponent: (ComponentContext, (ComponentOutput) -> Unit) -> MainTabComponent,
     private val trainingsTabComponent: (ComponentContext, (ComponentOutput) -> Unit) -> TrainingsTabComponent,
@@ -50,10 +54,12 @@ class HomeScreenComponentDefault private constructor(
         highlightsProvider: BlinklyHighlightsProvider,
         reminderManager: BlinklyReminderManager,
         notifier: BlinklyNotifier,
+        analytics: BlinklyAnalytics = NoOpBlinklyAnalytics,
         treeProgressWatcher: BlinklyTreeProgressWatcher,
         homeScreenOutput: (ComponentOutput) -> Unit,
     ) : this(
         componentContext = componentContext,
+        analytics = analytics,
         homeScreenOutput = homeScreenOutput,
         mainTabComponent = { childContext, componentOutput ->
             MainTabComponentDefault(
@@ -116,18 +122,26 @@ class HomeScreenComponentDefault private constructor(
 
     override val childStack: Value<ChildStack<*, HomeScreenComponent.Child>> = stack
 
+    init {
+        analytics.report(BlinklyAnalyticsEvent.TabOpened(BlinklyAnalyticsEvent.Tab.MAIN))
+    }
+
     override fun onTabClick(tab: HomeScreenTab) {
-        when (tab) {
-            HomeScreenTab.MAIN -> navigation.bringToFront(Config.MainTab)
-            HomeScreenTab.TRAINING -> navigation.bringToFront(Config.TrainingsTab)
-            HomeScreenTab.PROGRESS -> navigation.bringToFront(Config.ProgressTab)
-            HomeScreenTab.REMINDERS -> navigation.bringToFront(Config.RemindersTab)
+        val config = tab.toConfig()
+        if (stack.value.active.configuration != config) {
+            analytics.report(BlinklyAnalyticsEvent.TabOpened(tab.toAnalyticsTab()))
+            navigation.bringToFront(config)
         }
     }
 
     private fun onChildOutput(output: ComponentOutput) {
         when (output) {
-            is ComponentOutput.Main.OpenProgressTab -> navigation.bringToFront(Config.ProgressTab)
+            is ComponentOutput.Main.OpenProgressTab -> {
+                if (stack.value.active.configuration != Config.ProgressTab) {
+                    analytics.report(BlinklyAnalyticsEvent.TabOpened(BlinklyAnalyticsEvent.Tab.PROGRESS))
+                    navigation.bringToFront(Config.ProgressTab)
+                }
+            }
             else -> homeScreenOutput(output)
         }
     }
@@ -162,4 +176,20 @@ class HomeScreenComponentDefault private constructor(
         @Serializable
         data object RemindersTab : Config
     }
+
+    private fun HomeScreenTab.toConfig(): Config =
+        when (this) {
+            HomeScreenTab.MAIN -> Config.MainTab
+            HomeScreenTab.TRAINING -> Config.TrainingsTab
+            HomeScreenTab.PROGRESS -> Config.ProgressTab
+            HomeScreenTab.REMINDERS -> Config.RemindersTab
+        }
+
+    private fun HomeScreenTab.toAnalyticsTab(): BlinklyAnalyticsEvent.Tab =
+        when (this) {
+            HomeScreenTab.MAIN -> BlinklyAnalyticsEvent.Tab.MAIN
+            HomeScreenTab.TRAINING -> BlinklyAnalyticsEvent.Tab.TRAININGS
+            HomeScreenTab.PROGRESS -> BlinklyAnalyticsEvent.Tab.PROGRESS
+            HomeScreenTab.REMINDERS -> BlinklyAnalyticsEvent.Tab.REMINDERS
+        }
 }

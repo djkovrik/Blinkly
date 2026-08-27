@@ -1436,6 +1436,7 @@ PODS:
     - AppMetricaLibraryAdapter (~> 6.3.0)
 
 DEPENDENCIES:
+  - AppMetricaCore (~> 6.3.0)
   - FirebaseAuth (= 11.8.0)
   - FirebaseCrashlytics (= 11.8.0)
   - FirebaseFirestore (= 11.8.0)
@@ -1545,6 +1546,6 @@ SPEC CHECKSUMS:
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   YandexMobileAds: 47d9d0ce6705e79e3801138e8c1d9898e4c79a51
 
-PODFILE CHECKSUM: e5969359dbcd2769a14380049d58ca271cc6b7e2
+PODFILE CHECKSUM: 89a49ab48afc590a01abfb4fc12ea37ad61dd2bb
 
 COCOAPODS: 1.16.2

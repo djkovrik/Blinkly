@@ -17,7 +17,10 @@ sealed class ComponentOutput {
     }
 
     sealed class Trainings : ComponentOutput() {
-        data class OpenExerciseBlock(val block: ExerciseBlock) : Trainings()
+        data class OpenExerciseBlock(
+            val block: ExerciseBlock,
+            val source: TrainingSource = TrainingSource.TRAININGS,
+        ) : Trainings()
     }
 
     sealed class Progress : ComponentOutput() {

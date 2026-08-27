@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -20,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -49,6 +51,9 @@ import blinkly.shared.compose.generated.resources.icon_back
 import blinkly.shared.compose.generated.resources.preferences_count_label
 import blinkly.shared.compose.generated.resources.preferences_duration_label
 import blinkly.shared.compose.generated.resources.preferences_exercises_title
+import blinkly.shared.compose.generated.resources.preferences_analytics_description
+import blinkly.shared.compose.generated.resources.preferences_analytics_title
+import blinkly.shared.compose.generated.resources.preferences_privacy_title
 import blinkly.shared.compose.generated.resources.preferences_theme_dark
 import blinkly.shared.compose.generated.resources.preferences_theme_light
 import blinkly.shared.compose.generated.resources.preferences_theme_system
@@ -123,6 +128,12 @@ fun PreferencesContent(
             BlinklySyncContent(
                 component = component.syncComponent,
                 enableGoogleSignInContainer = enableGoogleSignInContainer,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            PrivacySettings(
+                analyticsEnabled = model.analyticsEnabled,
+                onAnalyticsEnabledChanged = component::onAnalyticsEnabledChanged,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -209,6 +220,65 @@ fun PreferencesContent(
                 onIncrease = { component.onPalmingDurationChanged(model.palmingDuration + PALMING_STEP) },
                 modifier = Modifier.padding(bottom = 16.dp),
             )
+        }
+    }
+}
+
+@Composable
+private fun PrivacySettings(
+    analyticsEnabled: Boolean,
+    onAnalyticsEnabledChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(space = 12.dp),
+        modifier = modifier,
+    ) {
+        Text(
+            text = stringResource(resource = Res.string.preferences_privacy_title),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
+        )
+
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 1.dp,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(space = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = analyticsEnabled,
+                        role = Role.Switch,
+                        onValueChange = onAnalyticsEnabledChanged,
+                    )
+                    .padding(all = 16.dp),
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(space = 4.dp),
+                    modifier = Modifier.weight(weight = 1f),
+                ) {
+                    Text(
+                        text = stringResource(resource = Res.string.preferences_analytics_title),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    Text(
+                        text = stringResource(resource = Res.string.preferences_analytics_description),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+
+                Switch(
+                    checked = analyticsEnabled,
+                    onCheckedChange = null,
+                )
+            }
         }
     }
 }
@@ -425,6 +495,17 @@ private fun PreferencesContentPreviewDark() {
     BlinklyWidgetPreview(isDarkTheme = true) {
         PreferencesContent(
             component = PreferencesComponentPreview(themeState = ThemeState.DARK),
+            enableGoogleSignInContainer = false,
+        )
+    }
+}
+
+@Preview(widthDp = 420, heightDp = 1500, locale = "ru", fontScale = 1.3f)
+@Composable
+private fun PreferencesContentPreviewRussianLargeText() {
+    BlinklyWidgetPreview {
+        PreferencesContent(
+            component = PreferencesComponentPreview(),
             enableGoogleSignInContainer = false,
         )
     }

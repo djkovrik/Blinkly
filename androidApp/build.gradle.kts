@@ -71,8 +71,28 @@ abstract class VerifyReleaseAudioResourcesTask : DefaultTask() {
     }
 }
 
+abstract class VerifyReleaseAppMetricaConfigurationTask : DefaultTask() {
+
+    @get:Input
+    abstract val apiKey: Property<String>
+
+    @TaskAction
+    fun verifyConfiguration() {
+        check(UUID_PATTERN.matches(apiKey.get())) {
+            "Android release AppMetrica API key must be a non-placeholder UUID"
+        }
+    }
+
+    private companion object {
+        val UUID_PATTERN = Regex(
+            "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+        )
+    }
+}
+
 val demoAdUnitId = "demo-banner-yandex"
 val androidYandexAdsApplicationId = "19603758"
+val productionAppMetricaApiKey = "b83c3a77-bd0a-4a46-be7c-9a4e5530e37e"
 
 enum class BlinklyAdFormat {
     BANNER,
@@ -167,6 +187,11 @@ android {
         debug {
             buildConfigField(
                 type = "String",
+                name = "BLINKLY_APPMETRICA_API_KEY",
+                value = quotedBuildConfigValue(""),
+            )
+            buildConfigField(
+                type = "String",
                 name = "BLINKLY_ACHIEVEMENTS_AD_UNIT_ID",
                 value = quotedBuildConfigValue(demoAdUnitId),
             )
@@ -180,6 +205,12 @@ android {
             if (releaseSigningConfigured) {
                 signingConfig = signingConfigs.getByName("release")
             }
+
+            buildConfigField(
+                type = "String",
+                name = "BLINKLY_APPMETRICA_API_KEY",
+                value = quotedBuildConfigValue(productionAppMetricaApiKey),
+            )
 
             isMinifyEnabled = true
             isShrinkResources = true
@@ -226,8 +257,15 @@ val verifyReleaseAudioResources by tasks.registering(VerifyReleaseAudioResources
     shrinkReport.set(layout.buildDirectory.file("outputs/mapping/release/resources.txt"))
 }
 
+val verifyReleaseAppMetricaConfiguration by tasks.registering(VerifyReleaseAppMetricaConfigurationTask::class) {
+    group = "verification"
+    description = "Verifies the Android release AppMetrica API key."
+    apiKey.set(productionAppMetricaApiKey)
+}
+
 tasks.matching { it.name == "preReleaseBuild" }.configureEach {
     dependsOn(verifyReleaseAdsConfiguration)
+    dependsOn(verifyReleaseAppMetricaConfiguration)
 }
 
 tasks.matching { it.name == "assembleRelease" || it.name == "bundleRelease" }.configureEach {
@@ -242,6 +280,7 @@ dependencies {
     implementation(project(":shared:component:root"))
     implementation(project(":shared:compose"))
     implementation(project(":shared:domain"))
+    implementation(project(":shared:settings"))
 
     implementation(platform(libs.lib.firebase.bom))
     implementation(libs.android.firebase.crashlytics)
@@ -249,6 +288,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.splash)
     implementation(libs.lib.alarmee)
+    implementation(libs.lib.appmetrica.analytics)
     implementation(libs.lib.kermit)
     implementation(libs.lib.moko.permissions)
     implementation(libs.ark.decompose.core)

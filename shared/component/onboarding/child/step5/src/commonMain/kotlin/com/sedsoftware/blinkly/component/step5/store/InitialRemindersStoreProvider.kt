@@ -144,6 +144,7 @@ internal class InitialRemindersStoreProvider(
                                             result = withContext(ioContext) { manager.setupInitial(setupState) },
                                             onSuccess = {
                                                 dispatch(Msg.InitialSetupApplied)
+                                                publish(Label.ReminderCreated)
                                             },
                                             onError = { throwable ->
                                                 dispatch(Msg.SavingChanged(false))
@@ -198,6 +199,9 @@ internal class InitialRemindersStoreProvider(
                             },
                             onSuccess = {
                                 dispatch(Msg.InitialSetupApplied)
+                                if (!hasExistingReminders) {
+                                    publish(Label.ReminderCreated)
+                                }
                             },
                             onError = { throwable ->
                                 dispatch(Msg.SavingChanged(false))

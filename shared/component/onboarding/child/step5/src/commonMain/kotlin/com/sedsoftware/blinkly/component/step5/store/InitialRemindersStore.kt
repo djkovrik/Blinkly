@@ -43,6 +43,7 @@ internal interface InitialRemindersStore : Store<Intent, State, Label> {
     }
 
     sealed class Label {
+        data object ReminderCreated : Label()
         data class ErrorCaught(val exception: Throwable) : Label()
     }
 

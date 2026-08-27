@@ -56,6 +56,7 @@ class AppActivity : ComponentActivity() {
             permissionsController = permissionsController,
             context = applicationContext,
             window = window,
+            analyticsReporter = (application as BlinklyApplication).analyticsReporter,
         )
 
         setContent {

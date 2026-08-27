@@ -28,6 +28,8 @@ import com.sedsoftware.blinkly.component.preferences.PreferencesComponent
 import com.sedsoftware.blinkly.component.preferences.integration.PreferencesComponentDefault
 import com.sedsoftware.blinkly.component.root.RootComponent
 import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
+import com.sedsoftware.blinkly.domain.NoOpBlinklyAnalytics
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
@@ -45,9 +47,11 @@ import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementType
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.BlinklyNotification
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ThemeState
+import com.sedsoftware.blinkly.domain.model.TrainingSource
 import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -62,11 +66,12 @@ import kotlinx.serialization.Serializable
 @Suppress("LongParameterList")
 class RootComponentDefault private constructor(
     private val settings: BlinklySettings,
+    private val analytics: BlinklyAnalytics,
     private val componentContext: ComponentContext,
     private val onboardingComponent: (ComponentContext, (ComponentOutput) -> Unit) -> OnboardingComponent,
     private val homeScreenComponent: (ComponentContext, (ComponentOutput) -> Unit) -> HomeScreenComponent,
     private val preferencesComponent: (ComponentContext, (ComponentOutput) -> Unit) -> PreferencesComponent,
-    private val exercisesComponent: (ComponentContext, ExerciseBlock, (ComponentOutput) -> Unit) -> WorkoutComponent,
+    private val exercisesComponent: (ComponentContext, ExerciseBlock, TrainingSource, (ComponentOutput) -> Unit) -> WorkoutComponent,
     private val achievementsComponent: (ComponentContext, (ComponentOutput) -> Unit) -> AchievementsComponent,
     private val gardenComponent: (ComponentContext, (ComponentOutput) -> Unit) -> GardenComponent,
     private val addNewReminderComponent: (ComponentContext, (ComponentOutput) -> Unit) -> AddNewReminderComponent,
@@ -81,6 +86,7 @@ class RootComponentDefault private constructor(
     constructor(
         componentContext: ComponentContext,
         storeFactory: StoreFactory,
+        analytics: BlinklyAnalytics = NoOpBlinklyAnalytics,
         beeper: BlinklyBeeper,
         crashReporter: BlinklyCrashReporter,
         dispatchers: BlinklyDispatchers,
@@ -98,8 +104,9 @@ class RootComponentDefault private constructor(
     ) : this(
         componentContext = componentContext,
         settings = settings,
+        analytics = analytics,
         onboardingComponent = { childContext, output ->
-            OnboardingComponentDefault(childContext, storeFactory, reminderManager, notifier, dispatchers, output)
+            OnboardingComponentDefault(childContext, storeFactory, reminderManager, notifier, dispatchers, analytics, output)
         },
         homeScreenComponent = { childContext, output ->
             HomeScreenComponentDefault(
@@ -113,19 +120,22 @@ class RootComponentDefault private constructor(
                 highlightsProvider = highlightsProvider,
                 reminderManager = reminderManager,
                 notifier = notifier,
+                analytics = analytics,
                 treeProgressWatcher = treeProgressWatcher,
                 homeScreenOutput = output,
             )
         },
         preferencesComponent = { childContext, output ->
-            PreferencesComponentDefault(childContext, storeFactory, dispatchers, settings, syncManager, output)
+            PreferencesComponentDefault(childContext, storeFactory, dispatchers, settings, syncManager, analytics, output)
         },
-        exercisesComponent = { childContext, block, output ->
+        exercisesComponent = { childContext, block, source, output ->
             WorkoutComponentDefault(
                 componentContext = childContext,
                 storeFactory = storeFactory,
                 dispatchers = dispatchers,
                 block = block,
+                source = source,
+                analytics = analytics,
                 exerciseManager = exerciseManager,
                 beeper = beeper,
                 screenAwakeController = screenAwakeController,
@@ -144,6 +154,7 @@ class RootComponentDefault private constructor(
                 storeFactory = storeFactory,
                 dispatchers = dispatchers,
                 reminderManager = reminderManager,
+                analytics = analytics,
                 addNewReminderOutput = output,
             )
         },
@@ -163,6 +174,9 @@ class RootComponentDefault private constructor(
     private val scope = CoroutineScope(mainDispatcher + SupervisorJob())
 
     init {
+        if (!settings.onboardingDisplayed) {
+            analytics.report(BlinklyAnalyticsEvent.OnboardingStarted)
+        }
         scope.launch {
             achievements.collect {}
         }
@@ -215,7 +229,9 @@ class RootComponentDefault private constructor(
                 RootComponent.Child.Preferences(preferencesComponent(componentContext, ::onChildOutput))
 
             is Config.Workout ->
-                RootComponent.Child.Workout(exercisesComponent(componentContext, config.block, ::onChildOutput))
+                RootComponent.Child.Workout(
+                    exercisesComponent(componentContext, config.block, config.source, ::onChildOutput)
+                )
 
             is Config.Achievements ->
                 RootComponent.Child.Achievements(achievementsComponent(componentContext, ::onChildOutput))
@@ -230,29 +246,40 @@ class RootComponentDefault private constructor(
     private fun onChildOutput(output: ComponentOutput) {
         when (output) {
             is ComponentOutput.Onboarding.GoToHomeScreen -> {
+                analytics.report(BlinklyAnalyticsEvent.OnboardingCompleted)
                 settings.onboardingDisplayed = true
                 navigation.replaceCurrent(Config.HomeScreen)
             }
 
             is ComponentOutput.Main.OpenPreferences -> {
+                analytics.report(BlinklyAnalyticsEvent.PreferencesOpened)
                 navigation.push(Config.Preferences)
             }
 
             is ComponentOutput.Main.OpenProgressTab -> Unit
 
             is ComponentOutput.Trainings.OpenExerciseBlock -> {
-                navigation.push(Config.Workout(output.block))
+                navigation.push(Config.Workout(output.block, output.source))
             }
 
             is ComponentOutput.Progress.OpenAchievements -> {
+                analytics.report(
+                    BlinklyAnalyticsEvent.ProgressDetailsOpened(BlinklyAnalyticsEvent.ProgressScreen.ACHIEVEMENTS)
+                )
                 navigation.push(Config.Achievements)
             }
 
             is ComponentOutput.Progress.OpenGarden -> {
+                analytics.report(
+                    BlinklyAnalyticsEvent.ProgressDetailsOpened(BlinklyAnalyticsEvent.ProgressScreen.GARDEN)
+                )
                 navigation.push(Config.Garden)
             }
 
             is ComponentOutput.Reminders.OpenAddNew -> {
+                analytics.report(
+                    BlinklyAnalyticsEvent.ReminderFlowOpened(BlinklyAnalyticsEvent.ReminderSource.REMINDERS)
+                )
                 navigation.push(Config.AddNewReminder)
             }
 
@@ -301,7 +328,7 @@ class RootComponentDefault private constructor(
         data object Preferences : Config
 
         @Serializable
-        data class Workout(val block: ExerciseBlock) : Config
+        data class Workout(val block: ExerciseBlock, val source: TrainingSource) : Config
 
         @Serializable
         data object Achievements : Config

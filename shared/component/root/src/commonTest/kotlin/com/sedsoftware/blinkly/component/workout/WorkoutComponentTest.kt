@@ -14,16 +14,19 @@ import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.workout.integration.WorkoutComponentDefault
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
 import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
 import com.sedsoftware.blinkly.domain.model.BlinklyError
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
 import com.sedsoftware.blinkly.domain.model.ExerciseEvent
 import com.sedsoftware.blinkly.domain.model.ExerciseProgress
 import com.sedsoftware.blinkly.domain.model.ExerciseType
 import com.sedsoftware.blinkly.domain.model.EyeMovement
+import com.sedsoftware.blinkly.domain.model.TrainingSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
@@ -35,6 +38,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     private var exerciseManager: FakeExerciseManager = FakeExerciseManager()
     private var beeper: FakeBeeper = FakeBeeper()
     private var screenAwakeController: FakeScreenAwakeController = FakeScreenAwakeController()
+    private val analytics = RecordingAnalytics()
 
     @Test
     fun `when component created then intro model contains selected block exercises`() = runTest(testScheduler) {
@@ -68,6 +72,9 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
         assertThat(component.model.value.movement).isNull()
         assertThat(component.model.value.progress).isNull()
         assertThat(component.model.value.timerRemainingSeconds).isNull()
+        assertThat(analytics.events).contains(
+            BlinklyAnalyticsEvent.TrainingStarted(TrainingSource.TRAININGS)
+        )
     }
 
     @Test
@@ -217,6 +224,9 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
         // then
         assertThat(component.model.value.phase).isEqualTo(WorkoutComponent.Phase.COMPLETED)
         assertThat(componentOutput).contains(ComponentOutput.Common.BackPressed)
+        assertThat(analytics.events).contains(
+            BlinklyAnalyticsEvent.TrainingFinished(BlinklyAnalyticsEvent.TrainingResult.COMPLETED)
+        )
     }
 
     @Test
@@ -371,6 +381,24 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
     }
 
     @Test
+    fun `when started workout closes then cancellation is reported once`() = runTest(testScheduler) {
+        // given
+        component.onStartClick()
+        testScheduler.advanceUntilIdle()
+
+        // when
+        component.onBackClick()
+        component.onBackClick()
+
+        // then
+        assertThat(
+            analytics.events.count {
+                it == BlinklyAnalyticsEvent.TrainingFinished(BlinklyAnalyticsEvent.TrainingResult.CANCELLED)
+            }
+        ).isEqualTo(1)
+    }
+
+    @Test
     fun `when lifecycle destroyed then manager stops and beeper stays owned by root`() = runTest(testScheduler) {
         // given
         val localLifecycle = LifecycleRegistry()
@@ -421,6 +449,7 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
             exerciseManager = manager,
             beeper = beeper,
             screenAwakeController = screenAwakeController,
+            analytics = analytics,
             workoutOutput = { componentOutput.add(it) },
         )
 
@@ -496,5 +525,15 @@ class WorkoutComponentTest : ComponentTest<WorkoutComponent>() {
         override fun disable() {
             disableCount++
         }
+    }
+
+    private class RecordingAnalytics : BlinklyAnalytics {
+        val events: MutableList<BlinklyAnalyticsEvent> = mutableListOf()
+
+        override fun report(event: BlinklyAnalyticsEvent) {
+            events.add(event)
+        }
+
+        override fun setEnabled(enabled: Boolean) = Unit
     }
 }

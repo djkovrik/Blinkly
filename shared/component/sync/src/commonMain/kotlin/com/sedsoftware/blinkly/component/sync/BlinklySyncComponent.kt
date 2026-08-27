@@ -11,6 +11,7 @@ interface BlinklySyncComponent {
     fun onPrimaryButtonClick()
     fun onGoogleSignInCompleted(user: BlinklyUser)
     fun onGoogleSignInFailed(throwable: Throwable)
+    fun onGoogleSignInCancelled()
 
     data class Model(
         val isAuthorized: Boolean,

@@ -14,9 +14,12 @@ import com.sedsoftware.blinkly.component.step5.domain.InitialRemindersManager
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStore
 import com.sedsoftware.blinkly.component.step5.store.InitialRemindersStoreProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
+import com.sedsoftware.blinkly.domain.NoOpBlinklyAnalytics
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import com.sedsoftware.blinkly.utils.asValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -30,6 +33,7 @@ class OnboardingStep5ComponentDefault(
     private val dispatchers: BlinklyDispatchers,
     private val reminderManager: BlinklyReminderManager,
     private val notifier: BlinklyNotifier,
+    private val analytics: BlinklyAnalytics = NoOpBlinklyAnalytics,
     private val onboardingOutput: (ComponentOutput) -> Unit,
 ) : OnboardingStep5Component, ComponentContext by componentContext {
 
@@ -49,6 +53,9 @@ class OnboardingStep5ComponentDefault(
         scope.launch {
             store.labels.collect { label ->
                 when (label) {
+                    is InitialRemindersStore.Label.ReminderCreated -> analytics.report(
+                        BlinklyAnalyticsEvent.ReminderCreated(BlinklyAnalyticsEvent.ReminderKind.WORKDAY_PERIOD)
+                    )
                     is InitialRemindersStore.Label.ErrorCaught -> onboardingOutput(ComponentOutput.Common.ErrorCaught(label.exception))
                 }
             }

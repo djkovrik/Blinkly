@@ -1,6 +1,7 @@
 package com.sedsoftware.blinkly.component.home
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.arkivanov.decompose.DefaultComponentContext
@@ -10,6 +11,7 @@ import com.sedsoftware.blinkly.component.ComponentTest
 import com.sedsoftware.blinkly.component.home.integration.HomeScreenComponentDefault
 import com.sedsoftware.blinkly.component.home.model.HomeScreenTab
 import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
@@ -19,6 +21,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.Achievement
 import com.sedsoftware.blinkly.domain.model.AchievementType
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
 import com.sedsoftware.blinkly.domain.model.PermissionResult
 import com.sedsoftware.blinkly.domain.model.Reminder
@@ -41,6 +44,7 @@ import kotlin.time.Instant
 
 class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
 
+    private val analytics = RecordingAnalytics()
     private val settingsMock: BlinklySettings = mock()
     private val fakeSettings = FakeSettings(settingsMock = settingsMock)
     private val timeUtils: BlinklyTimeUtils =
@@ -79,6 +83,14 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
         component.onTabClick(HomeScreenTab.REMINDERS)
         // then
         assertThat(component.childStack.active.instance is HomeScreenComponent.Child.RemindersTab).isTrue()
+        assertThat(analytics.events).isEqualTo(
+            listOf(
+                BlinklyAnalyticsEvent.TabOpened(BlinklyAnalyticsEvent.Tab.MAIN),
+                BlinklyAnalyticsEvent.TabOpened(BlinklyAnalyticsEvent.Tab.TRAININGS),
+                BlinklyAnalyticsEvent.TabOpened(BlinklyAnalyticsEvent.Tab.PROGRESS),
+                BlinklyAnalyticsEvent.TabOpened(BlinklyAnalyticsEvent.Tab.REMINDERS),
+            )
+        )
     }
 
     @Test
@@ -140,8 +152,19 @@ class HomeScreenComponentTest : ComponentTest<HomeScreenComponent>() {
                 override val tree: Flow<Tree> = flowOf(Tree(TreeStage.TINY, TreeType.FRAXINUS_EXCELSIOR, 0f))
                 override val garden: Flow<TreeGarden> = flowOf(emptyGarden())
             },
+            analytics = analytics,
             homeScreenOutput = { componentOutput.add(it) },
         )
+
+    private class RecordingAnalytics : BlinklyAnalytics {
+        val events: MutableList<BlinklyAnalyticsEvent> = mutableListOf()
+
+        override fun report(event: BlinklyAnalyticsEvent) {
+            events.add(event)
+        }
+
+        override fun setEnabled(enabled: Boolean) = Unit
+    }
 
     private fun emptyGarden(): TreeGarden =
         TreeGarden(

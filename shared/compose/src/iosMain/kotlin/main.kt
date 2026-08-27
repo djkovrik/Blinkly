@@ -13,6 +13,10 @@ import com.sedsoftware.blinkly.compose.ads.BlinklyAdsPlatform
 import com.sedsoftware.blinkly.compose.ui.RootContent
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
+import com.sedsoftware.blinkly.domain.external.BlinklyAnalyticsReporter
+import com.sedsoftware.blinkly.settings.BlinklyAnalyticsBootstrapState
+import com.sedsoftware.blinkly.settings.SharedSettingsFactory
+import com.sedsoftware.blinkly.settings.readBlinklyAnalyticsBootstrapState
 import dev.icerock.moko.permissions.ios.PermissionsController
 import platform.Foundation.NSBundle
 import platform.UIKit.UIApplication
@@ -29,18 +33,15 @@ private val permissionsController: PermissionsController by lazy {
     PermissionsController()
 }
 
-private val rootComponent: RootComponent by lazy {
-    RootComponentFactory(
+@Suppress("FunctionNaming")
+fun MainViewController(analyticsReporter: BlinklyAnalyticsReporter): UIViewController {
+    initializeGoogleAuth()
+    val rootComponent: RootComponent = RootComponentFactory(
         componentContext = DefaultComponentContext(lifecycle),
         contentConfigurations = getNotificationConfigurations(),
         permissionsController = permissionsController,
+        analyticsReporter = analyticsReporter,
     )
-
-}
-
-@Suppress("FunctionNaming")
-fun MainViewController(): UIViewController {
-    initializeGoogleAuth()
 
     return ComposeUIViewController {
         RootContent(
@@ -50,6 +51,10 @@ fun MainViewController(): UIViewController {
         )
     }
 }
+
+@Suppress("FunctionNaming")
+fun GetBlinklyAnalyticsBootstrapState(): BlinklyAnalyticsBootstrapState =
+    readBlinklyAnalyticsBootstrapState(SharedSettingsFactory())
 
 private fun getAdsConfiguration(): BlinklyAdsConfiguration =
     BlinklyAdsConfiguration(

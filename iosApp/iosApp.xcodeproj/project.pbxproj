@@ -253,7 +253,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "bash \"${SRCROOT}/verify_ads_configuration.sh\"\nbash \"${SRCROOT}/update_skad_ids.sh\"";
+			shellScript = "bash \"${SRCROOT}/verify_ads_configuration.sh\"\nbash \"${SRCROOT}/verify_appmetrica_configuration.sh\"\nbash \"${SRCROOT}/update_skad_ids.sh\"";
 		};
 		D47D39AB9D01128AC465EF4F /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;

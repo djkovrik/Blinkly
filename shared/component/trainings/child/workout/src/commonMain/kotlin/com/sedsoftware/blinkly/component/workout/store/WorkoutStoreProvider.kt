@@ -64,8 +64,15 @@ internal class WorkoutStoreProvider(
                                     is ExerciseEvent.Progress -> dispatch(Msg.ProgressUpdated(event.progress))
                                     is ExerciseEvent.Tick -> dispatch(Msg.TickUpdated(event.second))
                                     is ExerciseEvent.Beep -> beeper.beep()
-                                    is ExerciseEvent.ExerciseCompleted -> dispatch(Msg.ExerciseCompleted(event.exercise))
-                                    is ExerciseEvent.BlockCompleted -> dispatch(Msg.BlockCompleted)
+                                    is ExerciseEvent.ExerciseCompleted -> {
+                                        val completesWorkout = state().currentExerciseIndex + 1 >= state().exercises.size
+                                        dispatch(Msg.ExerciseCompleted(event.exercise))
+                                        if (completesWorkout) publish(Label.WorkoutCompleted)
+                                    }
+                                    is ExerciseEvent.BlockCompleted -> {
+                                        dispatch(Msg.BlockCompleted)
+                                        publish(Label.WorkoutCompleted)
+                                    }
                                     is ExerciseEvent.Error -> publish(
                                         Label.ErrorCaught(event.throwable.asBlinklyError(BlinklyError::WorkoutDataLoading))
                                     )
@@ -79,6 +86,7 @@ internal class WorkoutStoreProvider(
                         Phase.INTRO -> {
                             exerciseManager.startBlock(block)
                             dispatch(Msg.ExerciseReady)
+                            publish(Label.WorkoutStarted)
                         }
 
                         Phase.READY -> {
