@@ -120,7 +120,7 @@ private fun GoogleSignInButtonContainer(
                     if (user != null) {
                         component.onGoogleSignInCompleted(user.toBlinklyUser())
                     } else {
-                        component.onGoogleSignInFailed(IllegalStateException("Google Sign-In returned no user"))
+                        component.onGoogleSignInCancelled()
                     }
                 }
                 .onFailure(component::onGoogleSignInFailed)

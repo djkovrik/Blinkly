@@ -39,4 +39,5 @@ class BlinklySyncComponentPreview(
     override fun onPrimaryButtonClick() = Unit
     override fun onGoogleSignInCompleted(user: BlinklyUser) = Unit
     override fun onGoogleSignInFailed(throwable: Throwable) = Unit
+    override fun onGoogleSignInCancelled() = Unit
 }

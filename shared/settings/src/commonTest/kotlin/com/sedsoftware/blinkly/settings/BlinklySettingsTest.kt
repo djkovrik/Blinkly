@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.isTrue
 import com.russhwolf.settings.MapSettings
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.model.ThemeState
@@ -36,6 +37,7 @@ class BlinklySettingsTest {
         val displayedHighlightsDefault = settings.displayedHighlights
         val currentHighlightDateDefault = settings.currentHighlightDate
         val onboardingDisplayedDefault = settings.onboardingDisplayed
+        val analyticsEnabledDefault = settings.analyticsEnabled
 
         // then
         assertThat(blinkBreakCountDefault).isEqualTo(BLINK_BREAK_COUNT_DEFAULT)
@@ -53,6 +55,7 @@ class BlinklySettingsTest {
         assertThat(displayedHighlightsDefault).isEmpty()
         assertThat(currentHighlightDateDefault).isEqualTo(null)
         assertThat(onboardingDisplayedDefault).isFalse()
+        assertThat(analyticsEnabledDefault).isTrue()
     }
 
     @Test
@@ -80,6 +83,7 @@ class BlinklySettingsTest {
         settings.displayedHighlights = listValue
         settings.currentHighlightDate = localDateValue
         settings.onboardingDisplayed = booleanValue
+        settings.analyticsEnabled = false
         // then
         assertThat(settings.blinkBreakCount).isEqualTo(intValue)
         assertThat(settings.nearFarFocusCount).isEqualTo(intValue)
@@ -96,6 +100,7 @@ class BlinklySettingsTest {
         assertThat(settings.displayedHighlights).isEqualTo(listValue)
         assertThat(settings.currentHighlightDate).isEqualTo(localDateValue)
         assertThat(settings.onboardingDisplayed).isEqualTo(booleanValue)
+        assertThat(settings.analyticsEnabled).isFalse()
     }
 
     @Test

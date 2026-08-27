@@ -11,8 +11,11 @@ import com.sedsoftware.blinkly.component.sync.BlinklySyncComponent
 import com.sedsoftware.blinkly.component.sync.BlinklySyncComponent.Model
 import com.sedsoftware.blinkly.component.sync.store.BlinklySyncStore
 import com.sedsoftware.blinkly.component.sync.store.BlinklySyncStoreProvider
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
+import com.sedsoftware.blinkly.domain.NoOpBlinklyAnalytics
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import com.sedsoftware.blinkly.domain.model.BlinklyUser
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.utils.asValue
@@ -26,6 +29,7 @@ class BlinklySyncComponentDefault(
     storeFactory: StoreFactory,
     dispatchers: BlinklyDispatchers,
     syncManager: BlinklySyncManager,
+    private val analytics: BlinklyAnalytics = NoOpBlinklyAnalytics,
     private val syncOutput: (ComponentOutput) -> Unit,
 ) : BlinklySyncComponent, ComponentContext by componentContext {
 
@@ -46,6 +50,9 @@ class BlinklySyncComponentDefault(
                 when (label) {
                     is BlinklySyncStore.Label.ErrorCaught ->
                         syncOutput(ComponentOutput.Common.ErrorCaught(label.exception))
+
+                    is BlinklySyncStore.Label.SyncActionFinished ->
+                        analytics.report(BlinklyAnalyticsEvent.SyncActionFinished(label.result))
                 }
             }
         }
@@ -69,5 +76,9 @@ class BlinklySyncComponentDefault(
 
     override fun onGoogleSignInFailed(throwable: Throwable) {
         store.accept(BlinklySyncStore.Intent.GoogleSignInFailed(throwable))
+    }
+
+    override fun onGoogleSignInCancelled() {
+        store.accept(BlinklySyncStore.Intent.GoogleSignInCancelled)
     }
 }

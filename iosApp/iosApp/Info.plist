@@ -8,6 +8,8 @@
 	<string>$(BLINKLY_ADS_BUILD_TYPE)</string>
 	<key>BlinklyGardenAdUnitId</key>
 	<string>$(BLINKLY_GARDEN_AD_UNIT_ID)</string>
+	<key>BlinklyAppMetricaApiKey</key>
+	<string>$(BLINKLY_APPMETRICA_API_KEY)</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleURLTypes</key>

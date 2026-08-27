@@ -14,6 +14,12 @@ internal class BlinklySettingsImpl(
     private val settings: Settings,
 ) : BlinklySettings {
 
+    override var analyticsEnabled: Boolean
+        get() = settings.getValue(PREF_ANALYTICS_ENABLED, true)
+        set(value) {
+            settings.setValue(PREF_ANALYTICS_ENABLED, value)
+        }
+
     private val json: Json by lazy {
         Json {
             isLenient = true
@@ -197,6 +203,7 @@ internal class BlinklySettingsImpl(
         }
 
     private companion object {
+        const val PREF_ANALYTICS_ENABLED = "ae"
         const val PREF_BLINK_BREAK_COUNT = "bc"
         const val BLINK_BREAK_COUNT_DEFAULT = 60
         const val PREF_NEAR_FOCUS_COUNT = "nfc"

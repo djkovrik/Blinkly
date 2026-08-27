@@ -14,11 +14,15 @@ import com.sedsoftware.blinkly.component.workout.WorkoutComponent.Model
 import com.sedsoftware.blinkly.component.workout.store.WorkoutStore
 import com.sedsoftware.blinkly.component.workout.store.WorkoutStoreProvider
 import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
+import com.sedsoftware.blinkly.domain.NoOpBlinklyAnalytics
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyScreenAwakeController
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.TrainingSource
 import com.sedsoftware.blinkly.utils.asValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -31,11 +35,17 @@ class WorkoutComponentDefault(
     private val storeFactory: StoreFactory,
     private val dispatchers: BlinklyDispatchers,
     private val block: ExerciseBlock,
+    private val source: TrainingSource = TrainingSource.TRAININGS,
+    private val analytics: BlinklyAnalytics = NoOpBlinklyAnalytics,
     private val exerciseManager: BlinklyExerciseManager,
     private val beeper: BlinklyBeeper,
     private val screenAwakeController: BlinklyScreenAwakeController,
     private val workoutOutput: (ComponentOutput) -> Unit,
 ) : WorkoutComponent, ComponentContext by componentContext {
+
+    private var workoutStarted = false
+    private var workoutCompleted = false
+    private var cancellationReported = false
 
     private val store: WorkoutStore =
         instanceKeeper.getStore {
@@ -54,6 +64,20 @@ class WorkoutComponentDefault(
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
             store.labels.collect { label ->
                 when (label) {
+                    WorkoutStore.Label.WorkoutStarted -> {
+                        if (!workoutStarted) {
+                            workoutStarted = true
+                            analytics.report(BlinklyAnalyticsEvent.TrainingStarted(source))
+                        }
+                    }
+                    WorkoutStore.Label.WorkoutCompleted -> {
+                        if (!workoutCompleted) {
+                            workoutCompleted = true
+                            analytics.report(
+                                BlinklyAnalyticsEvent.TrainingFinished(BlinklyAnalyticsEvent.TrainingResult.COMPLETED)
+                            )
+                        }
+                    }
                     is WorkoutStore.Label.ErrorCaught -> {
                         workoutOutput(ComponentOutput.Common.ErrorCaught(label.exception))
                     }
@@ -73,6 +97,7 @@ class WorkoutComponentDefault(
         }
 
         lifecycle.doOnDestroy {
+            reportCancellationIfNeeded()
             screenAwakeController.disable()
             exerciseManager.stop()
             scope.cancel()
@@ -82,6 +107,7 @@ class WorkoutComponentDefault(
     override val model: Value<Model> = store.asValue().map(stateToModel)
 
     override fun onBackClick() {
+        reportCancellationIfNeeded()
         workoutOutput(ComponentOutput.Common.BackPressed)
     }
 
@@ -98,6 +124,16 @@ class WorkoutComponentDefault(
     }
 
     override fun onFinishClick() {
+        reportCancellationIfNeeded()
         workoutOutput(ComponentOutput.Common.BackPressed)
+    }
+
+    private fun reportCancellationIfNeeded() {
+        if (workoutStarted && !workoutCompleted && !cancellationReported) {
+            cancellationReported = true
+            analytics.report(
+                BlinklyAnalyticsEvent.TrainingFinished(BlinklyAnalyticsEvent.TrainingResult.CANCELLED)
+            )
+        }
     }
 }

@@ -14,6 +14,8 @@ import com.sedsoftware.blinkly.component.preferences.store.PreferencesStore
 import com.sedsoftware.blinkly.component.preferences.store.PreferencesStoreProvider
 import com.sedsoftware.blinkly.component.sync.BlinklySyncComponent
 import com.sedsoftware.blinkly.component.sync.integration.BlinklySyncComponentDefault
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
+import com.sedsoftware.blinkly.domain.NoOpBlinklyAnalytics
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
@@ -30,6 +32,7 @@ class PreferencesComponentDefault(
     private val dispatchers: BlinklyDispatchers,
     private val settings: BlinklySettings,
     syncManager: BlinklySyncManager,
+    private val analytics: BlinklyAnalytics = NoOpBlinklyAnalytics,
     private val preferencesOutput: (ComponentOutput) -> Unit,
 ) : PreferencesComponent, ComponentContext by componentContext {
 
@@ -37,7 +40,7 @@ class PreferencesComponentDefault(
         instanceKeeper.getStore {
             PreferencesStoreProvider(
                 storeFactory = storeFactory,
-                manager = PreferencesManager(settings = settings),
+                manager = PreferencesManager(settings = settings, analytics = analytics),
                 mainContext = dispatchers.main,
                 ioContext = dispatchers.io,
             ).create(autoInit = false)
@@ -49,6 +52,7 @@ class PreferencesComponentDefault(
             storeFactory = storeFactory,
             dispatchers = dispatchers,
             syncManager = syncManager,
+            analytics = analytics,
             syncOutput = preferencesOutput,
         )
 
@@ -114,5 +118,9 @@ class PreferencesComponentDefault(
 
     override fun onThemeStateChanged(value: ThemeState) {
         store.accept(PreferencesStore.Intent.ThemeStateChanged(value))
+    }
+
+    override fun onAnalyticsEnabledChanged(value: Boolean) {
+        store.accept(PreferencesStore.Intent.AnalyticsEnabledChanged(value))
     }
 }

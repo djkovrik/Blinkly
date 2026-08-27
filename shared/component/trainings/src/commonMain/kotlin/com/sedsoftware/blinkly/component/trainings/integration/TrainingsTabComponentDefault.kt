@@ -17,6 +17,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.TrainingSource
 import com.sedsoftware.blinkly.utils.asValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -68,14 +69,14 @@ class TrainingsTabComponentDefault(
     override val model: Value<Model> = store.asValue().map(stateToModel)
 
     override fun onBlockAClick() {
-        trainingsTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.A))
+        trainingsTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.A, TrainingSource.TRAININGS))
     }
 
     override fun onBlockBClick() {
-        trainingsTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.B))
+        trainingsTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.B, TrainingSource.TRAININGS))
     }
 
     override fun onBlockCClick() {
-        trainingsTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+        trainingsTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C, TrainingSource.TRAININGS))
     }
 }

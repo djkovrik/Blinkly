@@ -12,4 +12,5 @@ internal data class PreferencesData(
     val clockRollsEachSide: Int,
     val palmingDuration: Int,
     val themeState: ThemeState,
+    val analyticsEnabled: Boolean = true,
 )

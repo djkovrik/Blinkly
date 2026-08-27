@@ -18,6 +18,7 @@ internal interface PreferencesStore : Store<Intent, State, Label> {
         data class ClockRollsEachSideChanged(val value: Int) : Intent
         data class PalmingDurationChanged(val value: Int) : Intent
         data class ThemeStateChanged(val value: ThemeState) : Intent
+        data class AnalyticsEnabledChanged(val value: Boolean) : Intent
     }
 
     data class State(
@@ -30,6 +31,7 @@ internal interface PreferencesStore : Store<Intent, State, Label> {
         val clockRollsEachSide: Int = 0,
         val palmingDuration: Int = 0,
         val themeState: ThemeState = ThemeState.SYSTEM,
+        val analyticsEnabled: Boolean = true,
     )
 
     sealed class Label {

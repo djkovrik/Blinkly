@@ -20,6 +20,7 @@ class PreferencesComponentPreview(
     private val clockRollsEachSide: Int = 5,
     private val palmingDuration: Int = 120,
     private val themeState: ThemeState = ThemeState.SYSTEM,
+    private val analyticsEnabled: Boolean = true,
 ) : PreferencesComponent {
 
     override val syncComponent: BlinklySyncComponent = BlinklySyncComponentPreview()
@@ -35,6 +36,7 @@ class PreferencesComponentPreview(
             clockRollsEachSide = clockRollsEachSide,
             palmingDuration = palmingDuration,
             themeState = themeState,
+            analyticsEnabled = analyticsEnabled,
         )
     )
 
@@ -48,4 +50,5 @@ class PreferencesComponentPreview(
     override fun onClockRollsEachSideChanged(value: Int) = Unit
     override fun onPalmingDurationChanged(value: Int) = Unit
     override fun onThemeStateChanged(value: ThemeState) = Unit
+    override fun onAnalyticsEnabledChanged(value: Boolean) = Unit
 }

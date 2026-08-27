@@ -48,6 +48,7 @@ firebase-bom = "33.15.0"
 google-services = "4.5.0"
 firebase-crashlytics-plugin = "3.0.7"
 yandex-ads = "8.1.0"
+appmetrica-android = "8.1.0"
 
 [libraries]
 
@@ -86,6 +87,7 @@ ark-essenty = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essen
 
 lib-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 lib-yandex-mobileads-compose = { module = "com.yandex.ads.multiplatform:mobileads-compose", version.ref = "yandex-ads" }
+lib-appmetrica-analytics = { module = "io.appmetrica.analytics:analytics", version.ref = "appmetrica-android" }
 lib-alarmee = { group = "io.github.tweener", name = "alarmee", version.ref = "alarmee" }
 lib-moko-permissions = { group = "dev.icerock.moko", name = "permissions", version.ref = "moko-permissions" }
 lib-moko-permissions-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "moko-permissions" }

@@ -185,6 +185,21 @@ internal class PreferencesStoreProvider(
                         )
                     }
                 }
+
+                onIntent<Intent.AnalyticsEnabledChanged> {
+                    val value = it.value
+                    dirtyFlags = dirtyFlags.copy(analyticsEnabled = true)
+                    dispatch(Msg.AnalyticsEnabledChanged(value))
+                    val previousJob = saveJob
+                    saveJob = launch {
+                        previousJob?.join()
+                        unwrap(
+                            result = withContext(ioContext) { manager.saveAnalyticsEnabled(value) },
+                            onSuccess = {},
+                            onError = { throwable -> publish(Label.ErrorCaught(BlinklyError.PreferencesSaving(throwable))) },
+                        )
+                    }
+                }
             },
             reducer = { msg ->
                 when (msg) {
@@ -218,6 +233,11 @@ internal class PreferencesStoreProvider(
                         },
                         palmingDuration = if (msg.dirtyFlags.palmingDuration) palmingDuration else msg.data.palmingDuration,
                         themeState = if (msg.dirtyFlags.themeState) themeState else msg.data.themeState,
+                        analyticsEnabled = if (msg.dirtyFlags.analyticsEnabled) {
+                            analyticsEnabled
+                        } else {
+                            msg.data.analyticsEnabled
+                        },
                     )
 
                     is Msg.BlinkBreakCountChanged -> copy(blinkBreakCount = msg.value)
@@ -229,6 +249,7 @@ internal class PreferencesStoreProvider(
                     is Msg.ClockRollsEachSideChanged -> copy(clockRollsEachSide = msg.value)
                     is Msg.PalmingDurationChanged -> copy(palmingDuration = msg.value)
                     is Msg.ThemeStateChanged -> copy(themeState = msg.value)
+                    is Msg.AnalyticsEnabledChanged -> copy(analyticsEnabled = msg.value)
                 }
             }
         ) {}
@@ -247,6 +268,7 @@ internal class PreferencesStoreProvider(
         val clockRollsEachSide: Boolean = false,
         val palmingDuration: Boolean = false,
         val themeState: Boolean = false,
+        val analyticsEnabled: Boolean = false,
     )
 
     sealed interface Msg {
@@ -260,6 +282,7 @@ internal class PreferencesStoreProvider(
         data class ClockRollsEachSideChanged(val value: Int) : Msg
         data class PalmingDurationChanged(val value: Int) : Msg
         data class ThemeStateChanged(val value: ThemeState) : Msg
+        data class AnalyticsEnabledChanged(val value: Boolean) : Msg
     }
 }
 

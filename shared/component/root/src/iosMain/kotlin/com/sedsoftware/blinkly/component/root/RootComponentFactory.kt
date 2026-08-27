@@ -20,6 +20,7 @@ import com.sedsoftware.blinkly.database.di.DatabaseModuleDependencies
 import com.sedsoftware.blinkly.domain.di.DomainModule
 import com.sedsoftware.blinkly.domain.di.DomainModuleDependencies
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
+import com.sedsoftware.blinkly.domain.external.BlinklyAnalyticsReporter
 import com.sedsoftware.blinkly.domain.external.BlinklyBeeper
 import com.sedsoftware.blinkly.domain.external.BlinklyCrashReporter
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
@@ -47,6 +48,7 @@ fun RootComponentFactory(
     componentContext: ComponentContext,
     contentConfigurations: Map<ReminderType, ReminderConfig>,
     permissionsController: PermissionsController,
+    analyticsReporter: BlinklyAnalyticsReporter,
 ): RootComponent {
 
     val dispatchers: BlinklyDispatchers by lazy {
@@ -130,6 +132,7 @@ fun RootComponentFactory(
     val domainModule: DomainModule by lazy {
         DomainModule(
             dependencies = object : DomainModuleDependencies {
+                override val analyticsReporter: BlinklyAnalyticsReporter = analyticsReporter
                 override val alarmManager: BlinklyAlarmManager = alarmManager
                 override val database: BlinklyDatabase = database
                 override val notifier: BlinklyNotifier = notifier
@@ -161,6 +164,7 @@ fun RootComponentFactory(
     return RootComponentDefault(
         componentContext = componentContext,
         storeFactory = DefaultStoreFactory(),
+        analytics = domainModule.analytics,
         beeper = beeper,
         crashReporter = crashReporter,
         dispatchers = dispatchers,

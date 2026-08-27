@@ -527,4 +527,7 @@
     <string name="content_description_training_completed">Training completed today</string>
     <string name="content_description_google_sign_in">Google sign in</string>
     <string name="content_description_sync">Sync</string>
+    <string name="preferences_privacy_title">Privacy</string>
+    <string name="preferences_analytics_title">Anonymous analytics</string>
+    <string name="preferences_analytics_description">Share anonymous usage data to help improve Blinkly. Exercise, reminder, account, and location details are not sent.</string>
 </resources>

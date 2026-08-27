@@ -5,6 +5,9 @@ import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
 interface BlinklySettings {
+    var analyticsEnabled: Boolean
+        get() = true
+        set(_) = Unit
     var blinkBreakCount: Int
     var nearFarFocusCount: Int
     var nearFarFocusDuration: Float

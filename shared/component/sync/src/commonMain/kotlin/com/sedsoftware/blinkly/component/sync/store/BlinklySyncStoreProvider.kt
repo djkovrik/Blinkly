@@ -11,6 +11,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklySyncManager
 import com.sedsoftware.blinkly.domain.model.BlinklyError
 import com.sedsoftware.blinkly.domain.model.BlinklyAuthSession
 import com.sedsoftware.blinkly.domain.model.BlinklySyncState
+import com.sedsoftware.blinkly.domain.model.BlinklyAnalyticsEvent
 import com.sedsoftware.blinkly.domain.model.asBlinklyError
 import com.sedsoftware.blinkly.utils.StoreProvider
 import kotlinx.coroutines.flow.catch
@@ -50,10 +51,14 @@ internal class BlinklySyncStoreProvider(
                         if (state().authSession is BlinklyAuthSession.SignedIn) {
                             launch {
                                 runCatching { syncManager.syncNow() }
+                                    .onSuccess {
+                                        publish(Label.SyncActionFinished(BlinklyAnalyticsEvent.SyncResult.SUCCESS))
+                                    }
                                     .onFailure { throwable ->
                                         val error = throwable.asBlinklyError(BlinklyError::SyncUnknown)
                                         dispatch(Msg.SyncFailed(error))
                                         publish(Label.ErrorCaught(error))
+                                        publish(Label.SyncActionFinished(BlinklyAnalyticsEvent.SyncResult.FAILURE))
                                     }
                             }
                         }
@@ -62,10 +67,14 @@ internal class BlinklySyncStoreProvider(
                     onIntent<Intent.GoogleSignInCompleted> { intent ->
                         launch {
                             runCatching { syncManager.completeGoogleSignIn(intent.user) }
+                                .onSuccess {
+                                    publish(Label.SyncActionFinished(BlinklyAnalyticsEvent.SyncResult.SUCCESS))
+                                }
                                 .onFailure { throwable ->
                                     val error = throwable.asBlinklyError(BlinklyError::SyncAuthFailed)
                                     dispatch(Msg.SyncFailed(error))
                                     publish(Label.ErrorCaught(error))
+                                    publish(Label.SyncActionFinished(BlinklyAnalyticsEvent.SyncResult.FAILURE))
                                 }
                         }
                     }
@@ -74,6 +83,11 @@ internal class BlinklySyncStoreProvider(
                         val error = intent.throwable.asBlinklyError(BlinklyError::SyncAuthFailed)
                         dispatch(Msg.SyncFailed(error))
                         publish(Label.ErrorCaught(error))
+                        publish(Label.SyncActionFinished(BlinklyAnalyticsEvent.SyncResult.FAILURE))
+                    }
+
+                    onIntent<Intent.GoogleSignInCancelled> {
+                        publish(Label.SyncActionFinished(BlinklyAnalyticsEvent.SyncResult.CANCELLED))
                     }
                 },
                 reducer = ReducerImpl,

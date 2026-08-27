@@ -28,6 +28,8 @@ internal interface WorkoutStore : Store<WorkoutStore.Intent, WorkoutStore.State,
     )
 
     sealed interface Label {
+        data object WorkoutStarted : Label
+        data object WorkoutCompleted : Label
         data class ErrorCaught(val exception: Throwable) : Label
     }
 

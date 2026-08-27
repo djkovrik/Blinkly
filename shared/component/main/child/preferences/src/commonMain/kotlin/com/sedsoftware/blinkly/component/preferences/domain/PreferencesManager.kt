@@ -1,11 +1,13 @@
 package com.sedsoftware.blinkly.component.preferences.domain
 
 import com.sedsoftware.blinkly.component.preferences.domain.model.PreferencesData
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
 import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.model.ThemeState
 
 internal class PreferencesManager(
     private val settings: BlinklySettings,
+    private val analytics: BlinklyAnalytics,
 ) {
 
     fun load(): Result<PreferencesData> =
@@ -20,6 +22,7 @@ internal class PreferencesManager(
                 clockRollsEachSide = settings.clockRollsEachSide,
                 palmingDuration = settings.palmingDuration,
                 themeState = settings.themeState,
+                analyticsEnabled = settings.analyticsEnabled,
             )
         }
 
@@ -66,5 +69,11 @@ internal class PreferencesManager(
     fun saveThemeState(value: ThemeState): Result<Unit> =
         runCatching {
             settings.themeState = value
+        }
+
+    fun saveAnalyticsEnabled(value: Boolean): Result<Unit> =
+        runCatching {
+            settings.analyticsEnabled = value
+            analytics.setEnabled(value)
         }
 }

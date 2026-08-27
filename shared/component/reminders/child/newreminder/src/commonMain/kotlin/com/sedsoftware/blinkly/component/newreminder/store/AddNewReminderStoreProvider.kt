@@ -94,7 +94,7 @@ internal class AddNewReminderStoreProvider(
                                 },
                                 onSuccess = {
                                     dispatch(Msg.SavingChanged(false))
-                                    publish(Label.ReminderCreated)
+                                    publish(Label.ReminderCreated(state.scheduleType))
                                 },
                                 onError = { throwable ->
                                     dispatch(Msg.SavingChanged(false))

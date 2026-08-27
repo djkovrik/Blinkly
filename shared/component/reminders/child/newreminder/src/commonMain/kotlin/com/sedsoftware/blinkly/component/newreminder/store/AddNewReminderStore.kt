@@ -43,7 +43,7 @@ internal interface AddNewReminderStore : Store<Intent, State, Label> {
     }
 
     sealed class Label {
-        data object ReminderCreated : Label()
+        data class ReminderCreated(val type: ReminderScheduleType) : Label()
         data class ErrorCaught(val exception: Throwable) : Label()
     }
 

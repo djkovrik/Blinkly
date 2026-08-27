@@ -1,13 +1,16 @@
 package com.sedsoftware.blinkly.domain.di
 
 import com.sedsoftware.blinkly.domain.BlinklyAchievementsWatcher
+import com.sedsoftware.blinkly.domain.BlinklyAnalytics
 import com.sedsoftware.blinkly.domain.BlinklyCalendarWatcher
 import com.sedsoftware.blinkly.domain.BlinklyExerciseManager
 import com.sedsoftware.blinkly.domain.BlinklyHighlightsProvider
 import com.sedsoftware.blinkly.domain.BlinklyReminderManager
 import com.sedsoftware.blinkly.domain.BlinklyTreeProgressWatcher
+import com.sedsoftware.blinkly.domain.createBlinklyAnalytics
 import com.sedsoftware.blinkly.domain.createBlinklyReminderManager
 import com.sedsoftware.blinkly.domain.external.BlinklyAlarmManager
+import com.sedsoftware.blinkly.domain.external.BlinklyAnalyticsReporter
 import com.sedsoftware.blinkly.domain.external.BlinklyDatabase
 import com.sedsoftware.blinkly.domain.external.BlinklyDispatchers
 import com.sedsoftware.blinkly.domain.external.BlinklyNotifier
@@ -20,6 +23,7 @@ import com.sedsoftware.blinkly.domain.impl.BlinklyHighlightsProviderImpl
 import com.sedsoftware.blinkly.domain.impl.BlinklyTreeProgressWatcherImpl
 
 interface DomainModule {
+    val analytics: BlinklyAnalytics
     val achievementsWatcher: BlinklyAchievementsWatcher
     val calendarWatcher: BlinklyCalendarWatcher
     val exerciseManager: BlinklyExerciseManager
@@ -29,6 +33,7 @@ interface DomainModule {
 }
 
 interface DomainModuleDependencies {
+    val analyticsReporter: BlinklyAnalyticsReporter
     val alarmManager: BlinklyAlarmManager
     val database: BlinklyDatabase
     val notifier: BlinklyNotifier
@@ -39,6 +44,12 @@ interface DomainModuleDependencies {
 
 fun DomainModule(dependencies: DomainModuleDependencies): DomainModule {
     return object : DomainModule {
+        override val analytics: BlinklyAnalytics by lazy {
+            createBlinklyAnalytics(
+                reporter = dependencies.analyticsReporter,
+                initiallyEnabled = dependencies.settings.analyticsEnabled,
+            )
+        }
         override val achievementsWatcher: BlinklyAchievementsWatcher by lazy {
             BlinklyAchievementsWatcherImpl(
                 database = dependencies.database,

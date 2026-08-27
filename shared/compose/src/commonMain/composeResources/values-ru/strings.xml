@@ -524,4 +524,7 @@
     <string name="content_description_training_completed">Тренировка выполнена сегодня</string>
     <string name="content_description_google_sign_in">Вход через Google</string>
     <string name="content_description_sync">Синхронизация</string>
+    <string name="preferences_privacy_title">Конфиденциальность</string>
+    <string name="preferences_analytics_title">Обезличенная аналитика</string>
+    <string name="preferences_analytics_description">Отправлять обезличенные данные об использовании, чтобы помогать улучшать Blinkly. Данные упражнений, напоминаний, аккаунта и геолокации не отправляются.</string>
 </resources>

@@ -22,6 +22,7 @@ import com.sedsoftware.blinkly.domain.external.BlinklySettings
 import com.sedsoftware.blinkly.domain.external.BlinklyTimeUtils
 import com.sedsoftware.blinkly.domain.model.ComponentOutput
 import com.sedsoftware.blinkly.domain.model.ExerciseBlock
+import com.sedsoftware.blinkly.domain.model.TrainingSource
 import com.sedsoftware.blinkly.utils.asValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -93,12 +94,13 @@ class MainTabComponentDefault(
         when (model.value.ctaState) {
             MainCtaState.MorningWarmUp,
             MainCtaState.AfternoonWarmUp,
-                -> mainTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.A))
+                -> mainTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.A, TrainingSource.MAIN))
 
-            MainCtaState.EveningRelax -> mainTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.B))
+            MainCtaState.EveningRelax ->
+                mainTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.B, TrainingSource.MAIN))
             MainCtaState.WorkBreakDue,
             MainCtaState.RepeatBreakDue,
-                -> mainTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C))
+                -> mainTabOutput(ComponentOutput.Trainings.OpenExerciseBlock(ExerciseBlock.C, TrainingSource.MAIN))
 
             MainCtaState.BreakCooldown,
             MainCtaState.DayClosing,
