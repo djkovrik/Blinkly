@@ -59,7 +59,7 @@ private final class AppMetricaBlinklyAnalyticsReporter: NSObject, BlinklyIosAnal
 
     func reportEvent(name: String, parameters: [String: String]) {
         guard active else { return }
-        AppMetrica.reportEvent(name, parameters: parameters, onFailure: nil)
+        AppMetrica.reportEvent(name: name, parameters: parameters, onFailure: nil)
     }
 
     func setDataSendingEnabled(enabled: Bool) {
