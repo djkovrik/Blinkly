@@ -98,18 +98,24 @@ jobs:
 
       - name: Build iOS workspace
         run: |
-          xcodebuild \
-            -workspace iosApp/iosApp.xcworkspace \
-            -scheme iosApp \
-            -configuration Debug \
-            -destination "generic/platform=iOS Simulator" \
-            CODE_SIGNING_ALLOWED=NO \
-            build
+          if ! xcodebuild \
+              -workspace iosApp/iosApp.xcworkspace \
+              -scheme iosApp \
+              -configuration Debug \
+              -destination "generic/platform=iOS Simulator" \
+              CODE_SIGNING_ALLOWED=NO \
+              build \
+              > "$RUNNER_TEMP/ios-xcodebuild.log" 2>&1; then
+            tail -n 200 "$RUNNER_TEMP/ios-xcodebuild.log"
+            exit 1
+          fi
 
       - name: Upload iOS test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ios-test-reports
-          path: shared/**/build/reports/tests
+          path: |
+            shared/**/build/reports/tests
+            ${{ runner.temp }}/ios-xcodebuild.log
           if-no-files-found: ignore

@@ -5,7 +5,7 @@ import AppMetricaCore
 
 @main
 struct ComposeApp: App {
-    private let analyticsReporter: BlinklyAnalyticsReporter
+    private let analyticsReporter: BlinklyIosAnalyticsReporter
 
     init() {
         FirebaseApp.configure()
@@ -29,7 +29,7 @@ struct ComposeApp: App {
 }
 
 struct ContentView: UIViewControllerRepresentable {
-    let analyticsReporter: BlinklyAnalyticsReporter
+    let analyticsReporter: BlinklyIosAnalyticsReporter
 
     func makeUIViewController(context: Context) -> UIViewController {
         return MainKt.MainViewController(analyticsReporter: analyticsReporter)
@@ -40,7 +40,7 @@ struct ContentView: UIViewControllerRepresentable {
     }
 }
 
-private final class AppMetricaBlinklyAnalyticsReporter: NSObject, BlinklyAnalyticsReporter {
+private final class AppMetricaBlinklyAnalyticsReporter: NSObject, BlinklyIosAnalyticsReporter {
     private var active = false
 
     func activate(apiKey: String, dataSendingEnabled: Bool, existingInstallation: Bool) {

@@ -10,11 +10,12 @@ import com.sedsoftware.blinkly.compose.ads.BlinklyAdPlacement
 import com.sedsoftware.blinkly.compose.ads.BlinklyAdsBuildType
 import com.sedsoftware.blinkly.compose.ads.BlinklyAdsConfiguration
 import com.sedsoftware.blinkly.compose.ads.BlinklyAdsPlatform
+import com.sedsoftware.blinkly.compose.analytics.BlinklyIosAnalyticsBootstrapState
+import com.sedsoftware.blinkly.compose.analytics.BlinklyIosAnalyticsReporter
+import com.sedsoftware.blinkly.compose.analytics.asDomainReporter
 import com.sedsoftware.blinkly.compose.ui.RootContent
 import com.sedsoftware.blinkly.domain.model.ReminderConfig
 import com.sedsoftware.blinkly.domain.model.ReminderType
-import com.sedsoftware.blinkly.domain.external.BlinklyAnalyticsReporter
-import com.sedsoftware.blinkly.settings.BlinklyAnalyticsBootstrapState
 import com.sedsoftware.blinkly.settings.SharedSettingsFactory
 import com.sedsoftware.blinkly.settings.readBlinklyAnalyticsBootstrapState
 import dev.icerock.moko.permissions.ios.PermissionsController
@@ -34,13 +35,13 @@ private val permissionsController: PermissionsController by lazy {
 }
 
 @Suppress("FunctionNaming")
-fun MainViewController(analyticsReporter: BlinklyAnalyticsReporter): UIViewController {
+fun MainViewController(analyticsReporter: BlinklyIosAnalyticsReporter): UIViewController {
     initializeGoogleAuth()
     val rootComponent: RootComponent = RootComponentFactory(
         componentContext = DefaultComponentContext(lifecycle),
         contentConfigurations = getNotificationConfigurations(),
         permissionsController = permissionsController,
-        analyticsReporter = analyticsReporter,
+        analyticsReporter = analyticsReporter.asDomainReporter(),
     )
 
     return ComposeUIViewController {
@@ -53,8 +54,13 @@ fun MainViewController(analyticsReporter: BlinklyAnalyticsReporter): UIViewContr
 }
 
 @Suppress("FunctionNaming")
-fun GetBlinklyAnalyticsBootstrapState(): BlinklyAnalyticsBootstrapState =
-    readBlinklyAnalyticsBootstrapState(SharedSettingsFactory())
+fun GetBlinklyAnalyticsBootstrapState(): BlinklyIosAnalyticsBootstrapState {
+    val state = readBlinklyAnalyticsBootstrapState(SharedSettingsFactory())
+    return BlinklyIosAnalyticsBootstrapState(
+        analyticsEnabled = state.analyticsEnabled,
+        existingInstallation = state.existingInstallation,
+    )
+}
 
 private fun getAdsConfiguration(): BlinklyAdsConfiguration =
     BlinklyAdsConfiguration(
