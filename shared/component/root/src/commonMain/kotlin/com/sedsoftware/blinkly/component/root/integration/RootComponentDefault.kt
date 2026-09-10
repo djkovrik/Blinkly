@@ -243,6 +243,7 @@ class RootComponentDefault private constructor(
                 RootComponent.Child.AddNewReminder(addNewReminderComponent(componentContext, ::onChildOutput))
         }
 
+    @Suppress("TooGenericExceptionCaught")
     private fun onChildOutput(output: ComponentOutput) {
         when (output) {
             is ComponentOutput.Onboarding.GoToHomeScreen -> {
@@ -296,7 +297,11 @@ class RootComponentDefault private constructor(
                 val cause = error.cause ?: error
 
                 Logger.e(cause) { "Blinkly error caught: ${error.message}" }
-                crashReporter.recordException(cause)
+                try {
+                    crashReporter.recordException(cause)
+                } catch (reportingException: Exception) {
+                    Logger.e(reportingException) { "Unable to report Blinkly error to Crashlytics" }
+                }
                 errorEvents.tryEmit(error)
             }
 

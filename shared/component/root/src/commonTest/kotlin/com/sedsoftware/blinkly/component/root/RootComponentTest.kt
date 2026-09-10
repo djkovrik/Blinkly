@@ -365,6 +365,31 @@ class RootComponentTest : ComponentTest<RootComponent>() {
     }
 
     @Test
+    fun `when crash reporter fails then root still publishes original error`() = runTest(testScheduler) {
+        // given
+        val sourceException = IllegalStateException("permission check failed")
+        val reportingException = NullPointerException("FirebaseCrashlytics component is not present")
+        val errors = mutableListOf<BlinklyError>()
+        val collectJob = launch { component.errors.collect { errors.add(it) } }
+        prepareStep5Dependencies()
+        everySuspend { notifierMock.isNotificationPermissionGranted() } throws sourceException
+        every { crashReporterMock.recordException(sourceException) } throws reportingException
+
+        // when
+        val before = component.childStack.active.instance::class
+        navigateToStep5(component)
+        testScheduler.advanceUntilIdle()
+
+        // then
+        assertThat(component.childStack.active.instance::class).isEqualTo(before)
+        assertThat(
+            errors.any { it is BlinklyError.NotificationPermissionChecking && it.cause === sourceException }
+        ).isTrue()
+        verify(exactly(1)) { crashReporterMock.recordException(sourceException) }
+        collectJob.cancel()
+    }
+
+    @Test
     fun `when achievement unlocked then root publishes notification`() = runTest(testScheduler) {
         // given
         val notifications = mutableListOf<BlinklyNotification>()
