@@ -48,7 +48,6 @@ firebase-bom = "33.15.0"
 google-services = "4.5.0"
 firebase-crashlytics-plugin = "3.0.7"
 yandex-ads = "8.1.0"
-appmetrica-android = "8.1.0"
 
 [libraries]
 
@@ -87,7 +86,6 @@ ark-essenty = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essen
 
 lib-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 lib-yandex-mobileads-compose = { module = "com.yandex.ads.multiplatform:mobileads-compose", version.ref = "yandex-ads" }
-lib-appmetrica-analytics = { module = "io.appmetrica.analytics:analytics", version.ref = "appmetrica-android" }
 lib-alarmee = { group = "io.github.tweener", name = "alarmee", version.ref = "alarmee" }
 lib-moko-permissions = { group = "dev.icerock.moko", name = "permissions", version.ref = "moko-permissions" }
 lib-moko-permissions-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "moko-permissions" }
@@ -112,6 +110,7 @@ lib-firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.re
 lib-firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "gitlive-firebase" }
 lib-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 android-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+android-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 
 test-kotlin = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }

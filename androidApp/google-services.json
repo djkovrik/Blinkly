@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "38221976818-62guf4m5rnsl10e196df96lne0mr5dsk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sedsoftware.blinkly",
+            "certificate_hash": "7de5fd7fc06004d2d51ce572761cf959f5773fe2"
+          }
+        },
+        {
           "client_id": "38221976818-7b2q1brbjuek827berdc2bvcf1mt2nms.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

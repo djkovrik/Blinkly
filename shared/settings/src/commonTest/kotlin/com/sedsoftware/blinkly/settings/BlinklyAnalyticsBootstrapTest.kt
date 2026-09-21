@@ -13,7 +13,6 @@ class BlinklyAnalyticsBootstrapTest {
         val state = readBlinklyAnalyticsBootstrapState(MapSettings())
 
         assertThat(state.analyticsEnabled).isTrue()
-        assertThat(state.existingInstallation).isFalse()
     }
 
     @Test
@@ -25,13 +24,4 @@ class BlinklyAnalyticsBootstrapTest {
         assertThat(state.analyticsEnabled).isFalse()
     }
 
-    @Test
-    fun `database or existing preference marks an update installation`() {
-        val settings = MapSettings().apply { putBoolean("od", true) }
-
-        assertThat(readBlinklyAnalyticsBootstrapState(settings).existingInstallation).isTrue()
-        assertThat(
-            readBlinklyAnalyticsBootstrapState(MapSettings(), databaseExists = true).existingInstallation
-        ).isTrue()
-    }
 }
