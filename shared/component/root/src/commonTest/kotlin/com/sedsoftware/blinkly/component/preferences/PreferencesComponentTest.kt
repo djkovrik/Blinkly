@@ -145,6 +145,20 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
     }
 
     @Test
+    fun `when saving analytics preference fails then reporter is not changed`() = runTest(testScheduler) {
+        testScheduler.advanceUntilIdle()
+        val failure = IllegalStateException("analytics save failed")
+        settings.analyticsEnabledSaveFailure = failure
+
+        component.onAnalyticsEnabledChanged(false)
+        testScheduler.advanceUntilIdle()
+
+        assertThat(settings.analyticsEnabled).isTrue()
+        assertThat(analytics.enabledChanges).isEqualTo(emptyList())
+        assertThat(componentOutputContainsErrorCausedBy<BlinklyError.PreferencesSaving>(failure)).isTrue()
+    }
+
+    @Test
     fun `when invalid low value selected then value is clamped`() = runTest(testScheduler) {
         // given
         testScheduler.advanceUntilIdle()
@@ -224,8 +238,13 @@ class PreferencesComponentTest : ComponentTest<PreferencesComponent>() {
 
     private class FakeSettings : BlinklySettings {
         var blinkBreakCountSaveFailure: Throwable? = null
+        var analyticsEnabledSaveFailure: Throwable? = null
 
         override var analyticsEnabled: Boolean = true
+            set(value) {
+                analyticsEnabledSaveFailure?.let { throw it }
+                field = value
+            }
 
         override var blinkBreakCount: Int = 60
             set(value) {

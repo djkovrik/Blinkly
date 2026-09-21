@@ -8,8 +8,16 @@
 	<string>$(BLINKLY_ADS_BUILD_TYPE)</string>
 	<key>BlinklyGardenAdUnitId</key>
 	<string>$(BLINKLY_GARDEN_AD_UNIT_ID)</string>
-	<key>BlinklyAppMetricaApiKey</key>
-	<string>$(BLINKLY_APPMETRICA_API_KEY)</string>
+	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
+	<false/>
+#if BLINKLY_FIREBASE_ANALYTICS_DEBUG
+	<key>FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED</key>
+	<true/>
+#endif
+	<key>GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_PERSONALIZATION_SIGNALS</key>
+	<false/>
+	<key>GOOGLE_ANALYTICS_IDFV_COLLECTION_ENABLED</key>
+	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleURLTypes</key>

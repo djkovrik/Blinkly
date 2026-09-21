@@ -1,7 +1,7 @@
 import SwiftUI
 import compose
+import FirebaseAnalytics
 import FirebaseCore
-import AppMetricaCore
 
 @main
 struct ComposeApp: App {
@@ -9,14 +9,13 @@ struct ComposeApp: App {
 
     init() {
         FirebaseApp.configure()
-        let reporter = AppMetricaBlinklyAnalyticsReporter()
-#if !DEBUG
+        let reporter = FirebaseBlinklyAnalyticsReporter()
+#if DEBUG
+        Analytics.setAnalyticsCollectionEnabled(false)
+#else
         let bootstrapState = MainKt.GetBlinklyAnalyticsBootstrapState()
-        reporter.activate(
-            apiKey: Bundle.main.object(forInfoDictionaryKey: "BlinklyAppMetricaApiKey") as? String ?? "",
-            dataSendingEnabled: bootstrapState.analyticsEnabled,
-            existingInstallation: bootstrapState.existingInstallation
-        )
+        Analytics.setAnalyticsCollectionEnabled(bootstrapState.analyticsEnabled)
+        reporter.activate()
 #endif
         analyticsReporter = reporter
     }
@@ -40,30 +39,23 @@ struct ContentView: UIViewControllerRepresentable {
     }
 }
 
-private final class AppMetricaBlinklyAnalyticsReporter: NSObject, BlinklyIosAnalyticsReporter {
+private final class FirebaseBlinklyAnalyticsReporter: NSObject, BlinklyIosAnalyticsReporter {
     private var active = false
 
-    func activate(apiKey: String, dataSendingEnabled: Bool, existingInstallation: Bool) {
-        guard let configuration = AppMetricaConfiguration(apiKey: apiKey) else {
-            assertionFailure("Unable to create AppMetrica configuration")
-            return
-        }
-
-        configuration.locationTracking = false
-        configuration.revenueAutoTrackingEnabled = false
-        configuration.dataSendingEnabled = dataSendingEnabled
-        configuration.handleFirstActivationAsUpdate = existingInstallation
-        AppMetrica.activate(with: configuration)
+    func activate() {
         active = true
     }
 
     func reportEvent(name: String, parameters: [String: String]) {
         guard active else { return }
-        AppMetrica.reportEvent(name: name, parameters: parameters, onFailure: nil)
+        let firebaseParameters = parameters.reduce(into: [String: Any]()) { result, entry in
+            result[entry.key] = entry.value
+        }
+        Analytics.logEvent(name, parameters: firebaseParameters)
     }
 
     func setDataSendingEnabled(enabled: Bool) {
         guard active else { return }
-        AppMetrica.setDataSendingEnabled(enabled)
+        Analytics.setAnalyticsCollectionEnabled(enabled)
     }
 }

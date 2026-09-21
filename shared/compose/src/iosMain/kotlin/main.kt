@@ -58,7 +58,6 @@ fun GetBlinklyAnalyticsBootstrapState(): BlinklyIosAnalyticsBootstrapState {
     val state = readBlinklyAnalyticsBootstrapState(SharedSettingsFactory())
     return BlinklyIosAnalyticsBootstrapState(
         analyticsEnabled = state.analyticsEnabled,
-        existingInstallation = state.existingInstallation,
     )
 }
 

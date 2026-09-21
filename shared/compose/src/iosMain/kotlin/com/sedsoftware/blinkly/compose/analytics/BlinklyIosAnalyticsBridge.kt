@@ -16,7 +16,6 @@ interface BlinklyIosAnalyticsReporter {
 
 class BlinklyIosAnalyticsBootstrapState(
     val analyticsEnabled: Boolean,
-    val existingInstallation: Boolean,
 )
 
 internal fun BlinklyIosAnalyticsReporter.asDomainReporter(): BlinklyAnalyticsReporter =
