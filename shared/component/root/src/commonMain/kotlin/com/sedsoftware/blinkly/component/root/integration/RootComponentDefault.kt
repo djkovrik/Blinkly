@@ -6,7 +6,7 @@ import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
@@ -254,34 +254,34 @@ class RootComponentDefault private constructor(
 
             is ComponentOutput.Main.OpenPreferences -> {
                 analytics.report(BlinklyAnalyticsEvent.PreferencesOpened)
-                navigation.push(Config.Preferences)
+                navigation.pushNew(Config.Preferences)
             }
 
             is ComponentOutput.Main.OpenProgressTab -> Unit
 
             is ComponentOutput.Trainings.OpenExerciseBlock -> {
-                navigation.push(Config.Workout(output.block, output.source))
+                navigation.pushNew(Config.Workout(output.block, output.source))
             }
 
             is ComponentOutput.Progress.OpenAchievements -> {
                 analytics.report(
                     BlinklyAnalyticsEvent.ProgressDetailsOpened(BlinklyAnalyticsEvent.ProgressScreen.ACHIEVEMENTS)
                 )
-                navigation.push(Config.Achievements)
+                navigation.pushNew(Config.Achievements)
             }
 
             is ComponentOutput.Progress.OpenGarden -> {
                 analytics.report(
                     BlinklyAnalyticsEvent.ProgressDetailsOpened(BlinklyAnalyticsEvent.ProgressScreen.GARDEN)
                 )
-                navigation.push(Config.Garden)
+                navigation.pushNew(Config.Garden)
             }
 
             is ComponentOutput.Reminders.OpenAddNew -> {
                 analytics.report(
                     BlinklyAnalyticsEvent.ReminderFlowOpened(BlinklyAnalyticsEvent.ReminderSource.REMINDERS)
                 )
-                navigation.push(Config.AddNewReminder)
+                navigation.pushNew(Config.AddNewReminder)
             }
 
             is ComponentOutput.Preferences.ThemeStateChanged -> {

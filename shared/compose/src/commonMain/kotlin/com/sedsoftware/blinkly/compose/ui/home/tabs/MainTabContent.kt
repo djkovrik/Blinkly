@@ -56,6 +56,7 @@ import com.sedsoftware.blinkly.compose.ui.extension.asDescription
 import com.sedsoftware.blinkly.compose.ui.extension.asLabel
 import com.sedsoftware.blinkly.compose.ui.extension.asTitle
 import com.sedsoftware.blinkly.compose.ui.extension.isActionable
+import com.sedsoftware.blinkly.compose.ui.extension.rememberClickOnce
 import com.sedsoftware.blinkly.compose.ui.extension.shimmering
 import com.sedsoftware.blinkly.compose.ui.widget.BlinklySpacing
 import com.sedsoftware.blinkly.domain.model.HighlightOfTheDay
@@ -148,6 +149,8 @@ private fun FirstCardTreeGrowth(
     onCtaClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val onCtaClickOnce = rememberClickOnce(onClick = onCtaClick)
+
     ElevatedCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -156,7 +159,7 @@ private fun FirstCardTreeGrowth(
             defaultElevation = 4.dp,
             pressedElevation = 1.dp,
         ),
-        onClick = onCtaClick,
+        onClick = onCtaClickOnce,
         enabled = model.ctaState.isActionable(),
         modifier = modifier,
     ) {

@@ -10,10 +10,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.ripple
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -122,4 +124,29 @@ fun Modifier.clickableOnce(
             }
         }
     )
+}
+
+@Composable
+fun rememberClickOnce(
+    onClick: () -> Unit,
+    debounceMs: Long = 500L,
+): () -> Unit {
+    val currentOnClick = rememberUpdatedState(onClick)
+    val isEnabled = remember { mutableStateOf(true) }
+
+    LaunchedEffect(isEnabled.value, debounceMs) {
+        if (!isEnabled.value) {
+            delay(debounceMs)
+            isEnabled.value = true
+        }
+    }
+
+    return remember {
+        {
+            if (isEnabled.value) {
+                isEnabled.value = false
+                currentOnClick.value()
+            }
+        }
+    }
 }
