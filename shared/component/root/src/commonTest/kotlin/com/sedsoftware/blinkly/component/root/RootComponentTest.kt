@@ -6,6 +6,7 @@ import assertk.assertions.isTrue
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.router.stack.active
+import com.arkivanov.decompose.router.stack.items
 import com.arkivanov.essenty.backhandler.BackDispatcher
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.sedsoftware.blinkly.component.ComponentTest
@@ -45,6 +46,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
@@ -228,6 +230,26 @@ class RootComponentTest : ComponentTest<RootComponent>() {
         (component.childStack.active.instance as RootComponent.Child.Workout).component.onBackClick()
         // then
         assertThat(component.childStack.active.instance is RootComponent.Child.HomeScreen).isTrue()
+    }
+
+    @Test
+    fun `when main CTA clicked twice then only one workout is pushed`() = runTest(testScheduler) {
+        // given
+        fakeSettings.onboardingDisplayed = true
+        every { timeUtilsMock.now() } returns Instant.parse("2025-01-15T14:00:00Z")
+        every { calendarWatcherMock.calendar } returns flowOf(emptyList())
+        val testComponent = createComponent()
+        testScheduler.advanceUntilIdle()
+        val homeScreenChild = testComponent.childStack.active.instance as RootComponent.Child.HomeScreen
+        val mainTabChild = homeScreenChild.component.childStack.active.instance as HomeScreenComponent.Child.MainTab
+
+        // when
+        mainTabChild.component.onPrimaryCtaClick()
+        mainTabChild.component.onPrimaryCtaClick()
+
+        // then
+        assertThat(testComponent.childStack.items.size).isEqualTo(2)
+        assertThat(testComponent.childStack.active.instance is RootComponent.Child.Workout).isTrue()
     }
 
     @Test
