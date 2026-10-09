@@ -243,6 +243,7 @@ dependencies {
     implementation(project(":shared:compose"))
     implementation(project(":shared:domain"))
     implementation(project(":shared:settings"))
+    implementation(project(":shared:alarm"))
 
     implementation(platform(libs.lib.firebase.bom))
     implementation(libs.android.firebase.analytics)
