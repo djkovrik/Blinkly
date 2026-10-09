@@ -11,6 +11,8 @@
 
     <application
         android:name=".BlinklyApplication"
+        android:appComponentFactory="com.sedsoftware.blinkly.alarm.impl.BlinklyAlarmComponentFactory"
+        tools:replace="android:appComponentFactory"
         android:icon="@mipmap/ic_launcher"
         android:label="Blinkly"
         android:theme="@style/Theme.App.Starting">

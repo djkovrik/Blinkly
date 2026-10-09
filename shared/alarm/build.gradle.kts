@@ -22,6 +22,8 @@ kotlin {
         androidUnitTest {
             dependencies {
                 implementation(libs.lib.alarmee)
+                implementation(libs.test.junit4)
+                implementation(libs.test.robolectric)
             }
         }
 
@@ -42,4 +44,8 @@ kotlin {
         freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
         freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
     }
+}
+
+android {
+    testOptions.unitTests.isIncludeAndroidResources = true
 }
