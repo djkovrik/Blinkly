@@ -99,6 +99,8 @@ class BlinklyNotificationReceiverTest {
 
 @Implements(NotificationManager::class)
 class FailingNotificationManager {
+    // Robolectric requires a method matching the Android API, even for a constant result.
+    @Suppress("FunctionOnlyReturningConstant")
     @Implementation
     fun areNotificationsEnabled(): Boolean = true
 
